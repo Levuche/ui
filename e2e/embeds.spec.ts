@@ -1,3 +1,4 @@
+import { isSafeMediaSrc } from '../src/system/href';
 import { expect, test } from '@playwright/test';
 import { youtubeId } from '../src';
 import {
@@ -68,4 +69,16 @@ test('embedFor plays listed services and leaves the rest as links', () => {
   expect(
     embedFor('https://vimeo.com/76979871', { services: ['spotify'] })
   ).toBeNull();
+});
+
+test('audio takes a link or a local clip, nothing else', () => {
+  expect(isSafeMediaSrc('https://example.com/a.mp3')).toBe(true);
+  expect(isSafeMediaSrc('/media/a.mp3')).toBe(true);
+  expect(isSafeMediaSrc('blob:https://example.com/1234')).toBe(true);
+  expect(isSafeMediaSrc('data:audio/wav;base64,AAAA')).toBe(true);
+  expect(isSafeMediaSrc('data:text/html;base64,AAAA')).toBe(false);
+  expect(isSafeMediaSrc('data:video/mp4;base64,AAAA')).toBe(false);
+  expect(isSafeMediaSrc('data:video/mp4;base64,AAAA', 'video')).toBe(true);
+  expect(isSafeMediaSrc('javascript:alert(1)')).toBe(false);
+  expect(isSafeMediaSrc('mailto:a@example.com')).toBe(false);
 });

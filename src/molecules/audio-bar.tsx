@@ -5,7 +5,7 @@ import { PauseIcon, PlayIcon } from '../atoms/icons';
 import { SiteLink } from '../atoms/link';
 import { Thumb } from '../atoms/thumb';
 import { cn } from '../system/cn';
-import { isSafeHref } from '../system/href';
+import { isSafeMediaSrc } from '../system/href';
 
 export type AudioBarLabels = {
   /** {title} is filled in. */
@@ -68,7 +68,7 @@ export function AudioBar({
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState(0);
   const [total, setTotal] = useState(0);
-  if (!isSafeHref(src)) return null;
+  if (!isSafeMediaSrc(src)) return null;
 
   const toggle = () => {
     const el = audio.current;

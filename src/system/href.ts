@@ -67,3 +67,21 @@ export function linkAttrs(
     ...(rel ? { rel } : {}),
   };
 }
+
+/**
+ * A source for an audio or video element: a safe link, or a local file the
+ * page made itself (a blob: preview, or a data: clip of that media type).
+ * A media element never runs what it loads, so these are safe there and
+ * nowhere else.
+ */
+export function isSafeMediaSrc(
+  src: string | null | undefined,
+  kind: 'audio' | 'video' = 'audio'
+): src is string {
+  if (typeof src !== 'string') return false;
+  const value = src.trim();
+  if (value.startsWith('blob:') || value.startsWith(`data:${kind}/`)) {
+    return value === value.replace(/[\s<>"']/g, '');
+  }
+  return isSafeHref(value) && !/^(mailto|tel|sms):/i.test(value);
+}
