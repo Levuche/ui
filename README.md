@@ -128,13 +128,82 @@ own buttons and fields can use `min-h-control` too, without defining it
 again. The widths are named `site` so an app's own `max-w-page` stays its
 own.
 
+## Grid pages
+
+`SiteGrid` lays a page out on a grid of 10 columns, with a separate
+arrangement for a phone, a tablet and a desktop, so each block can sit in a
+different place, at a different size, on each screen. It's what a
+drag-and-drop page editor saves and shows.
+
+```tsx
+import { SiteGrid, type PageLayouts } from '@levuche/ui';
+
+<SiteGrid
+  as="main"
+  blocks={[
+    {
+      id: 'profile',
+      kind: 'profile',
+      sticky: true,
+      children: <CreatorHeader name="Desi Origins" />,
+    },
+    {
+      id: 'shop',
+      kind: 'link',
+      children: (
+        <SiteLinkButton href="/shop" fullWidth>
+          Shop
+        </SiteLinkButton>
+      ),
+    },
+    {
+      id: 'video',
+      kind: 'media',
+      children: <YouTubeVideo video="…" title="…" />,
+    },
+  ]}
+  layouts={savedLayouts /* PageLayouts, or leave it out */}
+/>;
+```
+
+- **Layouts:** one list per screen of `{ i, x, y, w, h }`: the block's id, its
+  first column (0 to 9) and row, and how many columns and rows it spans. It's
+  the shape drag-and-drop grid editors read and write, so an editor's output
+  can be saved as it is.
+- **Rows:** as many as the page needs. A row is at least 3rem (48 px) tall
+  and grows to fit what's in it, so nothing is ever cut off.
+- **Screens:** a tablet from 42rem (672 px) wide and a desktop from 56rem
+  (896 px), measured on the page itself rather than the window, so a page in
+  an editor's preview pane switches at the same sizes.
+- **Starting arrangement:** a screen with nothing saved gets
+  `defaultLayout`. A phone has everything one under the other. A tablet has
+  the profile on the left and the rest on the right. A desktop has the rest
+  in a grid on the left, two links or cards to a row where they fit, and the
+  profile on the right. Set `side: true` on any block to put it in the
+  profile's column too.
+- **Size limits:** each block has a `kind` (profile, link, links, card,
+  media, gallery, text or band), and `BLOCK_SIZES` gives each kind's smallest
+  and largest width and height in rem. `limitsFor(kind, screen)` turns those
+  into the `minW`, `maxW`, `minH` and `maxH` an editor takes, in columns and
+  rows for that screen.
+- **Saved layouts are checked:** `fitLayout` drops blocks that are gone, keeps
+  each one inside the 10 columns and its size limits, moves a block down if it
+  would cover another, and adds new blocks at the bottom. `SiteGrid` runs it
+  on every layout it's given.
+- **Reading order:** screen readers and the Tab key follow the order of
+  `blocks`, whatever the arrangement, so put the profile first.
+
+In Storybook, **Pages/Grid page** shows the sample page on each screen, and a
+creator's own desktop arrangement. Each story checks where the blocks landed,
+that no block covers another and that the page never scrolls sideways.
+
 ## What's in it
 
 | Group           | Blocks                                                                                                        |
 | --------------- | ------------------------------------------------------------------------------------------------------------- |
 | Theme           | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `SiteTheme`                                    |
 | Buttons, text   | `SiteButton`, `SiteLinkButton`, `siteButtonClasses`, `SiteHeading`, `SiteText`, `SiteSection`, `SiteDivider`  |
-| Page            | `SitePage`                                                                                                    |
+| Page            | `SitePage`, `SiteGrid`                                                                                        |
 | Links           | `LinkTile`, `LinkList`, `FeaturedLink`, `SocialIcons`, `ImageGrid`                                            |
 | Profile         | `CreatorHeader`, `Avatar`                                                                                     |
 | Selling         | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`                                            |
