@@ -15,6 +15,7 @@ import {
   SellField,
   type SellProps,
 } from '../molecules/sell-button';
+import type { ImageSrc } from '../system/image';
 
 /**
  * A call or session to book: what it is, how long, the price, and a link to
@@ -51,7 +52,7 @@ export function BookingCard({
     href?: string;
     buttonLabel?: string;
     buttonVariant?: SiteButtonVariant;
-    image?: string | null;
+    image?: ImageSrc | null;
     headingAs?: HeadingTag;
   }) {
   return (
@@ -190,7 +191,7 @@ export function LeadMagnet({
 }: BlockRootProps & {
   title: string;
   detail?: ReactNode;
-  image?: string | null;
+  image?: ImageSrc | null;
   /** A free item to claim with the address. */
   sell?: SellProps['sell'];
   buttonLabel?: string;

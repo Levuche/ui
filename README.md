@@ -445,6 +445,36 @@ own buttons and fields can use `min-h-control` too, without defining it
 again. The widths are named `site` so an app's own `max-w-page` stays its
 own.
 
+### Pictures in the right size
+
+Every block that shows a picture takes a plain address or an `ImageSource`
+with the other sizes it comes in, so a phone downloads a small copy:
+
+```tsx
+<SiteImage
+  alt="Chai on a clay stove"
+  src={{
+    src: 'https://cdn.example.com/chai-800.jpg',
+    srcSet:
+      'https://cdn.example.com/chai-400.jpg 400w, https://cdn.example.com/chai-800.jpg 800w',
+    width: 800,
+    height: 600,
+  }}
+/>
+```
+
+- **Each block sets `sizes`** from its width on a phone and in the 576 px
+  column (`columnSizes(1 / 3)` for three to a row); pass `sizes` in the source
+  only for a page laid out differently, such as a grid page.
+- **Nothing jumps while pictures load:** a block's shape, or the picture's own
+  `width` and `height`, keeps its space.
+- **Pictures load when near the screen.** The header's picture loads at once,
+  as it's at the top; mark the first other picture with `priority: true`.
+- **Making the sizes is the page app's job.** BuildBase Assets stores a file
+  as it was uploaded, with no other sizes, and its uploads for an app's users
+  are only workspace and profile pictures, so creator media needs an image
+  service that resizes by address.
+
 ## Grid pages
 
 `SiteGrid` lays a page out on a grid of 10 columns, with a separate

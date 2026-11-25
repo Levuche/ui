@@ -20,10 +20,11 @@ import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { useControllableState } from '../system/state';
+import type { ImageSrc } from '../system/image';
 
 /** One slide in an ImageCarousel. */
 export type CarouselSlide = {
-  src: string | null | undefined;
+  src: ImageSrc | null | undefined;
   /** What the picture shows. */
   alt: string;
   caption?: ReactNode;

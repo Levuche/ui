@@ -8,6 +8,7 @@ import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { PlayFrame } from '../molecules/play-frame';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
+import type { ImageSrc } from '../system/image';
 
 /* ---------------------------------------------------------------- StatsRow */
 
@@ -222,7 +223,7 @@ export function MapCard({
   lng?: number;
   hours?: OpeningHours[];
   /** A picture of the place, shown until the map loads. */
-  image?: string | null;
+  image?: ImageSrc | null;
   /** Your own directions link. Built from the pin or address if left out. */
   directionsHref?: string;
   showMap?: boolean;
