@@ -119,6 +119,8 @@ npm run check        # ESLint, Prettier, TypeScript
 npm run build        # builds the gallery
 npx playwright install chromium
 npm run test:e2e     # end-to-end tests against the built gallery
+npm run storybook    # Storybook at http://localhost:6006
+npm run test:stories # every story's interaction and accessibility test
 ```
 
 The gallery (`gallery/`) shows every block in three themes: the sample
@@ -131,6 +133,21 @@ scrolling, and accessibility with axe (WCAG 2.2 AA, no serious or critical
 problems). `e2e/theme.spec.ts` checks the YouTube address reader and that a
 theme only lets plain colours and fonts into CSS.
 
+### Storybook
+
+Storybook (`stories/`, set up in `.storybook/`) has a story for each block
+and state, with its props as controls and docs built from them. The toolbar's
+Theme menu shows any story in the sample creator's light or dark scheme or in
+a creator's own theme, and `Pages/Creator page` shows a whole page in each.
+
+Each story is also a test. `npm run test:stories` opens every story in
+Chromium (Vitest with the Storybook plugin), runs its play function, which
+clicks and types like a visitor (the checkout's consent box, the newsletter's
+address check, the video loading only on play, new tabs for other sites,
+44 px tap targets), and fails on any axe problem (WCAG 2.2 AA). The
+Accessibility tab shows the same checks while you work. CI runs them as
+"Storybook tests" and builds Storybook.
+
 ### Adding a block
 
 1. Build it from its design board with `--site-*` tokens only (no raw
@@ -138,7 +155,9 @@ theme only lets plain colours and fonts into CSS.
    least 44 px for anything tapped.
 2. Export it from `src/index.ts`.
 3. Show it in `gallery/gallery.tsx`, inside a `Group`.
-4. Test what it does in `e2e/blocks.spec.ts`.
+4. Add `stories/<Block>.stories.tsx`, with a play function that does what a
+   visitor would, and add it to the sample page in `stories/sample-page.tsx`.
+5. Test what it does in `e2e/blocks.spec.ts`.
 
 ## Branches and releases
 

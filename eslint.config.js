@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import reactHooks from 'eslint-plugin-react-hooks';
+import storybook from 'eslint-plugin-storybook';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -11,6 +12,8 @@ export default tseslint.config(
       'gallery-dist',
       'test-results',
       'playwright-report',
+      'storybook-static',
+      '!.storybook',
     ],
   },
   js.configs.recommended,
@@ -21,5 +24,6 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
     plugins: { 'react-hooks': reactHooks },
     rules: reactHooks.configs.recommended.rules,
-  }
+  },
+  ...storybook.configs['flat/recommended']
 );
