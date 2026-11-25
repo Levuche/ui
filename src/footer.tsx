@@ -17,7 +17,11 @@ export function CreatorFooter({
     >
       <nav aria-label="Site policies" className="flex gap-3">
         {links.map((link) => (
-          <a key={link.href} href={link.href} className="text-site-link">
+          <a
+            key={`${link.label} ${link.href}`}
+            href={link.href}
+            className="text-site-link"
+          >
             {link.label}
           </a>
         ))}
