@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "The blocks creator sites on levuche.page are built from, themeable per creator.",
-  "license": "UNLICENSED",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Levuche/ui.git"
