@@ -264,3 +264,9 @@
   --color-site-field: var(--site-field, var(--site-bg));
   --color-site-on-field: var(--site-on-field, var(--site-text));
 }
+/* LogoStrip's scrolling row: the list is drawn twice and moves by half. */
+@keyframes levuche-marquee {
+  to {
+    translate: -50% 0;
+  }
+}

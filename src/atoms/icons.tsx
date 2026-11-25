@@ -69,6 +69,26 @@ export const ChevronDownIcon = (p: IconProps) => (
     <path d="M7 10l5 5 5-5" />
   </Svg>
 );
+export const ChevronLeftIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M15 6l-6 6 6 6" />
+  </Svg>
+);
+export const ChevronRightIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M9 6l6 6-6 6" />
+  </Svg>
+);
+export const PauseIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M9 5v14M15 5v14" />
+  </Svg>
+);
+export const ArrowsHorizontalIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M8 7l-5 5 5 5M16 7l5 5-5 5" />
+  </Svg>
+);
 export const LinkIcon = (p: IconProps) => (
   <Svg {...p}>
     <path d="M10 14a4 4 0 005.6 0l3-3a4 4 0 00-5.6-5.6l-1 1" />

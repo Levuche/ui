@@ -168,6 +168,18 @@ export {
 export { FaqList, Testimonials } from './organisms/trust';
 export { ReelGrid, YouTubeVideo, youtubeId } from './organisms/media';
 export { ImageGrid } from './organisms/images';
+export { LogoStrip, SiteImage, type Logo } from './organisms/pictures';
+export {
+  CAROUSEL_LABELS,
+  ImageCarousel,
+  type CarouselLabels,
+  type CarouselSlide,
+} from './organisms/carousel';
+export {
+  BEFORE_AFTER_LABELS,
+  BeforeAfter,
+  type BeforeAfterLabels,
+} from './organisms/before-after';
 export { NewsletterBand } from './organisms/newsletter';
 export { CreatorFooter } from './organisms/footer';
 

@@ -202,6 +202,38 @@ export const BLOCKS = [
     client: false,
     summary: 'Policy links and the credit line',
   },
+  {
+    id: 'site-image',
+    component: 'SiteImage',
+    kind: 'media',
+    group: 'media',
+    client: false,
+    summary: 'One picture, with a caption and a link',
+  },
+  {
+    id: 'image-carousel',
+    component: 'ImageCarousel',
+    kind: 'media',
+    group: 'media',
+    client: true,
+    summary: 'Pictures to swipe through, with captions and buttons',
+  },
+  {
+    id: 'before-after',
+    component: 'BeforeAfter',
+    kind: 'media',
+    group: 'media',
+    client: true,
+    summary: 'Drag to compare two pictures',
+  },
+  {
+    id: 'logo-strip',
+    component: 'LogoStrip',
+    kind: 'band',
+    group: 'trust',
+    client: false,
+    summary: 'Brand logos in a row, still or scrolling',
+  },
 ] as const satisfies readonly BlockInfo[];
 
 /** The id of a block in this package. */
