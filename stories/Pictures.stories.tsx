@@ -229,8 +229,9 @@ export const LogosScrolling: StoryObj<typeof LogoStrip> = {
 };
 
 /*
- * In a right-to-left script the row moves to the right, and the logos still
- * fill the strip at every point of the loop.
+ * In a right-to-left script the row starts at the right-hand edge and moves
+ * to the right, by half its length each pass, so the second copy takes the
+ * first one's place and the loop has no seam.
  */
 export const LogosScrollingRightToLeft: StoryObj<typeof LogoStrip> = {
   globals: { direction: 'rtl' },
@@ -244,12 +245,15 @@ export const LogosScrollingRightToLeft: StoryObj<typeof LogoStrip> = {
     if (!motion) return;
     motion.pause();
     const length = Number(motion.effect?.getComputedTiming().duration ?? 0);
-    for (const part of [0.25, 0.5, 0.9]) {
-      motion.currentTime = length * part;
-      const row = list.getBoundingClientRect();
-      const room = strip.getBoundingClientRect();
-      await expect(row.left).toBeLessThanOrEqual(room.left + 1);
-      await expect(row.right).toBeGreaterThanOrEqual(room.right - 1);
-    }
+    motion.currentTime = 0;
+    const start = list.getBoundingClientRect();
+    await expect(
+      Math.abs(start.right - strip.getBoundingClientRect().right)
+    ).toBeLessThan(1);
+    motion.currentTime = length / 2;
+    const middle = list.getBoundingClientRect();
+    await expect(
+      Math.abs(middle.left - start.left - start.width / 4)
+    ).toBeLessThan(1);
   },
 };
