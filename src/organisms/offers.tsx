@@ -1,6 +1,6 @@
 import type { FormEventHandler, ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
-import { SiteLinkButton, type SiteButtonVariant } from '../atoms/button';
+import type { SiteButtonVariant } from '../atoms/button';
 import { ClockIcon } from '../atoms/icons';
 import { Badge } from '../atoms/text';
 import { cn } from '../system/cn';
@@ -10,14 +10,26 @@ import { CheckList } from '../molecules/check-list';
 import { EmailForm, type EmailFormLabels } from '../molecules/email-form';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { Price } from '../molecules/price';
+import {
+  SellButton,
+  SellField,
+  type SellProps,
+} from '../molecules/sell-button';
 
-/** A call or session to book: what it is, how long, the price and a link. */
+/**
+ * A call or session to book: what it is, how long, the price, and a link to
+ * the booking page or, with `sell`, a button that starts a BuildBase booking.
+ */
 export function BookingCard({
   title,
   detail,
   duration,
   price,
   href,
+  sell,
+  sellState,
+  sellLabels,
+  renderBuy,
   buttonLabel = 'Book a call',
   buttonVariant = 'solid',
   image,
@@ -27,15 +39,16 @@ export function BookingCard({
   nofollow,
   ...root
 }: BlockRootProps &
-  LinkBehavior & {
+  LinkBehavior &
+  SellProps & {
     title: string;
     detail?: ReactNode;
     /** As "30 min". */
     duration: string;
     /** As "$40" or "Free". */
     price: string;
-    /** The booking page. */
-    href: string;
+    /** The booking page. Not needed with `sell`. */
+    href?: string;
     buttonLabel?: string;
     buttonVariant?: SiteButtonVariant;
     image?: string | null;
@@ -56,17 +69,20 @@ export function BookingCard({
         </span>
         <Price value={price} />
       </p>
-      <SiteLinkButton
+      <SellButton
         href={href}
+        sell={sell}
+        sellState={sellState}
+        sellLabels={sellLabels}
+        renderBuy={renderBuy}
         variant={buttonVariant}
         newTab={newTab}
         sponsored={sponsored}
         nofollow={nofollow}
         action="book"
-        fullWidth
       >
         {buttonLabel}
-      </SiteLinkButton>
+      </SellButton>
     </Block>
   );
 }
@@ -79,6 +95,10 @@ export function MembershipCard({
   period = 'month',
   perks,
   href,
+  sell,
+  sellState,
+  sellLabels,
+  renderBuy,
   buttonLabel = 'Join',
   featured = false,
   featuredLabel,
@@ -88,7 +108,8 @@ export function MembershipCard({
   nofollow,
   ...root
 }: BlockRootProps &
-  LinkBehavior & {
+  LinkBehavior &
+  SellProps & {
     title: string;
     price: string;
     /** The price before a discount. */
@@ -96,7 +117,8 @@ export function MembershipCard({
     /** Shown as "/ month". */
     period?: string;
     perks: ReactNode[];
-    href: string;
+    /** Where members join. Not needed with `sell`. */
+    href?: string;
     buttonLabel?: string;
     /** Outlines the tier in the button colour, for the one to pick. */
     featured?: boolean;
@@ -125,17 +147,20 @@ export function MembershipCard({
         <Price value={price} was={was} period={period} size="lg" />
       </p>
       <CheckList items={perks} />
-      <SiteLinkButton
+      <SellButton
         href={href}
+        sell={sell}
+        sellState={sellState}
+        sellLabels={sellLabels}
+        renderBuy={renderBuy}
         variant={featured ? 'solid' : 'outline'}
         newTab={newTab}
         sponsored={sponsored}
         nofollow={nofollow}
         action="join"
-        fullWidth
       >
         {buttonLabel}
-      </SiteLinkButton>
+      </SellButton>
     </Block>
   );
 }
@@ -146,7 +171,8 @@ export type LeadMagnetLabels = EmailFormLabels & { free: string };
 /**
  * Something free in return for an email address, such as a guide: the
  * visitor types their address and the creator's app sends it. `status` is
- * how the send went (see EmailForm).
+ * how the send went (see EmailForm). With `sell` (a free item), the form
+ * also carries it, so the app can make the claim through BuildBase.
  */
 export function LeadMagnet({
   title,
@@ -158,12 +184,15 @@ export function LeadMagnet({
   status,
   onSubmit,
   action,
+  sell,
   headingAs = 'h3',
   ...root
 }: BlockRootProps & {
   title: string;
   detail?: ReactNode;
   image?: string | null;
+  /** A free item to claim with the address. */
+  sell?: SellProps['sell'];
   buttonLabel?: string;
   placeholder?: string;
   labels?: Partial<LeadMagnetLabels>;
@@ -194,7 +223,9 @@ export function LeadMagnet({
           ...(placeholder ? { placeholder } : {}),
           ...formLabels,
         }}
-      />
+      >
+        <SellField sell={sell} />
+      </EmailForm>
     </Block>
   );
 }

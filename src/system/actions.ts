@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, type RefObject } from 'react';
+import { readSell, type SellRef } from './sell';
 
 /*
  * Clicks and sign-ups on blocks, for analytics (such as Buildbase tracking).
@@ -19,6 +20,12 @@ export type BlockAction = {
   label: string;
   /** Where a link goes. */
   href?: string;
+  /**
+   * What the press buys, when the block sells through BuildBase: start the
+   * checkout with it. Checked, but a visitor can change a page, so the
+   * server checks the price again as checkout always does.
+   */
+  sell?: SellRef;
 };
 
 /**
@@ -57,11 +64,17 @@ export function readBlockAction(event: Event): BlockAction | null {
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 100);
+  const sell = readSell(
+    control instanceof HTMLFormElement
+      ? (control.elements.namedItem('sell') as HTMLInputElement | null)?.value
+      : control.getAttribute('data-sell')
+  );
   return {
     action: named ?? fallback,
     block: control.closest('[data-block]')?.getAttribute('data-block') ?? null,
     label,
     ...(control instanceof HTMLAnchorElement ? { href: control.href } : {}),
+    ...(sell ? { sell } : {}),
   };
 }
 

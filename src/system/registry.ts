@@ -93,6 +93,22 @@ export const BLOCKS = [
     summary: 'Smaller products in a grid',
   },
   {
+    id: 'credit-pack',
+    component: 'CreditPack',
+    kind: 'card',
+    group: 'selling',
+    client: false,
+    summary: 'A pack of credits with its price and a buy button',
+  },
+  {
+    id: 'slot-picker',
+    component: 'SlotPicker',
+    kind: 'card',
+    group: 'selling',
+    client: true,
+    summary: 'Free times for a booking, then a button to book one',
+  },
+  {
     id: 'pack-checkout',
     component: 'PackCheckout',
     kind: 'band',

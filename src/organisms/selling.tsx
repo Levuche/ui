@@ -7,6 +7,7 @@ import {
   type SiteButtonVariant,
 } from '../atoms/button';
 import { SiteLink } from '../atoms/link';
+import { Badge } from '../atoms/text';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
@@ -14,8 +15,17 @@ import type { FormStatus } from '../system/state';
 import { FormNotice } from '../molecules/form-notice';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { Price } from '../molecules/price';
+import {
+  SellButton,
+  SellField,
+  type SellProps,
+} from '../molecules/sell-button';
+import type { SellRef, SellState } from '../system/sell';
 
-/** A pack in a list: thumbnail, title, what's in it, price. */
+/**
+ * A pack in a list: thumbnail, title, what's in it, price. The row links to
+ * `href`, or with `sell` gets a small buy button for BuildBase selling.
+ */
 export function PackRow({
   title,
   detail,
@@ -26,9 +36,17 @@ export function PackRow({
   newTab,
   sponsored,
   nofollow,
+  sell,
+  sellState,
+  sellLabels,
+  renderBuy,
+  buttonLabel = 'Buy',
   ...root
 }: BlockRootProps &
-  LinkBehavior & {
+  LinkBehavior &
+  SellProps & {
+    /** The words on the buy button, with `sell`. */
+    buttonLabel?: ReactNode;
     title: string;
     detail?: ReactNode;
     price: string;
@@ -51,7 +69,21 @@ export function PackRow({
   const row = 'text-site-text flex items-center gap-3 no-underline';
   return (
     <Block name="pack-row" {...root}>
-      {href ? (
+      {sell ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <div className={cn(row, 'min-w-48 flex-1')}>{body}</div>
+          <SellButton
+            sell={sell}
+            sellState={sellState}
+            sellLabels={sellLabels}
+            renderBuy={renderBuy}
+            size="sm"
+            fullWidth={false}
+          >
+            {buttonLabel}
+          </SellButton>
+        </div>
+      ) : href ? (
         <SiteLink
           href={href}
           newTab={newTab}
@@ -114,9 +146,12 @@ export function PackCheckout({
   status = 'idle',
   onSubmit,
   action,
+  sell,
   ...root
 }: BlockRootProps & {
   price: string;
+  /** What the form buys through BuildBase, sent as a hidden `sell` field. */
+  sell?: SellRef;
   consent?: ReactNode;
   /** Defaults to "I'll take it, {price}". */
   buttonLabel?: ReactNode;
@@ -130,12 +165,14 @@ export function PackCheckout({
     <Block
       as="form"
       name="pack-checkout"
+      data-action="buy"
       defaults={{ tone: 'plain' }}
       action={action}
       method={typeof action === 'string' ? 'post' : undefined}
       onSubmit={onSubmit}
       {...root}
     >
+      <SellField sell={sell} />
       <label className="text-site-text-2 flex items-start gap-2.5 text-sm leading-normal">
         <input
           type="checkbox"
@@ -174,20 +211,28 @@ export function FeaturedPack({
   action,
   buttonLabel = 'I’ll take it',
   headingAs = 'h2',
+  sell,
+  sellState,
+  sellLabels,
+  renderBuy,
   ...root
-}: BlockRootProps & {
-  title: string;
-  detail?: ReactNode;
-  price: string;
-  was?: string;
-  image?: string | null;
-  imageAlt?: string;
-  ratio?: ThumbRatio;
-  /** The buy control; defaults to a pill with `buttonLabel` that does nothing. */
-  action?: ReactNode;
-  buttonLabel?: ReactNode;
-  headingAs?: HeadingTag;
-}) {
+}: BlockRootProps &
+  SellProps & {
+    title: string;
+    detail?: ReactNode;
+    price: string;
+    was?: string;
+    image?: string | null;
+    imageAlt?: string;
+    ratio?: ThumbRatio;
+    /**
+     * The buy control. Defaults to a buy button for `sell`, or else a pill with
+     * `buttonLabel` that does nothing.
+     */
+    action?: ReactNode;
+    buttonLabel?: ReactNode;
+    headingAs?: HeadingTag;
+  }) {
   return (
     <Block as="article" name="featured-pack" {...root}>
       <ItemHead
@@ -201,11 +246,23 @@ export function FeaturedPack({
       />
       <div className="flex items-center justify-between gap-3">
         <Price value={price} was={was} size="lg" />
-        {action ?? (
-          <span className={siteButtonClasses({ size: 'sm' })}>
-            {buttonLabel}
-          </span>
-        )}
+        {action ??
+          (sell ? (
+            <SellButton
+              sell={sell}
+              sellState={sellState}
+              sellLabels={sellLabels}
+              renderBuy={renderBuy}
+              size="sm"
+              fullWidth={false}
+            >
+              {buttonLabel}
+            </SellButton>
+          ) : (
+            <span className={siteButtonClasses({ size: 'sm' })}>
+              {buttonLabel}
+            </span>
+          ))}
       </div>
     </Block>
   );
@@ -215,18 +272,27 @@ export function FeaturedPack({
 export function PackGrid({
   packs,
   columns = 2,
+  buttonLabel = 'Buy',
+  sellLabels,
+  renderBuy,
   ...root
-}: BlockRootProps & {
-  packs: (LinkBehavior & {
-    title: string;
-    price: string;
-    was?: string;
-    image?: string | null;
-    href?: string;
-  })[];
-  /** Packs to a row from a tablet up; two on a phone. */
-  columns?: 2 | 3 | 4;
-}) {
+}: BlockRootProps &
+  Pick<SellProps, 'sellLabels' | 'renderBuy'> & {
+    packs: (LinkBehavior & {
+      title: string;
+      price: string;
+      was?: string;
+      image?: string | null;
+      href?: string;
+      /** Sells the pack through BuildBase, with a buy button on the tile. */
+      sell?: SellRef;
+      sellState?: SellState;
+    })[];
+    /** The words on each buy button, for packs with `sell`. */
+    buttonLabel?: ReactNode;
+    /** Packs to a row from a tablet up; two on a phone. */
+    columns?: 2 | 3 | 4;
+  }) {
   return (
     <Block name="pack-grid" defaults={{ tone: 'plain' }} {...root}>
       <ul
@@ -236,36 +302,160 @@ export function PackGrid({
           columns === 4 && 'md:grid-cols-4'
         )}
       >
-        {packs.map(({ title, price, was, image, href, ...link }, i) => {
-          const body = (
-            <>
-              <Thumb src={image} className="h-15 w-full" />
-              <strong>{title}</strong>
-              <Price value={price} was={was} size="sm" />
-            </>
-          );
-          const tile =
-            'bg-site-surface text-site-text rounded-block flex h-full flex-col gap-1.5 p-2.5 no-underline';
-          return (
-            <li key={`${i}-${title}`} className="m-0">
-              {href ? (
-                <SiteLink
-                  href={href}
-                  newTab={link.newTab}
-                  sponsored={link.sponsored}
-                  nofollow={link.nofollow}
-                  action="view_product"
-                  className={tile}
-                >
-                  {body}
-                </SiteLink>
-              ) : (
-                <div className={tile}>{body}</div>
-              )}
-            </li>
-          );
-        })}
+        {packs.map(
+          ({ title, price, was, image, href, sell, sellState, ...link }, i) => {
+            const body = (
+              <>
+                <Thumb src={image} className="h-15 w-full" />
+                <strong>{title}</strong>
+                <Price value={price} was={was} size="sm" />
+              </>
+            );
+            const tile =
+              'bg-site-surface text-site-text rounded-block flex h-full flex-col gap-1.5 p-2.5 no-underline';
+            return (
+              <li key={`${i}-${title}`} className="m-0">
+                {sell ? (
+                  <div className={tile}>
+                    {body}
+                    <SellButton
+                      sell={sell}
+                      sellState={sellState}
+                      sellLabels={sellLabels}
+                      renderBuy={renderBuy}
+                      size="sm"
+                      className="mt-auto"
+                    >
+                      {buttonLabel}
+                    </SellButton>
+                  </div>
+                ) : href ? (
+                  <SiteLink
+                    href={href}
+                    newTab={link.newTab}
+                    sponsored={link.sponsored}
+                    nofollow={link.nofollow}
+                    action="view_product"
+                    className={tile}
+                  >
+                    {body}
+                  </SiteLink>
+                ) : (
+                  <div className={tile}>{body}</div>
+                )}
+              </li>
+            );
+          }
+        )}
       </ul>
+    </Block>
+  );
+}
+
+/** The words a credit pack shows. */
+export type CreditPackLabels = {
+  /** {n} is filled in. */
+  credits: string;
+  /** {n} is filled in. */
+  bonus: string;
+  button: string;
+};
+
+export const CREDIT_PACK_LABELS: CreditPackLabels = {
+  credits: '{n} credits',
+  bonus: '+{n} bonus',
+  button: 'Buy credits',
+};
+
+/**
+ * A pack of credits: how many, any bonus, the price, how long they last and
+ * a buy button. With `sell` (a BuildBase credit package) the press reports
+ * it; otherwise the button links to `href`.
+ */
+export function CreditPack({
+  credits,
+  bonus,
+  price,
+  was,
+  detail,
+  expires,
+  href,
+  sell,
+  sellState,
+  sellLabels,
+  renderBuy,
+  featured = false,
+  featuredLabel,
+  labels,
+  locale,
+  headingAs: Heading = 'h3',
+  ...root
+}: BlockRootProps &
+  SellProps & {
+    credits: number;
+    bonus?: number;
+    /** As "₹499". */
+    price: string;
+    was?: string;
+    detail?: ReactNode;
+    /** As "Credits last a year". */
+    expires?: ReactNode;
+    href?: string;
+    /** Outlines the pack in the button colour, for the one to pick. */
+    featured?: boolean;
+    featuredLabel?: string;
+    labels?: Partial<CreditPackLabels>;
+    locale?: string;
+    headingAs?: HeadingTag;
+  }) {
+  const words = { ...CREDIT_PACK_LABELS, ...labels };
+  const count = new Intl.NumberFormat(locale);
+  return (
+    <Block
+      as="article"
+      name="credit-pack"
+      {...root}
+      className={cn(
+        'border-2',
+        featured ? 'border-site-button' : 'border-transparent',
+        root.className
+      )}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Heading className="text-block-title m-0 font-bold tabular-nums">
+          {words.credits.replace('{n}', count.format(credits))}
+        </Heading>
+        {featured && featuredLabel ? (
+          <Badge tone="solid">{featuredLabel}</Badge>
+        ) : bonus ? (
+          <Badge tone="outline">
+            {words.bonus.replace('{n}', count.format(bonus))}
+          </Badge>
+        ) : null}
+      </div>
+      {featured && featuredLabel && bonus ? (
+        <p className="m-0 text-sm font-semibold">
+          {words.bonus.replace('{n}', count.format(bonus))}
+        </p>
+      ) : null}
+      {detail ? <p className="text-site-text-2 m-0 text-sm">{detail}</p> : null}
+      <p className="m-0">
+        <Price value={price} was={was} size="lg" />
+      </p>
+      {expires ? (
+        <p className="text-site-text-2 m-0 text-sm">{expires}</p>
+      ) : null}
+      <SellButton
+        href={href}
+        sell={sell}
+        sellState={sellState}
+        sellLabels={sellLabels}
+        renderBuy={renderBuy}
+        variant={featured ? 'solid' : 'outline'}
+        action="buy_credits"
+      >
+        {words.button}
+      </SellButton>
     </Block>
   );
 }

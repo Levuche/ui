@@ -200,6 +200,59 @@ const user = res.ok ? await res.json() : null;
 function that draws the data. Stories use fixed sample data, so tests never
 reach a service.
 
+### Selling through BuildBase
+
+Every block that sells takes `sell`: plain data naming what BuildBase
+selling checks out. The block shows the offer and reports the press; your
+app starts the checkout with the BuildBase SDK. ui has no SDK, no Stripe and
+no keys, and the blocks stay Server Components.
+
+| What is sold                                     | `sell`                                                        |
+| ------------------------------------------------ | ------------------------------------------------------------- |
+| An item, one-time or a subscription price        | `{ itemId, variantId, priceId, quantity?, recurring? }`       |
+| Pay what you want, or free                       | the same, with `amount` (minor units) or `free: true`         |
+| A booking (`BookingCard`, `SlotPicker`)          | the same; `SlotPicker` adds the chosen `slotStart`            |
+| A plan of the app (`PricingTable`, `yearlySell`) | `{ planVersionId, billingInterval? }`                         |
+| Credits (`CreditPack`)                           | `{ creditPackageId }`                                         |
+| A coupon                                         | `couponCode` on an item, `promotionCode` on a plan or credits |
+
+Blocks with a button (`PackRow`, `FeaturedPack`, `PackGrid`, `CourseCard`,
+`BookingCard`, `MembershipCard`, `PricingTable`, `CreditPack`,
+`SlotPicker`) write it on the button; form blocks (`PackCheckout`,
+`TipJar`, `LeadMagnet`) send it as a hidden `sell` field. Any action with
+`sell` is a sale, whatever its name (`buy`, `book`, `join`, …):
+
+```tsx
+'use client';
+import { useBlockActions } from '@levuche/ui';
+import { useCheckout } from '@buildbase/sdk/react';
+
+export function Checkout({ children }: { children: React.ReactNode }) {
+  const { checkout } = useCheckout();
+  useBlockActions(async ({ sell }) => {
+    if (!sell || !('itemId' in sell)) return;
+    // free and recurring are for the SDK's <BuyButton>; checkout reads the price.
+    const { itemId, free: _free, recurring: _recurring, ...input } = sell;
+    const start = await checkout(itemId, input);
+    if (start.url) window.location.assign(start.url);
+  });
+  return children;
+}
+```
+
+In a server action, `readSell(formData)` reads a form's sale back, checked.
+Check the price on the server as BuildBase does: a visitor can change a
+page.
+
+- `sellState` (`idle`, `sending`, `sold_out`, `unavailable`, `error`)
+  shows where the sale stands; the words are in `sellLabels`.
+- `renderBuy` draws your own buy button (such as the SDK's `<BuyButton>`)
+  in the block's place.
+- Affiliates: BuildBase keeps the visitor's referral token itself.
+  `referralHref(href, code)` puts a creator's own code on a link as `?ref=`.
+- `BookingEmbed` stays for booking pages outside BuildBase; `SlotPicker`
+  is the BuildBase way.
+
 ## Size presets
 
 Blocks use named sizes, never fixed pixels, so one change in `tokens.css`
@@ -307,26 +360,27 @@ that no block covers another and that the page never scrolls sideways.
 
 ## What's in it
 
-| Group       | Blocks                                                                                                                                                                                            |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `Block`, `withBlockLook`, `BlockLook`                                                                                              |
-| Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                 |
-| Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `CountUp`, `StatList`, `Sparkline`, `LiveData` |
-| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                      |
-| Profile     | `CreatorHeader`, `SocialIcons`, `SaveContact`                                                                                                                                                     |
-| Links       | `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                          |
-| Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `TopPicks`                                                                                      |
-| Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                              |
-| Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                    |
-| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `BeforeAfter`                                                                                                              |
-| Forms       | `NewsletterBand`, `ContactForm`                                                                                                                                                                   |
-| Developer   | `GitHubProfile`, `ContributionGraph`, `RepoCard`, `RepoList`, `PackageStats`, `TechStack`                                                                                                         |
+| Group       | Blocks                                                                                                                                                                                                                                     |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `Block`, `withBlockLook`, `BlockLook`                                                                                                                                       |
+| Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                          |
+| Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton` |
+| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                                                               |
+| Profile     | `CreatorHeader`, `SocialIcons`, `SaveContact`                                                                                                                                                                                              |
+| Links       | `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                                                                   |
+| Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                   |
+| Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                       |
+| Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                                                             |
+| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `BeforeAfter`, `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                                                        |
+| Forms       | `NewsletterBand`, `ContactForm`                                                                                                                                                                                                            |
+| Feeds       | `LatestVideos`, `LatestPosts`, `LiveStatus`, `EventList`, `ReviewSummary`, `NowPlaying`                                                                                                                                                    |
+| Developer   | `GitHubProfile`, `ContributionGraph`, `RepoCard`, `RepoList`, `PackageStats`, `TechStack`                                                                                                                                                  |
 
 `BLOCKS` in the registry lists every block with its group, so this table
 is a summary; the registry is the full list.
 
 `BookingCard` and `MembershipCard` link to the page that takes the booking
-or the payment. `LeadMagnet`, `TipJar` and `NewsletterBand` are forms: give
+or the payment, or sell through BuildBase with `sell` (see below). `LeadMagnet`, `TipJar` and `NewsletterBand` are forms: give
 them an `action` to post to, or an `onSubmit`. `TipJar` sends `amount`.
 `Countdown` ticks in the visitor's browser (pass `now` to freeze it in a
 preview). `DiscountCode` copies with the browser's clipboard and says so to

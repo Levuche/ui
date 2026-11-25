@@ -6,7 +6,10 @@ import { SiteButton } from '../atoms/button';
 import { HeartIcon } from '../atoms/icons';
 import { SiteInput } from '../atoms/input';
 import type { FormStatus } from '../system/state';
+import { ChoiceChips } from '../molecules/choice-chips';
 import { FormNotice } from '../molecules/form-notice';
+import { SellField } from '../molecules/sell-button';
+import type { SellRef } from '../system/sell';
 
 /** The words a tip jar shows. */
 export type TipJarLabels = {
@@ -24,7 +27,8 @@ export const TIP_JAR_LABELS: TipJarLabels = {
 /**
  * A tip jar: preset amounts to pick, or any other amount. The form sends
  * `amount` (a whole number) to `action`, or hands it to `onSubmit`.
- * `status` is how the payment went.
+ * `status` is how the payment went. With `sell` (a pay-what-you-want item),
+ * the form also sends it as `sell`; the app adds the amount in minor units.
  */
 export function TipJar({
   title = 'Leave a tip',
@@ -39,8 +43,11 @@ export function TipJar({
   status = 'idle',
   onSubmit,
   action,
+  sell,
   ...root
 }: BlockRootProps & {
+  /** The pay-what-you-want item the tip buys through BuildBase. */
+  sell?: SellRef;
   title?: ReactNode;
   detail?: ReactNode;
   /** Beside the title; a heart by default, `null` for none. */
@@ -70,11 +77,13 @@ export function TipJar({
     <Block
       as="form"
       name="tip-jar"
+      data-action="tip"
       action={action}
       method={typeof action === 'string' ? 'post' : undefined}
       onSubmit={onSubmit}
       {...root}
     >
+      <SellField sell={sell} />
       <fieldset className="m-0 flex flex-col gap-3 border-0 p-0">
         <legend className="text-block-title mb-1 flex items-center gap-2 p-0 font-bold">
           {icon === undefined ? (
@@ -87,28 +96,18 @@ export function TipJar({
         {detail ? (
           <p className="text-site-text-2 m-0 text-sm">{detail}</p>
         ) : null}
-        <div className="flex flex-wrap gap-2">
-          {amounts.map((value) => (
-            <label
-              key={value}
-              className="bg-site-surface-2 text-site-text has-checked:bg-site-button has-checked:text-site-on-button has-focus-visible:outline-site-button rounded-site-button min-h-control inline-flex cursor-pointer items-center px-4 font-bold tabular-nums has-focus-visible:outline-2 has-focus-visible:outline-offset-2"
-            >
-              <input
-                type="radio"
-                name={other ? undefined : 'amount'}
-                value={value}
-                checked={!other && picked === String(value)}
-                onChange={() => {
-                  setPicked(String(value));
-                  setOther('');
-                }}
-                className="sr-only"
-              />
-              {currency}
-              {value}
-            </label>
-          ))}
-        </div>
+        <ChoiceChips
+          name={other ? undefined : 'amount'}
+          value={other ? '' : picked}
+          onChange={(value) => {
+            setPicked(value);
+            setOther('');
+          }}
+          options={amounts.map((value) => ({
+            value: String(value),
+            label: `${currency}${value}`,
+          }))}
+        />
         {allowOther ? (
           <label
             htmlFor={`${id}-other`}

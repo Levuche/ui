@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
-import { SiteLinkButton, type SiteButtonVariant } from '../atoms/button';
+import type { SiteButtonVariant } from '../atoms/button';
 import { ClockIcon, VideoIcon } from '../atoms/icons';
 import { SiteLink } from '../atoms/link';
 import { Badge } from '../atoms/text';
 import { Thumb } from '../atoms/thumb';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { Price } from '../molecules/price';
+import { SellButton, type SellProps } from '../molecules/sell-button';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 
@@ -39,6 +40,10 @@ export function CourseCard({
   price,
   was,
   href,
+  sell,
+  sellState,
+  sellLabels,
+  renderBuy,
   labels,
   buttonVariant = 'solid',
   headingAs = 'h3',
@@ -47,7 +52,8 @@ export function CourseCard({
   nofollow,
   ...root
 }: BlockRootProps &
-  LinkBehavior & {
+  LinkBehavior &
+  SellProps & {
     title: ReactNode;
     detail?: ReactNode;
     image?: string | null;
@@ -59,7 +65,8 @@ export function CourseCard({
     level?: ReactNode;
     price: string;
     was?: string;
-    href: string;
+    /** The checkout or course page. Not needed with `sell`. */
+    href?: string;
     labels?: Partial<CourseCardLabels>;
     buttonVariant?: SiteButtonVariant;
     headingAs?: HeadingTag;
@@ -94,17 +101,20 @@ export function CourseCard({
         </span>
         <Price value={price} was={was} />
       </div>
-      <SiteLinkButton
+      <SellButton
         href={href}
+        sell={sell}
+        sellState={sellState}
+        sellLabels={sellLabels}
+        renderBuy={renderBuy}
         variant={buttonVariant}
         newTab={newTab}
         sponsored={sponsored}
         nofollow={nofollow}
         action="buy_course"
-        fullWidth
       >
         {words.button}
-      </SiteLinkButton>
+      </SellButton>
     </Block>
   );
 }

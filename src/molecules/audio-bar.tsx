@@ -77,7 +77,9 @@ export function AudioBar({
       document.querySelectorAll('audio').forEach((other) => {
         if (other !== el) other.pause();
       });
-      void el.play();
+      // A browser may refuse to play (no tap yet, or a broken file): the
+      // button then stays on Play rather than throwing.
+      el.play().catch(() => setPlaying(false));
       onPlay?.();
     } else {
       el.pause();

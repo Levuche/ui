@@ -7,6 +7,8 @@ import { Segmented } from '../molecules/segmented';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { useControllableState } from '../system/state';
+import type { SellProps } from '../molecules/sell-button';
+import type { SellRef, SellState } from '../system/sell';
 import { MembershipCard } from './offers';
 
 /** How often a plan is paid for. */
@@ -21,9 +23,16 @@ export type Plan = {
   yearlyPrice?: string;
   was?: string;
   perks: ReactNode[];
-  href: string;
+  /** Where the plan is bought. Not needed with `sell`. */
+  href?: string;
   /** Where the yearly plan is bought, when it isn't `href`. */
   yearlyHref?: string;
+  /** What BuildBase selling checks out for the monthly price. */
+  sell?: SellRef;
+  /** What it checks out for the yearly price, when it isn't `sell`. */
+  yearlySell?: SellRef;
+  /** Where this plan's sale stands, from the app. */
+  sellState?: SellState;
   /** Outlined in the button colour, with `featuredLabel`. */
   featured?: boolean;
   featuredLabel?: string;
@@ -72,9 +81,12 @@ export function PricingTable({
   newTab,
   sponsored,
   nofollow,
+  sellLabels,
+  renderBuy,
   ...root
 }: BlockRootProps &
-  LinkBehavior & {
+  LinkBehavior &
+  Pick<SellProps, 'sellLabels' | 'renderBuy'> & {
     plans: Plan[];
     title?: ReactNode;
     detail?: ReactNode;
@@ -128,6 +140,10 @@ export function PricingTable({
               period={useYear ? words.year : words.month}
               perks={plan.perks}
               href={useYear ? (plan.yearlyHref ?? plan.href) : plan.href}
+              sell={useYear ? (plan.yearlySell ?? plan.sell) : plan.sell}
+              sellState={plan.sellState}
+              sellLabels={sellLabels}
+              renderBuy={renderBuy}
               featured={plan.featured}
               featuredLabel={plan.featuredLabel}
               buttonLabel={plan.buttonLabel}
