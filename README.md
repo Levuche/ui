@@ -97,20 +97,15 @@ Buttons also take `variant` (`solid`, `outline`, `soft`, `text`) and `size`
 Blocks use named sizes, never fixed pixels, so one change in `tokens.css`
 resizes every block and the pages stay compact on a phone, tablet or desktop.
 
-| Preset          | Size                               | Used for              |
-| --------------- | ---------------------------------- | --------------------- |
-| <<<<<<< HEAD    |
-| `min-h-control` | 40 px with a mouse, 44 px on touch | small buttons, inputs |
-| =======         |
-| `min-h-control` | 40 px with a mouse, 44 px on touch | small buttons, inputs |
-
-> > > > > > > fix/preset-names
-> > > > > > > | `min-h-control-md` | 44 px, 48 px on touch | the default button |
-> > > > > > > | `min-h-control-lg` | 48 px, 52 px on touch | the buy button |
-> > > > > > > | `max-w-site` | 420 px | a creator page's column |
-> > > > > > > | `max-w-site-wide` | 640 px | a wider column, for grids |
-> > > > > > > | `text-xs` to `text-2xl` | Tailwind's type scale (12–24 px) | all text; body is `text-base` |
-> > > > > > > | `p-3`, `gap-2`, `size-13` … | Tailwind's spacing scale (4 px steps) | padding, gaps, thumbnails |
+| Preset                      | Size                                  | Used for                      |
+| --------------------------- | ------------------------------------- | ----------------------------- |
+| `min-h-control`             | 40 px with a mouse, 44 px on touch    | small buttons, inputs         |
+| `min-h-control-md`          | 44 px, 48 px on touch                 | the default button            |
+| `min-h-control-lg`          | 48 px, 52 px on touch                 | the buy button                |
+| `max-w-site`                | 420 px                                | a creator page's column       |
+| `max-w-site-wide`           | 640 px                                | a wider column, for grids     |
+| `text-xs` to `text-2xl`     | Tailwind's type scale (12–24 px)      | all text; body is `text-base` |
+| `p-3`, `gap-2`, `size-13` … | Tailwind's spacing scale (4 px steps) | padding, gaps, thumbnails     |
 
 The control presets work like any spacing value (`h-control`,
 `size-control-md`), and they grow on touch screens by themselves, so a block
@@ -119,15 +114,9 @@ give its column `max-w-site`) so blocks never stretch across a big screen.
 Inputs keep 16 px text on touch screens so phones don't zoom in.
 
 An app that imports `@levuche/ui/tokens.css` gets the same presets, so its
-<<<<<<< HEAD
-own buttons and fields can use `min-h-control` too.
-=======
-
 own buttons and fields can use `min-h-control` too, without defining it
 again. The widths are named `site` so an app's own `max-w-page` stays its
 own.
-
-> > > > > > > fix/preset-names
 
 ## What's in it
 
