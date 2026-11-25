@@ -6,3 +6,6 @@ playwright-report/
 *.tsbuildinfo
 .DS_Store
 .env*
+storybook-static/
+*storybook.log
+.wrangler/

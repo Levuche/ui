@@ -1,0 +1,13 @@
+@import 'tailwindcss';
+@import '../src/tokens.css';
+@source '../src';
+@source '../stories';
+
+body {
+  margin: 0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+:focus-visible {
+  outline: 3px solid #ffb627;
+  outline-offset: 2px;
+}

@@ -20,6 +20,11 @@ export default defineConfig({
   },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
+    // An iPad-sized touch screen, in Chromium (CI installs only Chromium).
+    {
+      name: 'tablet',
+      use: { ...devices['iPad (gen 7)'], browserName: 'chromium' },
+    },
     { name: 'phone', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {

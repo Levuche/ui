@@ -15,5 +15,5 @@
     "noUnusedParameters": true,
     "types": ["node"]
   },
-  "include": ["src", "gallery", "e2e", "*.ts"]
+  "include": ["src", "gallery", "e2e", "stories", ".storybook", "*.ts"]
 }

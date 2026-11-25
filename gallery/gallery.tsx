@@ -1,6 +1,15 @@
 import type { ReactNode } from 'react';
 import {
   AppIcon,
+  BookingCard,
+  Countdown,
+  DiscountCode,
+  FaqList,
+  FeaturedLink,
+  ImageGrid,
+  MembershipCard,
+  SocialIcons,
+  Testimonials,
   CameraIcon,
   CreatorFooter,
   CreatorHeader,
@@ -22,7 +31,16 @@ import {
   YouTubeVideo,
   type SiteTheme,
 } from '../src';
-import { CheckoutDemo, NewsletterDemo } from './demos';
+import {
+  CheckoutDemo,
+  LeadMagnetDemo,
+  LockedLinkDemo,
+  NewsletterDemo,
+  TipJarDemo,
+} from './demos';
+
+/** A fixed clock for the countdown, so the gallery never changes. */
+const NOW = Date.UTC(2026, 11, 1, 9, 0, 0);
 
 const THEMES: { id: string; title: string; theme: SiteTheme }[] = [
   { id: 'light', title: 'Light', theme: { scheme: 'light' } },
@@ -126,6 +144,33 @@ function Panel({
           </SiteLinkButton>
         </Group>
 
+        <Group id={id} name="social" title="Social and featured link">
+          <SocialIcons
+            links={[
+              {
+                label: 'Instagram',
+                href: 'https://www.instagram.com/example',
+                icon: <CameraIcon size={20} />,
+              },
+              {
+                label: 'YouTube',
+                href: 'https://www.youtube.com/@example',
+                icon: <VideoIcon size={20} />,
+              },
+              {
+                label: 'Email',
+                href: 'mailto:hello@example.com',
+                icon: <EmailIcon size={20} />,
+              },
+            ]}
+          />
+          <FeaturedLink
+            href="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+            title="New: how tea came to India"
+            detail="12 minutes, out now"
+          />
+        </Group>
+
         <Group id={id} name="links" title="Links">
           <LinkList
             label="Desi Origins links"
@@ -183,6 +228,74 @@ function Panel({
             ]}
           />
           <CheckoutDemo />
+        </Group>
+
+        <Group id={id} name="offers" title="Calls, memberships, freebies">
+          <BookingCard
+            title="Origin story review"
+            detail="I read your script and tell you what to cut."
+            duration="30 min"
+            price="$40"
+            href="https://example.com/book"
+            headingAs="p"
+          />
+          <MembershipCard
+            title="Insiders"
+            price="$5"
+            perks={['A bonus story every week', 'Early access to new packs']}
+            href="https://example.com/join"
+            featured
+            headingAs="p"
+          />
+          <LeadMagnetDemo />
+        </Group>
+
+        <Group id={id} name="tips" title="Tips">
+          <TipJarDemo />
+        </Group>
+
+        <Group id={id} name="locked" title="Locked link">
+          <LockedLinkDemo />
+        </Group>
+
+        <Group id={id} name="promo" title="Countdown and code">
+          <Countdown
+            title="The caption playbook drops in"
+            to={new Date(NOW + 3 * 86_400_000 + 5 * 3_600_000)}
+            now={NOW}
+          />
+          <DiscountCode code="ORIGINS10" detail="10% off the reel pack" />
+        </Group>
+
+        <Group id={id} name="photos" title="Photos">
+          <ImageGrid
+            images={[
+              { alt: 'Chai on a clay stove', href: 'https://example.com/chai' },
+              { alt: 'A spice market in Kochi' },
+              { alt: 'Tea leaves drying in Assam' },
+            ]}
+          />
+        </Group>
+
+        <Group id={id} name="reviews" title="Reviews and questions">
+          <Testimonials
+            items={[
+              {
+                quote: 'The prompts saved me a whole week of planning.',
+                name: 'Meera K.',
+                detail: 'Bought the reel pack',
+                rating: 5,
+              },
+            ]}
+          />
+          <FaqList
+            items={[
+              {
+                question: 'What do I get in the reel pack?',
+                answer: '100 prompts, a guide and 12 templates.',
+              },
+            ]}
+          />
         </Group>
 
         <Group id={id} name="reels" title="Reels">

@@ -1,36 +1,49 @@
-Copyright (c) 2026 Jagodana LLC. All rights reserved.
+Levuche UI Licence
 
-This repository and everything in it (source code, page copy, designs,
-design tokens, logos, icons, images and text) is the property of
-Jagodana LLC, except for the third-party material listed below.
+Copyright (c) 2026 Jagodana LLC.
 
-This repository is public so that people can see how Levuche's page
-blocks are built. That is the only reason. Viewing these files on GitHub,
-and the copy that GitHub's own Terms of Service allow when someone forks a
-public repository, are the only permissions granted. No other right or
-licence is given, whether stated, implied or by estoppel.
+Free to use, with no reselling.
 
-Without prior written permission from Jagodana LLC, you may not:
+Jagodana LLC grants anyone who gets a copy of this software and its files
+(the "Software") permission, free of charge, to use, copy and change the
+Software, and to use it, changed or not, in their own websites, apps and
+other products, including commercial ones, on these conditions:
 
-  - copy, download for reuse, or reproduce any part of this repository;
-  - modify it or make works based on it;
-  - publish, distribute, sublicense or sell it;
-  - use it in any product, service or website, commercial or not;
-  - use it to train, fine-tune or evaluate machine learning or AI models,
-    or include it in any dataset.
+1. No reselling. You may not sell the Software, or a changed version of
+   it, or charge for access to it, whether on its own or as part of a
+   component library, UI kit, template, theme, starter or similar product
+   whose main value is the Software itself. Selling your own website, app
+   or product that is built with the Software is allowed.
 
-To ask for permission, contact Jagodana LLC through https://jagodana.com.
+2. Keep this notice. Every copy of the Software's source, or of a
+   substantial part of it, must include the copyright line above and this
+   licence.
 
-Trademarks: Levuche, the Levuche logo, levuche.com and levuche.page are
-trademarks of Jagodana LLC. This licence grants no trademark rights.
-See TRADEMARKS.md.
+3. No trademark rights. Levuche, the Levuche logo, levuche.com and
+   levuche.page are trademarks of Jagodana LLC. This licence grants no
+   right to use them. See TRADEMARKS.md.
 
-Third-party material, which stays under its own licence:
+4. No AI training. You may not use the Software, or any part of it, to
+   train, fine-tune or evaluate machine learning or AI models, or include
+   it in any dataset.
+
+5. Levuche's own features. Some blocks are sold to creators as paid packs
+   inside Levuche. This licence covers the code in this repository; it
+   gives no access to paid packs or any other paid feature on Levuche.
+
+Any use not allowed above, including reselling or AI training, needs
+written permission from Jagodana LLC. To ask, contact Jagodana LLC through
+https://jagodana.com.
+
+Third-party material stays under its own licence:
 
   - npm packages installed from package.json keep their own licences.
   - The gallery loads the Sora font from Google Fonts; Sora is licensed by
     The Sora Project Authors under the SIL Open Font License 1.1.
 
-THE MATERIAL IN THIS REPOSITORY IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
-KIND. IN NO EVENT SHALL JAGODANA LLC BE LIABLE FOR ANY CLAIM, DAMAGES OR
-OTHER LIABILITY ARISING FROM IT OR ITS USE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+JAGODANA LLC BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

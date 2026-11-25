@@ -1,0 +1,578 @@
+import type { BlockKind } from './grid';
+
+/*
+ * Every block in the package, once. The id is the block's data-block name,
+ * so tests, analytics and the page editor can find any block on a page; the
+ * editor also reads `kind` for the grid and `group` for its menu. A test
+ * checks every id and component name is used only once, and that each block
+ * writes its own id.
+ */
+
+/*
+ * Packs say which blocks a creator gets free in Levuche and which they unlock
+ * with a one-time purchase. Core is free and holds everything that sells
+ * through BuildBase, so every page can take payments. The code itself is the
+ * same for every block: packs only tell the Levuche editor what to offer.
+ */
+export const BLOCK_PACKS = [
+  'core',
+  'growth',
+  'media',
+  'feeds',
+  'developer',
+] as const;
+export type BlockPack = (typeof BLOCK_PACKS)[number];
+
+/** Whether a creator unlocks this pack with a one-time purchase in Levuche. */
+export function isPaidPack(pack: BlockPack): boolean {
+  return pack !== 'core';
+}
+
+export const BLOCK_GROUPS = [
+  'profile',
+  'links',
+  'selling',
+  'offers',
+  'media',
+  'trust',
+  'forms',
+  'feeds',
+  'developer',
+  'page',
+] as const;
+export type BlockGroup = (typeof BLOCK_GROUPS)[number];
+
+export type BlockInfo = {
+  /** Written on the block as data-block. */
+  id: string;
+  /** The component's name in this package. */
+  component: string;
+  kind: BlockKind;
+  group: BlockGroup;
+  /** Needs the browser ('use client'): it has state or effects. */
+  client: boolean;
+  /** The pack it comes in: core is free, the rest are unlocked in Levuche. */
+  pack: BlockPack;
+  /** One line on what it's for, for the editor's menu. */
+  summary: string;
+};
+
+export const BLOCKS = [
+  {
+    id: 'creator-header',
+    component: 'CreatorHeader',
+    kind: 'profile',
+    group: 'profile',
+    client: false,
+    pack: 'core',
+    summary: 'Profile picture, name and tagline',
+  },
+  {
+    id: 'social-icons',
+    component: 'SocialIcons',
+    kind: 'link',
+    group: 'profile',
+    client: false,
+    pack: 'core',
+    summary: 'Icon links to social accounts',
+  },
+  {
+    id: 'link-list',
+    component: 'LinkList',
+    kind: 'links',
+    group: 'links',
+    client: false,
+    pack: 'core',
+    summary: 'A column of links',
+  },
+  {
+    id: 'featured-link',
+    component: 'FeaturedLink',
+    kind: 'card',
+    group: 'links',
+    client: false,
+    pack: 'core',
+    summary: 'One link shown big, with a picture',
+  },
+  {
+    id: 'pack-row',
+    component: 'PackRow',
+    kind: 'card',
+    group: 'selling',
+    client: false,
+    pack: 'core',
+    summary: 'A product in a list, with its price',
+  },
+  {
+    id: 'featured-pack',
+    component: 'FeaturedPack',
+    kind: 'card',
+    group: 'selling',
+    client: false,
+    pack: 'core',
+    summary: 'The main product, big, with a buy button',
+  },
+  {
+    id: 'pack-grid',
+    component: 'PackGrid',
+    kind: 'gallery',
+    group: 'selling',
+    client: false,
+    pack: 'core',
+    summary: 'Smaller products in a grid',
+  },
+  {
+    id: 'credit-pack',
+    component: 'CreditPack',
+    kind: 'card',
+    group: 'selling',
+    client: false,
+    pack: 'core',
+    summary: 'A pack of credits with its price and a buy button',
+  },
+  {
+    id: 'slot-picker',
+    component: 'SlotPicker',
+    kind: 'card',
+    group: 'selling',
+    client: true,
+    pack: 'core',
+    summary: 'Free times for a booking, then a button to book one',
+  },
+  {
+    id: 'pack-checkout',
+    component: 'PackCheckout',
+    kind: 'band',
+    group: 'selling',
+    client: false,
+    pack: 'core',
+    summary: 'Buy a digital product, with the download consent',
+  },
+  {
+    id: 'booking-card',
+    component: 'BookingCard',
+    kind: 'card',
+    group: 'offers',
+    client: false,
+    pack: 'core',
+    summary: 'A call or session to book',
+  },
+  {
+    id: 'membership-card',
+    component: 'MembershipCard',
+    kind: 'card',
+    group: 'offers',
+    client: false,
+    pack: 'core',
+    summary: 'A membership tier and what members get',
+  },
+  {
+    id: 'lead-magnet',
+    component: 'LeadMagnet',
+    kind: 'card',
+    group: 'offers',
+    client: false,
+    pack: 'core',
+    summary: 'Something free for an email address',
+  },
+  {
+    id: 'tip-jar',
+    component: 'TipJar',
+    kind: 'card',
+    group: 'offers',
+    client: true,
+    pack: 'core',
+    summary: 'Pick an amount and leave a tip',
+  },
+  {
+    id: 'discount-code',
+    component: 'DiscountCode',
+    kind: 'card',
+    group: 'offers',
+    client: false,
+    pack: 'growth',
+    summary: 'A code to copy with one tap',
+  },
+  {
+    id: 'countdown',
+    component: 'Countdown',
+    kind: 'card',
+    group: 'offers',
+    client: true,
+    pack: 'growth',
+    summary: 'Time left to a launch or the end of a sale',
+  },
+  {
+    id: 'testimonials',
+    component: 'Testimonials',
+    kind: 'text',
+    group: 'trust',
+    client: false,
+    pack: 'core',
+    summary: 'What buyers and fans say',
+  },
+  {
+    id: 'faq-list',
+    component: 'FaqList',
+    kind: 'text',
+    group: 'trust',
+    client: false,
+    pack: 'core',
+    summary: 'Questions that open one at a time',
+  },
+  {
+    id: 'youtube-video',
+    component: 'YouTubeVideo',
+    kind: 'media',
+    group: 'media',
+    client: false,
+    pack: 'core',
+    summary: 'A YouTube video that loads on play',
+  },
+  {
+    id: 'reel-grid',
+    component: 'ReelGrid',
+    kind: 'gallery',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'Reel thumbnails in a grid',
+  },
+  {
+    id: 'image-grid',
+    component: 'ImageGrid',
+    kind: 'gallery',
+    group: 'media',
+    client: false,
+    pack: 'core',
+    summary: 'Pictures in a grid',
+  },
+  {
+    id: 'newsletter-band',
+    component: 'NewsletterBand',
+    kind: 'band',
+    group: 'forms',
+    client: false,
+    pack: 'core',
+    summary: 'Newsletter sign-up',
+  },
+  {
+    id: 'creator-footer',
+    component: 'CreatorFooter',
+    kind: 'band',
+    group: 'page',
+    client: false,
+    pack: 'core',
+    summary: 'Policy links and the credit line',
+  },
+  {
+    id: 'site-image',
+    component: 'SiteImage',
+    kind: 'media',
+    group: 'media',
+    client: false,
+    pack: 'core',
+    summary: 'One picture, with a caption and a link',
+  },
+  {
+    id: 'image-carousel',
+    component: 'ImageCarousel',
+    kind: 'media',
+    group: 'media',
+    client: true,
+    pack: 'media',
+    summary: 'Pictures to swipe through, with captions and buttons',
+  },
+  {
+    id: 'before-after',
+    component: 'BeforeAfter',
+    kind: 'media',
+    group: 'media',
+    client: true,
+    pack: 'media',
+    summary: 'Drag to compare two pictures',
+  },
+  {
+    id: 'logo-strip',
+    component: 'LogoStrip',
+    kind: 'band',
+    group: 'trust',
+    client: false,
+    pack: 'growth',
+    summary: 'Brand logos in a row, still or scrolling',
+  },
+  {
+    id: 'contact-form',
+    component: 'ContactForm',
+    kind: 'card',
+    group: 'forms',
+    client: false,
+    pack: 'core',
+    summary: 'Name, email and a message',
+  },
+  {
+    id: 'save-contact',
+    component: 'SaveContact',
+    kind: 'link',
+    group: 'profile',
+    client: false,
+    pack: 'core',
+    summary: 'Download a contact card for the phone',
+  },
+  {
+    id: 'stats-row',
+    component: 'StatsRow',
+    kind: 'band',
+    group: 'trust',
+    client: false,
+    pack: 'growth',
+    summary: 'Big numbers that count up once',
+  },
+  {
+    id: 'timeline',
+    component: 'Timeline',
+    kind: 'text',
+    group: 'trust',
+    client: false,
+    pack: 'growth',
+    summary: 'Dated milestones joined by a line',
+  },
+  {
+    id: 'map-card',
+    component: 'MapCard',
+    kind: 'card',
+    group: 'page',
+    client: false,
+    pack: 'core',
+    summary: 'A place with a map, hours and directions',
+  },
+  {
+    id: 'qr-code',
+    component: 'QrCode',
+    kind: 'card',
+    group: 'page',
+    client: false,
+    pack: 'core',
+    summary: 'A code to scan, with a download button',
+  },
+  {
+    id: 'locked-link',
+    component: 'LockedLink',
+    kind: 'link',
+    group: 'links',
+    client: true,
+    pack: 'growth',
+    summary: 'A link behind a code, an age check or a warning',
+  },
+  {
+    id: 'course-card',
+    component: 'CourseCard',
+    kind: 'card',
+    group: 'selling',
+    client: false,
+    pack: 'core',
+    summary: 'A course with lessons, length, price and a buy button',
+  },
+  {
+    id: 'pricing-table',
+    component: 'PricingTable',
+    kind: 'band',
+    group: 'selling',
+    client: true,
+    pack: 'core',
+    summary: 'Plans side by side, with a monthly or yearly switch',
+  },
+  {
+    id: 'top-picks',
+    component: 'TopPicks',
+    kind: 'links',
+    group: 'selling',
+    client: false,
+    pack: 'growth',
+    summary: 'Recommended products, with affiliate links marked',
+  },
+  {
+    id: 'booking-embed',
+    component: 'BookingEmbed',
+    kind: 'card',
+    group: 'offers',
+    client: true,
+    pack: 'core',
+    summary: 'A booking page in the page or a pop-up',
+  },
+  {
+    id: 'latest-videos',
+    component: 'LatestVideos',
+    kind: 'gallery',
+    group: 'feeds',
+    client: false,
+    pack: 'feeds',
+    summary: 'The newest videos from a channel',
+  },
+  {
+    id: 'latest-posts',
+    component: 'LatestPosts',
+    kind: 'gallery',
+    group: 'feeds',
+    client: false,
+    pack: 'feeds',
+    summary: 'The newest posts from a blog or feed',
+  },
+  {
+    id: 'live-status',
+    component: 'LiveStatus',
+    kind: 'card',
+    group: 'feeds',
+    client: false,
+    pack: 'feeds',
+    summary: 'Live or offline, with a player while live',
+  },
+  {
+    id: 'event-list',
+    component: 'EventList',
+    kind: 'gallery',
+    group: 'feeds',
+    client: false,
+    pack: 'feeds',
+    summary: 'Upcoming events or tour dates with tickets',
+  },
+  {
+    id: 'review-summary',
+    component: 'ReviewSummary',
+    kind: 'card',
+    group: 'feeds',
+    client: false,
+    pack: 'growth',
+    summary: 'A star rating and recent reviews from a review site',
+  },
+  {
+    id: 'now-playing',
+    component: 'NowPlaying',
+    kind: 'card',
+    group: 'feeds',
+    client: false,
+    pack: 'feeds',
+    summary: 'What the creator is listening to, reading or watching',
+  },
+  {
+    id: 'github-profile',
+    component: 'GitHubProfile',
+    kind: 'card',
+    group: 'developer',
+    client: false,
+    pack: 'developer',
+    summary: 'A GitHub profile with followers, repos and stars',
+  },
+  {
+    id: 'contribution-graph',
+    component: 'ContributionGraph',
+    kind: 'band',
+    group: 'developer',
+    client: false,
+    pack: 'developer',
+    summary: 'A year of contributions, with streaks',
+  },
+  {
+    id: 'repo-card',
+    component: 'RepoCard',
+    kind: 'card',
+    group: 'developer',
+    client: false,
+    pack: 'developer',
+    summary: 'One repository with stars, forks and language',
+  },
+  {
+    id: 'repo-list',
+    component: 'RepoList',
+    kind: 'gallery',
+    group: 'developer',
+    client: false,
+    pack: 'developer',
+    summary: 'Pinned or top repositories',
+  },
+  {
+    id: 'package-stats',
+    component: 'PackageStats',
+    kind: 'card',
+    group: 'developer',
+    client: false,
+    pack: 'developer',
+    summary: 'A package’s version and downloads, with a chart',
+  },
+  {
+    id: 'tech-stack',
+    component: 'TechStack',
+    kind: 'text',
+    group: 'developer',
+    client: false,
+    pack: 'developer',
+    summary: 'Tools and languages as logo chips',
+  },
+  {
+    id: 'spotify-embed',
+    component: 'SpotifyEmbed',
+    kind: 'media',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'A Spotify track, album, playlist or podcast',
+  },
+  {
+    id: 'tiktok-video',
+    component: 'TikTokVideo',
+    kind: 'media',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'One TikTok video, played in place',
+  },
+  {
+    id: 'instagram-post',
+    component: 'InstagramPost',
+    kind: 'media',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'One Instagram post or reel',
+  },
+  {
+    id: 'link-embed',
+    component: 'LinkEmbed',
+    kind: 'media',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'Paste a link from a listed service and it plays',
+  },
+  {
+    id: 'audio-player',
+    component: 'AudioPlayer',
+    kind: 'card',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'One track with play, pause and a seek bar',
+  },
+  {
+    id: 'podcast-episodes',
+    component: 'PodcastEpisodes',
+    kind: 'links',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'The newest podcast episodes, each with a player',
+  },
+] as const satisfies readonly BlockInfo[];
+
+/** The id of a block in this package. */
+export type BlockId = (typeof BLOCKS)[number]['id'];
+
+/** Every block in a pack, in registry order. */
+export function blocksInPack(pack: BlockPack): BlockInfo[] {
+  return BLOCKS.filter((block) => block.pack === pack);
+}
+
+/** A block's entry by id, or undefined. */
+export function blockInfo(id: string): BlockInfo | undefined {
+  return BLOCKS.find((block) => block.id === id);
+}

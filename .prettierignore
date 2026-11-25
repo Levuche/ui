@@ -3,3 +3,4 @@ gallery-dist
 test-results
 playwright-report
 package-lock.json
+storybook-static
