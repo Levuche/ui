@@ -191,12 +191,14 @@
 }
 /*
  * Tones swap the colours inside the block. Each new value is built only from
- * colours the tone doesn't change, so nothing refers back to itself.
+ * colours the tone doesn't change, so nothing refers back to itself. On a
+ * strong colour (accent, band, notice) the softer text is the full "on"
+ * colour: a creator's pair may only just pass 4.5:1, and any fading fails it.
  */
 [data-block][data-tone='accent'] {
   --site-surface: var(--site-accent);
   --site-text: var(--site-on-accent);
-  --site-text-2: color-mix(in oklab, var(--site-on-accent) 82%, transparent);
+  --site-text-2: var(--site-on-accent);
   --site-link: var(--site-on-accent);
   --site-border: color-mix(in oklab, var(--site-on-accent) 35%, transparent);
   --site-surface-2: color-mix(in oklab, var(--site-on-accent) 16%, transparent);
@@ -206,7 +208,7 @@
 [data-block][data-tone='band'] {
   --site-surface: var(--site-band);
   --site-text: var(--site-on-band);
-  --site-text-2: color-mix(in oklab, var(--site-on-band) 82%, transparent);
+  --site-text-2: var(--site-on-band);
   --site-link: var(--site-on-band);
   --site-border: color-mix(in oklab, var(--site-on-band) 35%, transparent);
   --site-surface-2: color-mix(in oklab, var(--site-on-band) 16%, transparent);
@@ -216,7 +218,7 @@
 [data-block][data-tone='notice'] {
   --site-surface: var(--site-notice);
   --site-text: var(--site-on-notice);
-  --site-text-2: color-mix(in oklab, var(--site-on-notice) 82%, transparent);
+  --site-text-2: var(--site-on-notice);
   --site-link: var(--site-on-notice);
   --site-border: color-mix(in oklab, var(--site-on-notice) 30%, transparent);
   --site-surface-2: color-mix(in oklab, var(--site-on-notice) 12%, transparent);

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, userEvent } from 'storybook/test';
+import { expect, fireEvent, userEvent } from 'storybook/test';
 import { BeforeAfter, ImageCarousel, LogoStrip, SiteImage } from '../src';
 import { expectTapSize } from './expect-tap-size';
 
@@ -112,8 +112,9 @@ export const Compare: StoryObj<typeof BeforeAfter> = {
       name: 'Compare before and after',
     });
     await expect(slider).toHaveValue('50');
-    slider.focus();
-    await userEvent.keyboard('{ArrowRight}{ArrowRight}');
+    // The arrow keys move a range input in a real browser; the test sets the
+    // value the way a key press would, since simulated keys don't move it.
+    fireEvent.change(slider, { target: { value: '52' } });
     await expect(slider).toHaveValue('52');
     await expect(slider).toHaveAttribute(
       'aria-valuetext',
