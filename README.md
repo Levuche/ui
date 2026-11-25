@@ -202,6 +202,140 @@ const user = res.ok ? await res.json() : null;
 function that draws the data. Stories use fixed sample data, so tests never
 reach a service.
 
+### Tracking clicks and sign-ups with BuildBase
+
+Blocks load no analytics. `useBlockActions` reports every link, button and
+form on the page as a `BlockAction`; your app forwards it to BuildBase
+tracking (`@buildbase/sdk/tracking`), which sends it to the tags set up in
+the console (GA4, PostHog and the rest) and waits for the visitor's consent
+where a tag needs it. Use it once, inside the SDK's provider:
+
+```tsx
+'use client';
+import { useBlockActions } from '@levuche/ui';
+import { useTracking } from '@buildbase/sdk/tracking';
+
+// Form blocks whose submit is a sign-up.
+const SIGN_UPS = new Set(['newsletter-band', 'lead-magnet', 'contact-form']);
+
+export function BlockTracking({ children }: { children: React.ReactNode }) {
+  const { track } = useTracking();
+  useBlockActions(({ action, block, label, href, sell }) => {
+    // A sale: BuildBase reports checkout_started and purchase itself.
+    if (sell) return;
+    // A sign-up is BuildBase's lead event, sent on as a conversion
+    // (GA4 generate_lead, Meta Lead, TikTok SubmitForm).
+    if (action === 'form_submit' && block && SIGN_UPS.has(block)) {
+      track('lead', { block });
+      return;
+    }
+    track(action, {
+      block: block ?? 'page',
+      label,
+      // Where a link goes, by its site only: a mailto: or tel: link holds an address.
+      ...(href?.startsWith('http') ? { link_host: new URL(href).host } : {}),
+    });
+  });
+  return children;
+}
+```
+
+- Event names follow BuildBase's rule: lowercase letters, digits and
+  underscores, starting with a letter, 40 characters at most. The built-in
+  names are `link_click`, `button_click` and `form_submit`; a block's own
+  `data-action` (`buy`, `tip`, `save_contact`, `qr_download`,
+  `audio_play`, …) follows the same rule, and so must yours.
+- Send ids and labels only. Never send what a visitor typed, an email
+  address, a name or anything else that identifies them: every tag
+  forbids it.
+- Each press is reported once: a submit button is reported by its form's
+  submit, and a click inside a form (ticking its consent box, say) isn't
+  the form's action.
+- To make one of these a conversion in an ad network that takes labels
+  (Google Ads, X, LinkedIn), map its name to the label under **Settings,
+  Tracking & tags** in the BuildBase console.
+- Cookie consent isn't here: BuildBase's consent banner covers it.
+
+### Sending forms to BuildBase Forms
+
+`NewsletterBand`, `LeadMagnet`, `ContactForm`, `PackCheckout` and `TipJar`
+take `onSubmit` (or `action`) and a `status`: `idle`, `sending`, `sent` or
+`error`. While sending, the button is disabled and says so; once sent, a
+thank-you shows; on error, the reason shows under the form. Each change is
+read out to screen readers. The words are in each block's
+`labels`.
+
+Send sign-ups to a BuildBase form rather than a backend of your own. It
+stores each submission, adds the person to the audience and sends the
+confirmation email:
+
+1. In the BuildBase console, make a collection under **Content,
+   Collections** with an `email` field (and any others the block sends,
+   such as `name` and `message`), and publish a version.
+2. Under **Forms**, create a form on that collection and **Publish** it.
+   Until then its endpoint answers 404.
+3. For a newsletter or waitlist, turn on **Collect subscribers**. Leave
+   **Ask them to confirm (double opt-in)** on, as it is by default, so
+   nobody can sign someone else up.
+
+Send the form from your server, not the browser, so the app can check the
+request came from its own site, cap each field and solve a captcha the form
+asks for. The block posts to your route and shows how it went:
+
+```tsx
+'use client';
+import { useState } from 'react';
+import { NewsletterBand, type FormStatus } from '@levuche/ui';
+
+export function Newsletter() {
+  const [status, setStatus] = useState<FormStatus>('idle');
+  return (
+    <NewsletterBand
+      title="Get new packs first"
+      status={status}
+      onSubmit={async (event) => {
+        event.preventDefault();
+        if (status === 'sending') return;
+        setStatus('sending');
+        const email = new FormData(event.currentTarget).get('email');
+        const res = await fetch('/api/newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        }).catch(() => null);
+        setStatus(res?.ok ? 'sent' : 'error');
+      }}
+    />
+  );
+}
+```
+
+The route forwards it to the form's public endpoint, which needs no key.
+The body is the data itself, keyed by field slug:
+
+```ts
+// app/api/newsletter/route.ts
+export async function POST(request: Request) {
+  const { email } = await request.json().catch(() => ({}));
+  if (typeof email !== 'string' || email.length > 320) {
+    return Response.json({ error: 'invalid' }, { status: 400 });
+  }
+  const res = await fetch(
+    `https://api.console.buildbase.app/api/forms/public/${ORG_ID}/${FORM_ID}/submit`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.trim() }),
+    }
+  );
+  return Response.json({ ok: res.ok }, { status: res.ok ? 200 : res.status });
+}
+```
+
+A `400` lists every field that failed, and a `429` means too many sends
+from one address. Show either as `error`. BuildBase's Forms docs cover
+captchas, spam rules and the `form.submitted` workflow trigger.
+
 ### Selling through BuildBase
 
 Every block that sells takes `sell`: plain data naming what BuildBase
