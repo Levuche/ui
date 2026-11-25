@@ -253,6 +253,24 @@ page.
 - `BookingEmbed` stays for booking pages outside BuildBase; `SlotPicker`
   is the BuildBase way.
 
+### Free and paid blocks
+
+Every block's code is here for anyone building with this package. Packs only
+say what a creator gets in the Levuche editor: core blocks are free, and a
+creator unlocks each other pack once, with a one-time purchase.
+
+| Pack          | What's in it                                                                                                                                           |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `core` (free) | Profile, links, contact and newsletter, basic pictures and video, FAQs and testimonials, map and QR code, and every block that sells through BuildBase |
+| `growth`      | Countdown, discount code, locked link, top picks, stats, logo strip, timeline and review summary                                                       |
+| `media`       | Carousel, before and after, reels, Spotify, TikTok, Instagram, link embed, audio player and podcast episodes                                           |
+| `feeds`       | Latest videos and posts, live status, events and now playing                                                                                           |
+| `developer`   | GitHub profile, contribution graph, repositories, package stats and tech stack                                                                         |
+
+Each registry entry has a `pack`. `blocksInPack('media')` lists a pack's
+blocks and `isPaidPack(pack)` says whether the editor should ask for the
+unlock. Blocks that take payments stay in `core`, so every creator can sell.
+
 ## Size presets
 
 Blocks use named sizes, never fixed pixels, so one change in `tokens.css`
