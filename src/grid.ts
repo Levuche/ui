@@ -84,21 +84,19 @@ export type BlockSize = {
   maxWidth?: number;
   minHeight: number;
   maxHeight?: number;
-  /** The height it starts at. */
-  height: number;
   /** Two of these sit side by side on a desktop when they're next to each other. */
   half?: boolean;
 };
 
 export const BLOCK_SIZES: Record<BlockKind, BlockSize> = {
-  profile: { minWidth: 15, maxWidth: 32, minHeight: 9, height: 15 },
-  link: { minWidth: 10, minHeight: 3, maxHeight: 7, height: 3, half: true },
-  links: { minWidth: 15, minHeight: 7, height: 15 },
-  card: { minWidth: 15, minHeight: 7, height: 11, half: true },
-  media: { minWidth: 18, minHeight: 11, height: 19 },
-  gallery: { minWidth: 15, minHeight: 7, height: 15 },
-  text: { minWidth: 15, minHeight: 3, height: 7 },
-  band: { minWidth: 18, minHeight: 7, height: 11 },
+  profile: { minWidth: 15, maxWidth: 32, minHeight: 9 },
+  link: { minWidth: 10, minHeight: 3, maxHeight: 7, half: true },
+  links: { minWidth: 15, minHeight: 7 },
+  card: { minWidth: 15, minHeight: 7, half: true },
+  media: { minWidth: 18, minHeight: 11 },
+  gallery: { minWidth: 15, minHeight: 7 },
+  text: { minWidth: 15, minHeight: 3 },
+  band: { minWidth: 18, minHeight: 7 },
 };
 
 /** A block on the page, as the layout helpers see it. */
@@ -159,8 +157,13 @@ export function limitsFor(kind: BlockKind, screen: GridScreen): GridLimits {
 }
 
 const isSide = (block: GridBlockSpec) => block.side ?? block.kind === 'profile';
+/*
+ * Blocks start at their smallest height. Rows grow to fit what's in them, so
+ * starting small never cuts anything off, while starting tall would leave a
+ * gap under a short block.
+ */
 const startRows = (block: GridBlockSpec) =>
-  rowsFor(BLOCK_SIZES[block.kind].height);
+  rowsFor(BLOCK_SIZES[block.kind].minHeight);
 
 /** The row after the last one a layout uses. */
 export function layoutBottom(layout: GridLayout) {
