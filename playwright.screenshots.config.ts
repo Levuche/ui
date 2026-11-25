@@ -29,6 +29,9 @@ export default defineConfig({
     baseURL: `http://localhost:${port}`,
     timezoneId: 'UTC',
     locale: 'en-US',
+    // A picture is of a resting page: with less motion asked for, a carousel
+    // jumps to its slide instead of scrolling there over several frames.
+    contextOptions: { reducedMotion: 'reduce' },
     trace: 'retain-on-failure',
   },
   webServer: {

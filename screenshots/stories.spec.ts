@@ -72,6 +72,26 @@ async function show(page: Page, id: string, theme: ThemeName) {
   // Let pictures finish loading or failing before the picture is taken.
   await page.waitForLoadState('networkidle');
   await page.evaluate(() => document.fonts.ready);
+  // A player a story pressed shows its length and place only once its clip
+  // has loaded and stopped.
+  await page.waitForFunction(
+    () =>
+      [...document.querySelectorAll('audio, video')].every(
+        (media) =>
+          (media as HTMLMediaElement).paused &&
+          (media as HTMLMediaElement).networkState !==
+            HTMLMediaElement.NETWORK_LOADING
+      ),
+    null,
+    { timeout: 10_000 }
+  );
+  // Two frames, so what those last events changed has been drawn.
+  await page.evaluate(
+    () =>
+      new Promise((done) =>
+        requestAnimationFrame(() => requestAnimationFrame(done))
+      )
+  );
   return root.locator(':scope > div');
 }
 
