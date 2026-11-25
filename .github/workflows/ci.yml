@@ -1,10 +1,19 @@
 name: CI
 
-# ESLint, Prettier, the type check, the gallery build, the end-to-end tests
-# and the Storybook tests on every push and pull request. No secrets.
+# ESLint, Prettier, the type check, the gallery build, the end-to-end tests,
+# the Storybook tests and the screenshot checks on every push and pull
+# request. No secrets.
+#
+# Run it by hand on a work branch with "Update the reference screenshots"
+# ticked to make new reference pictures and commit them to that branch.
 
 on:
   workflow_dispatch:
+    inputs:
+      update-screenshots:
+        description: Update the reference screenshots and commit them to this branch
+        type: boolean
+        default: false
   push:
     branches: ['**']
   pull_request:
@@ -14,7 +23,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  # The update run starts a fresh check run when it is done, so the two
+  # don't share a group and cancel each other.
+  group: ci-${{ github.ref }}${{ inputs.update-screenshots && '-update' || '' }}
   cancel-in-progress: true
 
 jobs:
@@ -22,7 +33,7 @@ jobs:
   # required check on dev and main.
   branches:
     name: Branch rules
-    if: github.event_name == 'pull_request'
+    if: ${{ (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch') && !inputs.update-screenshots }}
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     steps:
@@ -31,7 +42,18 @@ jobs:
           BASE: ${{ github.base_ref }}
           HEAD: ${{ github.head_ref }}
           HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          REF: ${{ github.ref_name }}
         run: |
+          # A run started by hand checks the branch it runs on as a work
+          # branch headed for dev.
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            if [ "$REF" = "dev" ] || [ "$REF" = "main" ]; then
+              echo "$REF is a release branch."
+              exit 0
+            fi
+            BASE=dev
+            HEAD=$REF
+          fi
           if [ "$BASE" = "main" ]; then
             if [ "$HEAD" != "dev" ] || [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]; then
               echo "::error::Pull requests into main must come from dev. Open this one against dev instead."
@@ -47,6 +69,7 @@ jobs:
 
   check:
     name: Check and build
+    if: ${{ !inputs.update-screenshots }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -75,6 +98,7 @@ jobs:
 
   e2e:
     name: End-to-end tests
+    if: ${{ !inputs.update-screenshots }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -100,6 +124,7 @@ jobs:
 
   stories:
     name: Storybook tests
+    if: ${{ !inputs.update-screenshots }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -124,3 +149,80 @@ jobs:
 
       - name: Build Storybook
         run: npm run build-storybook
+
+  # Every story on a phone, a tablet and a desktop, compared with the
+  # reference pictures in screenshots/__screenshots__.
+  screenshots:
+    name: Screenshot checks
+    if: ${{ !inputs.update-screenshots }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Build Storybook
+        run: npm run build-storybook
+
+      - name: Compare every story with its reference pictures
+        run: npm run test:screenshots
+
+  # Run by hand only. Makes new reference pictures on the same runner the
+  # checks use, commits them to the branch it runs on, then starts this
+  # workflow again on that commit, since a push made with the workflow's own
+  # token starts no run by itself. Never on dev or main.
+  update-screenshots:
+    name: Update the reference screenshots
+    if: ${{ inputs.update-screenshots && github.ref_name != 'dev' && github.ref_name != 'main' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Build Storybook
+        run: npm run build-storybook
+
+      - name: Make every reference picture again
+        run: |
+          rm -rf screenshots/__screenshots__
+          npm run test:screenshots -- --update-snapshots=all
+
+      - name: Commit the pictures and check them
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          git add -A screenshots/__screenshots__
+          if git diff --cached --quiet; then
+            echo "The reference pictures already match."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update the reference screenshots"
+          git push origin "HEAD:$BRANCH"
+          gh workflow run ci.yml --ref "$BRANCH"
