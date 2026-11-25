@@ -15,7 +15,9 @@ Built from the boards in [Levuche/design](https://github.com/Levuche/design)
 `--site-*` tokens in `tokens/levuche-tokens.css` (v1.1).
 
 Levuche is a product managed by Jagodana LLC. See [LICENSE](LICENSE): the
-code is public to read, not to reuse.
+code is free to use, change and ship in your own sites and apps, including
+commercial ones, but not to resell as a component library, kit or template,
+or to use for training AI models.
 
 ## Use it in a Levuche app
 
@@ -255,9 +257,11 @@ page.
 
 ### Free and paid blocks
 
-Every block's code is here for anyone building with this package. Packs only
-say what a creator gets in the Levuche editor: core blocks are free, and a
-creator unlocks each other pack once, with a one-time purchase.
+Every block's code is free for anyone building with this package, under the
+[licence](LICENSE): free to use, with no reselling. Packs only say what a
+creator gets in the Levuche editor: core blocks are free, and a creator
+unlocks each other pack once, with a one-time purchase. Using the code
+doesn't unlock a pack in Levuche.
 
 | Pack          | What's in it                                                                                                                                           |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
