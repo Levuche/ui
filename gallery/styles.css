@@ -1,0 +1,18 @@
+@import 'tailwindcss';
+@import '../src/tokens.css';
+@source '../src';
+
+@theme inline {
+  --font-sans: 'Sora', 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #eceef6;
+  color: #14154a;
+  font-family: var(--font-sans);
+}
+:focus-visible {
+  outline: 3px solid #ffb627;
+  outline-offset: 2px;
+}

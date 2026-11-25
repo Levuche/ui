@@ -1,0 +1,99 @@
+name: CI
+
+# ESLint, Prettier, the type check, the gallery build and the end-to-end
+# tests on every push and pull request. No secrets.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [dev, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Work branches go into dev, and only dev goes into main. Make this a
+  # required check on dev and main.
+  branches:
+    name: Branch rules
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Check the branch names
+        env:
+          BASE: ${{ github.base_ref }}
+          HEAD: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          if [ "$BASE" = "main" ]; then
+            if [ "$HEAD" != "dev" ] || [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]; then
+              echo "::error::Pull requests into main must come from dev. Open this one against dev instead."
+              exit 1
+            fi
+          elif [ "$BASE" = "dev" ]; then
+            if ! printf '%s' "$HEAD" | grep -Eq '^(feature|fix|hotfix|chore|docs|ci|dependabot)/[a-z0-9._/-]+$'; then
+              echo "::error::Name the branch type/short-name, for example feature/date-picker or fix/tabs-focus. Types: feature, fix, hotfix, chore, docs, ci."
+              exit 1
+            fi
+          fi
+          echo "$HEAD into $BASE is allowed."
+
+  check:
+    name: Check and build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Prettier
+        run: npm run format:check
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Build the gallery
+        run: npm run build
+
+  e2e:
+    name: End-to-end tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Build the gallery
+        run: npm run build
+
+      - name: Run the end-to-end tests
+        run: npm run test:e2e

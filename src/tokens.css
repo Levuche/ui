@@ -1,0 +1,75 @@
+/*
+ * Creator page tokens, from Levuche design tokens v1.1 (Levuche/design,
+ * tokens/levuche-tokens.css). Import once, after `@import 'tailwindcss'`.
+ *
+ * --site-* is a creator's brand on their levuche.page site. data-site="light"
+ * or "dark" switches everything inside it (<CreatorTheme> sets it). These
+ * values are the sample creator ("Desi Origins"); each creator sets their own
+ * in the editor's Theme panel by overriding the variables.
+ *
+ * Every page block in this package uses only --site-* tokens.
+ */
+/* Shape and type. A creator's theme overrides these too (see CreatorTheme). */
+[data-site] {
+  --site-radius: 16px;
+  --site-button-radius: 9999px;
+  --site-font: inherit;
+  font-family: var(--site-font);
+}
+[data-site='light'] {
+  --site-bg: #ffffff;
+  --site-surface: #fff4ec;
+  --site-surface-2: #ffe6d4;
+  --site-border: #f1dfd2;
+  --site-text: #1a1325;
+  --site-text-2: #4b4458;
+  --site-link: #9a3412;
+  --site-accent: #c2410c;
+  --site-on-accent: #ffffff;
+  --site-band: #c2410c;
+  --site-on-band: #ffffff;
+  --site-notice: #fff4dc;
+  --site-on-notice: #3d2a00;
+  --site-danger: #b91c1c;
+  --site-danger-bg: #fef2f2;
+  color-scheme: light;
+}
+[data-site='dark'] {
+  --site-bg: #0f1020;
+  --site-surface: #1b1c33;
+  --site-surface-2: #2a2b4a;
+  --site-border: #23244a;
+  --site-text: #f4f4f8;
+  --site-text-2: #c2c3d8;
+  --site-link: #ffb27a;
+  --site-accent: #ff8a3d;
+  --site-on-accent: #0f1020;
+  --site-band: #ff8a3d;
+  --site-on-band: #0f1020;
+  --site-notice: #fff4dc;
+  --site-on-notice: #3d2a00;
+  --site-danger: #fca5a5;
+  --site-danger-bg: #2a1220;
+  color-scheme: dark;
+}
+
+/* The tokens as Tailwind colours: bg-site-surface, text-site-accent and so on. */
+@theme inline {
+  --color-site-bg: var(--site-bg);
+  --color-site-surface: var(--site-surface);
+  --color-site-surface-2: var(--site-surface-2);
+  --color-site-border: var(--site-border);
+  --color-site-text: var(--site-text);
+  --color-site-text-2: var(--site-text-2);
+  --color-site-link: var(--site-link);
+  --color-site-accent: var(--site-accent);
+  --color-site-on-accent: var(--site-on-accent);
+  --color-site-band: var(--site-band);
+  --color-site-on-band: var(--site-on-band);
+  --color-site-notice: var(--site-notice);
+  --color-site-on-notice: var(--site-on-notice);
+  --color-site-danger: var(--site-danger);
+  --color-site-danger-bg: var(--site-danger-bg);
+  --radius-site: var(--site-radius);
+  --radius-site-button: var(--site-button-radius);
+}
