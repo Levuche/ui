@@ -373,6 +373,14 @@ import { SiteGrid, type PageLayouts } from '@levuche/ui';
   each one inside the 10 columns and its size limits, moves a block down if it
   would cover another, and adds new blocks at the bottom. `SiteGrid` runs it
   on every layout it's given.
+- **Heights in an editor:** on the page a row grows to fit what's in it, but
+  a drag-and-drop editor's rows are fixed, so a tall block can look cut short
+  there and seem to run into the one below. Measure each block in the editor
+  (a `ResizeObserver` on each one, say), then pass the heights in px to
+  `fitHeights(layout, measured, blocks)` before showing or saving the layout.
+  Each block grows to the rows it needs, up to its kind's largest height,
+  never shrinks, keeps lining up with a card beside it, and pushes anything
+  under it down.
 - **Reading order:** screen readers and the Tab key follow the order of
   `blocks`, whatever the arrangement, so put the profile first.
 

@@ -76,6 +76,7 @@ export {
   GRID_WIDTH,
   columnsFor,
   defaultLayout,
+  fitHeights,
   fitLayout,
   layoutBottom,
   limitsFor,
