@@ -113,15 +113,30 @@ export function ImageCarousel({
     setCurrent(to);
   };
 
+  // Where a button or the app is scrolling the track to, while it scrolls.
+  // Midway, the track shows part of the slide it is leaving, so its scroll
+  // events must not set the slide back.
+  const moving = useRef<number | null>(null);
+  const settle = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const release = () => {
+    moving.current = null;
+    clearTimeout(settle.current);
+  };
+
   // Show the current slide when it changes, from a button or the app.
   useEffect(() => {
     const el = track.current;
     if (!el) return;
     const left = current * el.clientWidth;
     if (Math.abs(el.scrollLeft - left) > 2) {
+      moving.current = left;
+      clearTimeout(settle.current);
+      // In case the scroll never lands, as when the track is resized.
+      settle.current = setTimeout(release, 1000);
       el.scrollTo({ left, behavior: prefersLessMotion() ? 'auto' : 'smooth' });
     }
   }, [current]);
+  useEffect(() => release, []);
 
   // Move on its own, unless paused, held, or less motion is asked for.
   useEffect(() => {
@@ -137,6 +152,10 @@ export function ImageCarousel({
   const onScroll = () => {
     const el = track.current;
     if (!el || el.clientWidth === 0) return;
+    if (moving.current !== null) {
+      if (Math.abs(el.scrollLeft - moving.current) <= 2) release();
+      return;
+    }
     const shown = Math.round(el.scrollLeft / el.clientWidth);
     if (shown !== current && shown >= 0 && shown < total) setCurrent(shown);
   };
@@ -177,6 +196,9 @@ export function ImageCarousel({
           // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           tabIndex={0}
           onScroll={onScroll}
+          // A swipe or wheel takes over from a scroll a button started.
+          onPointerDown={release}
+          onWheel={release}
           className="rounded-block-inner flex snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto overscroll-x-contain focus-visible:outline-2 focus-visible:outline-offset-2 [&::-webkit-scrollbar]:hidden"
         >
           {slides.map((slide, i) => (
