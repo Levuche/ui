@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { expect, waitFor } from 'storybook/test';
 import {
   LinkList,
@@ -18,6 +18,16 @@ function Page() {
   const root = useRef<HTMLDivElement>(null);
   const [seen, setSeen] = useState<BlockAction[]>([]);
   useBlockActions((action) => setSeen((all) => [...all, action]), root);
+  // The test runs inside this page, so a link must not leave it: the click
+  // is still reported, but the browser doesn't follow it.
+  useEffect(() => {
+    const node = root.current;
+    const stay = (event: MouseEvent) => {
+      if ((event.target as Element).closest('a')) event.preventDefault();
+    };
+    node?.addEventListener('click', stay);
+    return () => node?.removeEventListener('click', stay);
+  }, []);
   return (
     <div ref={root} className="flex flex-col gap-4">
       <LinkList
