@@ -13,7 +13,7 @@ const THEMES = {
   custom: { scheme: 'light', accent: 'rgb(15, 118, 110)' },
 } as const;
 
-/** control-sm: 44 px on a touch screen (the phone run), 40 px with a mouse. */
+/** control: 44 px on a touch screen (the phone run), 40 px with a mouse. */
 const tapMin = (page: Page) =>
   page.evaluate(() => (matchMedia('(pointer: coarse)').matches ? 44 : 40));
 

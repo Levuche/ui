@@ -23,7 +23,7 @@ export const Light: Story = {
   play: async ({ canvas }) => {
     const buy = canvas.getByRole('button', { name: 'I’ll take it, $12' });
     await expect(styleOf(buy).backgroundColor).toBe('rgb(194, 65, 12)');
-    // SitePage keeps the column to max-w-page however wide the screen is.
+    // SitePage keeps the column to max-w-site however wide the screen is.
     await expect(styleOf(canvas.getByRole('main')).maxWidth).toBe('420px');
   },
 };
