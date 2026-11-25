@@ -52,9 +52,7 @@ export function Segmented<T extends string>({
           />
           {option.label}
           {option.note ? (
-            <span className="text-xs font-semibold">
-              {option.note}
-            </span>
+            <span className="text-xs font-semibold">{option.note}</span>
           ) : null}
         </label>
       ))}
