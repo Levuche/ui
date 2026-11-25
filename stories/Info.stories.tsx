@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect } from 'storybook/test';
 import { MapCard, QrCode, StatsRow, Timeline } from '../src';
 import { expectTapSize } from './expect-tap-size';
-import { sampleEncode } from './sample-qr';
 import { onScreen } from './screens';
 
 const meta = {
@@ -121,7 +120,6 @@ export const Qr: Story = {
     <QrCode
       title="Scan to open my page"
       value="https://levuche.com/desi-origins"
-      encode={sampleEncode}
       fileName="desi-origins"
     />
   ),
