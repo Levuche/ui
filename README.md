@@ -172,8 +172,8 @@ import { SiteGrid, type PageLayouts } from '@levuche/ui';
   can be saved as it is.
 - **Rows:** as many as the page needs. A row is at least 3rem (48 px) tall
   and grows to fit what's in it, so nothing is ever cut off.
-- **Screens:** a tablet from 48rem (768 px) wide and a desktop from 64rem
-  (1024 px), measured on the page itself rather than the window, so a page in
+- **Screens:** a tablet from 42rem (672 px) wide and a desktop from 56rem
+  (896 px), measured on the page itself rather than the window, so a page in
   an editor's preview pane switches at the same sizes.
 - **Starting arrangement:** a screen with nothing saved gets
   `defaultLayout`. A phone has everything one under the other. A tablet has

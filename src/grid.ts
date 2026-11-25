@@ -19,14 +19,17 @@ export const GRID_SCREENS = ['phone', 'tablet', 'desktop'] as const;
 export type GridScreen = (typeof GRID_SCREENS)[number];
 
 /**
- * The page is laid out as a tablet from 48rem (768 px) wide and as a desktop
- * from 64rem (1024 px). Measured on the page itself, not the window, so a
- * page inside an editor's preview pane switches at the same sizes.
+ * The page is laid out as a tablet from 42rem (672 px) wide and as a desktop
+ * from 56rem (896 px). That's the page's own width, after the space around
+ * it, so a tablet held upright gets the tablet layout even with a scroll bar
+ * and some padding, and a tablet on its side or a laptop gets the desktop
+ * one. Measured on the page itself, not the window, so a page inside an
+ * editor's preview pane switches at the same sizes.
  */
 export const GRID_BREAKPOINTS: Record<GridScreen, number> = {
   phone: 0,
-  tablet: 48,
-  desktop: 64,
+  tablet: 42,
+  desktop: 56,
 };
 
 /** One row is 3rem (48 px), and there's 1rem (16 px) between rows and columns. */

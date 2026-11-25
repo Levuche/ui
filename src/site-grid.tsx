@@ -32,8 +32,8 @@ const SCREEN_KEYS: Record<GridScreen, string> = {
  */
 const PLACE =
   '[grid-column:var(--grid-p-col)] [grid-row:var(--grid-p-row)] ' +
-  '@3xl:[grid-column:var(--grid-t-col)] @3xl:[grid-row:var(--grid-t-row)] ' +
-  '@5xl:[grid-column:var(--grid-d-col)] @5xl:[grid-row:var(--grid-d-row)]';
+  '@2xl:[grid-column:var(--grid-t-col)] @2xl:[grid-row:var(--grid-t-row)] ' +
+  '@4xl:[grid-column:var(--grid-d-col)] @4xl:[grid-row:var(--grid-d-row)]';
 
 function placeStyle(places: Record<GridScreen, GridItem | undefined>) {
   const style: Record<string, string> = {};
@@ -55,7 +55,7 @@ function placeStyle(places: Record<GridScreen, GridItem | undefined>) {
  *
  * Rows are 3rem tall at the least and grow to fit what's in them, so text is
  * never cut off. The screen is chosen by the page's own width: a tablet from
- * 48rem and a desktop from 64rem. Screen readers and the Tab key follow the
+ * 42rem and a desktop from 56rem. Screen readers and the Tab key follow the
  * order of `blocks`, whatever the arrangement.
  */
 export function SiteGrid({
@@ -89,7 +89,7 @@ export function SiteGrid({
             className={cn(
               PLACE,
               'flex min-w-0 flex-col *:grow',
-              block.sticky && '@3xl:sticky @3xl:top-6 @3xl:self-start'
+              block.sticky && '@2xl:sticky @2xl:top-6 @2xl:self-start'
             )}
             style={placeStyle({
               phone: placeOf('phone', block.id),
