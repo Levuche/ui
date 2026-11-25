@@ -118,17 +118,26 @@ own buttons and fields can use `min-h-control-sm` too.
 
 ## What's in it
 
-| Group           | Blocks                                                                                                       |
-| --------------- | ------------------------------------------------------------------------------------------------------------ |
-| Theme           | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `SiteTheme`                                   |
-| Buttons, text   | `SiteButton`, `SiteLinkButton`, `siteButtonClasses`, `SiteHeading`, `SiteText`, `SiteSection`, `SiteDivider` |
-| Page            | `SitePage`                                                                                                   |
-| Links           | `LinkTile`, `LinkList`                                                                                       |
-| Profile         | `CreatorHeader`, `Avatar`                                                                                    |
-| Selling         | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`                                           |
-| Media           | `YouTubeVideo`, `youtubeId`, `ReelGrid`                                                                      |
-| Sign-up, footer | `NewsletterBand`, `CreatorFooter`                                                                            |
-| Icons           | link, video, camera, globe, app, email, share, QR code and a few more                                        |
+| Group           | Blocks                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------- |
+| Theme           | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `SiteTheme`                                    |
+| Buttons, text   | `SiteButton`, `SiteLinkButton`, `siteButtonClasses`, `SiteHeading`, `SiteText`, `SiteSection`, `SiteDivider`  |
+| Page            | `SitePage`                                                                                                    |
+| Links           | `LinkTile`, `LinkList`, `FeaturedLink`, `SocialIcons`, `ImageGrid`                                            |
+| Profile         | `CreatorHeader`, `Avatar`                                                                                     |
+| Selling         | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`                                            |
+| Offers          | `BookingCard`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`, `timeLeft`              |
+| Reviews, FAQ    | `Testimonials`, `FaqList`                                                                                     |
+| Media           | `YouTubeVideo`, `youtubeId`, `ReelGrid`                                                                       |
+| Sign-up, footer | `NewsletterBand`, `CreatorFooter`                                                                             |
+| Icons           | link, video, camera, globe, app, email, share, QR code, calendar, clock, star, copy, download, heart and more |
+
+`BookingCard` and `MembershipCard` link to the page that takes the booking
+or the payment. `LeadMagnet`, `TipJar` and `NewsletterBand` are forms: give
+them an `action` to post to, or an `onSubmit`. `TipJar` sends `amount`.
+`Countdown` ticks in the visitor's browser (pass `now` to freeze it in a
+preview). `DiscountCode` copies with the browser's clipboard and says so to
+screen readers.
 
 `YouTubeVideo` shows a play button first and loads YouTube (privacy-enhanced
 mode) only when the visitor presses it. `youtubeId` reads the id from any

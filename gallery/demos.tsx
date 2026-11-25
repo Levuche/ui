@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NewsletterBand, PackCheckout } from '../src';
+import { LeadMagnet, NewsletterBand, PackCheckout, TipJar } from '../src';
 
 /** Checkout that says when it would start, for the tests. */
 export function CheckoutDemo() {
@@ -31,6 +31,42 @@ export function NewsletterDemo() {
         }}
       />
       {done ? <p role="status">Subscribed</p> : null}
+    </div>
+  );
+}
+
+/** Lead magnet that says when it would send the guide, for the tests. */
+export function LeadMagnetDemo() {
+  const [sent, setSent] = useState(false);
+  return (
+    <div className="flex flex-col gap-2">
+      <LeadMagnet
+        title="The origin story checklist"
+        detail="One page to plan your next video."
+        headingAs="p"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSent(true);
+        }}
+      />
+      {sent ? <p role="status">Guide sent</p> : null}
+    </div>
+  );
+}
+
+/** Tip jar that says which amount it would send, for the tests. */
+export function TipJarDemo() {
+  const [tip, setTip] = useState<string | null>(null);
+  return (
+    <div className="flex flex-col gap-2">
+      <TipJar
+        title="Buy me a chai"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setTip(String(new FormData(event.currentTarget).get('amount')));
+        }}
+      />
+      {tip ? <p role="status">Tip of {tip} started</p> : null}
     </div>
   );
 }
