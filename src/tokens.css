@@ -63,14 +63,19 @@
  *   control     40 px, 44 px on touch   (small buttons, inputs)
  *   control-md  44 px, 48 px on touch   (the default button)
  *   control-lg  48 px, 52 px on touch   (the buy button)
- * Widths: max-w-site is a creator page's column (420 px), max-w-site-wide a
- * wider one for grids (640 px). They are named after the --site-* tokens so
- * they never clash with an app's own page widths (max-w-page and so on).
+ * Widths grow once the screen is a tablet or wider (48rem, 768 px), so a page
+ * fills a phone and reads as a comfortable column on a tablet or desktop:
+ *   site       420 px, 576 px from a tablet up   (a creator page's column)
+ *   site-wide  640 px, 768 px from a tablet up   (a page of grids)
+ * They are named after the --site-* tokens so they never clash with an app's
+ * own page widths (max-w-page and so on).
  */
 :root {
   --levuche-control: 2.5rem;
   --levuche-control-md: 2.75rem;
   --levuche-control-lg: 3rem;
+  --levuche-site: 26.25rem;
+  --levuche-site-wide: 40rem;
 }
 @media (pointer: coarse) {
   :root {
@@ -79,14 +84,18 @@
     --levuche-control-lg: 3.25rem;
   }
 }
+@media (min-width: 48rem) {
+  :root {
+    --levuche-site: 36rem;
+    --levuche-site-wide: 48rem;
+  }
+}
 @theme inline {
   --spacing-control: var(--levuche-control);
   --spacing-control-md: var(--levuche-control-md);
   --spacing-control-lg: var(--levuche-control-lg);
-}
-@theme {
-  --container-site: 26.25rem;
-  --container-site-wide: 40rem;
+  --container-site: var(--levuche-site);
+  --container-site-wide: var(--levuche-site-wide);
 }
 
 /* The tokens as Tailwind colours: bg-site-surface, text-site-accent and so on. */

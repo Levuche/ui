@@ -102,8 +102,8 @@ resizes every block and the pages stay compact on a phone, tablet or desktop.
 | `min-h-control`             | 40 px with a mouse, 44 px on touch    | small buttons, inputs         |
 | `min-h-control-md`          | 44 px, 48 px on touch                 | the default button            |
 | `min-h-control-lg`          | 48 px, 52 px on touch                 | the buy button                |
-| `max-w-site`                | 420 px                                | a creator page's column       |
-| `max-w-site-wide`           | 640 px                                | a wider column, for grids     |
+| `max-w-site`                | 420 px, 576 px from a tablet up       | a creator page's column       |
+| `max-w-site-wide`           | 640 px, 768 px from a tablet up       | a wider column, for grids     |
 | `text-xs` to `text-2xl`     | Tailwind's type scale (12–24 px)      | all text; body is `text-base` |
 | `p-3`, `gap-2`, `size-13` … | Tailwind's spacing scale (4 px steps) | padding, gaps, thumbnails     |
 
@@ -112,6 +112,16 @@ The control presets work like any spacing value (`h-control`,
 never needs `pointer-coarse:` for its height. Wrap a page in `SitePage` (or
 give its column `max-w-site`) so blocks never stretch across a big screen.
 Inputs keep 16 px text on touch screens so phones don't zoom in.
+
+### Phone, tablet and desktop
+
+A page fills a phone, then from a tablet up (768 px and wider) its column grows
+to 576 px and stays there, centred, however wide the screen gets. In Storybook,
+**Pages/Creator page** has a story for each screen (phone, tablet, tablet
+turned sideways, desktop), and the screen menu in the toolbar shows any story
+at those sizes. Each screen story checks that the page never scrolls sideways
+and that no block spills out of its column. The end-to-end tests run on a
+desktop, a tablet and a phone.
 
 An app that imports `@levuche/ui/tokens.css` gets the same presets, so its
 own buttons and fields can use `min-h-control` too, without defining it

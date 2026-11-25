@@ -1,5 +1,6 @@
 import type { Preview } from '@storybook/react-vite';
 import { CreatorTheme } from '../src';
+import { SCREENS } from '../stories/screens';
 import { THEMES, type ThemeName } from '../stories/themes';
 import './preview.css';
 
@@ -41,6 +42,7 @@ const preview: Preview = {
   parameters: {
     layout: 'fullscreen',
     controls: { expanded: true },
+    viewport: { options: SCREENS },
     a11y: {
       // Fail the story's test on any accessibility violation (WCAG 2.2 AA).
       test: 'error',
