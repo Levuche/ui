@@ -38,7 +38,7 @@ export function NewsletterBand({
           aria-label="Email"
           autoComplete="email"
           placeholder={placeholder}
-          className="bg-site-bg text-site-text rounded-site-button min-h-control-sm min-w-0 flex-1 border-0 px-3.5 font-[inherit] text-base pointer-fine:text-sm"
+          className="bg-site-bg text-site-text rounded-site-button min-h-control min-w-0 flex-1 border-0 px-3.5 font-[inherit] text-base pointer-fine:text-sm"
         />
         <button
           type="submit"

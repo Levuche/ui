@@ -99,22 +99,24 @@ resizes every block and the pages stay compact on a phone, tablet or desktop.
 
 | Preset                      | Size                                  | Used for                      |
 | --------------------------- | ------------------------------------- | ----------------------------- |
-| `min-h-control-sm`          | 40 px with a mouse, 44 px on touch    | small buttons, inputs         |
+| `min-h-control`             | 40 px with a mouse, 44 px on touch    | small buttons, inputs         |
 | `min-h-control-md`          | 44 px, 48 px on touch                 | the default button            |
 | `min-h-control-lg`          | 48 px, 52 px on touch                 | the buy button                |
-| `max-w-page`                | 420 px                                | a creator page's column       |
-| `max-w-page-wide`           | 640 px                                | a wider column, for grids     |
+| `max-w-site`                | 420 px                                | a creator page's column       |
+| `max-w-site-wide`           | 640 px                                | a wider column, for grids     |
 | `text-xs` to `text-2xl`     | Tailwind's type scale (12–24 px)      | all text; body is `text-base` |
 | `p-3`, `gap-2`, `size-13` … | Tailwind's spacing scale (4 px steps) | padding, gaps, thumbnails     |
 
-The control presets work like any spacing value (`h-control-sm`,
+The control presets work like any spacing value (`h-control`,
 `size-control-md`), and they grow on touch screens by themselves, so a block
 never needs `pointer-coarse:` for its height. Wrap a page in `SitePage` (or
-give its column `max-w-page`) so blocks never stretch across a big screen.
+give its column `max-w-site`) so blocks never stretch across a big screen.
 Inputs keep 16 px text on touch screens so phones don't zoom in.
 
 An app that imports `@levuche/ui/tokens.css` gets the same presets, so its
-own buttons and fields can use `min-h-control-sm` too.
+own buttons and fields can use `min-h-control` too, without defining it
+again. The widths are named `site` so an app's own `max-w-page` stays its
+own.
 
 ## What's in it
 
@@ -182,7 +184,7 @@ variable, the same pair the website uses.
 
 1. Build it from its design board with `--site-*` tokens only (no raw
    colours), `rounded-site` or `rounded-site-button` for corners, and the
-   size presets above (no fixed pixel sizes; `min-h-control-sm` or more for
+   size presets above (no fixed pixel sizes; `min-h-control` or more for
    anything tapped).
 2. Export it from `src/index.ts`.
 3. Show it in `gallery/gallery.tsx`, inside a `Group`.

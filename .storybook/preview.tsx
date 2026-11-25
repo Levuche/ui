@@ -31,7 +31,7 @@ const preview: Preview = {
           className="min-h-screen p-5"
           data-testid="story-theme"
         >
-          <div className="max-w-page mx-auto flex flex-col gap-4">
+          <div className="max-w-site mx-auto flex flex-col gap-4">
             <Story />
           </div>
         </CreatorTheme>
