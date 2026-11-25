@@ -129,6 +129,7 @@ export function LockedLink({
   const words = { ...LOCKED_LINK_LABELS, ...labels };
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
   const key = `levuche-lock:${rememberAs ?? href ?? ''}`;
   const [passed, setPassed] = useState(false);
   const [denied, setDenied] = useState(false);
@@ -273,7 +274,11 @@ export function LockedLink({
                 variant="outline"
                 fullWidth
                 action="lock_cancel"
-                onClick={() => setDenied(true)}
+                onClick={() => {
+                  setDenied(true);
+                  // The answer buttons go; keep focus in the dialog.
+                  requestAnimationFrame(() => closeButton.current?.focus());
+                }}
               >
                 {words.ageNo}
               </SiteButton>
@@ -298,6 +303,7 @@ export function LockedLink({
         ) : null}
 
         <SiteButton
+          ref={closeButton}
           variant="text"
           action="lock_cancel"
           fullWidth

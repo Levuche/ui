@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { LockedLink } from '../src';
 import { expectTapSize } from './expect-tap-size';
 import { onScreen } from './screens';
@@ -64,7 +64,7 @@ export const WrongCode: Story = {
   },
 };
 
-/** An age check: "No" says why, and Escape gives focus back to the button. */
+/** An age check: "No" says why, and closing gives focus back to the button. */
 export const AgeCheck: Story = {
   globals: onScreen('phone'),
   args: {
@@ -80,7 +80,9 @@ export const AgeCheck: Story = {
     await expect(dialog.getByText('Are you 18 or older?')).toBeVisible();
     await userEvent.click(dialog.getByRole('button', { name: 'No' }));
     await expect(dialog.getByRole('status')).toHaveTextContent(/18 and over/);
-    await userEvent.keyboard('{Escape}');
+    const close = dialog.getByRole('button', { name: 'Close' });
+    await waitFor(() => expect(close).toHaveFocus());
+    await userEvent.click(close);
     await expect(open).toHaveFocus();
   },
 };
