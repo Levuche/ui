@@ -127,6 +127,34 @@ export const OnDesktop: Story = {
 };
 
 /*
+ * In a right-to-left script the layouts mirror: on a tablet the profile
+ * moves to the right, and on a desktop to the left.
+ */
+export const OnTabletRightToLeft: Story = {
+  globals: { theme: 'light', direction: 'rtl', ...onScreen('tablet') },
+  play: async ({ canvasElement }) => {
+    await expectGridFits(canvasElement, 'tablet');
+    const profile = boxOf(canvasElement, 'profile');
+    const presets = boxOf(canvasElement, 'presets');
+    await expect(presets.right).toBeLessThan(profile.left);
+  },
+};
+
+export const OnDesktopRightToLeft: Story = {
+  globals: { theme: 'dark', direction: 'rtl', ...onScreen('desktop') },
+  play: async ({ canvasElement }) => {
+    await expectGridFits(canvasElement, 'desktop');
+    const profile = boxOf(canvasElement, 'profile');
+    const presets = boxOf(canvasElement, 'presets');
+    const app = boxOf(canvasElement, 'app');
+    const video = boxOf(canvasElement, 'video');
+    await expect(profile.right).toBeLessThan(video.left);
+    // The first link is on the right, the one after it to its left.
+    await expect(app.right).toBeLessThan(presets.left);
+  },
+};
+
+/*
  * A creator's own desktop arrangement: profile on the left, links in three
  * columns, the video and photos side by side. Phone and tablet keep their
  * defaults, as nothing was saved for them.

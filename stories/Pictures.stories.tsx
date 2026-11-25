@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, fireEvent, userEvent } from 'storybook/test';
+import { expect, fireEvent, userEvent, waitFor } from 'storybook/test';
 import { BeforeAfter, ImageCarousel, LogoStrip, SiteImage } from '../src';
 import { expectTapSize } from './expect-tap-size';
 
@@ -136,6 +136,76 @@ export const Compare: StoryObj<typeof BeforeAfter> = {
   },
 };
 
+/*
+ * In a right-to-left script the next slide is on the left: the next button
+ * sits on the left, the track scrolls left, and the left arrow key goes on.
+ */
+export const CarouselRightToLeft: StoryObj<typeof ImageCarousel> = {
+  globals: { direction: 'rtl' },
+  render: () => <ImageCarousel title="Where tea comes from" slides={SLIDES} />,
+  play: async ({ canvas, canvasElement }) => {
+    const next = canvas.getByRole('button', { name: 'Next slide' });
+    const previous = canvas.getByRole('button', { name: 'Previous slide' });
+    await expect(next.getBoundingClientRect().right).toBeLessThan(
+      previous.getBoundingClientRect().left
+    );
+    const track = canvasElement.querySelector<HTMLElement>('[id$="-track"]');
+    if (!track) throw new Error('No track');
+    await userEvent.click(next);
+    await expect(
+      canvas.getByRole('button', { name: 'Slide 2 of 3' })
+    ).toHaveAttribute('aria-current', 'true');
+    // The track really moved to the second slide, scrolling to the left.
+    await waitFor(() =>
+      expect(Math.round(track.scrollLeft)).toBe(-track.clientWidth)
+    );
+    track.focus();
+    await userEvent.keyboard('{ArrowLeft}');
+    await expect(
+      canvas.getByRole('button', { name: 'Slide 3 of 3' })
+    ).toHaveAttribute('aria-current', 'true');
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(
+      canvas.getByRole('button', { name: 'Slide 2 of 3' })
+    ).toHaveAttribute('aria-current', 'true');
+  },
+};
+
+/*
+ * In a right-to-left script the before picture shows from the right, where
+ * the slider starts, so the handle and the picture move together.
+ */
+export const CompareRightToLeft: StoryObj<typeof BeforeAfter> = {
+  globals: { direction: 'rtl' },
+  render: () => (
+    <BeforeAfter
+      before={{ src: picture('#6b7280', 'Before'), alt: 'The kitchen before' }}
+      after={{ src: picture('#c2410c', 'After'), alt: 'The kitchen after' }}
+      defaultPosition={30}
+    />
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const slider = canvas.getByRole('slider', {
+      name: 'Compare before and after',
+    });
+    const box = slider.getBoundingClientRect();
+    const line = canvasElement.querySelector<HTMLElement>(
+      '[style*="inset-inline-start"]'
+    );
+    if (!line) throw new Error('No dividing line');
+    const lineBox = line.getBoundingClientRect();
+    const middle = (lineBox.left + lineBox.right) / 2;
+    // 30% in from the right-hand edge.
+    await expect(Math.abs(middle - (box.right - box.width * 0.3))).toBeLessThan(
+      2
+    );
+    const before = canvas.getByRole('img', { name: 'The kitchen before' });
+    const clip = getComputedStyle(before.parentElement as HTMLElement).clipPath;
+    // Clipped from the left, so only its right-hand 30% shows.
+    await expect(clip).toMatch(/^inset\(0px 0px 0px (calc\()?70%\)?\)$/);
+  },
+};
+
 const LOGOS = ['Chai Weekly', 'Spice Route', 'The Kettle', 'Leaf & Co'].map(
   (alt) => ({ src: null, alt })
 );
@@ -155,5 +225,31 @@ export const LogosScrolling: StoryObj<typeof LogoStrip> = {
     await expect(
       canvas.getAllByRole('listitem', { hidden: false })
     ).toHaveLength(4);
+  },
+};
+
+/*
+ * In a right-to-left script the row moves to the right, and the logos still
+ * fill the strip at every point of the loop.
+ */
+export const LogosScrollingRightToLeft: StoryObj<typeof LogoStrip> = {
+  globals: { direction: 'rtl' },
+  render: () => <LogoStrip title="As seen in" logos={LOGOS} mode="scroll" />,
+  play: async ({ canvasElement }) => {
+    const list = canvasElement.querySelector<HTMLElement>('ul');
+    const strip = list?.parentElement;
+    if (!list || !strip) throw new Error('No scrolling row');
+    const [motion] = list.getAnimations();
+    // With less motion asked for, the row doesn't move at all.
+    if (!motion) return;
+    motion.pause();
+    const length = Number(motion.effect?.getComputedTiming().duration ?? 0);
+    for (const part of [0.25, 0.5, 0.9]) {
+      motion.currentTime = length * part;
+      const row = list.getBoundingClientRect();
+      const room = strip.getBoundingClientRect();
+      await expect(row.left).toBeLessThanOrEqual(room.left + 1);
+      await expect(row.right).toBeGreaterThanOrEqual(room.right - 1);
+    }
   },
 };

@@ -445,6 +445,20 @@ own buttons and fields can use `min-h-control` too, without defining it
 again. The widths are named `site` so an app's own `max-w-page` stays its
 own.
 
+### Right-to-left scripts and long text
+
+Blocks use start and end, not left and right, so `dir="rtl"` on the page, or
+on any element around the blocks, mirrors them for Arabic, Hebrew or Urdu:
+link icons sit on the right, the carousel's next slide is on the left (and the
+left arrow key moves to it), the before-and-after picture shows from the
+right, scrolling logos move right, and grid pages mirror their columns.
+
+Long names, titles and addresses wrap inside their block, even a word with no
+place to break, so nothing spills off a phone; prices stay on one line. In
+Storybook, the toolbar's Direction menu shows any story right to left, and
+**Pages/Right to left and long text** checks a page in Arabic and one with
+very long words on each screen.
+
 ## Grid pages
 
 `SiteGrid` lays a page out on a grid of 10 columns, with a separate
@@ -575,6 +589,7 @@ Storybook (`stories/`, set up in `.storybook/`) has a story for each block
 and state, with its props as controls and docs built from them. The toolbar's
 Theme menu shows any story in the sample creator's light or dark scheme or in
 a creator's own theme, and `Pages/Creator page` shows a whole page in each.
+The Direction menu shows it right to left.
 
 Each story is also a test. `npm run test:stories` opens every story in
 Chromium (Vitest with the Storybook plugin), runs its play function, which
