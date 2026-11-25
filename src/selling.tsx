@@ -27,12 +27,12 @@ export function PackRow({
     <>
       <Thumb
         src={image}
-        className="size-[52px] rounded-[calc(var(--site-radius)*0.75)]"
+        className="size-13 rounded-[calc(var(--site-radius)*0.75)]"
       />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="font-semibold">{title}</span>
         {detail ? (
-          <span className="text-site-text-2 text-[13px]">{detail}</span>
+          <span className="text-site-text-2 text-sm">{detail}</span>
         ) : null}
       </span>
       <span className="font-bold tabular-nums">{price}</span>
@@ -107,12 +107,12 @@ export function PackCheckout({
       onSubmit={onSubmit}
       className={cn('flex flex-col gap-3.5', className)}
     >
-      <label className="text-site-text-2 flex items-start gap-2.5 text-[13px] leading-normal">
+      <label className="text-site-text-2 flex items-start gap-2.5 text-sm leading-normal">
         <input
           type="checkbox"
           name="consent"
           required
-          className="accent-site-accent m-0 size-[22px] flex-none"
+          className="accent-site-accent m-0 size-5.5 flex-none"
         />
         {consent}
       </label>
@@ -151,12 +151,10 @@ export function FeaturedPack({
     >
       <Thumb
         src={image}
-        className="h-[110px] w-full rounded-[calc(var(--site-radius)*0.75)]"
+        className="h-28 w-full rounded-[calc(var(--site-radius)*0.75)]"
       />
       <Heading className="m-0 text-lg font-bold">{title}</Heading>
-      {detail ? (
-        <p className="text-site-text-2 m-0 text-[13px]">{detail}</p>
-      ) : null}
+      {detail ? <p className="text-site-text-2 m-0 text-sm">{detail}</p> : null}
       <div className="flex items-center justify-between gap-3">
         <span className="text-xl font-bold tabular-nums">{price}</span>
         {action ?? (
@@ -185,7 +183,7 @@ export function PackGrid({
   return (
     <ul
       className={cn(
-        'm-0 grid list-none grid-cols-2 gap-2.5 p-0 text-[13px]',
+        'm-0 grid list-none grid-cols-2 gap-2.5 p-0 text-sm',
         className
       )}
     >
@@ -194,7 +192,7 @@ export function PackGrid({
           <>
             <Thumb
               src={pack.image}
-              className="h-[60px] w-full rounded-[calc(var(--site-radius)*0.6)]"
+              className="h-15 w-full rounded-[calc(var(--site-radius)*0.6)]"
             />
             <strong>{pack.title}</strong>
             <span className="tabular-nums">{pack.price}</span>

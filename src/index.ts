@@ -22,6 +22,7 @@ export {
   SiteDivider,
   SiteHeading,
   SiteLinkButton,
+  SitePage,
   SiteSection,
   SiteText,
   siteButtonClasses,

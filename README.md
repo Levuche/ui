@@ -90,8 +90,31 @@ Every block reads only `--site-*` CSS variables. `<CreatorTheme>` sets them:
 - `font`: a CSS font-family list (the app loads the font).
 
 Buttons also take `variant` (`solid`, `outline`, `soft`, `text`) and `size`
-(`sm`, `md`, `lg`; all at least 44 px tall to tap), so creators can pick them
-per block.
+(`sm`, `md`, `lg`), so creators can pick them per block.
+
+## Size presets
+
+Blocks use named sizes, never fixed pixels, so one change in `tokens.css`
+resizes every block and the pages stay compact on a phone, tablet or desktop.
+
+| Preset                      | Size                                  | Used for                      |
+| --------------------------- | ------------------------------------- | ----------------------------- |
+| `min-h-control-sm`          | 40 px with a mouse, 44 px on touch    | small buttons, inputs         |
+| `min-h-control-md`          | 44 px, 48 px on touch                 | the default button            |
+| `min-h-control-lg`          | 48 px, 52 px on touch                 | the buy button                |
+| `max-w-page`                | 420 px                                | a creator page's column       |
+| `max-w-page-wide`           | 640 px                                | a wider column, for grids     |
+| `text-xs` to `text-2xl`     | Tailwind's type scale (12–24 px)      | all text; body is `text-base` |
+| `p-3`, `gap-2`, `size-13` … | Tailwind's spacing scale (4 px steps) | padding, gaps, thumbnails     |
+
+The control presets work like any spacing value (`h-control-sm`,
+`size-control-md`), and they grow on touch screens by themselves, so a block
+never needs `pointer-coarse:` for its height. Wrap a page in `SitePage` (or
+give its column `max-w-page`) so blocks never stretch across a big screen.
+Inputs keep 16 px text on touch screens so phones don't zoom in.
+
+An app that imports `@levuche/ui/tokens.css` gets the same presets, so its
+own buttons and fields can use `min-h-control-sm` too.
 
 ## What's in it
 
@@ -99,6 +122,7 @@ per block.
 | --------------- | ------------------------------------------------------------------------------------------------------------ |
 | Theme           | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `SiteTheme`                                   |
 | Buttons, text   | `SiteButton`, `SiteLinkButton`, `siteButtonClasses`, `SiteHeading`, `SiteText`, `SiteSection`, `SiteDivider` |
+| Page            | `SitePage`                                                                                                   |
 | Links           | `LinkTile`, `LinkList`                                                                                       |
 | Profile         | `CreatorHeader`, `Avatar`                                                                                    |
 | Selling         | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`                                           |
@@ -126,9 +150,9 @@ npm run test:stories # every story's interaction and accessibility test
 The gallery (`gallery/`) shows every block in three themes: the sample
 creator's light and dark, and a creator's own colours, corners, button shape
 and font. The end-to-end tests (`e2e/`) open it in Chromium, at desktop and
-phone sizes, and check that each theme reaches every block, 44 px tap
-targets, links to other sites opening in a new tab, the video loading only on
-play, the checkout's consent box, newsletter validation, no sideways
+phone sizes, and check that each theme reaches every block, tap targets
+(40 px with a mouse, 44 px on touch), links to other sites opening in a new
+tab, the video loading only on play, the checkout's consent box, newsletter validation, no sideways
 scrolling, and accessibility with axe (WCAG 2.2 AA, no serious or critical
 problems). `e2e/theme.spec.ts` checks the YouTube address reader and that a
 theme only lets plain colours and fonts into CSS.
@@ -144,7 +168,7 @@ Each story is also a test. `npm run test:stories` opens every story in
 Chromium (Vitest with the Storybook plugin), runs its play function, which
 clicks and types like a visitor (the checkout's consent box, the newsletter's
 address check, the video loading only on play, new tabs for other sites,
-44 px tap targets), and fails on any axe problem (WCAG 2.2 AA). The
+tap targets), and fails on any axe problem (WCAG 2.2 AA). The
 Accessibility tab shows the same checks while you work. CI runs them as
 "Storybook tests" and builds Storybook.
 
@@ -157,8 +181,9 @@ variable, the same pair the website uses.
 ### Adding a block
 
 1. Build it from its design board with `--site-*` tokens only (no raw
-   colours), `rounded-site` or `rounded-site-button` for corners, and at
-   least 44 px for anything tapped.
+   colours), `rounded-site` or `rounded-site-button` for corners, and the
+   size presets above (no fixed pixel sizes; `min-h-control-sm` or more for
+   anything tapped).
 2. Export it from `src/index.ts`.
 3. Show it in `gallery/gallery.tsx`, inside a `Group`.
 4. Add `stories/<Block>.stories.tsx`, with a play function that does what a

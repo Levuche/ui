@@ -102,7 +102,7 @@ export function YouTubeVideo({
   if (!id) return null;
   const frame = cn(
     'bg-site-surface-2 rounded-site relative block w-full overflow-hidden',
-    vertical ? 'mx-auto aspect-[9/16] max-w-[360px]' : 'aspect-video',
+    vertical ? 'mx-auto aspect-[9/16] max-w-90' : 'aspect-video',
     className
   );
   if (playing) {
