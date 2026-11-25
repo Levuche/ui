@@ -61,7 +61,9 @@ export function CreatorHeader({
           <div className="flex min-w-0 flex-col gap-1">{words}</div>
         </div>
       ) : (
-        <div className="items-[inherit] flex flex-col gap-2">
+        // Lines up with the block's own align. Tailwind has no items-inherit
+        // class, so the style says it.
+        <div className="flex flex-col gap-2" style={{ alignItems: 'inherit' }}>
           <Avatar
             name={name}
             src={avatar}
