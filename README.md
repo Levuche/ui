@@ -16,7 +16,8 @@ Built from the boards in [Levuche/design](https://github.com/Levuche/design)
 
 Levuche is a product managed by Jagodana LLC. See [LICENSE](LICENSE): the
 code is free to use, change and ship in your own sites and apps, including
-commercial ones, but not to resell as a component library, kit or template.
+commercial ones, but not to resell as a component library, kit or template,
+or to use for training AI models.
 
 ## Use it in a Levuche app
 

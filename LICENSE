@@ -23,12 +23,17 @@ other products, including commercial ones, on these conditions:
    levuche.page are trademarks of Jagodana LLC. This licence grants no
    right to use them. See TRADEMARKS.md.
 
-4. Levuche's own features. Some blocks are sold to creators as paid packs
+4. No AI training. You may not use the Software, or any part of it, to
+   train, fine-tune or evaluate machine learning or AI models, or include
+   it in any dataset.
+
+5. Levuche's own features. Some blocks are sold to creators as paid packs
    inside Levuche. This licence covers the code in this repository; it
    gives no access to paid packs or any other paid feature on Levuche.
 
-Any use not allowed above, including reselling, needs written permission
-from Jagodana LLC. To ask, contact Jagodana LLC through https://jagodana.com.
+Any use not allowed above, including reselling or AI training, needs
+written permission from Jagodana LLC. To ask, contact Jagodana LLC through
+https://jagodana.com.
 
 Third-party material stays under its own licence:
 
