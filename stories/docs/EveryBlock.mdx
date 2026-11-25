@@ -1,0 +1,32 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { BlockTable } from './block-table';
+
+<Meta title="Docs/Every block" />
+
+# Every block
+
+Each block's own page, under **Blocks** in the menu, shows it in every state
+with its props as controls. This page lists them all from the registry
+(`BLOCKS` in `src/system/registry.ts`), so it always matches the code.
+
+- **Grid kind** is how a block sits on a grid page: `link` and `card` blocks
+  can sit two to a row on a desktop, `profile` stays a narrow column, and
+  `links`, `media`, `gallery`, `text` and `band` take the width they're given.
+- **In Levuche** is whether a creator gets the block free, or unlocks its pack
+  with a one-time purchase. The code is the same for every block.
+
+## By group
+
+- **Profile and links:** one header at the top of the page; keep the most
+  important link first.
+- **Selling and offers:** every price is the creator's own text, such as
+  "$12" or "Free"; buying goes through BuildBase.
+- **Media:** videos load only when a visitor presses play, so the page stays
+  fast; give each one a title.
+- **Trust:** quote real visitors, with their permission.
+- **Forms:** each form says what happens next and shows its own errors.
+- **Feeds and developer:** they show data the app fetches; give them
+  `loading` and `error` so a slow service never leaves a blank space.
+- **Page:** the footer, map and QR code; keep the footer last.
+
+<BlockTable />
