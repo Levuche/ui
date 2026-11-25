@@ -97,6 +97,11 @@ async function show(page: Page, id: string, theme: ThemeName) {
 
 test.beforeEach(async ({ page }) => {
   await page.clock.setFixedTime(NOW);
+  // Nothing plays: a clip a story presses would load and stop at a different
+  // moment each run, and its button and clock with it.
+  await page.addInitScript(() => {
+    HTMLMediaElement.prototype.play = () => Promise.resolve();
+  });
   // Nothing from outside: embeds and outside pictures would make the pictures
   // change between runs.
   await page.route(
