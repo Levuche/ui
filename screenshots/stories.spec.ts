@@ -45,6 +45,30 @@ async function show(page: Page, id: string, theme: ThemeName) {
   );
   const root = page.getByTestId('story-theme');
   await expect(root).toBeVisible();
+  // Wait for the story's play function to finish: many click, type or scroll.
+  await page.waitForFunction(
+    () => {
+      const preview = (
+        window as {
+          __STORYBOOK_PREVIEW__?: { currentRender?: { phase?: string } };
+        }
+      ).__STORYBOOK_PREVIEW__;
+      const phase = preview?.currentRender?.phase ?? '';
+      return [
+        'completed',
+        'afterEach',
+        'finished',
+        'errored',
+        'aborted',
+      ].includes(phase);
+    },
+    null,
+    { timeout: 30_000 }
+  );
+  // A focus ring left by the play function isn't part of the look.
+  await page.evaluate(() =>
+    (document.activeElement as HTMLElement | null)?.blur()
+  );
   // Let pictures finish loading or failing before the picture is taken.
   await page.waitForLoadState('networkidle');
   await page.evaluate(() => document.fonts.ready);
