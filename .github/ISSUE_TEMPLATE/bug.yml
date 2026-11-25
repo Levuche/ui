@@ -1,0 +1,67 @@
+name: Something is broken
+description: A block looks wrong, does the wrong thing, or is hard to use with a keyboard or screen reader.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to tell us. Please search the open issues first, in case it's already there.
+        For a security problem, don't open an issue: use **Report a vulnerability** on the Security tab.
+  - type: input
+    id: block
+    attributes:
+      label: Which block?
+      description: Its name, as `TipJar` or `LinkList`.
+      placeholder: TipJar
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The tag you installed, as `v0.1.0`, or `dev` for the latest.
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what you saw instead.
+      placeholder: |
+        1. Put a TipJar on the page with tone="accent"
+        2. Pick $10
+        Expected: the button says "Tip $10"
+        Saw: the button stays empty
+    validations:
+      required: true
+  - type: textarea
+    id: code
+    attributes:
+      label: The smallest code that shows it
+      description: Props and theme are often enough. Leave out keys, tokens and anything private.
+      render: tsx
+  - type: dropdown
+    id: screens
+    attributes:
+      label: Where does it happen?
+      multiple: true
+      options:
+        - Phone
+        - Tablet
+        - Desktop
+        - Light theme
+        - Dark theme
+        - A creator's own theme
+        - With a keyboard
+        - With a screen reader
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: Safari 18 on iPhone 15
+  - type: textarea
+    id: more
+    attributes:
+      label: Anything else?
+      description: Screenshots or a short screen recording help a lot.

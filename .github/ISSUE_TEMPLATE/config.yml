@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a question or share an idea
+    url: https://github.com/Levuche/ui/discussions
+    about: How do I…, which block should I use, and ideas that aren't ready to be an issue yet.
+  - name: Report a security problem
+    url: https://github.com/Levuche/ui/security/advisories/new
+    about: Please report security problems privately here, never in a public issue.

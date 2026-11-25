@@ -1,0 +1,30 @@
+name: Accessibility problem
+description: Something you can't do, or can't do well, with a keyboard, screen reader, zoom, or reduced motion.
+labels: [accessibility, bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every block aims for WCAG 2.2 AA. If one misses, that's a bug we want to fix first. Tell us what you were trying to do and what got in the way.
+  - type: input
+    id: block
+    attributes:
+      label: Which block?
+      placeholder: ImageCarousel
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What got in the way?
+      placeholder: With VoiceOver, the carousel's arrows are read as "button" with no name.
+    validations:
+      required: true
+  - type: input
+    id: tools
+    attributes:
+      label: What you use
+      description: Screen reader, browser, zoom level or other settings.
+      placeholder: VoiceOver on iOS 18, Safari
+    validations:
+      required: true
