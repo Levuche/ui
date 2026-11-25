@@ -8,3 +8,4 @@ playwright-report/
 .env*
 storybook-static/
 *storybook.log
+.wrangler/

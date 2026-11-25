@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // The public Storybook for the page blocks, on Cloudflare Workers as static
+  // files only (no Worker code). .github/workflows/storybook.yml builds it
+  // with `npm run build-storybook` and deploys it on every push to dev; pull
+  // requests into dev upload preview versions. No secrets belong in this file.
+  "name": "levuche-storybook",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./storybook-static",
+  },
+  // storybook.levuche.com only. The levuche.com zone is on the same
+  // Cloudflare account, so the first deploy adds the DNS record and
+  // certificate itself.
+  "routes": [{ "pattern": "storybook.levuche.com", "custom_domain": true }],
+  "workers_dev": false,
+  // Preview links for pull requests, on the account's workers.dev subdomain.
+  "preview_urls": true,
+}
