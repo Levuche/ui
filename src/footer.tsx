@@ -11,7 +11,7 @@ export function CreatorFooter({
   return (
     <footer
       className={cn(
-        'border-site-border text-site-text-2 flex flex-wrap justify-between gap-3 border-t px-[18px] py-3 text-xs',
+        'border-site-border text-site-text-2 flex flex-wrap justify-between gap-3 border-t px-4 py-3 text-xs',
         className
       )}
     >

@@ -1,4 +1,4 @@
-import { expect, test, type Locator } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { expectNoA11yViolations } from './a11y';
 
 /*
@@ -12,6 +12,10 @@ const THEMES = {
   dark: { scheme: 'dark', accent: 'rgb(255, 138, 61)' },
   custom: { scheme: 'light', accent: 'rgb(15, 118, 110)' },
 } as const;
+
+/** control-sm: 44 px on a touch screen (the phone run), 40 px with a mouse. */
+const tapMin = (page: Page) =>
+  page.evaluate(() => (matchMedia('(pointer: coarse)').matches ? 44 : 40));
 
 test.beforeEach(async ({ page }) => {
   // The video block must not reach YouTube until play is pressed; answer for
@@ -31,7 +35,10 @@ for (const [id, expected] of Object.entries(THEMES)) {
       await expect(panel).toHaveAttribute('data-site', expected.scheme);
     });
 
-    test('buttons use the theme’s colour and are big enough to tap', async () => {
+    test('buttons use the theme’s colour and are big enough to tap', async ({
+      page,
+    }) => {
+      const min = await tapMin(page);
       const buttons = panel.getByTestId('buttons');
       const solid = buttons.getByRole('button', { name: 'Solid' });
       expect(
@@ -44,11 +51,11 @@ for (const [id, expected] of Object.entries(THEMES)) {
         const box = await buttons
           .getByRole('button', { name, exact: true })
           .boundingBox();
-        expect(box?.height ?? 0, name).toBeGreaterThanOrEqual(44);
+        expect(box?.height ?? 0, name).toBeGreaterThanOrEqual(min);
       }
     });
 
-    test('links to other sites open in a new tab', async () => {
+    test('links to other sites open in a new tab', async ({ page }) => {
       const links = panel.getByRole('navigation', {
         name: 'Desi Origins links',
       });
@@ -61,7 +68,7 @@ for (const [id, expected] of Object.entries(THEMES)) {
       const shop = panel.getByRole('link', { name: 'Shop my presets' });
       await expect(shop).toHaveAttribute('target', '_blank');
       const box = await shop.boundingBox();
-      expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(await tapMin(page));
     });
 
     test('video loads YouTube only after play is pressed', async () => {
@@ -132,4 +139,18 @@ test('the page does not scroll sideways on any screen', async ({ page }) => {
     () => document.documentElement.scrollWidth - window.innerWidth
   );
   expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test('controls are 40 px with a mouse and grow to 44 px on touch', async ({
+  page,
+}) => {
+  const coarse = await page.evaluate(
+    () => matchMedia('(pointer: coarse)').matches
+  );
+  const small = page
+    .getByTestId('panel-light')
+    .getByTestId('buttons')
+    .getByRole('button', { name: 'Small', exact: true });
+  const box = await small.boundingBox();
+  expect(box?.height).toBe(coarse ? 44 : 40);
 });

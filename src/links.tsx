@@ -40,9 +40,7 @@ export function LinkTile({
       <span className="flex min-w-0 flex-col gap-0.5">
         {children}
         {detail ? (
-          <span className="text-site-text-2 text-[13px] font-normal">
-            {detail}
-          </span>
+          <span className="text-site-text-2 text-sm font-normal">{detail}</span>
         ) : null}
       </span>
     </a>

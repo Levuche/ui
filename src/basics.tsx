@@ -17,14 +17,15 @@ const variants: Record<SiteButtonVariant, string> = {
 };
 
 const sizes: Record<SiteButtonSize, string> = {
-  sm: 'min-h-11 px-4 text-sm',
-  md: 'min-h-12 px-5 text-[15px]',
-  lg: 'min-h-[52px] px-6 text-base',
+  sm: 'min-h-control-sm px-4 text-sm',
+  md: 'min-h-control-md px-5 text-sm',
+  lg: 'min-h-control-lg px-6 text-base',
 };
 
 /**
  * The classes for a button or a link that looks like one, in the creator's
- * colours and button shape. Every size is at least 44 px tall to tap.
+ * colours and button shape. Heights come from the control presets: 40 to
+ * 48 px with a mouse, 44 to 52 px on touch screens.
  */
 export function siteButtonClasses({
   variant = 'solid',
@@ -114,7 +115,7 @@ export function SiteHeading({
   as?: 'h1' | 'h2' | 'h3';
   size?: 'sm' | 'md' | 'lg';
 }) {
-  const sizes = { sm: 'text-base', md: 'text-xl', lg: 'text-3xl' };
+  const sizes = { sm: 'text-base', md: 'text-xl', lg: 'text-2xl' };
   return (
     <Tag
       className={cn(
@@ -136,7 +137,7 @@ export function SiteText({
   return (
     <p
       className={cn(
-        'm-0 text-[15px] leading-relaxed',
+        'm-0 text-base leading-relaxed',
         muted ? 'text-site-text-2' : 'text-site-text',
         className
       )}
@@ -172,5 +173,31 @@ export function SiteSection({
 export function SiteDivider({ className }: { className?: string }) {
   return (
     <hr className={cn('border-site-border m-0 border-0 border-t', className)} />
+  );
+}
+
+/**
+ * The column a creator's page sits in: centred, full width on a phone, and no
+ * wider than max-w-page (420 px) on a tablet or desktop, so blocks never
+ * stretch across a big screen. `wide` (640 px) suits a page of grids.
+ */
+export function SitePage({
+  as: Tag = 'div',
+  width = 'page',
+  className,
+  ...props
+}: HTMLAttributes<HTMLElement> & {
+  as?: 'div' | 'main';
+  width?: 'page' | 'wide';
+}) {
+  return (
+    <Tag
+      className={cn(
+        'mx-auto flex w-full flex-col gap-6',
+        width === 'wide' ? 'max-w-page-wide' : 'max-w-page',
+        className
+      )}
+      {...props}
+    />
   );
 }

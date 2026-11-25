@@ -85,7 +85,7 @@ export function CreatorHeader({
       <Avatar name={name} src={avatar} size={avatarSize} />
       <Heading className="text-site-text m-0 text-lg font-bold">{name}</Heading>
       {tagline ? (
-        <p className="text-site-text-2 m-0 text-[13px]">{tagline}</p>
+        <p className="text-site-text-2 m-0 text-sm">{tagline}</p>
       ) : null}
     </header>
   );

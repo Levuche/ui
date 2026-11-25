@@ -53,6 +53,41 @@
   color-scheme: dark;
 }
 
+/*
+ * Size presets, so blocks (and any app that imports this file) say
+ * min-h-control-md or max-w-page instead of a fixed pixel size. Type and
+ * spacing use Tailwind's own presets (text-sm, text-base, p-3, size-13).
+ *
+ * Controls are smaller with a mouse and grow on touch screens, where a thumb
+ * needs about 44 px:
+ *   control-sm  40 px, 44 px on touch   (small buttons, inputs)
+ *   control-md  44 px, 48 px on touch   (the default button)
+ *   control-lg  48 px, 52 px on touch   (the buy button)
+ * Page widths: max-w-page is a creator page's column (420 px), max-w-page-wide
+ * a wider one for grids (640 px).
+ */
+:root {
+  --levuche-control-sm: 2.5rem;
+  --levuche-control-md: 2.75rem;
+  --levuche-control-lg: 3rem;
+}
+@media (pointer: coarse) {
+  :root {
+    --levuche-control-sm: 2.75rem;
+    --levuche-control-md: 3rem;
+    --levuche-control-lg: 3.25rem;
+  }
+}
+@theme inline {
+  --spacing-control-sm: var(--levuche-control-sm);
+  --spacing-control-md: var(--levuche-control-md);
+  --spacing-control-lg: var(--levuche-control-lg);
+}
+@theme {
+  --container-page: 26.25rem;
+  --container-page-wide: 40rem;
+}
+
 /* The tokens as Tailwind colours: bg-site-surface, text-site-accent and so on. */
 @theme inline {
   --color-site-bg: var(--site-bg);

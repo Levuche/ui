@@ -13,6 +13,7 @@ import {
   ReelGrid,
   SiteDivider,
   SiteLinkButton,
+  SitePage,
   SiteSection,
   SiteText,
   VideoIcon,
@@ -52,7 +53,7 @@ export const SAMPLE_LINKS = [
 /** A whole creator page built from the blocks, as a creator might set it up. */
 export function SamplePage() {
   return (
-    <main id="top" className="flex flex-col gap-6">
+    <SitePage as="main" id="top">
       <CreatorHeader name="Desi Origins" tagline="How everyday things began" />
       <SiteLinkButton href="https://example.com/presets" fullWidth>
         Shop my presets
@@ -98,6 +99,6 @@ export function SamplePage() {
           { label: 'Refunds', href: '#top' },
         ]}
       />
-    </main>
+    </SitePage>
   );
 }
