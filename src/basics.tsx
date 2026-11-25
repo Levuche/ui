@@ -17,7 +17,7 @@ const variants: Record<SiteButtonVariant, string> = {
 };
 
 const sizes: Record<SiteButtonSize, string> = {
-  sm: 'min-h-control-sm px-4 text-sm',
+  sm: 'min-h-control px-4 text-sm',
   md: 'min-h-control-md px-5 text-sm',
   lg: 'min-h-control-lg px-6 text-base',
 };
@@ -178,7 +178,7 @@ export function SiteDivider({ className }: { className?: string }) {
 
 /**
  * The column a creator's page sits in: centred, full width on a phone, and no
- * wider than max-w-page (420 px) on a tablet or desktop, so blocks never
+ * wider than max-w-site (420 px) on a tablet or desktop, so blocks never
  * stretch across a big screen. `wide` (640 px) suits a page of grids.
  */
 export function SitePage({
@@ -194,7 +194,7 @@ export function SitePage({
     <Tag
       className={cn(
         'mx-auto flex w-full flex-col gap-6',
-        width === 'wide' ? 'max-w-page-wide' : 'max-w-page',
+        width === 'wide' ? 'max-w-site-wide' : 'max-w-site',
         className
       )}
       {...props}

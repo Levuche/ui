@@ -1,7 +1,7 @@
 import { expect } from 'storybook/test';
 
 /**
- * Every control a visitor taps is at least control-sm tall: 44 px on a touch
+ * Every control a visitor taps is at least control tall: 44 px on a touch
  * screen and 40 px with a mouse (WCAG 2.5.8 asks for at least 24 px).
  */
 export async function expectTapSize(element: Element, name = 'control') {

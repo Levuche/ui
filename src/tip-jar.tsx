@@ -58,7 +58,7 @@ export function TipJar({
           {amounts.map((value) => (
             <label
               key={value}
-              className="bg-site-surface-2 text-site-text has-checked:bg-site-accent has-checked:text-site-on-accent has-focus-visible:outline-site-accent rounded-site-button min-h-control-sm inline-flex cursor-pointer items-center px-4 font-bold tabular-nums has-focus-visible:outline-2 has-focus-visible:outline-offset-2"
+              className="bg-site-surface-2 text-site-text has-checked:bg-site-accent has-checked:text-site-on-accent has-focus-visible:outline-site-accent rounded-site-button min-h-control inline-flex cursor-pointer items-center px-4 font-bold tabular-nums has-focus-visible:outline-2 has-focus-visible:outline-offset-2"
             >
               <input
                 type="radio"
@@ -90,7 +90,7 @@ export function TipJar({
             name={other ? 'amount' : undefined}
             value={other}
             onChange={(event) => setOther(event.target.value)}
-            className="bg-site-bg text-site-text border-site-border rounded-site-button min-h-control-sm w-full border-2 px-3.5 font-[inherit] text-base pointer-fine:text-sm"
+            className="bg-site-bg text-site-text border-site-border rounded-site-button min-h-control w-full border-2 px-3.5 font-[inherit] text-base pointer-fine:text-sm"
           />
         </label>
       </fieldset>
