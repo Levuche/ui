@@ -177,9 +177,10 @@ export function SiteDivider({ className }: { className?: string }) {
 }
 
 /**
- * The column a creator's page sits in: centred, full width on a phone, and no
- * wider than max-w-site (420 px) on a tablet or desktop, so blocks never
- * stretch across a big screen. `wide` (640 px) suits a page of grids.
+ * The column a creator's page sits in: centred and full width on a phone. On a
+ * tablet or desktop it grows to max-w-site (576 px) and no further, so blocks
+ * read comfortably without stretching across a big screen. `wide` (768 px)
+ * suits a page of grids.
  */
 export function SitePage({
   as: Tag = 'div',
