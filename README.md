@@ -296,3 +296,11 @@ v0.2.0`).
    (`npm install github:Levuche/ui#v0.2.0`), where its own tests run.
 
 Tags are never moved or deleted once an app uses them.
+
+## Get help, report a problem or contribute
+
+- Questions and ideas: [Discussions](https://github.com/Levuche/ui/discussions)
+- Something broken, or a block you'd like: [open an issue](https://github.com/Levuche/ui/issues/new/choose)
+- A security problem: report it privately, as [SECURITY.md](.github/SECURITY.md) says
+- Making a change: [CONTRIBUTING.md](.github/CONTRIBUTING.md), and our
+  [Code of Conduct](.github/CODE_OF_CONDUCT.md)
