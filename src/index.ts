@@ -260,7 +260,13 @@ export {
   type Stat,
   type TimelineItem,
 } from './organisms/info';
-export { QrCode, qrSvg, type QrEncoder } from './organisms/qr-code';
+export {
+  QrCode,
+  qrEncode,
+  qrSvg,
+  type QrEncoder,
+  type QrLevel,
+} from './organisms/qr-code';
 export {
   LOCKED_LINK_LABELS,
   LockedLink,

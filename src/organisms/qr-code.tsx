@@ -1,3 +1,4 @@
+import qrcode from 'qrcode-generator';
 import type { ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { siteButtonClasses, type SiteButtonVariant } from '../atoms/button';
@@ -7,11 +8,39 @@ import { cn } from '../system/cn';
 import { isSafeColor } from '../system/theme';
 
 /**
- * Turns text into a QR code's squares, row by row, true for dark. Pass the
- * encoder your app already uses, for example
- * `(text) => toMatrix(qrcodeGenerator(0, 'M'), text)`.
+ * How much of the code can be covered or damaged and still scan: about 7%
+ * (L), 15% (M), 25% (Q) or 30% (H). Higher makes a denser code.
  */
-export type QrEncoder = (text: string) => boolean[][];
+export type QrLevel = 'L' | 'M' | 'Q' | 'H';
+
+/**
+ * Turns text into a QR code's squares, row by row, true for dark. The
+ * block uses `qrEncode`; pass your own to draw codes another way.
+ */
+export type QrEncoder = (text: string, level?: QrLevel) => boolean[][];
+
+/**
+ * Encodes text as a QR code in the smallest size that fits, reading it as
+ * UTF-8 so any language scans. Returns no squares when the text is too long
+ * for a QR code (about 2,300 bytes at level M).
+ */
+export const qrEncode: QrEncoder = (text, level = 'M') => {
+  const bytes = new TextEncoder().encode(text);
+  // The largest QR code holds 2,953 bytes, at level L.
+  if (bytes.length === 0 || bytes.length > 2953) return [];
+  const code = qrcode(0, level);
+  // The encoder takes one character per byte, so hand it the UTF-8 bytes.
+  code.addData(String.fromCharCode(...bytes), 'Byte');
+  try {
+    code.make();
+  } catch {
+    return [];
+  }
+  const count = code.getModuleCount();
+  return Array.from({ length: count }, (_, y) =>
+    Array.from({ length: count }, (_, x) => code.isDark(y, x))
+  );
+};
 
 /** The QR code as an SVG file, with a quiet border of 4 squares. */
 export function qrSvg(
@@ -37,13 +66,15 @@ export function qrSvg(
 
 /**
  * A code visitors scan to open a link on their phone, with a button that
- * saves it. Give `encode` to draw the code from `value`, or `src` for a
- * picture of a code made elsewhere. It stays dark on light whatever the
- * block's tone, since scanners need that; `dark` and `light` change it.
+ * saves it. The code is drawn from `value`; give `src` instead for a picture
+ * of a code made elsewhere. It stays dark on light whatever the block's
+ * tone, since scanners need that; `dark` and `light` change it, and keep
+ * enough contrast between them for a phone to read it.
  */
 export function QrCode({
   value,
-  encode,
+  encode = qrEncode,
+  level = 'M',
   src,
   title,
   detail,
@@ -60,7 +91,10 @@ export function QrCode({
 }: BlockRootProps & {
   /** What the code opens, usually the page's address. */
   value: string;
+  /** Draws the code. Defaults to `qrEncode`. */
   encode?: QrEncoder;
+  /** How much damage the code survives. Defaults to M. */
+  level?: QrLevel;
   /** A picture of the code, instead of `encode`. */
   src?: string | null;
   title?: ReactNode;
@@ -80,7 +114,7 @@ export function QrCode({
   const ink = isSafeColor(dark) ? dark : '#000000';
   const paper = isSafeColor(light) ? light : '#ffffff';
   const name = `QR code for ${value.replace(/^https?:\/\//, '')}`;
-  const modules = encode && !src ? encode(value) : null;
+  const modules = src ? null : encode(value, level);
   const svg = modules?.length
     ? qrSvg(modules, { dark: ink, light: paper, title: name })
     : null;
