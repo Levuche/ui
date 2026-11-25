@@ -145,7 +145,7 @@ jobs:
           status=${PIPESTATUS[0]}
           set -e
           if [ "$status" -ne 0 ]; then
-            if grep -qiE 'does not exist|not found|10007' upload.log; then
+            if grep -qiE 'does not (yet )?exist|not found|10007' upload.log; then
               echo "::notice::No preview yet: the Storybook Worker is created by the first deploy from dev."
               exit 0
             fi
