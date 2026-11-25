@@ -109,9 +109,10 @@ export const SoldOut: Story = {
 export const Refused: Story = {
   args: { sellState: 'error' },
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole('status')).toHaveTextContent(
-      'That didn’t go through. Please try again.'
-    );
+    // The app's own <output> is a status too, so find the words.
+    await expect(
+      canvas.getByText('That didn’t go through. Please try again.')
+    ).toHaveAttribute('role', 'status');
     await expect(canvas.getByRole('button', { name: 'Buy' })).toBeEnabled();
   },
 };
