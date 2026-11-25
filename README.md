@@ -148,6 +148,12 @@ address check, the video loading only on play, new tabs for other sites,
 Accessibility tab shows the same checks while you work. CI runs them as
 "Storybook tests" and builds Storybook.
 
+It is published at https://storybook.levuche.com from the dev branch, and
+every pull request into dev gets its own Storybook preview link, posted as a
+comment (`.github/workflows/storybook.yml`, `wrangler.jsonc`). The workflow
+needs the `CLOUDFLARE_API_TOKEN` secret and the `CLOUDFLARE_ACCOUNT_ID`
+variable, the same pair the website uses.
+
 ### Adding a block
 
 1. Build it from its design board with `--site-*` tokens only (no raw
