@@ -86,6 +86,19 @@ export const Carousel: StoryObj<typeof ImageCarousel> = {
   },
 };
 
+/** An index past the last slide shows the last one, so a slide always shows. */
+export const CarouselIndexPastEnd: StoryObj<typeof ImageCarousel> = {
+  render: () => <ImageCarousel slides={SLIDES} index={5} />,
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole('button', { name: 'Slide 3 of 3' })
+    ).toHaveAttribute('aria-current', 'true');
+    await expect(
+      canvas.getByRole('button', { name: 'Previous slide' })
+    ).toBeVisible();
+  },
+};
+
 /** Moves on its own, with a pause button; never with reduced motion. */
 export const CarouselAutoplay: StoryObj<typeof ImageCarousel> = {
   render: () => <ImageCarousel slides={SLIDES} autoplay={4} />,

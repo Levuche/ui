@@ -31,7 +31,8 @@ export type BlockAction = {
 /**
  * Reads a click or submit event into a BlockAction, or null when it wasn't
  * on a link, a button or a form. A link, button or form can name its action
- * with data-action, such as data-action="buy".
+ * with data-action, such as data-action="buy". A form's action is reported
+ * only when it's sent, never for a click inside it.
  */
 export function readBlockAction(event: Event): BlockAction | null {
   const target = event.target;
@@ -39,7 +40,9 @@ export function readBlockAction(event: Event): BlockAction | null {
   const control =
     event.type === 'submit'
       ? target.closest('form')
-      : target.closest('a[href], button, [data-action]');
+      : // A form's data-action names its submit, so a click inside a form
+        // (ticking its consent box, say) isn't that action.
+        target.closest('a[href], button, [data-action]:not(form)');
   if (!control) return null;
   // A submit button is reported by the form's submit event instead.
   if (

@@ -97,11 +97,14 @@ export function ImageCarousel({
   const id = useId();
   const track = useRef<HTMLDivElement>(null);
   const total = slides.length;
-  const [current, setCurrent] = useControllableState({
+  const [chosen, setCurrent] = useControllableState({
     value: index,
-    defaultValue: Math.min(Math.max(0, defaultIndex), Math.max(0, total - 1)),
+    defaultValue: defaultIndex,
     onChange: onIndexChange,
   });
+  // Kept to the slides there are, so a slide always shows when slides are
+  // taken away or the app passes an index past the end.
+  const current = Math.min(Math.max(0, chosen), Math.max(0, total - 1));
   const [playing, setPlaying] = useState(Boolean(autoplay));
   const [held, setHeld] = useState(false);
 

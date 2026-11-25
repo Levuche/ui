@@ -57,6 +57,12 @@ test('look-alike hosts and odd ids are refused', () => {
   ).toBeNull();
   expect(instagramEmbed('https://instagram.com/p/<script>')).toBeNull();
   expect(vimeoEmbed('javascript:alert(1)//vimeo.com/123456')).toBeNull();
+  // A showcase's or album's number is the collection's, not a video's.
+  expect(vimeoEmbed('https://vimeo.com/showcase/1234567')).toBeNull();
+  expect(vimeoEmbed('https://vimeo.com/album/1234567')).toBeNull();
+  expect(
+    vimeoEmbed('https://vimeo.com/showcase/1234567/video/76979871')?.src
+  ).toBe('https://player.vimeo.com/video/76979871?dnt=1');
   expect(loomEmbed('https://loom.com/share/not-an-id')).toBeNull();
 });
 

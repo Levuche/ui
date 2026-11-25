@@ -175,11 +175,15 @@ export function readSell(
 export function referralHref(href: string, code: string | null | undefined) {
   const ref = code ? text(code, CODE) : undefined;
   if (!ref) return href;
-  const [whole, hash] = href.split('#', 2);
-  // Last click wins: an older code in the link is replaced.
-  const base = whole.replace(/([?&])ref=[^&]*(&|$)/, (_, lead, tail) =>
-    tail ? lead : ''
-  );
-  const joined = `${base}${base.includes('?') ? '&' : '?'}ref=${ref}`;
-  return hash === undefined ? joined : `${joined}#${hash}`;
+  // Only the first # starts the anchor; the rest of it is kept whole.
+  const at = href.indexOf('#');
+  const whole = at < 0 ? href : href.slice(0, at);
+  const hash = at < 0 ? '' : href.slice(at);
+  const q = whole.indexOf('?');
+  const path = q < 0 ? whole : whole.slice(0, q);
+  // Last click wins: every older code in the link is replaced.
+  const kept = (q < 0 ? '' : whole.slice(q + 1))
+    .split('&')
+    .filter((part) => part && !/^ref(=|$)/.test(part));
+  return `${path}?${[...kept, `ref=${ref}`].join('&')}${hash}`;
 }

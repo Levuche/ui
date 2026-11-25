@@ -11,6 +11,19 @@ import type { SellProps } from '../molecules/sell-button';
 import type { SellRef, SellState } from '../system/sell';
 import { MembershipCard } from './offers';
 
+/**
+ * What a plan checks out for its yearly price: `yearlySell`, or the monthly
+ * plan billed yearly. An item or credit pack has no yearly billing, so with
+ * no `yearlySell` it sells nothing yearly rather than the monthly price.
+ */
+function yearlySell(plan: Plan): SellRef | undefined {
+  if (plan.yearlySell) return plan.yearlySell;
+  if (plan.sell && 'planVersionId' in plan.sell) {
+    return { ...plan.sell, billingInterval: 'yearly' };
+  }
+  return undefined;
+}
+
 /** How often a plan is paid for. */
 export type BillingPeriod = 'monthly' | 'yearly';
 
@@ -29,7 +42,10 @@ export type Plan = {
   yearlyHref?: string;
   /** What BuildBase selling checks out for the monthly price. */
   sell?: SellRef;
-  /** What it checks out for the yearly price, when it isn't `sell`. */
+  /**
+   * What it checks out for the yearly price. Left out, a plan's `sell` is
+   * billed yearly; an item or credit pack sells nothing yearly.
+   */
   yearlySell?: SellRef;
   /** Where this plan's sale stands, from the app. */
   sellState?: SellState;
@@ -140,7 +156,7 @@ export function PricingTable({
               period={useYear ? words.year : words.month}
               perks={plan.perks}
               href={useYear ? (plan.yearlyHref ?? plan.href) : plan.href}
-              sell={useYear ? (plan.yearlySell ?? plan.sell) : plan.sell}
+              sell={useYear ? yearlySell(plan) : plan.sell}
               sellState={plan.sellState}
               sellLabels={sellLabels}
               renderBuy={renderBuy}

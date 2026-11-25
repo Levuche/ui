@@ -48,6 +48,7 @@ export {
   type LinkBehavior,
 } from './system/href';
 export { useControllableState, type FormStatus } from './system/state';
+export { SERVER_LOCALE, useHydrated, useVisitorLocale } from './system/locale';
 export {
   readBlockAction,
   useBlockActions,

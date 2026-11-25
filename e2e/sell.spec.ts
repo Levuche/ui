@@ -67,4 +67,8 @@ test('a referral code goes on a link as ?ref=, last one wins', () => {
     'https://example.com/a?x=1&ref=new'
   );
   expect(referralHref('/a', 'bad code!')).toBe('/a');
+  // Every older code goes, and an anchor with a # of its own stays whole.
+  expect(referralHref('/a?ref=x&y=1&ref=z#p#q', 'new')).toBe(
+    '/a?y=1&ref=new#p#q'
+  );
 });

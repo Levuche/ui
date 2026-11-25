@@ -97,7 +97,9 @@ export function TipJar({
           <p className="text-site-text-2 m-0 text-sm">{detail}</p>
         ) : null}
         <ChoiceChips
-          name={other ? undefined : 'amount'}
+          // Always one group, so the arrow keys move between amounts. While
+          // another amount is typed none is checked, so the chips send nothing.
+          name="amount"
           value={other ? '' : picked}
           onChange={(value) => {
             setPicked(value);
