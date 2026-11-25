@@ -1,7 +1,7 @@
 name: CI
 
-# ESLint, Prettier, the type check, the gallery build and the end-to-end
-# tests on every push and pull request. No secrets.
+# ESLint, Prettier, the type check, the gallery build, the end-to-end tests
+# and the Storybook tests on every push and pull request. No secrets.
 
 on:
   workflow_dispatch:
@@ -97,3 +97,30 @@ jobs:
 
       - name: Run the end-to-end tests
         run: npm run test:e2e
+
+  stories:
+    name: Storybook tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+
+      # Every story renders, its interaction test passes and axe finds no
+      # WCAG 2.2 AA problem, in Chromium.
+      - name: Run the story tests
+        run: npm run test:stories
+
+      - name: Build Storybook
+        run: npm run build-storybook
