@@ -135,6 +135,8 @@ export {
 } from './molecules/copy-button';
 export { PlayFrame, type FrameRatio } from './molecules/play-frame';
 export { Field } from './molecules/field';
+export { SiteDialog } from './molecules/dialog';
+export { Segmented, type SegmentOption } from './molecules/segmented';
 export { CountUp, type NumberStyle } from './molecules/count-up';
 
 // Organisms: the blocks
@@ -216,3 +218,24 @@ export {
   type LockedLinkLabels,
   type UnlockLink,
 } from './organisms/locked-link';
+export {
+  COURSE_CARD_LABELS,
+  CourseCard,
+  TOP_PICKS_LABELS,
+  TopPicks,
+  type CourseCardLabels,
+  type TopPick,
+  type TopPicksLabels,
+} from './organisms/store';
+export {
+  PRICING_TABLE_LABELS,
+  PricingTable,
+  type BillingPeriod,
+  type Plan,
+  type PricingTableLabels,
+} from './organisms/pricing';
+export {
+  BOOKING_EMBED_LABELS,
+  BookingEmbed,
+  type BookingEmbedLabels,
+} from './organisms/booking-embed';

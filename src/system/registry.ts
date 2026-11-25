@@ -290,6 +290,38 @@ export const BLOCKS = [
     client: true,
     summary: 'A link behind a code, an age check or a warning',
   },
+  {
+    id: 'course-card',
+    component: 'CourseCard',
+    kind: 'card',
+    group: 'selling',
+    client: false,
+    summary: 'A course with lessons, length, price and a buy button',
+  },
+  {
+    id: 'pricing-table',
+    component: 'PricingTable',
+    kind: 'band',
+    group: 'selling',
+    client: true,
+    summary: 'Plans side by side, with a monthly or yearly switch',
+  },
+  {
+    id: 'top-picks',
+    component: 'TopPicks',
+    kind: 'links',
+    group: 'selling',
+    client: false,
+    summary: 'Recommended products, with affiliate links marked',
+  },
+  {
+    id: 'booking-embed',
+    component: 'BookingEmbed',
+    kind: 'card',
+    group: 'offers',
+    client: true,
+    summary: 'A booking page in the page or a pop-up',
+  },
 ] as const satisfies readonly BlockInfo[];
 
 /** The id of a block in this package. */

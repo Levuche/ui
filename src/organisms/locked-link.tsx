@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  useId,
   useRef,
   useState,
   useSyncExternalStore,
@@ -15,6 +14,7 @@ import {
   type SiteButtonVariant,
 } from '../atoms/button';
 import { LockIcon } from '../atoms/icons';
+import { SiteDialog } from '../molecules/dialog';
 import { Field } from '../molecules/field';
 import { FormNotice } from '../molecules/form-notice';
 import { isSafeHref, type LinkBehavior } from '../system/href';
@@ -129,7 +129,6 @@ export function LockedLink({
   const words = { ...LOCKED_LINK_LABELS, ...labels };
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
-  const titleId = useId();
   const key = `levuche-lock:${rememberAs ?? href ?? ''}`;
   const [passed, setPassed] = useState(false);
   const [denied, setDenied] = useState(false);
@@ -207,90 +206,59 @@ export function LockedLink({
       >
         {label}
       </SiteButton>
-      <dialog
+      <SiteDialog
         ref={dialog}
-        aria-labelledby={titleId}
+        title={
+          mode === 'age'
+            ? fill(words.ageQuestion, minAge)
+            : mode === 'warning'
+              ? words.warningTitle
+              : label
+        }
         onClose={() => trigger.current?.focus()}
-        className="bg-site-surface text-site-text rounded-block p-block border-site-border backdrop:bg-site-surface/85 m-auto w-[min(100%-2rem,24rem)] border shadow-xl backdrop:backdrop-blur-sm"
       >
-        <div className="flex flex-col gap-4">
-          <p id={titleId} className="m-0 text-lg font-bold">
-            {mode === 'age'
-              ? fill(words.ageQuestion, minAge)
-              : mode === 'warning'
-                ? words.warningTitle
-                : label}
-          </p>
+        {mode === 'code' && opened ? (
+          <SiteLinkButton
+            href={opened}
+            {...link}
+            variant={buttonVariant}
+            action="lock_continue"
+            fullWidth
+            onClick={close}
+          >
+            {words.open}
+          </SiteLinkButton>
+        ) : null}
 
-          {mode === 'code' && opened ? (
-            <SiteLinkButton
-              href={opened}
-              {...link}
+        {mode === 'code' && !opened ? (
+          <form onSubmit={submit} className="flex flex-col gap-3">
+            <Field
+              label={words.code}
+              name="code"
+              autoComplete="off"
+              required
+              readOnly={status === 'sending'}
+            />
+            <SiteButton
+              type="submit"
               variant={buttonVariant}
-              action="lock_continue"
+              loading={status === 'sending'}
+              action="lock_unlock"
               fullWidth
-              onClick={close}
             >
-              {words.open}
-            </SiteLinkButton>
-          ) : null}
+              {words.unlock}
+            </SiteButton>
+            <FormNotice status={status} error={words.wrongCode} />
+          </form>
+        ) : null}
 
-          {mode === 'code' && !opened ? (
-            <form onSubmit={submit} className="flex flex-col gap-3">
-              <Field
-                label={words.code}
-                name="code"
-                autoComplete="off"
-                required
-                readOnly={status === 'sending'}
-              />
-              <SiteButton
-                type="submit"
-                variant={buttonVariant}
-                loading={status === 'sending'}
-                action="lock_unlock"
-                fullWidth
-              >
-                {words.unlock}
-              </SiteButton>
-              <FormNotice status={status} error={words.wrongCode} />
-            </form>
-          ) : null}
-
-          {mode === 'age' ? (
-            denied ? (
-              <p role="status" className="m-0">
-                {fill(words.ageDenied, minAge)}
-              </p>
-            ) : target ? (
-              <div className="flex flex-col gap-2">
-                <SiteLinkButton
-                  href={target}
-                  {...link}
-                  variant={buttonVariant}
-                  action="lock_continue"
-                  fullWidth
-                  onClick={pass}
-                >
-                  {words.ageYes}
-                </SiteLinkButton>
-                <SiteButton
-                  variant="outline"
-                  fullWidth
-                  action="lock_cancel"
-                  onClick={() => setDenied(true)}
-                >
-                  {words.ageNo}
-                </SiteButton>
-              </div>
-            ) : null
-          ) : null}
-
-          {mode === 'warning' && target ? (
-            <>
-              {message ? (
-                <div className="text-site-text-2">{message}</div>
-              ) : null}
+        {mode === 'age' ? (
+          denied ? (
+            <p role="status" className="m-0">
+              {fill(words.ageDenied, minAge)}
+            </p>
+          ) : target ? (
+            <div className="flex flex-col gap-2">
               <SiteLinkButton
                 href={target}
                 {...link}
@@ -299,21 +267,45 @@ export function LockedLink({
                 fullWidth
                 onClick={pass}
               >
-                {words.continue}
+                {words.ageYes}
               </SiteLinkButton>
-            </>
-          ) : null}
+              <SiteButton
+                variant="outline"
+                fullWidth
+                action="lock_cancel"
+                onClick={() => setDenied(true)}
+              >
+                {words.ageNo}
+              </SiteButton>
+            </div>
+          ) : null
+        ) : null}
 
-          <SiteButton
-            variant="text"
-            action="lock_cancel"
-            fullWidth
-            onClick={close}
-          >
-            {mode === 'warning' ? words.cancel : words.close}
-          </SiteButton>
-        </div>
-      </dialog>
+        {mode === 'warning' && target ? (
+          <>
+            {message ? <div className="text-site-text-2">{message}</div> : null}
+            <SiteLinkButton
+              href={target}
+              {...link}
+              variant={buttonVariant}
+              action="lock_continue"
+              fullWidth
+              onClick={pass}
+            >
+              {words.continue}
+            </SiteLinkButton>
+          </>
+        ) : null}
+
+        <SiteButton
+          variant="text"
+          action="lock_cancel"
+          fullWidth
+          onClick={close}
+        >
+          {mode === 'warning' ? words.cancel : words.close}
+        </SiteButton>
+      </SiteDialog>
     </Block>
   );
 }
