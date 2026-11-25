@@ -143,6 +143,12 @@ export {
 } from './molecules/live-data';
 export { StatList, type StatItem } from './molecules/stat-list';
 export { Sparkline } from './molecules/sparkline';
+export {
+  AUDIO_BAR_LABELS,
+  AudioBar,
+  clock,
+  type AudioBarLabels,
+} from './molecules/audio-bar';
 export { SiteDialog } from './molecules/dialog';
 export { Segmented, type SegmentOption } from './molecules/segmented';
 export { CountUp, type NumberStyle } from './molecules/count-up';
@@ -271,3 +277,29 @@ export {
   type RepoLabels,
   type TechItem,
 } from './organisms/developer';
+export {
+  EMBED_SERVICES,
+  embedFor,
+  instagramEmbed,
+  loomEmbed,
+  soundcloudEmbed,
+  spotifyEmbed,
+  tiktokEmbed,
+  vimeoEmbed,
+  type Embed,
+  type EmbedService,
+  type EmbedShape,
+} from './system/embeds';
+export {
+  EMBED_LABELS,
+  InstagramPost,
+  LinkEmbed,
+  SpotifyEmbed,
+  TikTokVideo,
+  type EmbedLabels,
+} from './organisms/embeds';
+export {
+  AudioPlayer,
+  PodcastEpisodes,
+  type PodcastEpisode,
+} from './organisms/audio';

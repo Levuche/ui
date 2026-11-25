@@ -70,11 +70,13 @@ export type PageLayouts = Partial<Record<GridScreen, GridLayout>>;
  *
  * - profile: CreatorHeader, with SocialIcons under it
  * - link: SiteLinkButton, a LinkTile, SaveContact or LockedLink
- * - links: LinkList, TopPicks
+ * - links: LinkList, TopPicks, PodcastEpisodes
  * - card: FeaturedLink, FeaturedPack, PackRow, BookingCard, MembershipCard,
  *   LeadMagnet, TipJar, DiscountCode, Countdown, ContactForm, MapCard, QrCode,
- *   CourseCard, BookingEmbed, GitHubProfile, RepoCard, PackageStats
- * - media: YouTubeVideo, SiteImage, ImageCarousel, BeforeAfter
+ *   CourseCard, BookingEmbed, GitHubProfile, RepoCard, PackageStats,
+ *   AudioPlayer
+ * - media: YouTubeVideo, SiteImage, ImageCarousel, BeforeAfter, SpotifyEmbed,
+ *   TikTokVideo, InstagramPost, LinkEmbed
  * - gallery: ImageGrid, ReelGrid, PackGrid, RepoList
  * - text: SiteText, Testimonials, FaqList, Timeline, TechStack
  * - band: NewsletterBand, PackCheckout, CreatorFooter, LogoStrip, StatsRow,

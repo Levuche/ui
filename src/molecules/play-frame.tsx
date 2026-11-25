@@ -5,13 +5,14 @@ import { PlayIcon } from '../atoms/icons';
 import { cn } from '../system/cn';
 
 /** The shape of an embedded player. */
-export type FrameRatio = 'video' | 'vertical' | 'square' | 'audio';
+export type FrameRatio = 'video' | 'vertical' | 'square' | 'audio' | 'tall';
 
 const FRAME_RATIOS: Record<FrameRatio, string> = {
   video: 'aspect-video',
   vertical: 'mx-auto aspect-[9/16] max-w-90',
   square: 'aspect-square',
   audio: 'h-38',
+  tall: 'h-88',
 };
 
 /**
@@ -29,6 +30,7 @@ export function PlayFrame({
   allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen',
   autoLoad = false,
   playIcon,
+  sandbox,
   action = 'play',
   onPlay,
   className,
@@ -44,6 +46,8 @@ export function PlayFrame({
   allow?: string;
   autoLoad?: boolean;
   playIcon?: ReactNode;
+  /** Limits what the player may do, as the iframe's sandbox. */
+  sandbox?: string;
   /** What the press is called in `onAction`. */
   action?: string;
   onPlay?: () => void;
@@ -60,6 +64,7 @@ export function PlayFrame({
       <div className={frame}>
         <iframe
           src={src}
+          sandbox={sandbox}
           title={title}
           allow={allow}
           allowFullScreen
