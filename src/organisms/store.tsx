@@ -50,10 +50,13 @@ export function CourseCard({
   newTab,
   sponsored,
   nofollow,
+  saveLabel,
   ...root
 }: BlockRootProps &
   LinkBehavior &
   SellProps & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
     title: ReactNode;
     detail?: ReactNode;
     image?: string | null;
@@ -99,7 +102,7 @@ export function CourseCard({
             </span>
           ) : null}
         </span>
-        <Price value={price} was={was} />
+        <Price saveLabel={saveLabel} value={price} was={was} />
       </div>
       <SellButton
         href={href}

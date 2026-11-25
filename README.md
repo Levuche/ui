@@ -90,6 +90,8 @@ Every block reads only `--site-*` CSS variables. `<CreatorTheme>` sets them:
 - `corners`: `square`, `soft` or `round` for cards and tiles.
 - `buttonShape`: `square`, `rounded` or `pill`.
 - `font`: a CSS font-family list (the app loads the font).
+- `displayFont`: a second font for a few words set apart, such as the
+  header's `highlight`; it falls back to `font`.
 
 Buttons also take `variant` (`solid`, `outline`, `soft`, `text`) and `size`
 (`sm`, `md`, `lg`), so creators can pick them per block.

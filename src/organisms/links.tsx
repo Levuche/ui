@@ -11,8 +11,12 @@ export type LinkItem = LinkBehavior & {
   label: string;
   href: string;
   icon?: ReactNode;
+  /** A small picture on the start side, in place of the icon. */
+  image?: string | null;
+  imageAlt?: string;
   detail?: ReactNode;
-  trailing?: ReactNode;
+  /** A price, or `arrow` for a round arrow. */
+  trailing?: ReactNode | 'arrow';
 };
 
 /**
@@ -135,8 +139,11 @@ export function SocialIcons({
   /** `label` names each link for screen readers, as "Instagram". */
   links: (LinkBehavior & { label: string; href: string; icon: ReactNode })[];
   label?: string;
-  /** `filled` puts each icon on a round tile. */
-  iconStyle?: 'plain' | 'filled' | 'outline';
+  /**
+   * `filled` puts each icon on a round tile, `outline` in a ring, and `chip`
+   * on a round chip in the card colour with a thin line.
+   */
+  iconStyle?: 'plain' | 'filled' | 'outline' | 'chip';
 }) {
   return (
     <Block
@@ -159,7 +166,9 @@ export function SocialIcons({
                 'text-site-text size-control-md inline-flex items-center justify-center rounded-full',
                 iconStyle === 'plain' && 'hover:bg-site-surface-2',
                 iconStyle === 'filled' && 'bg-site-surface-2',
-                iconStyle === 'outline' && 'border-site-border border-2'
+                iconStyle === 'outline' && 'border-site-border border-2',
+                iconStyle === 'chip' &&
+                  'bg-site-surface border-site-border hover:bg-site-surface-2 border'
               )}
             >
               {icon}

@@ -125,7 +125,7 @@ export * from './atoms/icons';
 export { SiteSection } from './molecules/section';
 export { ItemHead, type HeadingTag } from './molecules/item-head';
 export { LinkTile, type LinkTileStyle } from './molecules/link-tile';
-export { Price } from './molecules/price';
+export { Price, priceSaving } from './molecules/price';
 export { Rating } from './molecules/rating';
 export { CheckList } from './molecules/check-list';
 export { FormNotice } from './molecules/form-notice';
