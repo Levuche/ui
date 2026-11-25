@@ -7,7 +7,7 @@ import {
   type SiteButtonVariant,
 } from '../atoms/button';
 import { SiteLink } from '../atoms/link';
-import { Badge } from '../atoms/text';
+import { Badge, Ribbon } from '../atoms/text';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
@@ -211,6 +211,7 @@ export function FeaturedPack({
   action,
   buttonLabel = 'I’ll take it',
   headingAs = 'h2',
+  ribbon,
   sell,
   sellState,
   sellLabels,
@@ -218,6 +219,8 @@ export function FeaturedPack({
   ...root
 }: BlockRootProps &
   SellProps & {
+    /** A small tilted label over the top corner, such as "Most popular". */
+    ribbon?: ReactNode;
     title: string;
     detail?: ReactNode;
     price: string;
@@ -234,7 +237,13 @@ export function FeaturedPack({
     headingAs?: HeadingTag;
   }) {
   return (
-    <Block as="article" name="featured-pack" {...root}>
+    <Block
+      as="article"
+      name="featured-pack"
+      {...root}
+      className={cn('relative', root.className)}
+    >
+      {ribbon ? <Ribbon>{ribbon}</Ribbon> : null}
       <ItemHead
         title={title}
         detail={detail}

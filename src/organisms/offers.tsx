@@ -2,7 +2,7 @@ import type { FormEventHandler, ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import type { SiteButtonVariant } from '../atoms/button';
 import { ClockIcon } from '../atoms/icons';
-import { Badge } from '../atoms/text';
+import { Badge, Ribbon } from '../atoms/text';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import type { FormStatus } from '../system/state';
@@ -102,6 +102,7 @@ export function MembershipCard({
   buttonLabel = 'Join',
   featured = false,
   featuredLabel,
+  ribbon,
   headingAs: Heading = 'h3',
   newTab,
   sponsored,
@@ -124,6 +125,8 @@ export function MembershipCard({
     featured?: boolean;
     /** A pill on the featured tier, such as "Most popular". */
     featuredLabel?: string;
+    /** A small tilted label over the top corner, such as "Best value". */
+    ribbon?: ReactNode;
     headingAs?: HeadingTag;
   }) {
   return (
@@ -132,11 +135,12 @@ export function MembershipCard({
       name="membership-card"
       {...root}
       className={cn(
-        'border-2',
+        'relative border-2',
         featured ? 'border-site-button' : 'border-transparent',
         root.className
       )}
     >
+      {ribbon ? <Ribbon>{ribbon}</Ribbon> : null}
       <div className="flex items-center justify-between gap-2">
         <Heading className="text-block-title m-0 font-bold">{title}</Heading>
         {featured && featuredLabel ? (

@@ -112,6 +112,7 @@ export { SiteLink } from './atoms/link';
 export {
   Badge,
   Eyebrow,
+  Ribbon,
   SiteDivider,
   SiteHeading,
   SiteText,
@@ -161,6 +162,7 @@ export { CountUp, type NumberStyle } from './molecules/count-up';
 
 // Organisms: the blocks
 export { CreatorHeader } from './organisms/profile';
+export { ActionCard, type ActionCardMedia } from './organisms/action-card';
 export {
   FeaturedLink,
   LinkList,
