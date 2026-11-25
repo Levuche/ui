@@ -41,3 +41,18 @@ export const CopyFails: Story = {
     );
   },
 };
+
+/** A copy that throws, as with no clipboard on an http page, fails the same way. */
+export const CopyThrows: Story = {
+  args: {
+    copy: fn((): Promise<void> => {
+      throw new Error('No clipboard here');
+    }),
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'Copy code' }));
+    await expect(canvas.getByRole('status')).toHaveTextContent(
+      'The code is ORIGINS10'
+    );
+  },
+};

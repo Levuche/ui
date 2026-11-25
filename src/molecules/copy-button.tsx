@@ -20,7 +20,12 @@ export const COPY_LABELS: CopyLabels = {
   failedStatus: 'Couldn’t copy. It’s {text}.',
 };
 
-const clipboard = (text: string) => navigator.clipboard.writeText(text);
+// No clipboard on an http page or in an older browser: that's a failed copy,
+// so the visitor is told the text, rather than nothing happening.
+const clipboard = (text: string) =>
+  navigator.clipboard
+    ? navigator.clipboard.writeText(text)
+    : Promise.reject(new Error('No clipboard here'));
 
 /** A button that copies `text` and says so, to the eye and to screen readers. */
 export function CopyButton({
@@ -53,13 +58,16 @@ export function CopyButton({
           state === 'copied' ? <CheckIcon size={18} /> : <CopyIcon size={18} />
         }
         onClick={() => {
-          copy(text).then(
-            () => {
-              setState('copied');
-              onCopied?.(text);
-            },
-            () => setState('failed')
-          );
+          // A copy function that throws counts as a failed copy too.
+          Promise.resolve()
+            .then(() => copy(text))
+            .then(
+              () => {
+                setState('copied');
+                onCopied?.(text);
+              },
+              () => setState('failed')
+            );
         }}
         className={className}
       >

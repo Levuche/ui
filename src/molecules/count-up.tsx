@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useVisitorLocale } from '../system/locale';
 
 /** How a number is written, as Intl.NumberFormat takes it. */
 export type NumberStyle = Intl.NumberFormatOptions;
@@ -30,7 +31,9 @@ export function CountUp({
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [shown, setShown] = useState(value);
-  const write = (n: number) => new Intl.NumberFormat(locale, format).format(n);
+  const shownLocale = useVisitorLocale(locale);
+  const write = (n: number) =>
+    new Intl.NumberFormat(shownLocale, format).format(n);
 
   useEffect(() => {
     const el = ref.current;

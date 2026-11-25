@@ -6,6 +6,7 @@ import {
   CreditPack,
   CourseCard,
   FeaturedPack,
+  PackCheckout,
   PackGrid,
   PackRow,
   PricingTable,
@@ -234,6 +235,57 @@ export const Plans: Story = {
   },
 };
 
+/** A plan with no yearlySell is billed yearly, not checked out monthly. */
+export const PlansBilledYearly: Story = {
+  globals: onScreen('desktop'),
+  render: () => (
+    <App>
+      <PricingTable
+        plans={[
+          {
+            name: 'Member',
+            price: '₹299',
+            yearlyPrice: '₹2,999',
+            perks: ['Every recipe'],
+            sell: { planVersionId: 'member' },
+          },
+        ]}
+      />
+    </App>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('radio', { name: 'Yearly' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Join' }));
+    await expect((await lastAction(canvas)).sell).toEqual({
+      planVersionId: 'member',
+      billingInterval: 'yearly',
+    });
+  },
+};
+
+/** Ticking the consent box is not a buy: only sending the form is. */
+export const CheckoutConsent: Story = {
+  render: () => (
+    <App>
+      <PackCheckout
+        price="₹499"
+        sell={PACK}
+        onSubmit={(event) => event.preventDefault()}
+      />
+    </App>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('checkbox'));
+    await new Promise((done) => setTimeout(done, 100));
+    await expect(canvas.getByLabelText('Last action')).toHaveTextContent('');
+    await userEvent.click(canvas.getByRole('button', { name: /take it/ }));
+    await expect(await lastAction(canvas)).toEqual({
+      action: 'buy',
+      sell: PACK,
+    });
+  },
+};
+
 /** A credit pack. */
 export const Credits: Story = {
   render: () => (
@@ -296,6 +348,44 @@ export const Slots: Story = {
     await expect(
       canvas.getByRole('button', { name: 'Pick a time' })
     ).toBeDisabled();
+  },
+};
+
+/**
+ * Times written with any offset come out in time order, and the one picked
+ * goes into the sale in UTC.
+ */
+export const SlotsAnyOffset: Story = {
+  render: () => (
+    <App>
+      <SlotPicker
+        data={[
+          '2026-12-02T12:00:00+05:30',
+          '2026-12-02T06:00:00Z',
+          '2026-12-02T10:00:00+0530',
+        ]}
+        timeZone="Asia/Kolkata"
+        locale="en-GB"
+        sell={SESSION}
+      />
+    </App>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const times = canvas
+      .getAllByRole('radio')
+      .slice(1)
+      .map((radio) => radio.closest('label')?.textContent);
+    await expect(times).toEqual(['10:00', '11:30', '12:00']);
+    await userEvent.click(canvas.getByRole('radio', { name: '10:00' }));
+    // The arrow keys move between times, as one group.
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(canvas.getByRole('radio', { name: '11:30' })).toBeChecked();
+    await userEvent.keyboard('{ArrowLeft}');
+    await userEvent.click(canvas.getByRole('button', { name: /^Book/ }));
+    await expect((await lastAction(canvas)).sell).toEqual({
+      ...SESSION,
+      slotStart: '2026-12-02T04:30:00.000Z',
+    });
   },
 };
 

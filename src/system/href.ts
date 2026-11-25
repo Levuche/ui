@@ -5,7 +5,9 @@
  * run code in a visitor's browser.
  */
 
-const SAFE_SCHEME = /^(https?:|mailto:|tel:|sms:)/i;
+// http and https need their "//": "http:evil.com" and "https:/evil.com"
+// open another site, so they'd pass as links on this one.
+const SAFE_SCHEME = /^(https?:\/\/|mailto:|tel:|sms:)/i;
 // Characters a browser ignores inside a scheme ("java\tscript:").
 // eslint-disable-next-line no-control-regex -- these are what it removes
 const HIDDEN = /[\u0000-\u0020\u007f-\u009f\u200b-\u200f\u2028\u2029\ufeff]/g;
@@ -18,8 +20,9 @@ export function isSafeHref(href: string | null | undefined): href is string {
   if (!value || value !== value.replace(/[\u0000-\u001f\u007f]/g, '')) {
     return false;
   }
-  // Same site: /path, #anchor, ?query or ./path. Not //host, which is another site.
-  if (/^(\/(?!\/)|#|\?|\.\/)/.test(value)) return true;
+  // Same site: /path, #anchor, ?query or ./path. Not //host or /\host:
+  // browsers read a backslash as a slash, so both open another site.
+  if (/^(\/(?![/\\])|#|\?|\.\/)/.test(value)) return true;
   return SAFE_SCHEME.test(value.replace(HIDDEN, ''));
 }
 

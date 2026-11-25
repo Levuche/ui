@@ -98,15 +98,24 @@ export function instagramEmbed(input: string): Embed | null {
   };
 }
 
+const VIMEO_COLLECTIONS = new Set(['showcase', 'album', 'event', 'ondemand']);
+
 /** A Vimeo video, as vimeo.com/123 or player.vimeo.com/video/123. */
 export function vimeoEmbed(input: string): Embed | null {
   const url = parse(input);
   if (!url) return null;
   const host = hostOf(url);
   const path = parts(url);
+  // In a showcase or album the number after it is the collection's, not a
+  // video's: only "…/video/123" inside one names a video.
+  const inVideo = path.indexOf('video');
   const id =
     host === 'vimeo.com'
-      ? path.find((p) => /^\d+$/.test(p))
+      ? inVideo >= 0
+        ? path[inVideo + 1]
+        : VIMEO_COLLECTIONS.has(path[0] ?? '')
+          ? undefined
+          : path.find((p) => /^\d+$/.test(p))
       : host === 'player.vimeo.com' && path[0] === 'video'
         ? path[1]
         : undefined;

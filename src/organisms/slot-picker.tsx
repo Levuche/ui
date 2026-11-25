@@ -1,12 +1,13 @@
 'use client';
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useId, useMemo, useState, type ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { ChoiceChips } from '../molecules/choice-chips';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { LiveData } from '../molecules/live-data';
 import { SellButton, type SellProps } from '../molecules/sell-button';
 import type { LiveProps } from '../system/live';
+import { useVisitorLocale } from '../system/locale';
 import type { ItemSell } from '../system/sell';
 import { useControllableState } from '../system/state';
 
@@ -78,6 +79,8 @@ export function SlotPicker({
     defaultValue,
     onChange,
   });
+  const id = useId();
+  const shownLocale = useVisitorLocale(locale);
   const days = useMemo(() => {
     const dayKey = new Intl.DateTimeFormat('en-CA', {
       timeZone,
@@ -85,13 +88,13 @@ export function SlotPicker({
       month: '2-digit',
       day: '2-digit',
     });
-    const dayName = new Intl.DateTimeFormat(locale, {
+    const dayName = new Intl.DateTimeFormat(shownLocale, {
       timeZone,
       weekday: 'short',
       day: 'numeric',
       month: 'short',
     });
-    const timeName = new Intl.DateTimeFormat(locale, {
+    const timeName = new Intl.DateTimeFormat(shownLocale, {
       timeZone,
       hour: 'numeric',
       minute: '2-digit',
@@ -100,16 +103,20 @@ export function SlotPicker({
       string,
       { label: string; times: { value: string; label: string }[] }
     >();
-    for (const start of [...(data ?? [])].sort()) {
-      const at = new Date(start);
-      if (Number.isNaN(at.getTime())) continue;
+    // By the moment each starts: as text, times in different zones would
+    // sort wrong ("10:00+05:30" is before "09:00Z").
+    const starts = (data ?? [])
+      .map((start) => ({ start, at: new Date(start) }))
+      .filter(({ at }) => !Number.isNaN(at.getTime()))
+      .sort((a, b) => a.at.getTime() - b.at.getTime());
+    for (const { start, at } of starts) {
       const key = dayKey.format(at);
       const day = byDay.get(key) ?? { label: dayName.format(at), times: [] };
       day.times.push({ value: start, label: timeName.format(at) });
       byDay.set(key, day);
     }
     return [...byDay.entries()].map(([key, day]) => ({ key, ...day }));
-  }, [data, timeZone, locale]);
+  }, [data, timeZone, shownLocale]);
 
   const [dayKey, setDayKey] = useState('');
   const pickedDay =
@@ -131,6 +138,7 @@ export function SlotPicker({
             <>
               <ChoiceChips
                 legend={words.day}
+                name={`${id}-day`}
                 value={pickedDay?.key ?? ''}
                 onChange={(key) => {
                   // A new day clears the time: the visitor picks it.
@@ -144,6 +152,7 @@ export function SlotPicker({
               />
               <ChoiceChips
                 legend={words.time}
+                name={`${id}-time`}
                 value={pickedTime?.value ?? ''}
                 onChange={setPicked}
                 options={pickedDay?.times ?? []}
@@ -153,7 +162,14 @@ export function SlotPicker({
               </p>
               <SellButton
                 sell={
-                  pickedTime ? { ...sell, slotStart: pickedTime.value } : sell
+                  pickedTime
+                    ? // As UTC, which BuildBase always takes, whatever way
+                      // the app wrote the start.
+                      {
+                        ...sell,
+                        slotStart: new Date(pickedTime.value).toISOString(),
+                      }
+                    : sell
                 }
                 sellState={sellState}
                 sellLabels={sellLabels}
