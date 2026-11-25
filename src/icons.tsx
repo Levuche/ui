@@ -82,6 +82,41 @@ export const SearchIcon = (p: IconProps) => (
   </Svg>
 );
 
+export const CalendarIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3" y="5" width="18" height="16" rx="2" />
+    <path d="M3 10h18M8 3v4M16 3v4" />
+  </Svg>
+);
+export const ClockIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 2" />
+  </Svg>
+);
+export const StarIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3l-5.5 2.9 1-6.2L3 9.6l6.2-.9z" />
+  </Svg>
+);
+export const CopyIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="9" y="9" width="12" height="12" rx="2" />
+    <path d="M5 15V5a2 2 0 012-2h10" />
+  </Svg>
+);
+export const DownloadIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 3v12M7 10l5 5 5-5" />
+    <path d="M5 19h14" />
+  </Svg>
+);
+export const HeartIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 20s-7-4.4-9.2-8.6A5 5 0 0112 6a5 5 0 019.2 5.4C19 15.6 12 20 12 20z" />
+  </Svg>
+);
+
 /** The loading arc used inside busy buttons. Always decorative. */
 /* For links and media on a creator's page. */
 export const PlayIcon = (p: IconProps) => (

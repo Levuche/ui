@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 import { SamplePage } from './sample-page';
 
 /*
@@ -43,7 +43,11 @@ export const CreatorsOwnTheme: Story = {
     const buy = canvas.getByRole('button', { name: 'I’ll take it, $12' });
     await expect(styleOf(buy).backgroundColor).toBe('rgb(15, 118, 110)');
     await expect(styleOf(buy).borderTopLeftRadius).toBe('12px');
-    const tile = canvas.getByRole('link', { name: 'Instagram' });
+    // The link tile, not the round Instagram icon in the social row.
+    const links = canvas.getByRole('navigation', {
+      name: 'Desi Origins links',
+    });
+    const tile = within(links).getByRole('link', { name: 'Instagram' });
     await expect(styleOf(tile).borderTopLeftRadius).toBe('4px');
     await expect(styleOf(buy).fontFamily).toContain('Georgia');
   },

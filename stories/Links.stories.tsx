@@ -1,8 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect } from 'storybook/test';
-import { CameraIcon, LinkList, LinkTile } from '../src';
+import {
+  CameraIcon,
+  FeaturedLink,
+  LinkList,
+  LinkTile,
+  SocialIcons,
+} from '../src';
 import { expectTapSize } from './expect-tap-size';
-import { SAMPLE_LINKS } from './sample-page';
+import { SAMPLE_LINKS, SAMPLE_SOCIALS } from './sample-page';
 
 const meta = {
   title: 'Blocks/Links',
@@ -44,4 +50,36 @@ export const Tile: StoryObj<typeof LinkTile> = {
       Instagram
     </LinkTile>
   ),
+};
+
+/** The one link a creator wants seen first, with a big picture. */
+export const Featured: StoryObj<typeof FeaturedLink> = {
+  render: () => (
+    <FeaturedLink
+      href="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+      title="New: how tea came to India"
+      detail="12 minutes, out now"
+    />
+  ),
+  play: async ({ canvas }) => {
+    const link = canvas.getByRole('link', { name: /how tea came to India/ });
+    await expect(link).toHaveAttribute('target', '_blank');
+    await expect(link).toHaveTextContent('12 minutes, out now');
+  },
+};
+
+/** Round icon links, each named for screen readers. */
+export const Social: StoryObj<typeof SocialIcons> = {
+  render: () => <SocialIcons links={SAMPLE_SOCIALS} />,
+  play: async ({ canvas }) => {
+    const nav = canvas.getByRole('navigation', { name: 'Social accounts' });
+    await expect(nav).toBeVisible();
+    for (const name of ['Instagram', 'YouTube', 'Email']) {
+      const link = canvas.getByRole('link', { name });
+      await expectTapSize(link, name);
+    }
+    await expect(
+      canvas.getByRole('link', { name: 'Email' })
+    ).not.toHaveAttribute('target');
+  },
 };

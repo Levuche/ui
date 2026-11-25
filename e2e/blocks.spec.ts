@@ -109,6 +109,97 @@ for (const [id, expected] of Object.entries(THEMES)) {
       await expect(band.getByRole('status')).toHaveText('Subscribed');
     });
 
+    test('social icons and the featured link open other sites in a new tab', async ({
+      page,
+    }) => {
+      const social = panel.getByTestId('social');
+      const icons = social.getByRole('navigation', { name: 'Social accounts' });
+      const min = await tapMin(page);
+      for (const name of ['Instagram', 'YouTube', 'Email']) {
+        const box = await icons.getByRole('link', { name }).boundingBox();
+        expect(box?.height ?? 0, name).toBeGreaterThanOrEqual(min);
+      }
+      await expect(
+        icons.getByRole('link', { name: 'YouTube' })
+      ).toHaveAttribute('target', '_blank');
+      await expect(
+        icons.getByRole('link', { name: 'Email' })
+      ).not.toHaveAttribute('target', '_blank');
+      await expect(
+        social.getByRole('link', { name: /how tea came to India/ })
+      ).toHaveAttribute('target', '_blank');
+    });
+
+    test('booking and membership link to their pages', async () => {
+      const offers = panel.getByTestId('offers');
+      await expect(
+        offers.getByRole('link', { name: 'Book a call' })
+      ).toHaveAttribute('href', 'https://example.com/book');
+      await expect(offers.getByRole('link', { name: 'Join' })).toHaveAttribute(
+        'href',
+        'https://example.com/join'
+      );
+    });
+
+    test('the free guide checks the address before sending', async () => {
+      const offers = panel.getByTestId('offers');
+      const email = offers.getByRole('textbox', { name: 'Email' });
+      const send = offers.getByRole('button', { name: 'Send it to me' });
+      await email.fill('nope');
+      await send.click();
+      await expect(offers.getByRole('status')).toHaveCount(0);
+      await email.fill('reader@example.com');
+      await send.click();
+      await expect(offers.getByRole('status')).toHaveText('Guide sent');
+    });
+
+    test('the tip jar sends the amount picked or typed', async () => {
+      const tips = panel.getByTestId('tips');
+      await tips.getByText('$10', { exact: true }).click();
+      await expect(tips.getByRole('radio', { name: '$10' })).toBeChecked();
+      await tips.getByRole('spinbutton', { name: 'Other amount' }).fill('25');
+      await expect(tips.getByRole('radio', { name: '$10' })).not.toBeChecked();
+      await tips.getByRole('button', { name: 'Tip $25' }).click();
+      await expect(tips.getByRole('status')).toHaveText('Tip of 25 started');
+    });
+
+    test('the code copies with one tap and the countdown shows time left', async ({
+      page,
+      context,
+    }) => {
+      await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+      const promo = panel.getByTestId('promo');
+      await expect(promo.getByRole('timer')).toHaveText(
+        '03days05hours00minutes00seconds'
+      );
+      await promo.getByRole('button', { name: 'Copy code' }).click();
+      await expect(promo.getByRole('status')).toHaveText('Copied ORIGINS10');
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+        'ORIGINS10'
+      );
+    });
+
+    test('questions open to show their answer', async () => {
+      const reviews = panel.getByTestId('reviews');
+      await expect(
+        reviews.getByRole('img', { name: '5 out of 5 stars' })
+      ).toBeVisible();
+      const answer = reviews.getByText(
+        '100 prompts, a guide and 12 templates.'
+      );
+      await expect(answer).toBeHidden();
+      await reviews.getByText('What do I get in the reel pack?').click();
+      await expect(answer).toBeVisible();
+    });
+
+    test('pictures are described and a linked one opens in a new tab', async () => {
+      const photos = panel.getByTestId('photos');
+      await expect(photos.getByRole('img')).toHaveCount(3);
+      await expect(
+        photos.getByRole('link', { name: 'Chai on a clay stove' })
+      ).toHaveAttribute('target', '_blank');
+    });
+
     test('has no serious accessibility problems', async ({ page }) => {
       await expectNoA11yViolations(page, `[data-testid="panel-${id}"]`);
     });
@@ -127,6 +218,7 @@ test('a creator’s theme changes corners, button shape and font', async ({
   expect(await radius(custom, 'Solid')).toBe('12px');
   expect(await radius(light, 'Solid')).not.toBe('12px');
   const tileRadius = await custom
+    .getByTestId('links')
     .getByRole('link', { name: 'Instagram' })
     .evaluate((el) => getComputedStyle(el).borderTopLeftRadius);
   expect(tileRadius).toBe('4px');

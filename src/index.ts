@@ -29,7 +29,8 @@ export {
   type SiteButtonSize,
   type SiteButtonVariant,
 } from './basics';
-export { LinkList, LinkTile } from './links';
+export { FeaturedLink, LinkList, LinkTile, SocialIcons } from './links';
+export { ImageGrid } from './images';
 
 // Profile
 export { Avatar, CreatorHeader, initials } from './profile';
@@ -42,6 +43,15 @@ export {
   PackGrid,
   PackRow,
 } from './selling';
+
+// Offers, tips and codes
+export { BookingCard, LeadMagnet, MembershipCard } from './offers';
+export { TipJar } from './tip-jar';
+export { DiscountCode } from './discount';
+export { Countdown, timeLeft } from './countdown';
+
+// Reviews and questions
+export { FaqList, Testimonials } from './trust';
 
 // Media
 export { ReelGrid, YouTubeVideo, youtubeId } from './media';
