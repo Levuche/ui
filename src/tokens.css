@@ -60,11 +60,12 @@
  *
  * Controls are smaller with a mouse and grow on touch screens, where a thumb
  * needs about 44 px:
- *   control  40 px, 44 px on touch   (small buttons, inputs)
+ *   control     40 px, 44 px on touch   (small buttons, inputs)
  *   control-md  44 px, 48 px on touch   (the default button)
  *   control-lg  48 px, 52 px on touch   (the buy button)
- * Page widths: max-w-site is a creator page's column (420 px), max-w-site-wide
- * a wider one for grids (640 px).
+ * Widths: max-w-site is a creator page's column (420 px), max-w-site-wide a
+ * wider one for grids (640 px). They are named after the --site-* tokens so
+ * they never clash with an app's own page widths (max-w-page and so on).
  */
 :root {
   --levuche-control: 2.5rem;
