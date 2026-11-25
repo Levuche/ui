@@ -56,8 +56,12 @@ export {
 export {
   BLOCKS,
   BLOCK_GROUPS,
+  BLOCK_PACKS,
   blockInfo,
+  blocksInPack,
+  isPaidPack,
   type BlockGroup,
+  type BlockPack,
   type BlockId,
   type BlockInfo,
 } from './system/registry';

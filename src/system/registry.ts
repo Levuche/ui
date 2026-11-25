@@ -8,6 +8,26 @@ import type { BlockKind } from './grid';
  * writes its own id.
  */
 
+/*
+ * Packs say which blocks a creator gets free in Levuche and which they unlock
+ * with a one-time purchase. Core is free and holds everything that sells
+ * through BuildBase, so every page can take payments. The code itself is the
+ * same for every block: packs only tell the Levuche editor what to offer.
+ */
+export const BLOCK_PACKS = [
+  'core',
+  'growth',
+  'media',
+  'feeds',
+  'developer',
+] as const;
+export type BlockPack = (typeof BLOCK_PACKS)[number];
+
+/** Whether a creator unlocks this pack with a one-time purchase in Levuche. */
+export function isPaidPack(pack: BlockPack): boolean {
+  return pack !== 'core';
+}
+
 export const BLOCK_GROUPS = [
   'profile',
   'links',
@@ -31,6 +51,8 @@ export type BlockInfo = {
   group: BlockGroup;
   /** Needs the browser ('use client'): it has state or effects. */
   client: boolean;
+  /** The pack it comes in: core is free, the rest are unlocked in Levuche. */
+  pack: BlockPack;
   /** One line on what it's for, for the editor's menu. */
   summary: string;
 };
@@ -42,6 +64,7 @@ export const BLOCKS = [
     kind: 'profile',
     group: 'profile',
     client: false,
+    pack: 'core',
     summary: 'Profile picture, name and tagline',
   },
   {
@@ -50,6 +73,7 @@ export const BLOCKS = [
     kind: 'link',
     group: 'profile',
     client: false,
+    pack: 'core',
     summary: 'Icon links to social accounts',
   },
   {
@@ -58,6 +82,7 @@ export const BLOCKS = [
     kind: 'links',
     group: 'links',
     client: false,
+    pack: 'core',
     summary: 'A column of links',
   },
   {
@@ -66,6 +91,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'links',
     client: false,
+    pack: 'core',
     summary: 'One link shown big, with a picture',
   },
   {
@@ -74,6 +100,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'selling',
     client: false,
+    pack: 'core',
     summary: 'A product in a list, with its price',
   },
   {
@@ -82,6 +109,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'selling',
     client: false,
+    pack: 'core',
     summary: 'The main product, big, with a buy button',
   },
   {
@@ -90,6 +118,7 @@ export const BLOCKS = [
     kind: 'gallery',
     group: 'selling',
     client: false,
+    pack: 'core',
     summary: 'Smaller products in a grid',
   },
   {
@@ -98,6 +127,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'selling',
     client: false,
+    pack: 'core',
     summary: 'A pack of credits with its price and a buy button',
   },
   {
@@ -106,6 +136,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'selling',
     client: true,
+    pack: 'core',
     summary: 'Free times for a booking, then a button to book one',
   },
   {
@@ -114,6 +145,7 @@ export const BLOCKS = [
     kind: 'band',
     group: 'selling',
     client: false,
+    pack: 'core',
     summary: 'Buy a digital product, with the download consent',
   },
   {
@@ -122,6 +154,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'offers',
     client: false,
+    pack: 'core',
     summary: 'A call or session to book',
   },
   {
@@ -130,6 +163,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'offers',
     client: false,
+    pack: 'core',
     summary: 'A membership tier and what members get',
   },
   {
@@ -138,6 +172,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'offers',
     client: false,
+    pack: 'core',
     summary: 'Something free for an email address',
   },
   {
@@ -146,6 +181,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'offers',
     client: true,
+    pack: 'core',
     summary: 'Pick an amount and leave a tip',
   },
   {
@@ -154,6 +190,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'offers',
     client: false,
+    pack: 'growth',
     summary: 'A code to copy with one tap',
   },
   {
@@ -162,6 +199,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'offers',
     client: true,
+    pack: 'growth',
     summary: 'Time left to a launch or the end of a sale',
   },
   {
@@ -170,6 +208,7 @@ export const BLOCKS = [
     kind: 'text',
     group: 'trust',
     client: false,
+    pack: 'core',
     summary: 'What buyers and fans say',
   },
   {
@@ -178,6 +217,7 @@ export const BLOCKS = [
     kind: 'text',
     group: 'trust',
     client: false,
+    pack: 'core',
     summary: 'Questions that open one at a time',
   },
   {
@@ -186,6 +226,7 @@ export const BLOCKS = [
     kind: 'media',
     group: 'media',
     client: false,
+    pack: 'core',
     summary: 'A YouTube video that loads on play',
   },
   {
@@ -194,6 +235,7 @@ export const BLOCKS = [
     kind: 'gallery',
     group: 'media',
     client: false,
+    pack: 'media',
     summary: 'Reel thumbnails in a grid',
   },
   {
@@ -202,6 +244,7 @@ export const BLOCKS = [
     kind: 'gallery',
     group: 'media',
     client: false,
+    pack: 'core',
     summary: 'Pictures in a grid',
   },
   {
@@ -210,6 +253,7 @@ export const BLOCKS = [
     kind: 'band',
     group: 'forms',
     client: false,
+    pack: 'core',
     summary: 'Newsletter sign-up',
   },
   {
@@ -218,6 +262,7 @@ export const BLOCKS = [
     kind: 'band',
     group: 'page',
     client: false,
+    pack: 'core',
     summary: 'Policy links and the credit line',
   },
   {
@@ -226,6 +271,7 @@ export const BLOCKS = [
     kind: 'media',
     group: 'media',
     client: false,
+    pack: 'core',
     summary: 'One picture, with a caption and a link',
   },
   {
@@ -234,6 +280,7 @@ export const BLOCKS = [
     kind: 'media',
     group: 'media',
     client: true,
+    pack: 'media',
     summary: 'Pictures to swipe through, with captions and buttons',
   },
   {
@@ -242,6 +289,7 @@ export const BLOCKS = [
     kind: 'media',
     group: 'media',
     client: true,
+    pack: 'media',
     summary: 'Drag to compare two pictures',
   },
   {
@@ -250,6 +298,7 @@ export const BLOCKS = [
     kind: 'band',
     group: 'trust',
     client: false,
+    pack: 'growth',
     summary: 'Brand logos in a row, still or scrolling',
   },
   {
@@ -258,6 +307,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'forms',
     client: false,
+    pack: 'core',
     summary: 'Name, email and a message',
   },
   {
@@ -266,6 +316,7 @@ export const BLOCKS = [
     kind: 'link',
     group: 'profile',
     client: false,
+    pack: 'core',
     summary: 'Download a contact card for the phone',
   },
   {
@@ -274,6 +325,7 @@ export const BLOCKS = [
     kind: 'band',
     group: 'trust',
     client: false,
+    pack: 'growth',
     summary: 'Big numbers that count up once',
   },
   {
@@ -282,6 +334,7 @@ export const BLOCKS = [
     kind: 'text',
     group: 'trust',
     client: false,
+    pack: 'growth',
     summary: 'Dated milestones joined by a line',
   },
   {
@@ -290,6 +343,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'page',
     client: false,
+    pack: 'core',
     summary: 'A place with a map, hours and directions',
   },
   {
@@ -298,6 +352,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'page',
     client: false,
+    pack: 'core',
     summary: 'A code to scan, with a download button',
   },
   {
@@ -306,6 +361,7 @@ export const BLOCKS = [
     kind: 'link',
     group: 'links',
     client: true,
+    pack: 'growth',
     summary: 'A link behind a code, an age check or a warning',
   },
   {
@@ -314,6 +370,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'selling',
     client: false,
+    pack: 'core',
     summary: 'A course with lessons, length, price and a buy button',
   },
   {
@@ -322,6 +379,7 @@ export const BLOCKS = [
     kind: 'band',
     group: 'selling',
     client: true,
+    pack: 'core',
     summary: 'Plans side by side, with a monthly or yearly switch',
   },
   {
@@ -330,6 +388,7 @@ export const BLOCKS = [
     kind: 'links',
     group: 'selling',
     client: false,
+    pack: 'growth',
     summary: 'Recommended products, with affiliate links marked',
   },
   {
@@ -338,6 +397,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'offers',
     client: true,
+    pack: 'core',
     summary: 'A booking page in the page or a pop-up',
   },
   {
@@ -346,6 +406,7 @@ export const BLOCKS = [
     kind: 'gallery',
     group: 'feeds',
     client: false,
+    pack: 'feeds',
     summary: 'The newest videos from a channel',
   },
   {
@@ -354,6 +415,7 @@ export const BLOCKS = [
     kind: 'gallery',
     group: 'feeds',
     client: false,
+    pack: 'feeds',
     summary: 'The newest posts from a blog or feed',
   },
   {
@@ -362,6 +424,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'feeds',
     client: false,
+    pack: 'feeds',
     summary: 'Live or offline, with a player while live',
   },
   {
@@ -370,6 +433,7 @@ export const BLOCKS = [
     kind: 'gallery',
     group: 'feeds',
     client: false,
+    pack: 'feeds',
     summary: 'Upcoming events or tour dates with tickets',
   },
   {
@@ -378,6 +442,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'feeds',
     client: false,
+    pack: 'growth',
     summary: 'A star rating and recent reviews from a review site',
   },
   {
@@ -386,6 +451,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'feeds',
     client: false,
+    pack: 'feeds',
     summary: 'What the creator is listening to, reading or watching',
   },
   {
@@ -394,6 +460,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'developer',
     client: false,
+    pack: 'developer',
     summary: 'A GitHub profile with followers, repos and stars',
   },
   {
@@ -402,6 +469,7 @@ export const BLOCKS = [
     kind: 'band',
     group: 'developer',
     client: false,
+    pack: 'developer',
     summary: 'A year of contributions, with streaks',
   },
   {
@@ -410,6 +478,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'developer',
     client: false,
+    pack: 'developer',
     summary: 'One repository with stars, forks and language',
   },
   {
@@ -418,6 +487,7 @@ export const BLOCKS = [
     kind: 'gallery',
     group: 'developer',
     client: false,
+    pack: 'developer',
     summary: 'Pinned or top repositories',
   },
   {
@@ -426,6 +496,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'developer',
     client: false,
+    pack: 'developer',
     summary: 'A package’s version and downloads, with a chart',
   },
   {
@@ -434,6 +505,7 @@ export const BLOCKS = [
     kind: 'text',
     group: 'developer',
     client: false,
+    pack: 'developer',
     summary: 'Tools and languages as logo chips',
   },
   {
@@ -442,6 +514,7 @@ export const BLOCKS = [
     kind: 'media',
     group: 'media',
     client: false,
+    pack: 'media',
     summary: 'A Spotify track, album, playlist or podcast',
   },
   {
@@ -450,6 +523,7 @@ export const BLOCKS = [
     kind: 'media',
     group: 'media',
     client: false,
+    pack: 'media',
     summary: 'One TikTok video, played in place',
   },
   {
@@ -458,6 +532,7 @@ export const BLOCKS = [
     kind: 'media',
     group: 'media',
     client: false,
+    pack: 'media',
     summary: 'One Instagram post or reel',
   },
   {
@@ -466,6 +541,7 @@ export const BLOCKS = [
     kind: 'media',
     group: 'media',
     client: false,
+    pack: 'media',
     summary: 'Paste a link from a listed service and it plays',
   },
   {
@@ -474,6 +550,7 @@ export const BLOCKS = [
     kind: 'card',
     group: 'media',
     client: false,
+    pack: 'media',
     summary: 'One track with play, pause and a seek bar',
   },
   {
@@ -482,12 +559,18 @@ export const BLOCKS = [
     kind: 'links',
     group: 'media',
     client: false,
+    pack: 'media',
     summary: 'The newest podcast episodes, each with a player',
   },
 ] as const satisfies readonly BlockInfo[];
 
 /** The id of a block in this package. */
 export type BlockId = (typeof BLOCKS)[number]['id'];
+
+/** Every block in a pack, in registry order. */
+export function blocksInPack(pack: BlockPack): BlockInfo[] {
+  return BLOCKS.filter((block) => block.pack === pack);
+}
 
 /** A block's entry by id, or undefined. */
 export function blockInfo(id: string): BlockInfo | undefined {
