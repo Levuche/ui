@@ -47,6 +47,12 @@ export const QrCodeIcon = (p: IconProps) => (
     <path d="M14 14h3v3h-3zM20 14v7M14 20h3" />
   </Svg>
 );
+export const MapPinIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 21s-7-6.2-7-12a7 7 0 0114 0c0 5.8-7 12-7 12z" />
+    <circle cx="12" cy="9" r="2.5" />
+  </Svg>
+);
 export const EmailIcon = (p: IconProps) => (
   <Svg {...p}>
     <rect x="3" y="5" width="18" height="14" rx="2" />

@@ -134,6 +134,8 @@ export {
   type CopyLabels,
 } from './molecules/copy-button';
 export { PlayFrame, type FrameRatio } from './molecules/play-frame';
+export { Field } from './molecules/field';
+export { CountUp, type NumberStyle } from './molecules/count-up';
 
 // Organisms: the blocks
 export { CreatorHeader } from './organisms/profile';
@@ -186,3 +188,24 @@ export { CreatorFooter } from './organisms/footer';
 // Templates
 export { SitePage } from './templates/page';
 export { SiteGrid, type SiteGridBlock } from './templates/site-grid';
+export {
+  CONTACT_FORM_LABELS,
+  ContactForm,
+  SaveContact,
+  toVCard,
+  type ContactCard,
+  type ContactFormLabels,
+} from './organisms/contact';
+export {
+  MAP_CARD_LABELS,
+  MapCard,
+  StatsRow,
+  Timeline,
+  directionsUrl,
+  mapEmbedUrl,
+  type MapCardLabels,
+  type OpeningHours,
+  type Stat,
+  type TimelineItem,
+} from './organisms/info';
+export { QrCode, qrSvg, type QrEncoder } from './organisms/qr-code';

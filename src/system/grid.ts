@@ -69,14 +69,16 @@ export type PageLayouts = Partial<Record<GridScreen, GridLayout>>;
  * The kinds of block, each with the sizes it needs:
  *
  * - profile: CreatorHeader, with SocialIcons under it
- * - link: SiteLinkButton or a LinkTile
+ * - link: SiteLinkButton, a LinkTile or SaveContact
  * - links: LinkList
  * - card: FeaturedLink, FeaturedPack, PackRow, BookingCard, MembershipCard,
- *   LeadMagnet, TipJar, DiscountCode, Countdown
- * - media: YouTubeVideo
+ *   LeadMagnet, TipJar, DiscountCode, Countdown, ContactForm, MapCard, QrCode
+ * - media: YouTubeVideo, SiteImage, ImageCarousel, BeforeAfter
  * - gallery: ImageGrid, ReelGrid, PackGrid
- * - text: SiteText, Testimonials, FaqList
- * - band: NewsletterBand, PackCheckout, CreatorFooter
+ * - text: SiteText, Testimonials, FaqList, Timeline
+ * - band: NewsletterBand, PackCheckout, CreatorFooter, LogoStrip, StatsRow
+ *
+ * Every block's kind is also in BLOCKS, in registry.ts.
  */
 export type BlockKind =
   'profile' | 'link' | 'links' | 'card' | 'media' | 'gallery' | 'text' | 'band';

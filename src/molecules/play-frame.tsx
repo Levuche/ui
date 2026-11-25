@@ -29,6 +29,7 @@ export function PlayFrame({
   allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen',
   autoLoad = false,
   playIcon,
+  action = 'play',
   onPlay,
   className,
 }: {
@@ -43,6 +44,8 @@ export function PlayFrame({
   allow?: string;
   autoLoad?: boolean;
   playIcon?: ReactNode;
+  /** What the press is called in `onAction`. */
+  action?: string;
   onPlay?: () => void;
   className?: string;
 }) {
@@ -69,7 +72,7 @@ export function PlayFrame({
   return (
     <button
       type="button"
-      data-action="play"
+      data-action={action}
       onClick={() => {
         setPlaying(true);
         onPlay?.();
