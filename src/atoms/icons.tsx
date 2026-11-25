@@ -53,6 +53,19 @@ export const MapPinIcon = (p: IconProps) => (
     <circle cx="12" cy="9" r="2.5" />
   </Svg>
 );
+export const ForkIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="6" cy="5" r="2" />
+    <circle cx="18" cy="5" r="2" />
+    <circle cx="12" cy="19" r="2" />
+    <path d="M6 7v2a3 3 0 003 3h6a3 3 0 003-3V7M12 12v5" />
+  </Svg>
+);
+export const CodeIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" />
+  </Svg>
+);
 export const EmailIcon = (p: IconProps) => (
   <Svg {...p}>
     <rect x="3" y="5" width="18" height="14" rx="2" />

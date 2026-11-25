@@ -73,12 +73,12 @@ export type PageLayouts = Partial<Record<GridScreen, GridLayout>>;
  * - links: LinkList, TopPicks
  * - card: FeaturedLink, FeaturedPack, PackRow, BookingCard, MembershipCard,
  *   LeadMagnet, TipJar, DiscountCode, Countdown, ContactForm, MapCard, QrCode,
- *   CourseCard, BookingEmbed
+ *   CourseCard, BookingEmbed, GitHubProfile, RepoCard, PackageStats
  * - media: YouTubeVideo, SiteImage, ImageCarousel, BeforeAfter
- * - gallery: ImageGrid, ReelGrid, PackGrid
- * - text: SiteText, Testimonials, FaqList, Timeline
+ * - gallery: ImageGrid, ReelGrid, PackGrid, RepoList
+ * - text: SiteText, Testimonials, FaqList, Timeline, TechStack
  * - band: NewsletterBand, PackCheckout, CreatorFooter, LogoStrip, StatsRow,
- *   PricingTable
+ *   PricingTable, ContributionGraph
  *
  * Every block's kind is also in BLOCKS, in registry.ts.
  */

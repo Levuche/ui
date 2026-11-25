@@ -158,6 +158,48 @@ The React ideas it uses, and why:
   its grid kind and its group, for the editor and for analytics. A test
   checks each id is used only once.
 
+### Data from other services
+
+Blocks that show another service's data (GitHub, npm, a channel's latest
+videos, reviews) never fetch it. The app's server fetches it, caches it and
+passes it in, so keys stay on the server, visitors don't each call the
+service, and rate limits last. Each such block exports the type of its data
+and takes `LiveProps`:
+
+| Prop      | What the block shows                                                      |
+| --------- | ------------------------------------------------------------------------- |
+| `data`    | The data, typed by the block (`GitHubProfileData`, `RepoData`, …)         |
+| `loading` | A skeleton while there's no data yet; screen readers hear "Loading"       |
+| `error`   | With data: the data and a quiet "couldn't refresh" note. Without: nothing |
+
+```tsx
+// app/page.tsx, a server component: fetch and cache on the server.
+const res = await fetch(`https://api.github.com/users/${login}`, {
+  headers: { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` },
+  next: { revalidate: 3600 },
+});
+const user = res.ok ? await res.json() : null;
+
+<GitHubProfile
+  data={
+    user && {
+      login: user.login,
+      name: user.name,
+      avatarUrl: user.avatar_url,
+      bio: user.bio,
+      followers: user.followers,
+      publicRepos: user.public_repos,
+      url: user.html_url,
+    }
+  }
+  error={!res.ok}
+/>;
+```
+
+`LiveData` does the same for a block of your own: give it the props and a
+function that draws the data. Stories use fixed sample data, so tests never
+reach a service.
+
 ## Size presets
 
 Blocks use named sizes, never fixed pixels, so one change in `tokens.css`
@@ -265,19 +307,23 @@ that no block covers another and that the page never scrolls sideways.
 
 ## What's in it
 
-| Group           | Blocks                                                                                                        |
-| --------------- | ------------------------------------------------------------------------------------------------------------- |
-| Theme           | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `SiteTheme`                                    |
-| Buttons, text   | `SiteButton`, `SiteLinkButton`, `siteButtonClasses`, `SiteHeading`, `SiteText`, `SiteSection`, `SiteDivider`  |
-| Page            | `SitePage`, `SiteGrid`                                                                                        |
-| Links           | `LinkTile`, `LinkList`, `FeaturedLink`, `SocialIcons`, `ImageGrid`                                            |
-| Profile         | `CreatorHeader`, `Avatar`                                                                                     |
-| Selling         | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`                                            |
-| Offers          | `BookingCard`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`, `timeLeft`              |
-| Reviews, FAQ    | `Testimonials`, `FaqList`                                                                                     |
-| Media           | `YouTubeVideo`, `youtubeId`, `ReelGrid`                                                                       |
-| Sign-up, footer | `NewsletterBand`, `CreatorFooter`                                                                             |
-| Icons           | link, video, camera, globe, app, email, share, QR code, calendar, clock, star, copy, download, heart and more |
+| Group       | Blocks                                                                                                                                                                                            |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `Block`, `withBlockLook`, `BlockLook`                                                                                              |
+| Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                 |
+| Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `CountUp`, `StatList`, `Sparkline`, `LiveData` |
+| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                      |
+| Profile     | `CreatorHeader`, `SocialIcons`, `SaveContact`                                                                                                                                                     |
+| Links       | `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                          |
+| Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `TopPicks`                                                                                      |
+| Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                              |
+| Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                    |
+| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `BeforeAfter`                                                                                                              |
+| Forms       | `NewsletterBand`, `ContactForm`                                                                                                                                                                   |
+| Developer   | `GitHubProfile`, `ContributionGraph`, `RepoCard`, `RepoList`, `PackageStats`, `TechStack`                                                                                                         |
+
+`BLOCKS` in the registry lists every block with its group, so this table
+is a summary; the registry is the full list.
 
 `BookingCard` and `MembershipCard` link to the page that takes the booking
 or the payment. `LeadMagnet`, `TipJar` and `NewsletterBand` are forms: give

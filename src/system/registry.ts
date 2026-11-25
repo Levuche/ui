@@ -16,6 +16,8 @@ export const BLOCK_GROUPS = [
   'media',
   'trust',
   'forms',
+  'feeds',
+  'developer',
   'page',
 ] as const;
 export type BlockGroup = (typeof BLOCK_GROUPS)[number];
@@ -321,6 +323,54 @@ export const BLOCKS = [
     group: 'offers',
     client: true,
     summary: 'A booking page in the page or a pop-up',
+  },
+  {
+    id: 'github-profile',
+    component: 'GitHubProfile',
+    kind: 'card',
+    group: 'developer',
+    client: false,
+    summary: 'A GitHub profile with followers, repos and stars',
+  },
+  {
+    id: 'contribution-graph',
+    component: 'ContributionGraph',
+    kind: 'band',
+    group: 'developer',
+    client: false,
+    summary: 'A year of contributions, with streaks',
+  },
+  {
+    id: 'repo-card',
+    component: 'RepoCard',
+    kind: 'card',
+    group: 'developer',
+    client: false,
+    summary: 'One repository with stars, forks and language',
+  },
+  {
+    id: 'repo-list',
+    component: 'RepoList',
+    kind: 'gallery',
+    group: 'developer',
+    client: false,
+    summary: 'Pinned or top repositories',
+  },
+  {
+    id: 'package-stats',
+    component: 'PackageStats',
+    kind: 'card',
+    group: 'developer',
+    client: false,
+    summary: 'A package’s version and downloads, with a chart',
+  },
+  {
+    id: 'tech-stack',
+    component: 'TechStack',
+    kind: 'text',
+    group: 'developer',
+    client: false,
+    summary: 'Tools and languages as logo chips',
   },
 ] as const satisfies readonly BlockInfo[];
 
