@@ -26,13 +26,21 @@ const preview: Preview = {
   decorators: [
     (Story, context) => {
       const name = (context.globals.theme ?? 'light') as ThemeName;
+      // Grid pages are wider than one column; they set `frame: 'wide'`.
+      const wide = context.parameters.frame === 'wide';
       return (
         <CreatorTheme
           theme={THEMES[name].theme}
           className="min-h-screen p-5"
           data-testid="story-theme"
         >
-          <div className="max-w-site mx-auto flex flex-col gap-4">
+          <div
+            className={
+              wide
+                ? 'mx-auto flex flex-col gap-4'
+                : 'max-w-site mx-auto flex flex-col gap-4'
+            }
+          >
             <Story />
           </div>
         </CreatorTheme>
