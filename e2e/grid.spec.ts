@@ -8,7 +8,7 @@ import {
   pageLayouts,
   type GridBlockSpec,
   type GridLayout,
-} from '../src/grid';
+} from '../src/system/grid';
 
 /* Plain checks of the grid helpers the page editor relies on. No browser. */
 

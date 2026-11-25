@@ -1,0 +1,127 @@
+import type { ReactNode } from 'react';
+import { Block, type BlockRootProps } from '../atoms/block';
+import { siteButtonClasses, type SiteButtonVariant } from '../atoms/button';
+import { DownloadIcon } from '../atoms/icons';
+import { ItemHead, type HeadingTag } from '../molecules/item-head';
+import { cn } from '../system/cn';
+import { isSafeColor } from '../system/theme';
+
+/**
+ * Turns text into a QR code's squares, row by row, true for dark. Pass the
+ * encoder your app already uses, for example
+ * `(text) => toMatrix(qrcodeGenerator(0, 'M'), text)`.
+ */
+export type QrEncoder = (text: string) => boolean[][];
+
+/** The QR code as an SVG file, with a quiet border of 4 squares. */
+export function qrSvg(
+  modules: boolean[][],
+  {
+    dark = '#000000',
+    light = '#ffffff',
+    title,
+  }: { dark?: string; light?: string; title?: string } = {}
+) {
+  const size = modules.length + 8;
+  let path = '';
+  modules.forEach((row, y) =>
+    row.forEach((on, x) => {
+      if (on) path += `M${x + 4} ${y + 4}h1v1h-1z`;
+    })
+  );
+  const name = title
+    ? `<title>${title.replace(/[<&>]/g, (c) => `&#${c.charCodeAt(0)};`)}</title>`
+    : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges">${name}<rect width="${size}" height="${size}" fill="${light}"/><path d="${path}" fill="${dark}"/></svg>`;
+}
+
+/**
+ * A code visitors scan to open a link on their phone, with a button that
+ * saves it. Give `encode` to draw the code from `value`, or `src` for a
+ * picture of a code made elsewhere. It stays dark on light whatever the
+ * block's tone, since scanners need that; `dark` and `light` change it.
+ */
+export function QrCode({
+  value,
+  encode,
+  src,
+  title,
+  detail,
+  caption,
+  dark = '#000000',
+  light = '#ffffff',
+  size = 'md',
+  download = true,
+  downloadLabel = 'Save the QR code',
+  fileName = 'qr-code',
+  buttonVariant = 'outline',
+  headingAs = 'h3',
+  ...root
+}: BlockRootProps & {
+  /** What the code opens, usually the page's address. */
+  value: string;
+  encode?: QrEncoder;
+  /** A picture of the code, instead of `encode`. */
+  src?: string | null;
+  title?: ReactNode;
+  detail?: ReactNode;
+  /** Under the code. Defaults to `value`, without "https://". */
+  caption?: ReactNode;
+  dark?: string;
+  light?: string;
+  size?: 'sm' | 'md' | 'lg';
+  download?: boolean;
+  downloadLabel?: ReactNode;
+  /** Without ".svg" or ".png". */
+  fileName?: string;
+  buttonVariant?: SiteButtonVariant;
+  headingAs?: HeadingTag;
+}) {
+  const ink = isSafeColor(dark) ? dark : '#000000';
+  const paper = isSafeColor(light) ? light : '#ffffff';
+  const name = `QR code for ${value.replace(/^https?:\/\//, '')}`;
+  const modules = encode && !src ? encode(value) : null;
+  const svg = modules?.length
+    ? qrSvg(modules, { dark: ink, light: paper, title: name })
+    : null;
+  const picture = svg
+    ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
+    : (src ?? null);
+  const width = { sm: 'w-32', md: 'w-44', lg: 'w-60' }[size];
+  const file = `${fileName.replace(/[\\/:*?"<>|]/g, '')}.${svg ? 'svg' : 'png'}`;
+  return (
+    <Block name="qr-code" defaults={{ align: 'center' }} {...root}>
+      {title ? (
+        <ItemHead title={title} detail={detail} headingAs={headingAs} />
+      ) : null}
+      {picture ? (
+        <img
+          src={picture}
+          alt={name}
+          className={cn(
+            'rounded-block-inner mx-auto aspect-square h-auto',
+            width
+          )}
+          style={{ background: paper }}
+        />
+      ) : null}
+      <p className="text-site-text-2 m-0 text-sm break-all">
+        {caption ?? value.replace(/^https?:\/\//, '')}
+      </p>
+      {download && picture ? (
+        <a
+          href={picture}
+          download={file}
+          data-action="qr_download"
+          className={siteButtonClasses({
+            variant: buttonVariant,
+            fullWidth: true,
+          })}
+        >
+          <DownloadIcon size={18} />
+          {downloadLabel}
+        </a>
+      ) : null}
+    </Block>
+  );
+}

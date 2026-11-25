@@ -92,6 +92,167 @@ Every block reads only `--site-*` CSS variables. `<CreatorTheme>` sets them:
 Buttons also take `variant` (`solid`, `outline`, `soft`, `text`) and `size`
 (`sm`, `md`, `lg`), so creators can pick them per block.
 
+### One block's own look
+
+Every block also takes the same look props, on top of the page theme, so a
+creator can change one block without touching the others:
+
+| Prop     | Values                                                              |
+| -------- | ------------------------------------------------------------------- |
+| `tone`   | `surface`, `muted`, `accent`, `band`, `notice`, `outline`, `plain`  |
+| `size`   | `sm`, `md`, `lg`: padding, gaps and type together                   |
+| `radius` | `theme` (the page's corners), `none`, `sm`, `md`, `lg`, `full`      |
+| `align`  | `start`, `center`, `end`                                            |
+| `shadow` | `none`, `sm`, `md`, `lg`                                            |
+| `motion` | `none`, `fade`, `rise`, `scale` (off for visitors who ask for less) |
+| `colors` | this block's own colours, the same keys as the theme                |
+| `font`   | this block's own font                                               |
+| `hideOn` | screens to hide it on: `phone`, `tablet`, `desktop`                 |
+
+A tone swaps the colours inside the block, so text, links and buttons stay
+readable: in an `accent` block, solid buttons turn inside out. Text boxes keep
+the page's colours in any tone. Blocks also take an `id`, `className`,
+`style`, `ref` and `data-*` attributes.
+
+Behaviour is set the same way. Links take `newTab` (`auto` opens other
+sites in a new tab), `sponsored` and `nofollow`, and an unsafe address
+(`javascript:` and the like) shows its words without a link. Words a block
+shows take a `labels` prop, so a page can be in any language. Forms take
+`status` (`idle`, `sending`, `sent`, `error`) from the app: the button spins
+while sending and the result is read out to screen readers.
+
+### How the blocks are built
+
+The package follows atomic design, and each level uses only the levels
+below it (a lint rule checks this):
+
+| Level            | What's in it                                                                          |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| `src/system/`    | Plain data and functions: theme, look, safe links, state, tracking, grid, registry    |
+| `src/atoms/`     | One element: `Block`, `SiteButton`, `SiteLink`, `SiteInput`, `Thumb`, `Avatar`, icons |
+| `src/molecules/` | A few atoms together: `LinkTile`, `EmailForm`, `Price`, `Rating`, `PlayFrame`         |
+| `src/organisms/` | The blocks a creator adds to a page: `BookingCard`, `TipJar`, `LinkList`              |
+| `src/templates/` | Page layouts: `SitePage`, `SiteGrid`                                                  |
+
+The React ideas it uses, and why:
+
+- **A prop getter, `lookProps()`**, turns a block's look props into the
+  classes, style and `data-*` attributes for its outermost element. Every
+  block spreads it, which is why one setting restyles any block the same way.
+- **CSS variables, not React context**, carry the theme and the look down to
+  everything inside a block. Context only works in client components; CSS
+  variables work in React Server Components too, so blocks render on the
+  server in Next.js and only blocks with state (`TipJar`, `Countdown`,
+  `CopyButton`, `PlayFrame`) are `'use client'`.
+- **A primitive, `<Block>`**, is the box every block is built on. An app's own
+  blocks can use it too, or wrap an existing component with the
+  **higher-order component `withBlockLook()`**.
+- **Controlled or uncontrolled state**: `useControllableState` lets the app
+  own a value (`value` and `onChange`) or leave it to the block
+  (`defaultValue`).
+- **Event delegation for tracking**: blocks mark presses with `data-action`
+  and their element with `data-block`. `useBlockActions(onAction)` on the
+  page reports every link, button and form as `{ action, block, label }`,
+  with no tracking prop on each block.
+- **A registry**: `BLOCKS` lists every block once, with its `data-block` id,
+  its grid kind and its group, for the editor and for analytics. A test
+  checks each id is used only once.
+
+### Data from other services
+
+Blocks that show another service's data (GitHub, npm, a channel's latest
+videos, reviews) never fetch it. The app's server fetches it, caches it and
+passes it in, so keys stay on the server, visitors don't each call the
+service, and rate limits last. Each such block exports the type of its data
+and takes `LiveProps`:
+
+| Prop      | What the block shows                                                      |
+| --------- | ------------------------------------------------------------------------- |
+| `data`    | The data, typed by the block (`GitHubProfileData`, `RepoData`, …)         |
+| `loading` | A skeleton while there's no data yet; screen readers hear "Loading"       |
+| `error`   | With data: the data and a quiet "couldn't refresh" note. Without: nothing |
+
+```tsx
+// app/page.tsx, a server component: fetch and cache on the server.
+const res = await fetch(`https://api.github.com/users/${login}`, {
+  headers: { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` },
+  next: { revalidate: 3600 },
+});
+const user = res.ok ? await res.json() : null;
+
+<GitHubProfile
+  data={
+    user && {
+      login: user.login,
+      name: user.name,
+      avatarUrl: user.avatar_url,
+      bio: user.bio,
+      followers: user.followers,
+      publicRepos: user.public_repos,
+      url: user.html_url,
+    }
+  }
+  error={!res.ok}
+/>;
+```
+
+`LiveData` does the same for a block of your own: give it the props and a
+function that draws the data. Stories use fixed sample data, so tests never
+reach a service.
+
+### Selling through BuildBase
+
+Every block that sells takes `sell`: plain data naming what BuildBase
+selling checks out. The block shows the offer and reports the press; your
+app starts the checkout with the BuildBase SDK. ui has no SDK, no Stripe and
+no keys, and the blocks stay Server Components.
+
+| What is sold                                     | `sell`                                                        |
+| ------------------------------------------------ | ------------------------------------------------------------- |
+| An item, one-time or a subscription price        | `{ itemId, variantId, priceId, quantity?, recurring? }`       |
+| Pay what you want, or free                       | the same, with `amount` (minor units) or `free: true`         |
+| A booking (`BookingCard`, `SlotPicker`)          | the same; `SlotPicker` adds the chosen `slotStart`            |
+| A plan of the app (`PricingTable`, `yearlySell`) | `{ planVersionId, billingInterval? }`                         |
+| Credits (`CreditPack`)                           | `{ creditPackageId }`                                         |
+| A coupon                                         | `couponCode` on an item, `promotionCode` on a plan or credits |
+
+Blocks with a button (`PackRow`, `FeaturedPack`, `PackGrid`, `CourseCard`,
+`BookingCard`, `MembershipCard`, `PricingTable`, `CreditPack`,
+`SlotPicker`) write it on the button; form blocks (`PackCheckout`,
+`TipJar`, `LeadMagnet`) send it as a hidden `sell` field. Any action with
+`sell` is a sale, whatever its name (`buy`, `book`, `join`, …):
+
+```tsx
+'use client';
+import { useBlockActions } from '@levuche/ui';
+import { useCheckout } from '@buildbase/sdk/react';
+
+export function Checkout({ children }: { children: React.ReactNode }) {
+  const { checkout } = useCheckout();
+  useBlockActions(async ({ sell }) => {
+    if (!sell || !('itemId' in sell)) return;
+    // free and recurring are for the SDK's <BuyButton>; checkout reads the price.
+    const { itemId, free: _free, recurring: _recurring, ...input } = sell;
+    const start = await checkout(itemId, input);
+    if (start.url) window.location.assign(start.url);
+  });
+  return children;
+}
+```
+
+In a server action, `readSell(formData)` reads a form's sale back, checked.
+Check the price on the server as BuildBase does: a visitor can change a
+page.
+
+- `sellState` (`idle`, `sending`, `sold_out`, `unavailable`, `error`)
+  shows where the sale stands; the words are in `sellLabels`.
+- `renderBuy` draws your own buy button (such as the SDK's `<BuyButton>`)
+  in the block's place.
+- Affiliates: BuildBase keeps the visitor's referral token itself.
+  `referralHref(href, code)` puts a creator's own code on a link as `?ref=`.
+- `BookingEmbed` stays for booking pages outside BuildBase; `SlotPicker`
+  is the BuildBase way.
+
 ## Size presets
 
 Blocks use named sizes, never fixed pixels, so one change in `tokens.css`
@@ -199,22 +360,27 @@ that no block covers another and that the page never scrolls sideways.
 
 ## What's in it
 
-| Group           | Blocks                                                                                                        |
-| --------------- | ------------------------------------------------------------------------------------------------------------- |
-| Theme           | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `SiteTheme`                                    |
-| Buttons, text   | `SiteButton`, `SiteLinkButton`, `siteButtonClasses`, `SiteHeading`, `SiteText`, `SiteSection`, `SiteDivider`  |
-| Page            | `SitePage`, `SiteGrid`                                                                                        |
-| Links           | `LinkTile`, `LinkList`, `FeaturedLink`, `SocialIcons`, `ImageGrid`                                            |
-| Profile         | `CreatorHeader`, `Avatar`                                                                                     |
-| Selling         | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`                                            |
-| Offers          | `BookingCard`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`, `timeLeft`              |
-| Reviews, FAQ    | `Testimonials`, `FaqList`                                                                                     |
-| Media           | `YouTubeVideo`, `youtubeId`, `ReelGrid`                                                                       |
-| Sign-up, footer | `NewsletterBand`, `CreatorFooter`                                                                             |
-| Icons           | link, video, camera, globe, app, email, share, QR code, calendar, clock, star, copy, download, heart and more |
+| Group       | Blocks                                                                                                                                                                                                                                     |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `Block`, `withBlockLook`, `BlockLook`                                                                                                                                       |
+| Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                          |
+| Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton` |
+| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                                                               |
+| Profile     | `CreatorHeader`, `SocialIcons`, `SaveContact`                                                                                                                                                                                              |
+| Links       | `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                                                                   |
+| Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                   |
+| Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                       |
+| Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                                                             |
+| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `BeforeAfter`, `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                                                        |
+| Forms       | `NewsletterBand`, `ContactForm`                                                                                                                                                                                                            |
+| Feeds       | `LatestVideos`, `LatestPosts`, `LiveStatus`, `EventList`, `ReviewSummary`, `NowPlaying`                                                                                                                                                    |
+| Developer   | `GitHubProfile`, `ContributionGraph`, `RepoCard`, `RepoList`, `PackageStats`, `TechStack`                                                                                                                                                  |
+
+`BLOCKS` in the registry lists every block with its group, so this table
+is a summary; the registry is the full list.
 
 `BookingCard` and `MembershipCard` link to the page that takes the booking
-or the payment. `LeadMagnet`, `TipJar` and `NewsletterBand` are forms: give
+or the payment, or sell through BuildBase with `sell` (see below). `LeadMagnet`, `TipJar` and `NewsletterBand` are forms: give
 them an `action` to post to, or an `onSubmit`. `TipJar` sends `amount`.
 `Countdown` ticks in the visitor's browser (pass `now` to freeze it in a
 preview). `DiscountCode` copies with the browser's clipboard and says so to
@@ -270,11 +436,15 @@ variable, the same pair the website uses.
 
 ### Adding a block
 
-1. Build it from its design board with `--site-*` tokens only (no raw
-   colours), `rounded-site` or `rounded-site-button` for corners, and the
-   size presets above (no fixed pixel sizes; `min-h-control` or more for
-   anything tapped).
-2. Export it from `src/index.ts`.
+1. Build it in `src/organisms/` on `<Block name="your-block">`, taking
+   `BlockRootProps` so it gets every look prop. Use atoms and molecules
+   before writing new markup, `--site-*` tokens only (no raw colours),
+   `rounded-block` or `rounded-block-inner` for corners, `p-block` and
+   `gap-block-gap` for spacing, and the size presets above (`min-h-control`
+   or more for anything tapped). Put words in a `labels` prop, links through
+   `SiteLink`, and add `'use client'` only if it has state.
+2. Add it to `BLOCKS` in `src/system/registry.ts` and export it from
+   `src/index.ts`.
 3. Show it in `gallery/gallery.tsx`, inside a `Group`.
 4. Add `stories/<Block>.stories.tsx`, with a play function that does what a
    visitor would, and add it to the sample page in `stories/sample-page.tsx`.
