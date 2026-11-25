@@ -209,3 +209,10 @@ export {
   type TimelineItem,
 } from './organisms/info';
 export { QrCode, qrSvg, type QrEncoder } from './organisms/qr-code';
+export {
+  LOCKED_LINK_LABELS,
+  LockedLink,
+  type LockMode,
+  type LockedLinkLabels,
+  type UnlockLink,
+} from './organisms/locked-link';

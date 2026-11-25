@@ -69,7 +69,7 @@ export type PageLayouts = Partial<Record<GridScreen, GridLayout>>;
  * The kinds of block, each with the sizes it needs:
  *
  * - profile: CreatorHeader, with SocialIcons under it
- * - link: SiteLinkButton, a LinkTile or SaveContact
+ * - link: SiteLinkButton, a LinkTile, SaveContact or LockedLink
  * - links: LinkList
  * - card: FeaturedLink, FeaturedPack, PackRow, BookingCard, MembershipCard,
  *   LeadMagnet, TipJar, DiscountCode, Countdown, ContactForm, MapCard, QrCode

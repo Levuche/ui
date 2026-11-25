@@ -179,6 +179,27 @@ for (const [id, expected] of Object.entries(THEMES)) {
       );
     });
 
+    test('a locked link stays out of the page until the code is right', async ({
+      page,
+    }) => {
+      const locked = panel.getByTestId('locked');
+      expect(await page.content()).not.toContain('early-access');
+      const open = locked.getByRole('button', { name: /Early access/ });
+      await open.click();
+      const dialog = page.getByRole('dialog');
+      await dialog.getByLabel('Code').fill('TEA');
+      await dialog.getByRole('button', { name: 'Unlock' }).click();
+      await expect(dialog.getByRole('status')).toContainText('didn’t work');
+      expect(await page.content()).not.toContain('early-access');
+      await dialog.getByLabel('Code').fill('chai');
+      await dialog.getByRole('button', { name: 'Unlock' }).click();
+      await expect(
+        dialog.getByRole('link', { name: 'Open the link' })
+      ).toHaveAttribute('href', 'https://example.com/early-access');
+      await page.keyboard.press('Escape');
+      await expect(open).toBeFocused();
+    });
+
     test('questions open to show their answer', async () => {
       const reviews = panel.getByTestId('reviews');
       await expect(

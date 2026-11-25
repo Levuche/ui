@@ -34,6 +34,7 @@ import {
 import {
   CheckoutDemo,
   LeadMagnetDemo,
+  LockedLinkDemo,
   NewsletterDemo,
   TipJarDemo,
 } from './demos';
@@ -251,6 +252,10 @@ function Panel({
 
         <Group id={id} name="tips" title="Tips">
           <TipJarDemo />
+        </Group>
+
+        <Group id={id} name="locked" title="Locked link">
+          <LockedLinkDemo />
         </Group>
 
         <Group id={id} name="promo" title="Countdown and code">

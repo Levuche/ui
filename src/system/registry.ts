@@ -282,6 +282,14 @@ export const BLOCKS = [
     client: false,
     summary: 'A code to scan, with a download button',
   },
+  {
+    id: 'locked-link',
+    component: 'LockedLink',
+    kind: 'link',
+    group: 'links',
+    client: true,
+    summary: 'A link behind a code, an age check or a warning',
+  },
 ] as const satisfies readonly BlockInfo[];
 
 /** The id of a block in this package. */

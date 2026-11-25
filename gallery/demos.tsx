@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { LeadMagnet, NewsletterBand, PackCheckout, TipJar } from '../src';
+import {
+  LeadMagnet,
+  LockedLink,
+  NewsletterBand,
+  PackCheckout,
+  TipJar,
+} from '../src';
 
 /** Checkout that says when it would start, for the tests. */
 export function CheckoutDemo() {
@@ -68,5 +74,21 @@ export function TipJarDemo() {
       />
       {tip ? <p role="status">Tip of {tip} started</p> : null}
     </div>
+  );
+}
+
+/** A code-locked link; "CHAI" opens it. Stands in for a server check. */
+export function LockedLinkDemo() {
+  return (
+    <LockedLink
+      label="Early access: the reel pack"
+      mode="code"
+      newTab
+      unlock={async (code) =>
+        code.toUpperCase() === 'CHAI'
+          ? ['https://example.com', 'early-access'].join('/')
+          : null
+      }
+    />
   );
 }
