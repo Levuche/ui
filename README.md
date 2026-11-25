@@ -90,6 +90,13 @@ Every block reads only `--site-*` CSS variables. `<CreatorTheme>` sets them:
 - `corners`: `square`, `soft` or `round` for cards and tiles.
 - `buttonShape`: `square`, `rounded` or `pill`.
 - `font`: a CSS font-family list (the app loads the font).
+- `cards`: `flat` (the default), `outline` (a thin line), `raised` (a soft
+  shadow tinted with the accent) or `glass` (see-through and blurred over the
+  page's background). It restyles every card on the page; a block that picks
+  its own `shadow` keeps it. The page's background itself is set by the app.
+- `hover`: `lift` (the default) raises links and linked cards a little under
+  the pointer and presses them in on tap; `none` keeps them still. Neither
+  moves for visitors who ask for less motion.
 
 Buttons also take `variant` (`solid`, `outline`, `soft`, `text`) and `size`
 (`sm`, `md`, `lg`), so creators can pick them per block.
@@ -574,7 +581,9 @@ theme only lets plain colours and fonts into CSS.
 Storybook (`stories/`, set up in `.storybook/`) has a story for each block
 and state, with its props as controls and docs built from them. The toolbar's
 Theme menu shows any story in the sample creator's light or dark scheme or in
-a creator's own theme, and `Pages/Creator page` shows a whole page in each.
+a creator's own theme, and `Pages/Creator page` shows a whole page in each. The
+Cards menu shows it in each card style, and `Pages/Card styles` shows a whole
+page in each.
 
 Each story is also a test. `npm run test:stories` opens every story in
 Chromium (Vitest with the Storybook plugin), runs its play function, which

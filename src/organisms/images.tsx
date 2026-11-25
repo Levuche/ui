@@ -39,6 +39,7 @@ export function ImageGrid({
                 <SiteLink
                   href={href}
                   action="image_click"
+                  data-lift=""
                   className="block"
                   {...link}
                 >
