@@ -104,7 +104,11 @@ export const OwnColours: Story = {
   args: {
     colors: {
       surface: '#1e1b4b',
+      surface2: '#312e81',
       text: '#ffffff',
+      text2: '#e0e7ff',
+      link: '#fde68a',
+      border: '#4338ca',
       accent: '#facc15',
       onAccent: '#1e1b4b',
     },
