@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { youtubeId } from '../src/media';
-import { isSafeColor, siteThemeStyle } from '../src/theme';
+import { youtubeId } from '../src/organisms/media';
+import { isSafeColor, siteThemeStyle } from '../src/system/theme';
 
 /* Plain checks of the helpers the page editor relies on. No browser. */
 

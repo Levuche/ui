@@ -1,12 +1,12 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
-import { cn } from './cn';
+import { cn } from '../system/cn';
 import {
   pageLayouts,
   type BlockKind,
   type GridItem,
   type GridScreen,
   type PageLayouts,
-} from './grid';
+} from '../system/grid';
 
 /** A block on a grid page: what it is, and what to show. */
 export type SiteGridBlock = {

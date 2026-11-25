@@ -1,13 +1,28 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
-import { cn } from './cn';
+import { Block, type BlockRootProps } from '../atoms/block';
+
+/** The names of the units, as the visitor reads them. */
+export type CountdownLabels = {
+  days: string;
+  hours: string;
+  minutes: string;
+  seconds: string;
+};
+
+export const COUNTDOWN_LABELS: CountdownLabels = {
+  days: 'days',
+  hours: 'hours',
+  minutes: 'minutes',
+  seconds: 'seconds',
+};
 
 const UNITS = [
-  { label: 'days', ms: 86_400_000 },
-  { label: 'hours', ms: 3_600_000 },
-  { label: 'minutes', ms: 60_000 },
-  { label: 'seconds', ms: 1_000 },
+  { key: 'days', ms: 86_400_000 },
+  { key: 'hours', ms: 3_600_000 },
+  { key: 'minutes', ms: 60_000 },
+  { key: 'seconds', ms: 1_000 },
 ] as const;
 
 /** Days, hours, minutes and seconds left until `to`. */
@@ -16,7 +31,7 @@ export function timeLeft(to: Date | string, now: number) {
   return UNITS.map((unit) => {
     const value = Math.floor(left / unit.ms);
     left -= value * unit.ms;
-    return { label: unit.label, value };
+    return { label: unit.key as string, value };
   });
 }
 
@@ -29,16 +44,26 @@ export function Countdown({
   to,
   title,
   doneLabel = 'It’s live',
+  doneContent,
+  labels,
+  showSeconds = true,
   now: fixedNow,
-  className,
-}: {
+  onDone,
+  ...root
+}: BlockRootProps & {
   to: Date | string;
   title?: ReactNode;
   doneLabel?: ReactNode;
+  /** Shown under `doneLabel` once time is up, such as a link to the stream. */
+  doneContent?: ReactNode;
+  labels?: Partial<CountdownLabels>;
+  showSeconds?: boolean;
   /** Freeze the clock at this time (ms), for previews and tests. */
   now?: number;
-  className?: string;
+  /** Called once when time runs out in the visitor's browser. */
+  onDone?: () => void;
 }) {
+  const words = { ...COUNTDOWN_LABELS, ...labels };
   // The clock starts in the browser, so the server and the first render
   // agree (no time until it has ticked once).
   const [ticked, setTicked] = useState<number | null>(null);
@@ -55,38 +80,47 @@ export function Countdown({
   const now = fixedNow ?? ticked;
 
   const done = now !== null && new Date(to).getTime() <= now;
+  useEffect(() => {
+    if (done && fixedNow === undefined) onDone?.();
+    // Only when it turns done.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [done]);
+
+  const parts = (
+    now === null
+      ? UNITS.map((u) => ({ label: u.key as string, value: null }))
+      : timeLeft(to, now)
+  ).filter((part) => showSeconds || part.label !== 'seconds');
+
   return (
-    <div
-      className={cn(
-        'bg-site-surface text-site-text rounded-site flex flex-col items-center gap-2.5 p-3.5 text-center',
-        className
-      )}
-    >
+    <Block name="countdown" defaults={{ align: 'center' }} {...root}>
       {title ? <p className="m-0 font-bold">{title}</p> : null}
       {done ? (
-        <p role="status" className="text-site-link m-0 text-xl font-bold">
-          {doneLabel}
-        </p>
+        <>
+          <p role="status" className="text-site-link m-0 text-xl font-bold">
+            {doneLabel}
+          </p>
+          {doneContent}
+        </>
       ) : (
         <p role="timer" className="m-0 flex justify-center gap-2">
-          {(now === null
-            ? UNITS.map((u) => ({ label: u.label, value: null }))
-            : timeLeft(to, now)
-          ).map((part) => (
+          {parts.map((part) => (
             <span
               key={part.label}
-              className="bg-site-surface-2 rounded-site flex min-w-14 flex-col items-center px-2 py-1.5"
+              className="bg-site-surface-2 rounded-block-inner flex min-w-14 flex-col items-center px-2 py-1.5"
             >
               <span className="text-2xl font-bold tabular-nums">
                 {part.value === null
                   ? '–'
                   : String(part.value).padStart(2, '0')}
               </span>
-              <span className="text-site-text-2 text-xs">{part.label}</span>
+              <span className="text-site-text-2 text-xs">
+                {words[part.label as keyof CountdownLabels]}
+              </span>
             </span>
           ))}
         </p>
       )}
-    </div>
+    </Block>
   );
 }

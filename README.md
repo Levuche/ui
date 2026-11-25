@@ -92,6 +92,72 @@ Every block reads only `--site-*` CSS variables. `<CreatorTheme>` sets them:
 Buttons also take `variant` (`solid`, `outline`, `soft`, `text`) and `size`
 (`sm`, `md`, `lg`), so creators can pick them per block.
 
+### One block's own look
+
+Every block also takes the same look props, on top of the page theme, so a
+creator can change one block without touching the others:
+
+| Prop     | Values                                                              |
+| -------- | ------------------------------------------------------------------- |
+| `tone`   | `surface`, `muted`, `accent`, `band`, `notice`, `outline`, `plain`  |
+| `size`   | `sm`, `md`, `lg`: padding, gaps and type together                   |
+| `radius` | `theme` (the page's corners), `none`, `sm`, `md`, `lg`, `full`      |
+| `align`  | `start`, `center`, `end`                                            |
+| `shadow` | `none`, `sm`, `md`, `lg`                                            |
+| `motion` | `none`, `fade`, `rise`, `scale` (off for visitors who ask for less) |
+| `colors` | this block's own colours, the same keys as the theme                |
+| `font`   | this block's own font                                               |
+| `hideOn` | screens to hide it on: `phone`, `tablet`, `desktop`                 |
+
+A tone swaps the colours inside the block, so text, links and buttons stay
+readable: in an `accent` block, solid buttons turn inside out. Text boxes keep
+the page's colours in any tone. Blocks also take an `id`, `className`,
+`style`, `ref` and `data-*` attributes.
+
+Behaviour is set the same way. Links take `newTab` (`auto` opens other
+sites in a new tab), `sponsored` and `nofollow`, and an unsafe address
+(`javascript:` and the like) shows its words without a link. Words a block
+shows take a `labels` prop, so a page can be in any language. Forms take
+`status` (`idle`, `sending`, `sent`, `error`) from the app: the button spins
+while sending and the result is read out to screen readers.
+
+### How the blocks are built
+
+The package follows atomic design, and each level uses only the levels
+below it (a lint rule checks this):
+
+| Level            | What's in it                                                                          |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| `src/system/`    | Plain data and functions: theme, look, safe links, state, tracking, grid, registry    |
+| `src/atoms/`     | One element: `Block`, `SiteButton`, `SiteLink`, `SiteInput`, `Thumb`, `Avatar`, icons |
+| `src/molecules/` | A few atoms together: `LinkTile`, `EmailForm`, `Price`, `Rating`, `PlayFrame`         |
+| `src/organisms/` | The blocks a creator adds to a page: `BookingCard`, `TipJar`, `LinkList`              |
+| `src/templates/` | Page layouts: `SitePage`, `SiteGrid`                                                  |
+
+The React ideas it uses, and why:
+
+- **A prop getter, `lookProps()`**, turns a block's look props into the
+  classes, style and `data-*` attributes for its outermost element. Every
+  block spreads it, which is why one setting restyles any block the same way.
+- **CSS variables, not React context**, carry the theme and the look down to
+  everything inside a block. Context only works in client components; CSS
+  variables work in React Server Components too, so blocks render on the
+  server in Next.js and only blocks with state (`TipJar`, `Countdown`,
+  `CopyButton`, `PlayFrame`) are `'use client'`.
+- **A primitive, `<Block>`**, is the box every block is built on. An app's own
+  blocks can use it too, or wrap an existing component with the
+  **higher-order component `withBlockLook()`**.
+- **Controlled or uncontrolled state**: `useControllableState` lets the app
+  own a value (`value` and `onChange`) or leave it to the block
+  (`defaultValue`).
+- **Event delegation for tracking**: blocks mark presses with `data-action`
+  and their element with `data-block`. `useBlockActions(onAction)` on the
+  page reports every link, button and form as `{ action, block, label }`,
+  with no tracking prop on each block.
+- **A registry**: `BLOCKS` lists every block once, with its `data-block` id,
+  its grid kind and its group, for the editor and for analytics. A test
+  checks each id is used only once.
+
 ## Size presets
 
 Blocks use named sizes, never fixed pixels, so one change in `tokens.css`
@@ -270,11 +336,15 @@ variable, the same pair the website uses.
 
 ### Adding a block
 
-1. Build it from its design board with `--site-*` tokens only (no raw
-   colours), `rounded-site` or `rounded-site-button` for corners, and the
-   size presets above (no fixed pixel sizes; `min-h-control` or more for
-   anything tapped).
-2. Export it from `src/index.ts`.
+1. Build it in `src/organisms/` on `<Block name="your-block">`, taking
+   `BlockRootProps` so it gets every look prop. Use atoms and molecules
+   before writing new markup, `--site-*` tokens only (no raw colours),
+   `rounded-block` or `rounded-block-inner` for corners, `p-block` and
+   `gap-block-gap` for spacing, and the size presets above (`min-h-control`
+   or more for anything tapped). Put words in a `labels` prop, links through
+   `SiteLink`, and add `'use client'` only if it has state.
+2. Add it to `BLOCKS` in `src/system/registry.ts` and export it from
+   `src/index.ts`.
 3. Show it in `gallery/gallery.tsx`, inside a `Group`.
 4. Add `stories/<Block>.stories.tsx`, with a play function that does what a
    visitor would, and add it to the sample page in `stories/sample-page.tsx`.

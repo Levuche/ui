@@ -25,5 +25,26 @@ export default tseslint.config(
     plugins: { 'react-hooks': reactHooks },
     rules: reactHooks.configs.recommended.rules,
   },
-  ...storybook.configs['flat/recommended']
+  ...storybook.configs['flat/recommended'],
+  // Atomic levels: each level uses only the levels below it, so a block's
+  // building pieces never depend on the blocks built from them.
+  ...levels()
 );
+
+function levels() {
+  const order = ['system', 'atoms', 'molecules', 'organisms', 'templates'];
+  return order.slice(0, -1).map((level, i) => ({
+    files: [`src/${level}/**/*.{ts,tsx}`],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: order.slice(i + 1).map((higher) => ({
+            group: [`../${higher}/*`, `./${higher}/*`],
+            message: `${level} can't use ${higher}: it sits higher up.`,
+          })),
+        },
+      ],
+    },
+  }));
+}
