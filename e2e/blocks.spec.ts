@@ -277,6 +277,44 @@ for (const [id, expected] of Object.entries(THEMES)) {
       ).toHaveAttribute('target', '_blank');
     });
 
+    test('moving words are read once and can be paused', async () => {
+      const motion = panel.getByTestId('motion');
+      const strip = motion.getByRole('region', { name: 'Shop news' });
+      // Screen readers hear each phrase once; the loop's copies are hidden.
+      await expect(strip.getByRole('listitem')).toHaveText([
+        /New drop/,
+        /Free shipping/,
+        /Made in Pune/,
+      ]);
+      const row = strip.locator('ul');
+      const state = () =>
+        row.evaluate((el) => el.getAnimations()[0]?.playState);
+      await strip.scrollIntoViewIfNeeded();
+      await expect.poll(state).toBe('running');
+      await strip
+        .getByRole('button', { name: 'Stop the moving words' })
+        .click();
+      await expect.poll(state).toBe('paused');
+      await expect(
+        strip.getByRole('button', { name: 'Move the words again' })
+      ).toBeVisible();
+      // The ring around the picture reads its words once, and pauses too.
+      await expect(
+        motion.getByText('Chai • Stories • Since 2019', { exact: true })
+      ).toHaveCount(1);
+      const ring = motion.locator('[data-word-ring] > svg');
+      await expect(ring).toHaveAttribute('aria-hidden', 'true');
+      const turning = () =>
+        ring.evaluate((el) => el.getAnimations()[0]?.playState);
+      // Scroll the still box, not the turning svg, which is never "stable".
+      await motion.locator('[data-word-ring]').scrollIntoViewIfNeeded();
+      await expect.poll(turning).toBe('running');
+      await motion
+        .getByRole('button', { name: 'Stop the turning words' })
+        .click();
+      await expect.poll(turning).toBe('paused');
+    });
+
     test('has no serious accessibility problems', async ({ page }) => {
       await expectNoA11yViolations(page, `[data-testid="panel-${id}"]`);
     });
@@ -301,6 +339,37 @@ test('a creator’s theme changes corners, button shape and font', async ({
   expect(tileRadius).toBe('4px');
   const font = await custom.evaluate((el) => getComputedStyle(el).fontFamily);
   expect(font).toContain('Georgia');
+});
+
+test('nothing moves for visitors who ask for less motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const motion = page.getByTestId('panel-light').getByTestId('motion');
+  const moving = await motion.evaluate(
+    (el) => el.getAnimations({ subtree: true }).length
+  );
+  expect(moving).toBe(0);
+  // Nothing to pause, so no pause buttons, and the words sit still, once.
+  await expect(motion.getByRole('button')).toHaveCount(0);
+  await expect(motion.locator('li:visible')).toHaveCount(3);
+});
+
+test('moving words hold still while they are off screen', async ({ page }) => {
+  const row = page
+    .getByTestId('panel-light')
+    .getByRole('region', { name: 'Shop news' })
+    .locator('ul');
+  const state = () => row.evaluate((el) => el.getAnimations()[0]?.playState);
+  await row.scrollIntoViewIfNeeded();
+  await expect.poll(state).toBe('running');
+  // Scroll the strip out of sight: above, or else below if the page is short.
+  const out = await row.evaluate((el) => {
+    window.scrollBy(0, el.getBoundingClientRect().bottom + 50);
+    if (el.getBoundingClientRect().bottom > 0) window.scrollTo(0, 0);
+    const box = el.getBoundingClientRect();
+    return box.bottom <= 0 || box.top >= window.innerHeight;
+  });
+  expect(out, 'the strip is out of sight').toBe(true);
+  await expect.poll(state).toBe('paused');
 });
 
 test('the page does not scroll sideways on any screen', async ({ page }) => {

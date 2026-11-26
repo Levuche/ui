@@ -114,8 +114,10 @@ import { SiteGrid } from '@levuche/ui';
 ## 5. Change any block's look
 
 Every block takes the same look props: `tone`, `size`, `radius`, `align`,
-`shadow`, `motion`, `colors`, `font` and `hideOn`, so one block can stand out,
-or hide on one screen, without new code.
+`shadow`, `motion`, `effect`, `colors`, `font` and `hideOn`, so one block can
+stand out, or hide on one screen, without new code. For `effect` loops to hold
+still off screen and `tilt` to follow the mouse, put `<BlockEffects />` once
+on the page.
 Words a visitor sees can be changed with the block's `labels` prop, for
 another language.
 
