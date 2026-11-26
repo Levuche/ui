@@ -403,7 +403,20 @@ test('the date and time are written where the event is, the same anywhere', () =
   expect(when.month).toBe('Mar');
   expect(when.day).toBe('15');
   expect(when.text).toMatch(/Mon, Mar 15, 2027, 7:00\s?–\s?10:00\s?PM/);
-  expect(when.zone).toBe('EDT');
+  // As an offset, the same in every engine (zone names differ).
+  expect(when.zone).toBe('UTC−4');
+  expect(
+    eventWhen(
+      eventSpan({ start: '2027-03-15T19:00', timeZone: 'Europe/London' })!,
+      'en-US'
+    ).zone
+  ).toBe('UTC');
+  expect(
+    eventWhen(
+      eventSpan({ start: '2027-07-15T19:00', timeZone: 'Asia/Kathmandu' })!,
+      'en-US'
+    ).zone
+  ).toBe('UTC+5:45');
   expect(when.dateTime).toBe('2027-03-15T23:00:00.000Z');
   // Another language writes its own month.
   expect(eventWhen(span, 'de-DE').month).toMatch(/^Mär/);

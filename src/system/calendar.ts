@@ -597,7 +597,7 @@ export type EventWhen = {
   day: string;
   /** The date and time, as "Sat, Mar 15, 2027, 7:00 – 10:00 PM". */
   text: string;
-  /** The zone's short name, as "GMT+1" or "UTC+5:30", when it has one. */
+  /** The time zone as its offset, as "UTC+1", "UTC−4" or "UTC+5:30", when it has one. */
   zone?: string;
   /** For a <time> element's dateTime. */
   dateTime: string;
@@ -641,14 +641,14 @@ export function eventWhen(span: EventSpan, locale?: string): EventWhen {
       minute: '2-digit',
     }).formatRange(start, new Date(wallMs(span.end.wall)));
   }
+  // Written as an offset from UTC, worked out from the zone's numbers: the
+  // zones' own short names ("GMT", "EDT") differ between the server's and
+  // browsers' data, which would make the page's HTML mismatch.
   let zone: string | undefined;
   if (!span.allDay && span.timeZone && span.start.utc !== null) {
-    zone = new Intl.DateTimeFormat(locale, {
-      timeZone: span.timeZone,
-      timeZoneName: 'short',
-    })
-      .formatToParts(new Date(span.start.utc))
-      .find((part) => part.type === 'timeZoneName')?.value;
+    zone = offsetName(
+      Math.round(zoneOffset(span.start.utc, span.timeZone) / MINUTE)
+    );
   } else if (!span.allDay && span.start.offset !== null) {
     zone = offsetName(span.start.offset);
   }

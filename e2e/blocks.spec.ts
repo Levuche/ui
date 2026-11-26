@@ -234,7 +234,7 @@ for (const [id, expected] of Object.entries(THEMES)) {
         '2027-03-15T13:30:00.000Z'
       );
       await expect(
-        card.getByRole('link', { name: 'Get tickets: Live cooking night' })
+        card.getByRole('link', { name: /^Get tickets ?: Live cooking night$/ })
       ).toHaveAttribute('href', 'https://example.com/tickets');
       const open = card.locator('summary');
       const box = await open.boundingBox();

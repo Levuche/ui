@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, userEvent } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import {
   EventList,
   LatestPosts,
@@ -192,11 +192,12 @@ export const Events: StoryObj<typeof EventList> = {
     );
     await expectTapSize(opens[0], 'Add to calendar');
     await userEvent.click(opens[0]);
-    const google = canvas.getByRole('link', { name: 'Google Calendar' });
+    const first = within(opens[0].parentElement!);
+    const google = first.getByRole('link', { name: 'Google Calendar' });
     await expect(
       new URL(google.getAttribute('href')!).searchParams.get('dates')
     ).toBe('20261206T133000Z/20261206T163000Z');
-    const file = canvas.getByRole('link', { name: 'Other calendars (.ics)' });
+    const file = first.getByRole('link', { name: 'Other calendars (.ics)' });
     await expect(file).toHaveAttribute('download', 'live-cooking-night.ics');
   },
 };
