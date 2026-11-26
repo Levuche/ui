@@ -6,8 +6,9 @@ import './preview.css';
 
 const preview: Preview = {
   // Pick the creator theme from the toolbar; a story can fix one with
-  // `globals: { theme: 'dark' }`.
-  initialGlobals: { theme: 'light' },
+  // `globals: { theme: 'dark' }`. Direction does the same for right-to-left
+  // scripts, such as Arabic, Hebrew and Urdu.
+  initialGlobals: { theme: 'light', direction: 'ltr' },
   globalTypes: {
     theme: {
       description: 'Creator theme',
@@ -22,14 +23,28 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    direction: {
+      description: 'Which way the text runs',
+      toolbar: {
+        title: 'Direction',
+        icon: 'transfer',
+        items: [
+          { value: 'ltr', title: 'Left to right' },
+          { value: 'rtl', title: 'Right to left' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
   decorators: [
     (Story, context) => {
       const name = (context.globals.theme ?? 'light') as ThemeName;
       // Grid pages are wider than one column; they set `frame: 'wide'`.
       const wide = context.parameters.frame === 'wide';
+      const dir = context.globals.direction === 'rtl' ? 'rtl' : 'ltr';
       return (
         <CreatorTheme
+          dir={dir}
           theme={THEMES[name].theme}
           className="min-h-screen p-5"
           data-testid="story-theme"

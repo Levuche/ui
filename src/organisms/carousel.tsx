@@ -52,6 +52,9 @@ export const CAROUSEL_LABELS: CarouselLabels = {
 const fill = (text: string, n: number, total: number) =>
   text.replace('{n}', String(n)).replace('{total}', String(total));
 
+/** Whether the element lays out right to left, as for Arabic or Hebrew. */
+const isRtl = (el: Element) => getComputedStyle(el).direction === 'rtl';
+
 const prefersLessMotion = () =>
   typeof matchMedia === 'function' &&
   matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -127,11 +130,12 @@ export function ImageCarousel({
     clearTimeout(settle.current);
   };
 
-  // Show the current slide when it changes, from a button or the app.
+  // Show the current slide when it changes, from a button or the app. In a
+  // right-to-left script the track scrolls the other way, from 0 down.
   useEffect(() => {
     const el = track.current;
     if (!el) return;
-    const left = current * el.clientWidth;
+    const left = current * el.clientWidth * (isRtl(el) ? -1 : 1);
     if (Math.abs(el.scrollLeft - left) > 2) {
       moving.current = left;
       clearTimeout(settle.current);
@@ -160,15 +164,17 @@ export function ImageCarousel({
       if (Math.abs(el.scrollLeft - moving.current) <= 2) release();
       return;
     }
-    const shown = Math.round(el.scrollLeft / el.clientWidth);
+    const shown = Math.round(Math.abs(el.scrollLeft) / el.clientWidth);
     if (shown !== current && shown >= 0 && shown < total) setCurrent(shown);
   };
 
   // Arrow keys anywhere in the carousel, except in the slide's own button.
   const onKeyDown = (event: KeyboardEvent) => {
     if ((event.target as HTMLElement).closest('a')) return;
-    if (event.key === 'ArrowRight') go(current + 1);
-    else if (event.key === 'ArrowLeft') go(current - 1);
+    // The next slide is on the left in a right-to-left script.
+    const back = track.current && isRtl(track.current) ? 1 : -1;
+    if (event.key === 'ArrowRight') go(current - back);
+    else if (event.key === 'ArrowLeft') go(current + back);
     else return;
     event.preventDefault();
   };
@@ -251,7 +257,7 @@ export function ImageCarousel({
               onClick={() => go(current - 1)}
               className={cn(arrow, 'start-2')}
             >
-              <ChevronLeftIcon size={20} />
+              <ChevronLeftIcon size={20} className="rtl:-scale-x-100" />
             </button>
             <button
               type="button"
@@ -262,7 +268,7 @@ export function ImageCarousel({
               onClick={() => go(current + 1)}
               className={cn(arrow, 'end-2')}
             >
-              <ChevronRightIcon size={20} />
+              <ChevronRightIcon size={20} className="rtl:-scale-x-100" />
             </button>
           </>
         ) : null}

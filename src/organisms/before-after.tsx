@@ -79,9 +79,11 @@ export function BeforeAfter({
           ratio={ratio}
           className="w-full rounded-none"
         />
+        {/* The before picture shows from the side the text starts on, so it
+            follows the slider in right-to-left scripts too. */}
         <div
-          className="absolute inset-0"
-          style={{ clipPath: `inset(0 ${100 - at}% 0 0)` }}
+          className="absolute inset-0 [clip-path:inset(0_calc(100%_-_var(--at))_0_0)] rtl:[clip-path:inset(0_0_0_calc(100%_-_var(--at)))]"
+          style={{ ['--at' as string]: `${at}%` }}
         >
           <Thumb
             src={before.src}
@@ -102,8 +104,8 @@ export function BeforeAfter({
         ) : null}
         <span
           aria-hidden
-          className="bg-site-bg pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2"
-          style={{ left: `${at}%` }}
+          className="bg-site-bg pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 rtl:translate-x-1/2"
+          style={{ insetInlineStart: `${at}%` }}
         >
           <span className="bg-site-button text-site-on-button absolute top-1/2 left-1/2 flex size-10 -translate-1/2 items-center justify-center rounded-full shadow-md">
             <ArrowsHorizontalIcon size={20} />

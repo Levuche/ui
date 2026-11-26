@@ -156,7 +156,7 @@ export function LogoStrip({
       {scrolling ? (
         <div className="group w-full overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]">
           <ul
-            className="m-0 flex w-max list-none gap-10 p-0 pe-10 group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-safe:animate-[levuche-marquee_var(--marquee)_linear_infinite] motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center"
+            className="m-0 flex w-max list-none gap-10 p-0 pe-10 group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-safe:animate-[levuche-marquee_var(--marquee)_linear_infinite] motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center rtl:[--marquee-to:50%]"
             style={{ ['--marquee' as string]: `${Math.max(5, speed)}s` }}
           >
             {logos.map((logo, i) => item(logo, i))}

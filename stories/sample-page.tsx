@@ -113,21 +113,50 @@ export const SAMPLE_FAQ = [
 /** A fixed clock for the sample page's countdown, so it never changes. */
 const SAMPLE_NOW = Date.UTC(2026, 11, 1, 9, 0, 0);
 
-/** A whole creator page built from the blocks, as a creator might set it up. */
-export function SamplePage() {
+/** The words on the sample page a creator writes themselves. */
+export type SampleWords = {
+  name: string;
+  tagline: string;
+  button: string;
+  featured: string;
+  featuredDetail: string;
+  pack: string;
+  packDetail: string;
+  price: string;
+  links: typeof SAMPLE_LINKS;
+};
+
+export const SAMPLE_WORDS: SampleWords = {
+  name: 'Desi Origins',
+  tagline: 'How everyday things began',
+  button: 'Shop my presets',
+  featured: 'New: how tea came to India',
+  featuredDetail: '12 minutes, out now',
+  pack: 'Origins reel pack',
+  packDetail: '100 prompts, a guide and 12 templates',
+  price: '$12',
+  links: SAMPLE_LINKS,
+};
+
+/**
+ * A whole creator page built from the blocks, as a creator might set it up.
+ * Pass `words` to try other names, titles and prices, such as very long ones
+ * or another language.
+ */
+export function SamplePage({ words = SAMPLE_WORDS }: { words?: SampleWords }) {
   return (
     <SitePage as="main" id="top">
-      <CreatorHeader name="Desi Origins" tagline="How everyday things began" />
+      <CreatorHeader name={words.name} tagline={words.tagline} />
       <SocialIcons links={SAMPLE_SOCIALS} />
       <SiteLinkButton href="https://example.com/presets" fullWidth>
-        Shop my presets
+        {words.button}
       </SiteLinkButton>
       <FeaturedLink
         href="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-        title="New: how tea came to India"
-        detail="12 minutes, out now"
+        title={words.featured}
+        detail={words.featuredDetail}
       />
-      <LinkList label="Desi Origins links" links={SAMPLE_LINKS} />
+      <LinkList label={`${words.name} links`} links={words.links} />
       <SiteSection title="Latest video">
         <YouTubeVideo
           video="https://www.youtube.com/watch?v=M7lc1UVf-VE"
@@ -137,14 +166,14 @@ export function SamplePage() {
       </SiteSection>
       <SiteSection title="Packs">
         <FeaturedPack
-          title="Origins reel pack"
-          detail="100 prompts, a guide and 12 templates"
-          price="$12"
+          title={words.pack}
+          detail={words.packDetail}
+          price={words.price}
           headingAs="h3"
         />
         <PackRow title="Prompt starter kit" detail="50 prompts" price="$7" />
         <PackCheckout
-          price="$12"
+          price={words.price}
           onSubmit={(event) => event.preventDefault()}
         />
       </SiteSection>
