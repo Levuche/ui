@@ -1532,8 +1532,8 @@ export const BLOCKS = [
     appOnly: ['index', 'onIndexChange'],
   },
   {
-    id: 'bento-gallery',
-    component: 'BentoGallery',
+    id: 'tile-gallery',
+    component: 'TileGallery',
     kind: 'gallery',
     group: 'media',
     client: false,

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor } from 'storybook/test';
-import { BentoGallery, ImageCarousel, SiteImage, VideoTile } from '../src';
+import { TileGallery, ImageCarousel, SiteImage, VideoTile } from '../src';
 import { expectTapSize } from './expect-tap-size';
 import { onScreen } from './screens';
 
@@ -55,18 +55,18 @@ const lessMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const meta = {
   title: 'Blocks/Gallery',
-  component: BentoGallery,
+  component: TileGallery,
   tags: ['autodocs'],
   args: { items: ITEMS },
   beforeEach: fakePlayback,
-} satisfies Meta<typeof BentoGallery>;
+} satisfies Meta<typeof TileGallery>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 const gridOf = (canvasElement: HTMLElement) => {
   const grid = canvasElement.querySelector<HTMLElement>(
-    '[data-block="bento-gallery"] ul'
+    '[data-block="tile-gallery"] ul'
   );
   if (!grid) throw new Error('No gallery');
   return grid;

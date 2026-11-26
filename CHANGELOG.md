@@ -8,7 +8,7 @@ change when it moves to that version.
 
 ### Added
 
-- `BentoGallery`: pictures and uploaded videos in square cells, each tile
+- `TileGallery`: pictures and uploaded videos in square cells, each tile
   one cell, two wide, two tall or a big square of four (`span`), two
   columns on a phone. In the media pack.
 - `VideoTile`: a video file the creator uploaded (mp4, mov or webm), wide,

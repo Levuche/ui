@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import {
   ActionCard,
   AppIcon,
-  BentoGallery,
+  TileGallery,
   BookingCard,
   Countdown,
   DiscountCode,
@@ -304,7 +304,7 @@ function Panel({
         </Group>
 
         <Group id={id} name="gallery" title="Gallery">
-          <BentoGallery
+          <TileGallery
             items={[
               {
                 alt: 'Chai on a clay stove',

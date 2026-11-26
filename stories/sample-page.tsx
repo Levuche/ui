@@ -1,6 +1,6 @@
 import {
   AppIcon,
-  BentoGallery,
+  TileGallery,
   BookingCard,
   Countdown,
   DiscountCode,
@@ -235,7 +235,7 @@ export function SamplePage({ words = SAMPLE_WORDS }: { words?: SampleWords }) {
         />
       </SiteSection>
       <SiteSection title="Gallery">
-        <BentoGallery
+        <TileGallery
           captionStyle="bar"
           items={[
             { alt: 'Chai on a clay stove', span: '2x2', caption: 'Chai' },

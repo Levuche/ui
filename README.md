@@ -693,7 +693,7 @@ that no block covers another and that the page never scrolls sideways.
 | Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                                      |
 | Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                                          |
 | Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                                                                                |
-| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `BentoGallery`, `VideoTile`, `BeforeAfter`, `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                                              |
+| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `TileGallery`, `VideoTile`, `BeforeAfter`, `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                                               |
 | Forms       | `NewsletterBand`, `ContactForm`, `MessageCard`                                                                                                                                                                                                                |
 | Feeds       | `LatestVideos`, `LatestPosts`, `LiveStatus`, `EventList`, `ReviewSummary`, `NowPlaying`                                                                                                                                                                       |
 | Developer   | `GitHubProfile`, `ContributionGraph`, `RepoCard`, `RepoList`, `PackageStats`, `TechStack`                                                                                                                                                                     |
@@ -721,7 +721,7 @@ screen readers.
 mode) only when the visitor presses it. `youtubeId` reads the id from any
 YouTube address a creator pastes, including Shorts.
 
-`BentoGallery` puts pictures and uploaded videos in square cells, each tile
+`TileGallery` puts pictures and uploaded videos in square cells, each tile
 one cell or bigger (`span`: `1x1`, `2x1`, `1x2`, `2x2`), two columns on a
 phone and `columns` from 448 px up. `VideoTile` plays a video file the
 creator uploaded (mp4, mov or webm), wide or `tall`, with its first frame or
@@ -729,7 +729,7 @@ a `poster` as the cover. Both play with sound only when pressed; with
 `loop` a video plays without sound, round and round, with pause and sound
 buttons, and never moves for visitors who ask for less motion. Captions come
 from `tracks` (WebVTT files). Captions on pictures (`captionStyle` on
-`SiteImage` and `BentoGallery`) sit under the picture, on a frosted `bar`
+`SiteImage` and `TileGallery`) sit under the picture, on a frosted `bar`
 over its bottom, or on a small `chip` in its corner. `ImageCarousel` takes
 `counter` for a "1/4" on the picture.
 

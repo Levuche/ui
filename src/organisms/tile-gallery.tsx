@@ -18,7 +18,7 @@ import {
 import { isSafeMediaSrc, type LinkBehavior } from '../system/href';
 import { columnSizes, type ImageSrc } from '../system/image';
 
-/** One tile in a BentoGallery: a picture, or a video the creator uploaded. */
+/** One tile in a TileGallery: a picture, or a video the creator uploaded. */
 export type GalleryItem = LinkBehavior & {
   /** The picture; for a video, its cover (left empty: its first frame). */
   src?: ImageSrc | null;
@@ -64,7 +64,7 @@ const GAP = '0.5rem';
  * through them matches the order on the screen; put a big tile where it
  * leaves no gap.
  */
-export function BentoGallery({
+export function TileGallery({
   items,
   columns = 3,
   captionStyle = 'chip',
@@ -84,7 +84,7 @@ export function BentoGallery({
   const words = { ...VIDEO_LABELS, ...labels };
   const over = isOverCaption(captionStyle);
   return (
-    <Block name="bento-gallery" defaults={{ tone: 'plain' }} {...root}>
+    <Block name="tile-gallery" defaults={{ tone: 'plain' }} {...root}>
       {title ? <p className="text-block-title m-0 font-bold">{title}</p> : null}
       <div className="@container">
         <ul

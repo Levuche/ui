@@ -335,7 +335,7 @@ export {
   VideoTile,
   type VideoTileLabels,
 } from './organisms/video';
-export { BentoGallery, type GalleryItem } from './organisms/bento';
+export { TileGallery, type GalleryItem } from './organisms/tile-gallery';
 export {
   CAROUSEL_LABELS,
   ImageCarousel,

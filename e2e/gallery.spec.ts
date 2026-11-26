@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
 import {
-  BentoGallery,
+  TileGallery,
   CAPTION_STYLES,
   GALLERY_SPANS,
   SiteImage,
@@ -19,7 +19,7 @@ const html = (element: Parameters<typeof renderToString>[0]) =>
   renderToString(element);
 
 test('the new blocks are in the media group of the registry', () => {
-  for (const id of ['bento-gallery', 'video-tile']) {
+  for (const id of ['tile-gallery', 'video-tile']) {
     const block = blockInfo(id);
     expect(block, id).toBeDefined();
     expect(block?.group).toBe('media');
@@ -75,7 +75,7 @@ test('a video address that could run code shows nothing', () => {
   }
   // In a gallery it falls back to a picture tile.
   const gallery = html(
-    createElement(BentoGallery, {
+    createElement(TileGallery, {
       items: [{ video: 'javascript:alert(1)', alt: 'A clip' }],
     })
   );
@@ -107,7 +107,7 @@ test('only safe caption files reach the video, as captions by default', () => {
 
 test('tiles take their span, and pictures their share of the width', () => {
   const page = html(
-    createElement(BentoGallery, {
+    createElement(TileGallery, {
       columns: 4,
       items: [
         {
