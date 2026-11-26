@@ -8,6 +8,14 @@ change when it moves to that version.
 
 ### Added
 
+- Block backgrounds: every block takes `background`, a gradient through two
+  or three theme colours, a faint pattern (lines, rings, dots, grid, waves)
+  or a picture under a dim layer of the block's own colour. Colours are
+  theme names, never typed CSS; picture addresses are checked
+  (`cssImageUrl`); a moving gradient stands still for visitors who ask for
+  less motion. `backgroundIssues` and `fixBackground` check and fix the
+  words' contrast on a background, as `contrastIssues` does for a theme.
+- The `inset` tone: a block pressed into the page.
 - `MessageCard`: a card that opens a chat on WhatsApp, Telegram, a text,
   email or Messenger with a message ready to send, shown in a chat bubble.
   The visitor can change the message first (`editable`), the number or
