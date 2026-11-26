@@ -572,6 +572,16 @@ export const BLOCKS = [
     pack: 'media',
     summary: 'The newest podcast episodes, each with a player',
   },
+  {
+    id: 'social-card',
+    component: 'SocialCard',
+    kind: 'card',
+    group: 'profile',
+    client: false,
+    pack: 'core',
+    summary:
+      'One social profile with its follower count, a follow button and the latest posts',
+  },
 ] as const satisfies readonly BlockInfo[];
 
 /** The id of a block in this package. */

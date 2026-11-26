@@ -9,6 +9,7 @@ import {
   FeaturedLink,
   ImageGrid,
   MembershipCard,
+  SocialCard,
   SocialIcons,
   Testimonials,
   CameraIcon,
@@ -180,6 +181,15 @@ function Panel({
               type: 'covers',
               covers: [{ src: null }, { src: null }, { src: null }],
             }}
+          />
+          <SocialCard
+            platform="youtube"
+            handle="desiorigins"
+            name="Desi Origins"
+            followers={86400}
+            verified
+            icon={<VideoIcon size={22} />}
+            headingAs="p"
           />
         </Group>
 
