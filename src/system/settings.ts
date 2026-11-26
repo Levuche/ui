@@ -21,7 +21,7 @@ import {
 } from './background';
 import type { SellKind } from './sell';
 import { PAGE_LANGUAGES, type PageLanguage } from './language';
-import { isSafeColor, type SiteTheme } from './theme';
+import { SITE_HOVERS, isSafeColor, type SiteTheme } from './theme';
 
 /*
  * What a creator can set on each block, described as plain data, so the page
@@ -587,6 +587,21 @@ export const LOOK_SETTINGS = [
     },
     default: 'none',
     help: 'Always still for visitors who ask for less motion.',
+  },
+  {
+    name: 'hover',
+    label: 'Under the pointer',
+    type: 'choice',
+    options: SITE_HOVERS,
+    optionLabels: {
+      lift: 'Lift',
+      tint: 'Deepen the colour',
+      zoom: 'Zoom the picture',
+      glow: 'Glow',
+      none: 'Stay still',
+    },
+    help: 'What its links do on hover and tap. Left unset, the page’s hover.',
+    icon: 'eye',
   },
   {
     name: 'colors',

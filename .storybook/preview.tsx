@@ -6,6 +6,7 @@ import {
   SITE_LOOK_NAMES,
   siteLook,
   type SiteCardStyle,
+  type SiteHover,
 } from '../src';
 import { LANGUAGES } from '../stories/languages';
 import { SCREENS } from '../stories/screens';
@@ -16,11 +17,12 @@ const preview: Preview = {
   // Pick the creator theme from the toolbar; a story can fix one with
   // `globals: { theme: 'dark' }`. Direction does the same for right-to-left
   // scripts, such as Arabic, Hebrew and Urdu. A ready-made look replaces the
-  // theme and card style with its own. Language sets the page's language, so
+  // theme, card style and hover with its own. Language sets the page's language, so
   // every block's own words and numbers follow it.
   initialGlobals: {
     theme: 'light',
     cards: 'flat',
+    hover: 'lift',
     look: 'none',
     direction: 'ltr',
     language: 'en',
@@ -49,6 +51,21 @@ const preview: Preview = {
           { value: 'outline', title: 'Outlined cards' },
           { value: 'raised', title: 'Raised cards' },
           { value: 'glass', title: 'Glass cards' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+    hover: {
+      description: 'What links do under the pointer',
+      toolbar: {
+        title: 'Hover',
+        icon: 'pointerhand',
+        items: [
+          { value: 'lift', title: 'Hover: lift' },
+          { value: 'tint', title: 'Hover: tint' },
+          { value: 'zoom', title: 'Hover: zoom' },
+          { value: 'glow', title: 'Hover: glow' },
+          { value: 'none', title: 'Hover: none' },
         ],
         dynamicTitle: true,
       },
@@ -113,6 +130,7 @@ const preview: Preview = {
               : {
                   ...THEMES[name].theme,
                   cards: (context.globals.cards ?? 'flat') as SiteCardStyle,
+                  hover: (context.globals.hover ?? 'lift') as SiteHover,
                 }),
             language,
           }}
