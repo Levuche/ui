@@ -16,6 +16,17 @@ change when it moves to that version.
 
 ### Added
 
+- `CalendarEmbed`: a creator's public calendar from the link Google
+  Calendar or Outlook gives. Google's shows as a list, a month or a week,
+  in the page's language and time zone, on the block's background where
+  Google's dark text stays readable. `TicketEmbed`: an event's tickets, in
+  the page or a pop-up, from Luma's checkout; an Eventbrite event's button
+  opens its page on Eventbrite. Both load lazily in a sandbox with a plain
+  link under them, wait for consent with `consent={false}`, and show a still
+  placeholder in preview mode. The parsers (`calendarEmbed`,
+  `googleCalendarEmbed`, `outlookCalendarEmbed`, `ticketsFor`,
+  `lumaTickets`, `eventbriteTickets`) check the host exactly and keep only
+  the ids. Google Calendar, Outlook and Luma are new `OUTSIDE_SERVICES`.
 - The creator's name in its own style: `CreatorHeader` `nameColor` (`text`,
   `accent` or `link`), `nameTint` (a colour of the creator's own, checked
   with `isSafeColor`), `nameCase` (`upper` for capitals) and `nameWeight`

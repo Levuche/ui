@@ -1,6 +1,6 @@
 import type { BlockKind } from './grid';
 import { BLOCK_TONES } from './look';
-import { EMBED_SERVICES } from './embeds';
+import { CALENDAR_VIEWS, EMBED_SERVICES } from './embeds';
 import { MESSAGE_CHANNELS } from './message';
 import {
   LOCAL_TIME_CITY_IDS,
@@ -3582,6 +3582,145 @@ export const BLOCKS = [
         'Tab reaches the button; Enter opens the booking page in a dialog (Escape closes it), or Load shows it in the page and moves focus into it.',
       screenReader:
         'A button that says it opens a dialog; the booking page is named by its title, with a plain link to it as well.',
+    },
+  },
+  {
+    id: 'calendar-embed',
+    component: 'CalendarEmbed',
+    kind: 'card',
+    group: 'offers',
+    client: true,
+    pack: 'core',
+    summary: 'A public Google or Outlook calendar of events or classes',
+    settings: [
+      {
+        name: 'src',
+        label: 'Calendar link',
+        type: 'link',
+        required: true,
+        main: true,
+        slow: true,
+        help: 'The share or embed link from Google Calendar, or the HTML link from publishing an Outlook calendar.',
+        icon: 'calendar',
+      },
+      { name: 'title', label: 'Title', type: 'text', required: true },
+      { name: 'detail', label: 'Line under the title', type: 'longText' },
+      {
+        name: 'view',
+        label: 'Show',
+        type: 'choice',
+        options: CALENDAR_VIEWS,
+        optionLabels: { agenda: 'A list', month: 'A month', week: 'A week' },
+        default: 'agenda',
+        help: 'Google calendars only; Outlook shows its own.',
+      },
+      {
+        name: 'height',
+        label: 'Height',
+        type: 'number',
+        min: 20,
+        max: 80,
+        step: 1,
+        unit: 'rem',
+        default: 36,
+        icon: 'size',
+      },
+      {
+        name: 'timeZone',
+        label: 'Time zone',
+        type: 'text',
+        help: 'For a Google calendar’s times, as "Europe/Berlin".',
+        icon: 'clock',
+      },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'CALENDAR_EMBED_LABELS',
+      },
+      CONSENT_LABELS_SETTING,
+    ],
+    appOnly: ['headingAs', 'locale', 'consent'],
+    privacy: {
+      services: ['googlecalendar', 'outlookcalendar'],
+      cookies: 'marketing',
+      reason:
+        'Shows the creator’s calendar from Google Calendar or Outlook inside the page; that site sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab moves into the calendar and through its own controls; Load shows it when the page asks first.',
+      screenReader:
+        'The calendar is named by its title, with a plain link to the same calendar under it.',
+    },
+  },
+  {
+    id: 'ticket-embed',
+    component: 'TicketEmbed',
+    kind: 'card',
+    group: 'offers',
+    client: true,
+    pack: 'core',
+    summary: 'Tickets for an event, in the page or a pop-up',
+    settings: [
+      {
+        name: 'src',
+        label: 'Ticket link',
+        type: 'link',
+        required: true,
+        main: true,
+        slow: true,
+        help: 'A Luma event’s embed link or evt- id, or an Eventbrite event page. Eventbrite tickets open on Eventbrite.',
+        icon: 'link',
+      },
+      { name: 'title', label: 'Title', type: 'text', required: true },
+      { name: 'detail', label: 'Line under the title', type: 'longText' },
+      {
+        name: 'display',
+        label: 'Show it',
+        type: 'choice',
+        options: ['inline', 'popup'],
+        optionLabels: { inline: 'In the page', popup: 'In a pop-up' },
+        default: 'popup',
+      },
+      {
+        name: 'height',
+        label: 'Height',
+        type: 'number',
+        min: 24,
+        max: 80,
+        step: 1,
+        unit: 'rem',
+        default: 40,
+        icon: 'size',
+      },
+      {
+        name: 'buttonVariant',
+        label: 'Button style',
+        type: 'choice',
+        options: BUTTON_VARIANT_OPTIONS,
+        optionLabels: BUTTON_VARIANT_LABELS,
+      },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'TICKET_EMBED_LABELS',
+      },
+      CONSENT_LABELS_SETTING,
+    ],
+    appOnly: ['headingAs', 'onOpen', 'consent'],
+    privacy: {
+      services: ['luma'],
+      cookies: 'marketing',
+      reason:
+        'Shows the event’s Luma registration and checkout inside the page, where that site sees your IP address and may set cookies; an Eventbrite event only links to Eventbrite.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the button; Enter opens the tickets in a dialog (Escape closes it), or Load shows them in the page and moves focus into them.',
+      screenReader:
+        'A button that says it opens a dialog, or a link for an Eventbrite event; the checkout is named by the event’s title, with a plain link to it as well.',
     },
   },
   {

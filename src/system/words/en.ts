@@ -284,6 +284,16 @@ export const WORDS_EN = {
     pause: 'Stop the moving logos',
     play: 'Move the logos again',
   },
+  calendarEmbed: {
+    frame: 'Calendar: {title}',
+    fallback: 'Open the calendar',
+  },
+  ticketEmbed: {
+    button: 'Get tickets',
+    frame: 'Tickets: {title}',
+    fallback: 'Open the ticket page',
+    close: 'Close',
+  },
   props: {
     /** CreatorHeader `verifiedLabel`. */
     verified: 'Verified',

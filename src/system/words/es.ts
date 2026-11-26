@@ -279,6 +279,16 @@ export const WORDS_ES: PageWords = {
     pause: 'Detener los logotipos en movimiento',
     play: 'Mover los logotipos de nuevo',
   },
+  calendarEmbed: {
+    frame: 'Calendario: {title}',
+    fallback: 'Abrir el calendario',
+  },
+  ticketEmbed: {
+    button: 'Conseguir entradas',
+    frame: 'Entradas: {title}',
+    fallback: 'Abrir la página de entradas',
+    close: 'Cerrar',
+  },
   props: {
     verified: 'Verificado',
     links: 'Enlaces',

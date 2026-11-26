@@ -93,6 +93,17 @@ export const OUTSIDE_SERVICES = {
     hosts: ['maps.google.com', 'www.google.com'],
     cookies: 'marketing',
   },
+  googlecalendar: {
+    name: 'Google Calendar',
+    hosts: ['calendar.google.com'],
+    cookies: 'marketing',
+  },
+  outlookcalendar: {
+    name: 'Outlook',
+    hosts: ['outlook.office365.com', 'outlook.office.com', 'outlook.live.com'],
+    cookies: 'marketing',
+  },
+  luma: { name: 'Luma', hosts: ['luma.com'], cookies: 'marketing' },
   booking: { name: 'the booking site', hosts: [], cookies: 'marketing' },
   'audio-host': {
     name: 'the site the audio is on',

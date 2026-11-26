@@ -277,6 +277,16 @@ export const WORDS_HI: PageWords = {
     pause: 'चलते लोगो रोकें',
     play: 'लोगो फिर से चलाएँ',
   },
+  calendarEmbed: {
+    frame: 'कैलेंडर: {title}',
+    fallback: 'कैलेंडर खोलें',
+  },
+  ticketEmbed: {
+    button: 'टिकट लें',
+    frame: 'टिकट: {title}',
+    fallback: 'टिकट वाला पेज खोलें',
+    close: 'बंद करें',
+  },
   props: {
     verified: 'सत्यापित',
     links: 'लिंक',

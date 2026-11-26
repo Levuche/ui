@@ -293,6 +293,13 @@ cookies that may come with it (`cookies`: `none`, `needed`, `preferences`,
 maps and booking pages load nothing until a press; feed and developer
 blocks show data your server fetched (see above).
 
+`CalendarEmbed` and `TicketEmbed` take only links they can check: a Google
+Calendar share, embed or iCal link or a published Outlook calendar, and a
+Luma event (its embed link or `evt-` id) or an Eventbrite event page. Check
+a pasted link with `calendarEmbed` or `ticketsFor` before saving it.
+Eventbrite's checkout needs its own script, which no block loads, so an
+Eventbrite event opens on Eventbrite.
+
 `pagePrivacy` adds up a page's blocks, for the cookie notice and the
 privacy page:
 
