@@ -199,6 +199,13 @@ export const WORDS_HI: PageWords = {
     post: 'पोस्ट {n}',
     on: '{platform} पर {name}',
   },
+  appBadges: {
+    list: 'ऐप पाएँ',
+    appStoreLead: 'डाउनलोड करें',
+    appStore: 'App Store',
+    googlePlayLead: 'इसे पाएँ',
+    googlePlay: 'Google Play',
+  },
   props: {
     verified: 'सत्यापित',
     links: 'लिंक',

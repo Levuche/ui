@@ -201,6 +201,13 @@ export const WORDS_FR: PageWords = {
     post: 'Publication {n}',
     on: '{name} sur {platform}',
   },
+  appBadges: {
+    list: 'Télécharger l’app',
+    appStoreLead: 'Télécharger dans l’',
+    appStore: 'App Store',
+    googlePlayLead: 'Disponible sur',
+    googlePlay: 'Google Play',
+  },
   props: {
     verified: 'Vérifié',
     links: 'Liens',

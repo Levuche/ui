@@ -79,6 +79,7 @@ test('each block’s English labels are the English word set', () => {
     ['topPicks', ui.TOP_PICKS_LABELS],
     ['pricingTable', ui.PRICING_TABLE_LABELS],
     ['bookingEmbed', ui.BOOKING_EMBED_LABELS],
+    ['appBadges', ui.APP_BADGE_LABELS],
     ['github', ui.GITHUB_LABELS],
     ['contributions', ui.CONTRIBUTION_LABELS],
     ['repo', ui.REPO_LABELS],
