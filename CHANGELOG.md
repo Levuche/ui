@@ -4,7 +4,10 @@ What changed in each release of `@levuche/ui`, newest first. Each release
 pull request into `dev` adds its section here, with anything an app must
 change when it moves to that version.
 
-## Unreleased
+## 0.4.0 (2026-11-26)
+
+New calendar and ticket blocks, the creator's name in its own style, a pause
+button on the scrolling logo strip, and every block behaving the same way.
 
 ### Changed
 
