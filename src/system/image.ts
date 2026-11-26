@@ -111,3 +111,16 @@ export function cssImageUrl(src: ImageSrc | null | undefined): string | null {
   );
   return `url("${encoded}")`;
 }
+
+/**
+ * The picture, when its address is one a page may load (the same addresses
+ * as cssImageUrl: https and http, links on the same site, and the editor's
+ * blob: and data:image/ previews); otherwise null. For a picture that goes
+ * somewhere other than an <img>, such as a video's poster.
+ */
+export function safeImageSource(
+  src: ImageSrc | null | undefined
+): ImageSource | null {
+  const source = toImageSource(src);
+  return source && cssImageUrl(source) ? source : null;
+}

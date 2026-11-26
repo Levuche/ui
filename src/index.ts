@@ -276,6 +276,24 @@ export { FaqList, Testimonials } from './organisms/trust';
 export { ReelGrid, YouTubeVideo, youtubeId } from './organisms/media';
 export { ImageGrid } from './organisms/images';
 export { LogoStrip, SiteImage, type Logo } from './organisms/pictures';
+export { CAPTION_STYLES, type CaptionStyle } from './molecules/tile-caption';
+export {
+  VIDEO_LABELS,
+  type VideoLabels,
+  type VideoRatio,
+  type VideoTrack,
+} from './molecules/video-frame';
+export {
+  VIDEO_TILE_LABELS,
+  VideoTile,
+  type VideoTileLabels,
+} from './organisms/video';
+export {
+  BentoGallery,
+  GALLERY_SPANS,
+  type GalleryItem,
+  type GallerySpan,
+} from './organisms/bento';
 export {
   CAROUSEL_LABELS,
   ImageCarousel,
@@ -443,6 +461,7 @@ export {
 export {
   columnSizes,
   cssImageUrl,
+  safeImageSource,
   imageAttrs,
   toImageSource,
   type ImageSource,

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import {
   ActionCard,
   AppIcon,
+  BentoGallery,
   BookingCard,
   Countdown,
   DiscountCode,
@@ -298,6 +299,22 @@ function Panel({
               { alt: 'Chai on a clay stove', href: 'https://example.com/chai' },
               { alt: 'A spice market in Kochi' },
               { alt: 'Tea leaves drying in Assam' },
+            ]}
+          />
+        </Group>
+
+        <Group id={id} name="gallery" title="Gallery">
+          <BentoGallery
+            items={[
+              {
+                alt: 'Chai on a clay stove',
+                span: '2x2',
+                caption: 'Morning chai',
+                href: 'https://example.com/chai',
+              },
+              { alt: 'A spice market in Kochi', span: '1x2', caption: 'Kochi' },
+              { alt: 'Tea leaves drying in Assam', span: '2x1' },
+              { alt: 'Hills above Darjeeling' },
             ]}
           />
         </Group>

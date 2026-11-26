@@ -1,5 +1,6 @@
 import {
   AppIcon,
+  BentoGallery,
   BookingCard,
   Countdown,
   DiscountCode,
@@ -230,6 +231,21 @@ export function SamplePage({ words = SAMPLE_WORDS }: { words?: SampleWords }) {
             { alt: 'Chai on a clay stove' },
             { alt: 'A spice market in Kochi' },
             { alt: 'Tea leaves drying in Assam' },
+          ]}
+        />
+      </SiteSection>
+      <SiteSection title="Gallery">
+        <BentoGallery
+          captionStyle="bar"
+          items={[
+            { alt: 'Chai on a clay stove', span: '2x2', caption: 'Chai' },
+            { alt: 'A spice market in Kochi', span: '1x2' },
+            { alt: 'Tea leaves drying in Assam' },
+            {
+              alt: 'Hills above Darjeeling',
+              span: '2x1',
+              caption: 'Darjeeling',
+            },
           ]}
         />
       </SiteSection>

@@ -8,6 +8,21 @@ change when it moves to that version.
 
 ### Added
 
+- `BentoGallery`: pictures and uploaded videos in square cells, each tile
+  one cell, two wide, two tall or a big square of four (`span`), two
+  columns on a phone. In the media pack.
+- `VideoTile`: a video file the creator uploaded (mp4, mov or webm), wide,
+  tall (9:16), square or 4:5, with its first frame or a cover picture. It
+  plays with sound only when pressed; `loop` plays it without sound while
+  on the screen, with pause and sound buttons, and never for visitors who
+  ask for less motion. Captions from `tracks` (WebVTT), a `transcriptHref`
+  link, and its words in `labels` (`VIDEO_TILE_LABELS`). In the media pack.
+- Captions over pictures: `captionStyle` on `SiteImage` (and on the new
+  blocks) puts the caption `below` the picture as before, on a frosted
+  `bar` over its bottom, or on a small `chip` in its corner.
+- `ImageCarousel` takes `counter`, a small "1/4" on the picture.
+- `safeImageSource`: a picture, only when its address is one a page may
+  load, for a picture that isn't an `<img>`, such as a video's cover.
 - Block backgrounds: every block takes `background`, a gradient through two
   or three theme colours, a faint pattern (lines, rings, dots, grid, waves)
   or a picture under a dim layer of the block's own colour. Colours are
