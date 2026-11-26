@@ -37,6 +37,7 @@ test('every block is in one pack, and every pack has blocks', () => {
 
 test('blocks that sell through BuildBase are free', () => {
   const sellers = [
+    'action-card',
     'pack-row',
     'featured-pack',
     'pack-grid',

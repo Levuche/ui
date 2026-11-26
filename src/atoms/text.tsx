@@ -104,3 +104,24 @@ export function Badge({
     />
   );
 }
+
+/**
+ * A small tilted label over a card's top corner, such as "Most popular". The
+ * card needs `relative` (the blocks that take a `ribbon` prop set it). It
+ * tilts the other way in right-to-left text, so it always leans off the
+ * corner.
+ */
+export function Ribbon({
+  className,
+  ...props
+}: HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span
+      className={cn(
+        'bg-site-notice text-site-on-notice absolute -end-2 -top-2.5 z-10 rotate-3 rounded-full px-2.5 py-1 text-xs font-bold shadow-sm rtl:-rotate-3',
+        className
+      )}
+      {...props}
+    />
+  );
+}

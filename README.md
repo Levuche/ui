@@ -377,7 +377,7 @@ no keys, and the blocks stay Server Components.
 | Credits (`CreditPack`)                           | `{ creditPackageId }`                                         |
 | A coupon                                         | `couponCode` on an item, `promotionCode` on a plan or credits |
 
-Blocks with a button (`PackRow`, `FeaturedPack`, `PackGrid`, `CourseCard`,
+Blocks with a button (`ActionCard`, `PackRow`, `FeaturedPack`, `PackGrid`, `CourseCard`,
 `BookingCard`, `MembershipCard`, `PricingTable`, `CreditPack`,
 `SlotPicker`) write it on the button; form blocks (`PackCheckout`,
 `TipJar`, `LeadMagnet`) send it as a hidden `sell` field. Any action with
@@ -596,11 +596,11 @@ that no block covers another and that the page never scrolls sideways.
 | Group       | Blocks                                                                                                                                                                                                                                     |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `contrastIssues`, `fixContrast`, `Block`, `withBlockLook`, `BlockLook`                                                                                                      |
-| Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                          |
+| Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Ribbon`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                |
 | Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton` |
 | Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                                                               |
 | Profile     | `CreatorHeader`, `SocialIcons`, `SaveContact`                                                                                                                                                                                              |
-| Links       | `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                                                                   |
+| Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                                                     |
 | Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                   |
 | Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                       |
 | Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                                                             |

@@ -71,7 +71,7 @@ export type PageLayouts = Partial<Record<GridScreen, GridLayout>>;
  * - profile: CreatorHeader, with SocialIcons under it
  * - link: SiteLinkButton, a LinkTile, SaveContact or LockedLink
  * - links: LinkList, TopPicks, PodcastEpisodes
- * - card: FeaturedLink, FeaturedPack, PackRow, BookingCard, MembershipCard,
+ * - card: ActionCard, FeaturedLink, FeaturedPack, PackRow, BookingCard, MembershipCard,
  *   LeadMagnet, TipJar, DiscountCode, Countdown, ContactForm, MapCard, QrCode,
  *   CourseCard, BookingEmbed, GitHubProfile, RepoCard, PackageStats,
  *   AudioPlayer

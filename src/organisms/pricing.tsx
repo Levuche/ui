@@ -52,6 +52,8 @@ export type Plan = {
   /** Outlined in the button colour, with `featuredLabel`. */
   featured?: boolean;
   featuredLabel?: string;
+  /** A small tilted label over the plan's top corner, such as "Best value". */
+  ribbon?: string;
   buttonLabel?: string;
 };
 
@@ -162,6 +164,7 @@ export function PricingTable({
               renderBuy={renderBuy}
               featured={plan.featured}
               featuredLabel={plan.featuredLabel}
+              ribbon={plan.ribbon}
               buttonLabel={plan.buttonLabel}
               headingAs={planHeading}
               tone={cardTone}

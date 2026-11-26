@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import {
+  ActionCard,
   AppIcon,
   BookingCard,
   Countdown,
@@ -168,6 +169,17 @@ function Panel({
             href="https://www.youtube.com/watch?v=M7lc1UVf-VE"
             title="New: how tea came to India"
             detail="12 minutes, out now"
+          />
+          <ActionCard
+            href="https://example.com/presets"
+            title="Story presets"
+            detail="Twelve looks for your reels, ready to drop in"
+            buttonLabel="Shop the presets"
+            ribbon="New"
+            media={{
+              type: 'covers',
+              covers: [{ src: null }, { src: null }, { src: null }],
+            }}
           />
         </Group>
 
