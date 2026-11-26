@@ -8,6 +8,10 @@ change when it moves to that version.
 
 ### Added
 
+- Ready-made looks (`SITE_LOOKS`: clean, soft, bold, night, paper and
+  terminal), each a whole `SiteTheme` that passes the contrast checks, and
+  `siteLook` to lay a creator's own changes over one. Storybook's toolbar has
+  a Look menu to see any story in each.
 - Storybook docs: **Docs/Getting started** (install, tokens, theme, layout)
   and **Docs/Every block**, a list of every block with what it's for, its grid
   kind and whether it's free, read from the registry.

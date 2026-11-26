@@ -1,5 +1,11 @@
 import type { Preview } from '@storybook/react-vite';
-import { CreatorTheme, type SiteCardStyle } from '../src';
+import {
+  CreatorTheme,
+  SITE_LOOKS,
+  SITE_LOOK_NAMES,
+  siteLook,
+  type SiteCardStyle,
+} from '../src';
 import { SCREENS } from '../stories/screens';
 import { THEMES, type ThemeName } from '../stories/themes';
 import './preview.css';
@@ -7,8 +13,14 @@ import './preview.css';
 const preview: Preview = {
   // Pick the creator theme from the toolbar; a story can fix one with
   // `globals: { theme: 'dark' }`. Direction does the same for right-to-left
-  // scripts, such as Arabic, Hebrew and Urdu.
-  initialGlobals: { theme: 'light', cards: 'flat', direction: 'ltr' },
+  // scripts, such as Arabic, Hebrew and Urdu. A ready-made look replaces the
+  // theme and card style with its own.
+  initialGlobals: {
+    theme: 'light',
+    cards: 'flat',
+    look: 'none',
+    direction: 'ltr',
+  },
   globalTypes: {
     theme: {
       description: 'Creator theme',
@@ -37,6 +49,21 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    look: {
+      description: 'Ready-made look',
+      toolbar: {
+        title: 'Look',
+        icon: 'mirror',
+        items: [
+          { value: 'none', title: 'No ready-made look' },
+          ...SITE_LOOK_NAMES.map((value) => ({
+            value,
+            title: `Look: ${SITE_LOOKS[value].title}`,
+          })),
+        ],
+        dynamicTitle: true,
+      },
+    },
     direction: {
       description: 'Which way the text runs',
       toolbar: {
@@ -56,13 +83,18 @@ const preview: Preview = {
       // Grid pages are wider than one column; they set `frame: 'wide'`.
       const wide = context.parameters.frame === 'wide';
       const dir = context.globals.direction === 'rtl' ? 'rtl' : 'ltr';
+      const look = SITE_LOOK_NAMES.find((n) => n === context.globals.look);
       return (
         <CreatorTheme
           dir={dir}
-          theme={{
-            ...THEMES[name].theme,
-            cards: (context.globals.cards ?? 'flat') as SiteCardStyle,
-          }}
+          theme={
+            look
+              ? siteLook(look)
+              : {
+                  ...THEMES[name].theme,
+                  cards: (context.globals.cards ?? 'flat') as SiteCardStyle,
+                }
+          }
           className="min-h-screen p-5"
           data-testid="story-theme"
         >

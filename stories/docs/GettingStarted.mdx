@@ -64,6 +64,19 @@ const theme: SiteTheme = {
 </CreatorTheme>;
 ```
 
+To start from a ready-made look, pass one of `SITE_LOOKS` (clean, soft, bold,
+night, paper and terminal). Each sets colours, cards, corners, buttons and
+fonts together and passes the contrast checks. `siteLook` lays a creator's own
+changes over it, colour by colour:
+
+```tsx
+import { CreatorTheme, siteLook } from '@levuche/ui';
+
+<CreatorTheme theme={siteLook('night', { colors: { accent: '#f472b6' } })}>
+  …
+</CreatorTheme>;
+```
+
 Add `dir="rtl"` around the page for Arabic, Hebrew or Urdu.
 
 ## 4. Lay the page out
