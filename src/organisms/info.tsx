@@ -185,6 +185,39 @@ export function mapEmbedUrl(lat: number, lng: number, zoom = 0.006) {
   return `https://www.openstreetmap.org/export/embed.html?bbox=${box}&layer=mapnik&marker=${lat.toFixed(5)},${lng.toFixed(5)}`;
 }
 
+/** How the map looks: the usual map, a pale or a dark one, or from above. */
+export type MapStyle = 'standard' | 'light' | 'dark' | 'satellite';
+
+/**
+ * The map's address for a style. The street map comes from OpenStreetMap;
+ * the view from above from Google Maps, as OpenStreetMap has none. Neither
+ * needs a key.
+ */
+/** The site a map in this style loads from. */
+export function mapService(style?: MapStyle) {
+  return style === 'satellite' ? 'googlemaps' : 'openstreetmap';
+}
+
+export function mapFrameUrl(lat: number, lng: number, style?: MapStyle) {
+  if (style === 'satellite') {
+    return `https://maps.google.com/maps?q=${lat.toFixed(5)},${lng.toFixed(5)}&t=k&z=17&output=embed`;
+  }
+  return mapEmbedUrl(lat, lng);
+}
+
+/*
+ * The light and dark maps are the street map, toned down or turned over, so
+ * they need no other map site. Only the loaded map is changed, never the
+ * picture of the place before it.
+ */
+const MAP_STYLE_CLASSES: Record<MapStyle, string | undefined> = {
+  standard: undefined,
+  light: 'grayscale contrast-90 brightness-105',
+  // Turned over first, then dimmed, so the land ends up dark grey.
+  dark: '[filter:invert(1)_hue-rotate(180deg)_grayscale(0.3)_brightness(0.9)]',
+  satellite: undefined,
+};
+
 /** A directions link that opens the visitor's maps app or site. */
 export function directionsUrl(place: {
   lat?: number;
@@ -212,6 +245,8 @@ export function MapCard({
   image,
   directionsHref,
   showMap = true,
+  mapStyle = 'standard',
+  mapCaption,
   labels,
   consent,
   consentLabels,
@@ -231,6 +266,10 @@ export function MapCard({
   /** Your own directions link. Built from the pin or address if left out. */
   directionsHref?: string;
   showMap?: boolean;
+  /** `light` and `dark` tone the street map down; `satellite` shows it from above. */
+  mapStyle?: MapStyle;
+  /** A short line laid over the map's corner, such as "Upstairs, blue door". */
+  mapCaption?: ReactNode;
   labels?: Partial<MapCardLabels>;
   /**
    * Whether the visitor agreed to OpenStreetMap, from the page's cookie
@@ -257,21 +296,30 @@ export function MapCard({
   return (
     <Block name="map-card" {...root}>
       {showMap && hasPin ? (
-        <PlayFrame
-          src={mapEmbedUrl(lat, lng)}
-          title={fill(words.map, place)}
-          playLabel={fill(words.showMap, place)}
-          poster={image}
-          playIcon={<MapPinIcon size={28} />}
-          action="map_load"
-          allow=""
-          consent={consent}
-          notice={consentNotice(
-            OUTSIDE_SERVICES.openstreetmap.name,
-            consentLabels
-          )}
-          consentLabels={consentLabels}
-        />
+        <div className="relative" data-map-style={mapStyle}>
+          <PlayFrame
+            src={mapFrameUrl(lat, lng, mapStyle)}
+            title={fill(words.map, place)}
+            playLabel={fill(words.showMap, place)}
+            poster={image}
+            playIcon={<MapPinIcon size={28} />}
+            action="map_load"
+            allow=""
+            frameClassName={MAP_STYLE_CLASSES[mapStyle]}
+            consent={consent}
+            notice={consentNotice(
+              OUTSIDE_SERVICES[mapService(mapStyle)].name,
+              consentLabels
+            )}
+            consentLabels={consentLabels}
+          />
+          {mapCaption ? (
+            // Over the map's corner; taps go through to the map under it.
+            <p className="bg-site-surface text-site-text rounded-block-inner pointer-events-none absolute start-2 bottom-2 m-0 max-w-[calc(100%-1rem)] px-2.5 py-1 text-sm font-semibold shadow-md">
+              {mapCaption}
+            </p>
+          ) : null}
+        </div>
       ) : null}
       <ItemHead title={place} headingAs={headingAs} />
       {address ? (

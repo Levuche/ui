@@ -334,6 +334,7 @@ export {
   type AudioBarLabels,
 } from './molecules/audio-bar';
 export { SiteDialog } from './molecules/dialog';
+export { DialogButton } from './molecules/dialog-button';
 export { Segmented, type SegmentOption } from './molecules/segmented';
 export { CountUp, type NumberStyle } from './molecules/count-up';
 export {
@@ -484,7 +485,11 @@ export {
   BeforeAfter,
   type BeforeAfterLabels,
 } from './organisms/before-after';
-export { NewsletterBand } from './organisms/newsletter';
+export {
+  NEWSLETTER_TILE_LABELS,
+  NewsletterBand,
+  type NewsletterTileLabels,
+} from './organisms/newsletter';
 export { CreatorFooter } from './organisms/footer';
 
 // Templates
@@ -526,7 +531,10 @@ export {
   Timeline,
   directionsUrl,
   mapEmbedUrl,
+  mapFrameUrl,
+  mapService,
   type MapCardLabels,
+  type MapStyle,
   type OpeningHours,
   type Stat,
   type TimelineItem,
@@ -574,6 +582,7 @@ export {
 export {
   BOOKING_EMBED_LABELS,
   BookingEmbed,
+  formatNextFree,
   type BookingEmbedLabels,
 } from './organisms/booking-embed';
 export { liveView, type LiveProps } from './system/live';

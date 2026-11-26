@@ -129,6 +129,8 @@ export const WORDS_HI: PageWords = {
     frame: 'बुकिंग: {title}',
     fallback: 'बुकिंग पेज खोलें',
     close: 'बंद करें',
+    length: 'अवधि',
+    nextFree: 'अगला खाली समय: {time}',
   },
   github: {
     followers: 'फ़ॉलोअर',
@@ -198,6 +200,10 @@ export const WORDS_HI: PageWords = {
     posts: 'नई पोस्ट',
     post: 'पोस्ट {n}',
     on: '{platform} पर {name}',
+  },
+  newsletterTile: {
+    open: 'साइन अप करें',
+    close: 'बंद करें',
   },
   appBadges: {
     list: 'ऐप पाएँ',

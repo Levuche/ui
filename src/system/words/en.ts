@@ -136,6 +136,8 @@ export const WORDS_EN = {
     frame: 'Booking: {title}',
     fallback: 'Open the booking page',
     close: 'Close',
+    length: 'Length',
+    nextFree: 'Next free: {time}',
   },
   github: {
     followers: 'Followers',
@@ -205,6 +207,10 @@ export const WORDS_EN = {
     posts: 'Latest posts',
     post: 'Post {n}',
     on: '{name} on {platform}',
+  },
+  newsletterTile: {
+    open: 'Sign up',
+    close: 'Close',
   },
   appBadges: {
     list: 'Get the app',

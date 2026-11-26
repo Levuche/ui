@@ -164,6 +164,19 @@ change when it moves to that version.
 
 - `PlayFrame` (and every player and map built on it) moves focus into the
   player once a visitor presses play, so keyboard users land in what loaded.
+- New options on blocks already in use, each off until set, so pages look
+  as before: `CreatorHeader` `initialsFont="display"` sets the initials in
+  the theme's display font (and `Avatar` `initialsFont`); `MapCard`
+  `mapStyle` (`light`, `dark`, `satellite`) and `mapCaption`, a line over
+  the map's corner (`mapFrameUrl`; the satellite map loads from Google Maps,
+  `googlemaps` in `OUTSIDE_SERVICES`, and `mapService` names the site for
+  each style); `NewsletterBand` `display="tile"`, a
+  small tile whose one button opens the form in a pop-up (`tileLabels`,
+  `NEWSLETTER_TILE_LABELS`, and `DialogButton` for any such button);
+  `BookingEmbed` `duration` and `nextFree` (with `timeZone`, `locale` and
+  `formatNextFree`) on the card before it's opened; `FeaturedPack` `href`, a
+  checkout on another site for a product not sold through BuildBase, and
+  `duration` on `FeaturedPack` and `PackRow` for a service.
 
 ### An app must change
 

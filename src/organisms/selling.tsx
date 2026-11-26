@@ -6,6 +6,7 @@ import {
   type SiteButtonSize,
   type SiteButtonVariant,
 } from '../atoms/button';
+import { ClockIcon } from '../atoms/icons';
 import { SiteLink } from '../atoms/link';
 import { Badge, Ribbon } from '../atoms/text';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
@@ -45,6 +46,7 @@ export function PackRow({
   renderBuy,
   buttonLabel: buttonLabelProp,
   saveLabel,
+  duration,
   ...root
 }: BlockRootProps &
   LinkBehavior &
@@ -55,6 +57,8 @@ export function PackRow({
     buttonLabel?: ReactNode;
     title: string;
     detail?: ReactNode;
+    /** How long a service takes, as "4.5 h", shown with a clock. */
+    duration?: ReactNode;
     price: string;
     was?: string;
     image?: ImageSrc | null;
@@ -69,6 +73,12 @@ export function PackRow({
         <span className="font-semibold">{title}</span>
         {detail ? (
           <span className="text-site-text-2 text-sm">{detail}</span>
+        ) : null}
+        {duration ? (
+          <span className="text-site-text-2 inline-flex items-center gap-1.5 text-sm">
+            <ClockIcon size={14} className="flex-none" />
+            {duration}
+          </span>
         ) : null}
       </span>
       <Price saveLabel={saveLabel} value={price} was={was} />
@@ -209,10 +219,15 @@ export function PackCheckout({
   );
 }
 
-/** The featured pack: big picture, title, what's in it, price and buy. */
+/**
+ * The featured pack: big picture, title, what's in it, price and buy. With
+ * `sell` the button checks out through BuildBase; with `href` it links to a
+ * checkout on another site.
+ */
 export function FeaturedPack({
   title,
   detail,
+  duration,
   price,
   was,
   image,
@@ -227,8 +242,13 @@ export function FeaturedPack({
   sellLabels,
   renderBuy,
   saveLabel,
+  href,
+  newTab,
+  sponsored,
+  nofollow,
   ...root
 }: BlockRootProps &
+  LinkBehavior &
   SellProps & {
     /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
     saveLabel?: string | null;
@@ -236,16 +256,23 @@ export function FeaturedPack({
     ribbon?: ReactNode;
     title: string;
     detail?: ReactNode;
+    /** How long a service takes, as "4.5 h", shown with a clock. */
+    duration?: ReactNode;
     price: string;
     was?: string;
     image?: ImageSrc | null;
     imageAlt?: string;
     ratio?: ThumbRatio;
     /**
-     * The buy control. Defaults to a buy button for `sell`, or else a pill with
-     * `buttonLabel` that does nothing.
+     * The buy control. Defaults to a buy button for `sell`, a link to `href`,
+     * or else a pill with `buttonLabel` that does nothing.
      */
     action?: ReactNode;
+    /**
+     * A checkout on another site, for a product not sold through BuildBase.
+     * Not used with `sell`.
+     */
+    href?: string;
     buttonLabel?: ReactNode;
     headingAs?: HeadingTag;
   }) {
@@ -269,15 +296,25 @@ export function FeaturedPack({
         media="top"
         headingAs={headingAs}
       />
+      {duration ? (
+        <p className="text-site-text-2 m-0 inline-flex items-center gap-1.5 text-sm">
+          <ClockIcon size={16} className="flex-none" />
+          {duration}
+        </p>
+      ) : null}
       <div className="flex items-center justify-between gap-3">
         <Price saveLabel={saveLabel} value={price} was={was} size="lg" />
         {action ??
-          (sell ? (
+          (sell || href ? (
             <SellButton
               sell={sell}
               sellState={sellState}
               sellLabels={sellLabels}
               renderBuy={renderBuy}
+              href={href}
+              newTab={newTab}
+              sponsored={sponsored}
+              nofollow={nofollow}
               size="sm"
               fullWidth={false}
             >

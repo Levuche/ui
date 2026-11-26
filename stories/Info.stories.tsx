@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect } from 'storybook/test';
+import { expect, userEvent } from 'storybook/test';
 import { MapCard, QrCode, StatsRow, Timeline } from '../src';
 import { expectTapSize } from './expect-tap-size';
 import { onScreen } from './screens';
@@ -111,6 +111,61 @@ export const Place: Story = {
     await expect(directions).toHaveAttribute('target', '_blank');
     await expectTapSize(directions, 'Directions');
     await expect(canvas.getByText('Mon–Fri')).toBeVisible();
+  },
+};
+
+/**
+ * A dark map with a line over its corner. Taps on the line reach the map
+ * under it, and only the loaded map is darkened.
+ */
+export const DarkMapWithCaption: Story = {
+  render: () => (
+    <MapCard
+      place="Spice Room, Fort Kochi"
+      address="12 Princess Street, Fort Kochi, Kerala"
+      lat={9.9658}
+      lng={76.2421}
+      mapStyle="dark"
+      mapCaption="Upstairs, blue door"
+    />
+  ),
+  play: async ({ canvas }) => {
+    const caption = canvas.getByText('Upstairs, blue door');
+    await expect(caption).toBeVisible();
+    await expect(getComputedStyle(caption).pointerEvents).toBe('none');
+    const show = canvas.getByRole('button', {
+      name: 'Show Spice Room, Fort Kochi on a map',
+    });
+    // The caption sits inside the map's box.
+    const box = show.getBoundingClientRect();
+    const line = caption.getBoundingClientRect();
+    await expect(line.bottom).toBeLessThanOrEqual(box.bottom);
+    await expect(line.left).toBeGreaterThanOrEqual(box.left);
+    await expect(getComputedStyle(show).filter).toBe('none');
+    await userEvent.click(show);
+    const map = canvas.getByTitle('Map of Spice Room, Fort Kochi');
+    await expect(map.getAttribute('src')).toContain('openstreetmap.org');
+    await expect(getComputedStyle(map).filter).toContain('invert');
+    await expect(caption).toBeVisible();
+  },
+};
+
+/** The same place from above. */
+export const SatelliteMap: Story = {
+  render: () => (
+    <MapCard
+      place="Spice Room, Fort Kochi"
+      lat={9.9658}
+      lng={76.2421}
+      mapStyle="satellite"
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    await expect(
+      canvasElement.querySelector('[data-map-style="satellite"]')
+    ).not.toBeNull();
+    // Nothing loads from the map site until the visitor asks for the map.
+    await expect(canvasElement.querySelector('iframe')).toBeNull();
   },
 };
 

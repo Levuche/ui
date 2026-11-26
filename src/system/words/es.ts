@@ -131,6 +131,8 @@ export const WORDS_ES: PageWords = {
     frame: 'Reserva: {title}',
     fallback: 'Abrir la página de reservas',
     close: 'Cerrar',
+    length: 'Duración',
+    nextFree: 'Próximo hueco libre: {time}',
   },
   github: {
     followers: 'Seguidores',
@@ -200,6 +202,10 @@ export const WORDS_ES: PageWords = {
     posts: 'Publicaciones recientes',
     post: 'Publicación {n}',
     on: '{name} en {platform}',
+  },
+  newsletterTile: {
+    open: 'Suscribirse',
+    close: 'Cerrar',
   },
   appBadges: {
     list: 'Descarga la app',

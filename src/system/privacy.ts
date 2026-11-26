@@ -88,6 +88,11 @@ export const OUTSIDE_SERVICES = {
     hosts: ['www.openstreetmap.org'],
     cookies: 'needed',
   },
+  googlemaps: {
+    name: 'Google Maps',
+    hosts: ['maps.google.com', 'www.google.com'],
+    cookies: 'marketing',
+  },
   booking: { name: 'the booking site', hosts: [], cookies: 'marketing' },
   'audio-host': {
     name: 'the site the audio is on',

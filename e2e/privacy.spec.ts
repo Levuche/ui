@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
-import { mapEmbedUrl } from '../src';
+import { mapEmbedUrl, mapFrameUrl, mapService } from '../src';
 import { EMBED_SERVICES, embedFor } from '../src/system/embeds';
 import { youtubeId } from '../src/organisms/media';
 import {
@@ -174,6 +174,12 @@ test('every pasted-link player loads from its listed hosts', () => {
   expect(OUTSIDE_SERVICES.openstreetmap.hosts).toContain(
     new URL(mapEmbedUrl(9.9658, 76.2421)).hostname
   );
+  for (const style of ['standard', 'light', 'dark', 'satellite'] as const) {
+    expect(OUTSIDE_SERVICES[mapService(style)].hosts, style).toContain(
+      new URL(mapFrameUrl(9.9658, 76.2421, style)).hostname
+    );
+  }
+  expect(blockInfo('map-card')?.privacy.services).toContain('googlemaps');
 });
 
 test('a page adds up its blocks’ services and cookies', () => {

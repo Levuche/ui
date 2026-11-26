@@ -68,6 +68,7 @@ export function PlayFrame({
   notice,
   consentLabels,
   className,
+  frameClassName,
 }: {
   /** The player's address, from a trusted maker (see each block). */
   src: string;
@@ -96,6 +97,8 @@ export function PlayFrame({
   notice?: string;
   consentLabels?: Partial<ConsentLabels>;
   className?: string;
+  /** Classes on the player itself, not on the picture before it loads. */
+  frameClassName?: string;
 }) {
   const preview = usePreviewMode();
   const [playing, setPlaying] = useState(
@@ -127,7 +130,7 @@ export function PlayFrame({
           allow={allow}
           allowFullScreen
           loading={autoLoad ? 'lazy' : undefined}
-          className="absolute inset-0 size-full border-0"
+          className={cn('absolute inset-0 size-full border-0', frameClassName)}
         />
       </div>
     );

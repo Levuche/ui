@@ -255,6 +255,15 @@ export const BLOCKS = [
         default: false,
       },
       {
+        name: 'initialsFont',
+        label: 'Initials font',
+        type: 'choice',
+        options: ['body', 'display'],
+        optionLabels: { body: 'Page font', display: 'Display font' },
+        default: 'body',
+        help: 'For the initials shown when there’s no picture.',
+      },
+      {
         name: 'nameSize',
         label: 'Name size',
         type: 'choice',
@@ -921,6 +930,13 @@ export const BLOCKS = [
       { name: 'title', label: 'Title', type: 'text', required: true },
       { name: 'detail', label: 'Line under the title', type: 'longText' },
       {
+        name: 'duration',
+        label: 'How long',
+        type: 'text',
+        help: 'For a service, as "4.5 h".',
+        icon: 'clock',
+      },
+      {
         name: 'price',
         label: 'Price',
         type: 'text',
@@ -965,6 +981,13 @@ export const BLOCKS = [
       { name: 'title', label: 'Title', type: 'text', required: true },
       { name: 'detail', label: 'What’s in it', type: 'longText' },
       {
+        name: 'duration',
+        label: 'How long',
+        type: 'text',
+        help: 'For a service, as "4.5 h".',
+        icon: 'clock',
+      },
+      {
         name: 'price',
         label: 'Price',
         type: 'text',
@@ -994,6 +1017,14 @@ export const BLOCKS = [
       },
       { name: 'ribbon', label: 'Ribbon', type: 'text', icon: 'tag' },
       ...SELL_SETTINGS,
+      {
+        name: 'href',
+        label: 'Checkout on another site',
+        type: 'link',
+        main: true,
+        help: 'For a product not sold through BuildBase.',
+      },
+      ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY, 'headingAs', 'action'],
     privacy: LOADS_NOTHING,
@@ -1866,10 +1897,28 @@ export const BLOCKS = [
         icon: 'layout',
       },
       {
+        name: 'display',
+        label: 'Show it as',
+        type: 'choice',
+        options: ['band', 'tile'],
+        optionLabels: {
+          band: 'The form in the block',
+          tile: 'A small tile with a button',
+        },
+        default: 'band',
+        help: 'The tile’s button opens the form in a pop-up.',
+      },
+      {
         name: 'labels',
         label: 'Words',
         type: 'words',
         from: 'EMAIL_FORM_LABELS',
+      },
+      {
+        name: 'tileLabels',
+        label: 'Words on the tile',
+        type: 'words',
+        from: 'NEWSLETTER_TILE_LABELS',
       },
     ],
     appOnly: [...FORM_APP_ONLY],
@@ -2895,6 +2944,25 @@ export const BLOCKS = [
       },
       { name: 'showMap', label: 'Show the map', type: 'toggle', default: true },
       {
+        name: 'mapStyle',
+        label: 'Map style',
+        type: 'choice',
+        options: ['standard', 'light', 'dark', 'satellite'],
+        optionLabels: {
+          standard: 'Standard',
+          light: 'Light',
+          dark: 'Dark',
+          satellite: 'Satellite',
+        },
+        default: 'standard',
+      },
+      {
+        name: 'mapCaption',
+        label: 'Line over the map',
+        type: 'text',
+        help: 'A short line on the map’s corner, as "Upstairs, blue door".',
+      },
+      {
         name: 'image',
         label: 'Picture of the place',
         type: 'picture',
@@ -2934,10 +3002,10 @@ export const BLOCKS = [
     ],
     appOnly: ['headingAs', 'children', 'consent'],
     privacy: {
-      services: ['openstreetmap'],
-      cookies: 'needed',
+      services: ['openstreetmap', 'googlemaps'],
+      cookies: 'marketing',
       reason:
-        'Loads the map from OpenStreetMap when you press it, which sees your IP address; directions open in your maps app or site.',
+        'Loads the map when you press it, from OpenStreetMap, or Google Maps for the satellite style, which sees your IP address and may set cookies; directions open in your maps app or site.',
     },
     accessibility: {
       keyboard:
@@ -3390,6 +3458,20 @@ export const BLOCKS = [
         icon: 'size',
       },
       {
+        name: 'duration',
+        label: 'How long',
+        type: 'text',
+        help: 'As "30 min".',
+        icon: 'clock',
+      },
+      {
+        name: 'timeZone',
+        label: 'Time zone',
+        type: 'text',
+        help: 'For the next free time, as "Asia/Kolkata".',
+        icon: 'clock',
+      },
+      {
         name: 'buttonVariant',
         label: 'Button style',
         type: 'choice',
@@ -3404,7 +3486,7 @@ export const BLOCKS = [
       },
       CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs', 'onOpen', 'consent'],
+    appOnly: ['headingAs', 'onOpen', 'nextFree', 'locale', 'consent'],
     privacy: {
       services: ['booking'],
       cookies: 'marketing',

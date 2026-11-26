@@ -171,3 +171,37 @@ export const WordRingInARow: Story = {
     ).toBeVisible();
   },
 };
+
+/** With no picture, the initials can be set in the theme's display font. */
+export const InitialsInADisplayFont: Story = {
+  args: { initialsFont: 'display' },
+  render: (args) => (
+    <CreatorTheme theme={{ displayFont: '"Courier New", monospace' }}>
+      <CreatorHeader {...args} />
+    </CreatorTheme>
+  ),
+  play: async ({ canvas }) => {
+    await expect(getComputedStyle(canvas.getByText('DO')).fontFamily).toContain(
+      'Courier New'
+    );
+    // The name keeps the page's own font.
+    const name = canvas.getByRole('heading', { level: 1 });
+    await expect(getComputedStyle(name).fontFamily).not.toContain(
+      'Courier New'
+    );
+  },
+};
+
+/** By default the initials are in the page's own font, as before. */
+export const InitialsInThePageFont: Story = {
+  render: (args) => (
+    <CreatorTheme theme={{ displayFont: '"Courier New", monospace' }}>
+      <CreatorHeader {...args} />
+    </CreatorTheme>
+  ),
+  play: async ({ canvas }) => {
+    await expect(
+      getComputedStyle(canvas.getByText('DO')).fontFamily
+    ).not.toContain('Courier New');
+  },
+};
