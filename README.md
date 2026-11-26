@@ -19,6 +19,38 @@ code is free to use, change and ship in your own sites and apps, including
 commercial ones, but not to resell as a component library, kit or template,
 or to use for training AI models.
 
+## Start here
+
+For a developer, or an AI agent, picking this repository up cold:
+
+1. **Set up.** Node 22 (CI uses it). `npm ci`, then `npm run check` and
+   `npm run build`. Both must pass before any push.
+2. **Find the work.** Open issues are grouped by milestone: **R1 Launch**
+   first, then R2 Polish, R3 More pages and stats, R4 Selling and extras.
+   The plan behind them is Levuche/app#45. Check an issue's milestone
+   before starting it, and finish R1 before anything later.
+3. **Know the code.** `src/atoms`, `src/molecules` and `src/organisms` are
+   the blocks, smallest to largest; `src/templates` holds whole pages.
+   `src/system/registry.ts` describes every block's settings for the page
+   editor, and `src/settings-check.ts` fails the type check when a prop is
+   in neither `settings` nor `appOnly`. `src/system/words/` holds every word
+   a visitor reads, one file per language. `src/index.ts` is what apps
+   import. `gallery/` is the test page, `stories/` is Storybook, `e2e/` the
+   tests.
+4. **Test.** `npm run test:e2e` runs every test in Chromium. Without a
+   browser installed, `npx playwright test --project=desktop` still runs the
+   plain tests (settings, words, registry, parsers) and skips the rest;
+   CI runs them all. Run the full phone, tablet and desktop checks once per
+   release, not on every push.
+5. **Ship.** One branch and one pull request into `dev` per issue (see
+   "Branches and releases"), with a CHANGELOG line under Unreleased. Only a
+   maintainer approves, merges and pushes tags.
+
+Work in flight: the block review (#93, done in #95; the rest in #96), the
+0.4.0 release (#94, waits for a maintainer's go) and screenshot checks for
+every story (#12, paused to a later release; pull request #56 is for
+reference only and is never merged).
+
 ## Use it in a Levuche app
 
 Install a released version straight from GitHub (no npm account or token
@@ -1037,7 +1069,14 @@ typecheck` says what's missing), and export it from `src/index.ts`.
 3. Show it in `gallery/gallery.tsx`, inside a `Group`.
 4. Add `stories/<Block>.stories.tsx`, with a play function that does what a
    visitor would, and add it to the sample page in `stories/sample-page.tsx`.
-5. Test what it does in `e2e/blocks.spec.ts`.
+5. Test what it does in `e2e/blocks.spec.ts`, and add its labels group to
+   the list in `e2e/words.spec.ts`, which checks that every language has
+   every word.
+6. Give its registry entry a `privacy` note (`LOADS_NOTHING`, or the sites
+   it loads in a visitor's browser) and its accessibility text, list it in
+   "What's in it" above, and add a CHANGELOG line under Unreleased.
+7. A press that matters for tracking names itself with `data-action` (on
+   the form for a send, not its button), so `useBlockActions` reports it.
 
 ## Branches and releases
 
