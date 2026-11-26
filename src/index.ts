@@ -509,3 +509,27 @@ export {
   type ImageSource,
   type ImageSrc,
 } from './system/image';
+export {
+  SOCIAL_CARD_LABELS,
+  SOCIAL_CARD_TILES,
+  SocialCard,
+  type SocialCardLabels,
+  type SocialCardTile,
+  type SocialPost,
+} from './organisms/social';
+export {
+  SOCIAL_ACTIONS,
+  SOCIAL_COUNTS,
+  SOCIAL_PLATFORM_INFO,
+  SOCIAL_PLATFORMS,
+  cleanHandle,
+  isSocialPlatform,
+  shortCount,
+  socialHandleText,
+  socialProfileHref,
+  socialTint,
+  type SocialAction,
+  type SocialCount,
+  type SocialPlatform,
+  type SocialPlatformInfo,
+} from './system/social';

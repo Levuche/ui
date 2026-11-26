@@ -9,6 +9,7 @@ import {
   ImageGrid,
   LeadMagnet,
   MembershipCard,
+  SocialCard,
   MessageCard,
   SocialIcons,
   Testimonials,
@@ -159,6 +160,13 @@ export function SamplePage({ words = SAMPLE_WORDS }: { words?: SampleWords }) {
         detail={words.featuredDetail}
       />
       <LinkList label={`${words.name} links`} links={words.links} />
+      <SocialCard
+        platform="instagram"
+        handle="desiorigins"
+        name={words.name}
+        followers={128000}
+        tile="2x1"
+      />
       <SiteSection title="Latest video">
         <YouTubeVideo
           video="https://www.youtube.com/watch?v=M7lc1UVf-VE"
