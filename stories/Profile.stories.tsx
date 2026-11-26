@@ -15,17 +15,42 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** Where an element's middle is across the page, in px. */
+function middle(element: Element) {
+  const box = element.getBoundingClientRect();
+  return box.left + box.width / 2;
+}
+
 /** With no photo, the round avatar shows the creator's initials. */
 export const Header: Story = {
   play: async ({ canvas }) => {
-    await expect(
-      canvas.getByRole('heading', { level: 1, name: 'Desi Origins' })
-    ).toBeVisible();
+    const name = canvas.getByRole('heading', {
+      level: 1,
+      name: 'Desi Origins',
+    });
+    await expect(name).toBeVisible();
     await expect(canvas.getByText('DO')).toBeVisible();
+    // Centred by default: the picture, name and tagline share one middle.
+    const header = canvas.getByRole('banner');
+    for (const part of [
+      canvas.getByText('DO'),
+      name,
+      canvas.getByText('How everyday things began'),
+    ]) {
+      await expect(Math.abs(middle(part) - middle(header))).toBeLessThan(1);
+    }
   },
 };
 
-export const AlignedStart: Story = { args: { align: 'start' } };
+/** Lined up on the start side, as in a row of blocks. */
+export const AlignedStart: Story = {
+  args: { align: 'start' },
+  play: async ({ canvas }) => {
+    const header = canvas.getByRole('banner').getBoundingClientRect();
+    const picture = canvas.getByText('DO').getBoundingClientRect();
+    await expect(Math.abs(picture.left - header.left)).toBeLessThan(1);
+  },
+};
 
 export const AvatarSizes: StoryObj<typeof Avatar> = {
   render: () => (
@@ -35,4 +60,16 @@ export const AvatarSizes: StoryObj<typeof Avatar> = {
       <Avatar name="Desi Origins" size={76} />
     </div>
   ),
+};
+
+/** The header's picture is at the top of the page, so it loads at once. */
+export const HeaderWithPicture: Story = {
+  args: {
+    avatar:
+      'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3Crect width="1" height="1" fill="%23c2410c"/%3E%3C/svg%3E',
+  },
+  play: async ({ canvasElement }) => {
+    const image = canvasElement.querySelector('header img');
+    await expect(image).toHaveAttribute('loading', 'eager');
+  },
 };
