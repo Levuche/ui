@@ -11,6 +11,9 @@ import {
   type VideoRatio,
 } from '../system/gallery';
 import { TileCaption, UNDER_CAPTION } from './tile-caption';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
+import { usePreviewMode } from '../system/preview-mode';
 
 /** A file of captions, subtitles or descriptions for a video (WebVTT). */
 export type VideoTrack = {
@@ -35,11 +38,7 @@ export type VideoLabels = {
   soundOn: string;
 };
 
-export const VIDEO_LABELS: VideoLabels = {
-  play: 'Play {title}',
-  pause: 'Pause {title}',
-  soundOn: 'Play {title} with sound',
-};
+export const VIDEO_LABELS: VideoLabels = WORDS_EN.video;
 
 const RATIOS: Record<VideoRatio, string> = {
   video: 'aspect-video',
@@ -107,7 +106,8 @@ export function VideoFrame({
   labels?: Partial<VideoLabels>;
   className?: string;
 }) {
-  const words = { ...VIDEO_LABELS, ...labels };
+  const words = usePageWords('video', labels);
+  const preview = usePreviewMode();
   const video = useRef<HTMLVideoElement>(null);
   const frame = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<Mode>('still');
@@ -116,13 +116,14 @@ export function VideoFrame({
   const watching = useRef(false);
   const fill = (text: string) => text.replace('{title}', title);
 
-  // Loop without sound while on the screen, unless less motion is asked for
-  // or the visitor paused it. Starts after the page loads, so the server's
+  // Loop without sound while on the screen, unless less motion is asked for,
+  // the visitor paused it or it's in preview mode (the page editor), where
+  // nothing plays. Starts after the page loads, so the server's
   // page and the first render match.
   useEffect(() => {
     const el = video.current;
     const box = frame.current;
-    if (!loop || !el || !box || watching.current) return;
+    if (!loop || preview || !el || !box || watching.current) return;
     if (paused) {
       el.pause();
       return;
@@ -165,7 +166,7 @@ export function VideoFrame({
       watcher?.disconnect();
       motion?.removeEventListener('change', update);
     };
-  }, [loop, paused]);
+  }, [loop, paused, preview]);
 
   if (!isSafeMediaSrc(src, 'video')) return null;
   const cover = safeImageSource(poster);
@@ -176,7 +177,7 @@ export function VideoFrame({
   /** Watch it with sound and the browser's controls, after a press. */
   const watch = () => {
     const el = video.current;
-    if (!el) return;
+    if (!el || preview) return;
     // One video with sound at a time.
     document.querySelectorAll('video').forEach((other) => {
       if (other !== el && !other.muted) other.pause();

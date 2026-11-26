@@ -21,6 +21,8 @@ import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { useControllableState } from '../system/state';
 import type { ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 /** One slide in an ImageCarousel. */
 export type CarouselSlide = {
@@ -41,13 +43,7 @@ export type CarouselLabels = {
   play: string;
 };
 
-export const CAROUSEL_LABELS: CarouselLabels = {
-  previous: 'Previous slide',
-  next: 'Next slide',
-  slide: 'Slide {n} of {total}',
-  pause: 'Pause slides',
-  play: 'Play slides',
-};
+export const CAROUSEL_LABELS: CarouselLabels = WORDS_EN.carousel;
 
 const fill = (text: string, n: number, total: number) =>
   text.replace('{n}', String(n)).replace('{total}', String(total));
@@ -80,7 +76,7 @@ export function ImageCarousel({
   showDots = true,
   counter = false,
   labels,
-  label = 'Pictures',
+  label: labelProp,
   ...root
 }: BlockRootProps & {
   slides: CarouselSlide[];
@@ -100,7 +96,9 @@ export function ImageCarousel({
   /** The carousel's name for screen readers, when there's no title. */
   label?: string;
 }) {
-  const words = { ...CAROUSEL_LABELS, ...labels };
+  const own = usePageWords('props');
+  const label = labelProp === undefined ? own.pictures : labelProp;
+  const words = usePageWords('carousel', labels);
   const id = useId();
   const track = useRef<HTMLDivElement>(null);
   const total = slides.length;

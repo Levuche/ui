@@ -1,5 +1,6 @@
 import {
   BLOCK_ALIGNS,
+  BLOCK_EFFECTS,
   BLOCK_MOTIONS,
   BLOCK_RADII,
   BLOCK_SCALES,
@@ -20,7 +21,8 @@ import {
   MIN_DIM,
 } from './background';
 import type { SellKind } from './sell';
-import { isSafeColor } from './theme';
+import { PAGE_LANGUAGES, type PageLanguage } from './language';
+import { SITE_HOVERS, isSafeColor, type SiteTheme } from './theme';
 
 /*
  * What a creator can set on each block, described as plain data, so the page
@@ -134,6 +136,11 @@ type SettingBase = {
 
 export type TextSetting = SettingBase & {
   type: 'text' | 'longText';
+  /**
+   * Words a block writes itself when the prop is left out (a button's words,
+   * a screen-reader name) have no default here: left empty, they follow the
+   * page's language (WORDS_EN.props and the other word sets).
+   */
   default?: string;
 };
 
@@ -362,6 +369,33 @@ export const COLOUR_SETTINGS = [
   { name: 'onBand', label: 'Text on the band', type: 'colour' },
 ] as const satisfies readonly SettingField[];
 
+/** Words for each ready language, in that language, for the editor's menu. */
+export const PAGE_LANGUAGE_LABELS: Readonly<Record<PageLanguage, string>> = {
+  en: 'English',
+  hi: 'हिन्दी (Hindi)',
+  es: 'Español (Spanish)',
+  de: 'Deutsch (German)',
+  fr: 'Français (French)',
+  pt: 'Português (Portuguese)',
+};
+
+/**
+ * What a creator sets once for the whole page, in SiteTheme, beside the
+ * colours (COLOUR_SETTINGS) and ready-made looks. Each name is a key of
+ * SiteTheme.
+ */
+export const PAGE_SETTINGS = [
+  {
+    name: 'language',
+    label: 'Page language',
+    type: 'choice',
+    options: PAGE_LANGUAGES,
+    optionLabels: PAGE_LANGUAGE_LABELS,
+    default: 'en',
+    help: 'The words blocks write themselves, and their numbers and dates, follow it.',
+  },
+] as const satisfies readonly (SettingField & { name: keyof SiteTheme })[];
+
 /**
  * The look every block shares (BlockLook), described once. Every block's
  * panel gets these after its own settings. Defaults are the look's own; a
@@ -554,6 +588,37 @@ export const LOOK_SETTINGS = [
     },
     default: 'none',
     help: 'Always still for visitors who ask for less motion.',
+  },
+  {
+    name: 'effect',
+    label: 'Gentle movement',
+    type: 'choice',
+    options: BLOCK_EFFECTS,
+    optionLabels: {
+      none: 'None',
+      float: 'Float',
+      pulse: 'Pulse',
+      shimmer: 'Shimmer',
+      tilt: 'Lean towards the pointer',
+    },
+    default: 'none',
+    help: 'A short loop once the block is on the page. Always still for visitors who ask for less motion.',
+    icon: 'eye',
+  },
+  {
+    name: 'hover',
+    label: 'Under the pointer',
+    type: 'choice',
+    options: SITE_HOVERS,
+    optionLabels: {
+      lift: 'Lift',
+      tint: 'Deepen the colour',
+      zoom: 'Zoom the picture',
+      glow: 'Glow',
+      none: 'Stay still',
+    },
+    help: 'What its links do on hover and tap. Left unset, the page’s hover.',
+    icon: 'eye',
   },
   {
     name: 'colors',

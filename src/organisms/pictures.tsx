@@ -7,6 +7,7 @@ import { isOverCaption, type CaptionStyle } from '../system/gallery';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { imageAttrs, toImageSource, type ImageSrc } from '../system/image';
+import { usePageWords } from '../system/page-words';
 
 /**
  * One picture, with an optional caption, and a link if given. The caption
@@ -97,7 +98,7 @@ export function LogoStrip({
   speed = 30,
   logoHeight = 32,
   muted = true,
-  label = 'Brands',
+  label: labelProp,
   ...root
 }: BlockRootProps & {
   /** Above the logos, such as "As seen in". */
@@ -113,6 +114,8 @@ export function LogoStrip({
   /** The list's name for screen readers. */
   label?: string;
 }) {
+  const own = usePageWords('props');
+  const label = labelProp === undefined ? own.brands : labelProp;
   const item = (logo: Logo, i: number, hidden = false) => {
     const source = toImageSource(logo.src);
     // Logos are at most 160 px wide (max-w-40).

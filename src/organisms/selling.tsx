@@ -22,6 +22,8 @@ import {
 } from '../molecules/sell-button';
 import type { SellRef, SellState } from '../system/sell';
 import { columnSizes, type ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageLocale, usePageWords } from '../system/page-words';
 
 /**
  * A pack in a list: thumbnail, title, what's in it, price. The row links to
@@ -41,7 +43,7 @@ export function PackRow({
   sellState,
   sellLabels,
   renderBuy,
-  buttonLabel = 'Buy',
+  buttonLabel: buttonLabelProp,
   saveLabel,
   ...root
 }: BlockRootProps &
@@ -58,6 +60,8 @@ export function PackRow({
     image?: ImageSrc | null;
     href?: string;
   }) {
+  const own = usePageWords('props');
+  const buttonLabel = buttonLabelProp === undefined ? own.buy : buttonLabelProp;
   const body = (
     <>
       <Thumb src={image} ratio="square" sizes="52px" className="size-13" />
@@ -109,7 +113,7 @@ export function PackRow({
 export function BuyButton({
   variant = 'solid',
   size = 'lg',
-  children = 'I’ll take it',
+  children: childrenProp,
   type = 'button',
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -117,6 +121,8 @@ export function BuyButton({
   size?: SiteButtonSize;
   loading?: boolean;
 }) {
+  const own = usePageWords('props');
+  const children = childrenProp === undefined ? own.takeIt : childrenProp;
   return (
     <SiteButton
       type={type}
@@ -136,9 +142,7 @@ export type PackCheckoutLabels = {
   error: ReactNode;
 };
 
-export const PACK_CHECKOUT_LABELS: PackCheckoutLabels = {
-  error: 'The payment didn’t go through. Please try again.',
-};
+export const PACK_CHECKOUT_LABELS: PackCheckoutLabels = WORDS_EN.packCheckout;
 
 /**
  * Checkout for a digital pack: the consent to start the download now (the
@@ -147,7 +151,7 @@ export const PACK_CHECKOUT_LABELS: PackCheckoutLabels = {
  */
 export function PackCheckout({
   price,
-  consent = 'I want to download now and understand I lose my 14-day right to cancel.',
+  consent: consentProp,
   buttonLabel,
   buttonVariant,
   labels,
@@ -169,6 +173,9 @@ export function PackCheckout({
   onSubmit?: FormEventHandler<HTMLFormElement>;
   action?: string | ((data: FormData) => void | Promise<void>);
 }) {
+  const own = usePageWords('props');
+  const consent = consentProp === undefined ? own.consent : consentProp;
+  const words = usePageWords('packCheckout', labels);
   return (
     <Block
       as="form"
@@ -195,12 +202,9 @@ export function PackCheckout({
         variant={buttonVariant}
         loading={status === 'sending'}
       >
-        {buttonLabel ?? <>I’ll take it, {price}</>}
+        {buttonLabel ?? own.takeItFor.replace('{price}', price)}
       </BuyButton>
-      <FormNotice
-        status={status}
-        error={labels?.error ?? PACK_CHECKOUT_LABELS.error}
-      />
+      <FormNotice status={status} error={words.error} />
     </Block>
   );
 }
@@ -215,7 +219,7 @@ export function FeaturedPack({
   imageAlt = '',
   ratio,
   action,
-  buttonLabel = 'I’ll take it',
+  buttonLabel: buttonLabelProp,
   headingAs = 'h2',
   ribbon,
   sell,
@@ -245,6 +249,9 @@ export function FeaturedPack({
     buttonLabel?: ReactNode;
     headingAs?: HeadingTag;
   }) {
+  const own = usePageWords('props');
+  const buttonLabel =
+    buttonLabelProp === undefined ? own.takeIt : buttonLabelProp;
   return (
     <Block
       as="article"
@@ -290,7 +297,7 @@ export function FeaturedPack({
 export function PackGrid({
   packs,
   columns = 2,
-  buttonLabel = 'Buy',
+  buttonLabel: buttonLabelProp,
   sellLabels,
   renderBuy,
   saveLabel,
@@ -314,6 +321,8 @@ export function PackGrid({
     /** Packs to a row from a tablet up; two on a phone. */
     columns?: 2 | 3 | 4;
   }) {
+  const own = usePageWords('props');
+  const buttonLabel = buttonLabelProp === undefined ? own.buy : buttonLabelProp;
   return (
     <Block name="pack-grid" defaults={{ tone: 'plain' }} {...root}>
       <ul
@@ -391,11 +400,7 @@ export type CreditPackLabels = {
   button: string;
 };
 
-export const CREDIT_PACK_LABELS: CreditPackLabels = {
-  credits: '{n} credits',
-  bonus: '+{n} bonus',
-  button: 'Buy credits',
-};
+export const CREDIT_PACK_LABELS: CreditPackLabels = WORDS_EN.creditPack;
 
 /**
  * A pack of credits: how many, any bonus, the price, how long they last and
@@ -417,7 +422,7 @@ export function CreditPack({
   featured = false,
   featuredLabel,
   labels,
-  locale,
+  locale: localeProp,
   headingAs: Heading = 'h3',
   saveLabel,
   ...root
@@ -441,7 +446,8 @@ export function CreditPack({
     locale?: string;
     headingAs?: HeadingTag;
   }) {
-  const words = { ...CREDIT_PACK_LABELS, ...labels };
+  const locale = usePageLocale(localeProp);
+  const words = usePageWords('creditPack', labels);
   const count = new Intl.NumberFormat(locale);
   return (
     <Block

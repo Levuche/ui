@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLink } from '../atoms/link';
 import {
-  VIDEO_LABELS,
   VideoFrame,
   type VideoLabels,
   type VideoTrack,
@@ -10,16 +9,15 @@ import {
 import type { CaptionStyle, VideoRatio } from '../system/gallery';
 import { isSafeMediaSrc } from '../system/href';
 import type { ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 export type VideoTileLabels = VideoLabels & {
   /** The link to the video's words. */
   transcript: string;
 };
 
-export const VIDEO_TILE_LABELS: VideoTileLabels = {
-  ...VIDEO_LABELS,
-  transcript: 'Transcript',
-};
+export const VIDEO_TILE_LABELS: VideoTileLabels = WORDS_EN.videoTile;
 
 /**
  * A video the creator uploaded (mp4, mov or webm), with its first frame or a
@@ -60,8 +58,8 @@ export function VideoTile({
   transcriptHref?: string;
   labels?: Partial<VideoTileLabels>;
 }) {
+  const words = usePageWords('videoTile', labels);
   if (!isSafeMediaSrc(src, 'video')) return null;
-  const words = { ...VIDEO_TILE_LABELS, ...labels };
   return (
     <Block name="video-tile" defaults={{ tone: 'plain' }} {...root}>
       <VideoFrame

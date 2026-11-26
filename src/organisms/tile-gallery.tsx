@@ -4,7 +4,6 @@ import { SiteLink } from '../atoms/link';
 import { Thumb } from '../atoms/thumb';
 import { TileCaption, UNDER_CAPTION } from '../molecules/tile-caption';
 import {
-  VIDEO_LABELS,
   VideoFrame,
   type VideoLabels,
   type VideoTrack,
@@ -81,7 +80,6 @@ export function TileGallery({
   /** The words on the video buttons. */
   labels?: Partial<VideoLabels>;
 }) {
-  const words = { ...VIDEO_LABELS, ...labels };
   const over = isOverCaption(captionStyle);
   return (
     <Block name="tile-gallery" defaults={{ tone: 'plain' }} {...root}>
@@ -114,7 +112,7 @@ export function TileGallery({
                     tracks={item.tracks}
                     caption={item.caption}
                     captionStyle={captionStyle}
-                    labels={words}
+                    labels={labels}
                   />
                 </li>
               );
