@@ -74,7 +74,7 @@ export function LatestVideos({
                     newTab
                     action="video_click"
                     data-lift=""
-                    className="flex flex-col gap-2 no-underline"
+                    className="rounded-block-inner flex flex-col gap-2 no-underline"
                   >
                     <Thumb
                       src={video.thumbnail}

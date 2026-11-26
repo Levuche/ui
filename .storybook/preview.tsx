@@ -5,6 +5,7 @@ import {
   SITE_LOOK_NAMES,
   siteLook,
   type SiteCardStyle,
+  type SiteHover,
 } from '../src';
 import { SCREENS } from '../stories/screens';
 import { THEMES, type ThemeName } from '../stories/themes';
@@ -14,10 +15,11 @@ const preview: Preview = {
   // Pick the creator theme from the toolbar; a story can fix one with
   // `globals: { theme: 'dark' }`. Direction does the same for right-to-left
   // scripts, such as Arabic, Hebrew and Urdu. A ready-made look replaces the
-  // theme and card style with its own.
+  // theme, card style and hover with its own.
   initialGlobals: {
     theme: 'light',
     cards: 'flat',
+    hover: 'lift',
     look: 'none',
     direction: 'ltr',
   },
@@ -45,6 +47,21 @@ const preview: Preview = {
           { value: 'outline', title: 'Outlined cards' },
           { value: 'raised', title: 'Raised cards' },
           { value: 'glass', title: 'Glass cards' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+    hover: {
+      description: 'What links do under the pointer',
+      toolbar: {
+        title: 'Hover',
+        icon: 'pointerhand',
+        items: [
+          { value: 'lift', title: 'Hover: lift' },
+          { value: 'tint', title: 'Hover: tint' },
+          { value: 'zoom', title: 'Hover: zoom' },
+          { value: 'glow', title: 'Hover: glow' },
+          { value: 'none', title: 'Hover: none' },
         ],
         dynamicTitle: true,
       },
@@ -93,6 +110,7 @@ const preview: Preview = {
               : {
                   ...THEMES[name].theme,
                   cards: (context.globals.cards ?? 'flat') as SiteCardStyle,
+                  hover: (context.globals.hover ?? 'lift') as SiteHover,
                 }
           }
           className="min-h-screen p-5"

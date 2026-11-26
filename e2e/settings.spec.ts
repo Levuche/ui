@@ -8,6 +8,7 @@ import {
 } from '../src/system/registry';
 import { BLOCK_TONES, splitLook } from '../src/system/look';
 import { EMBED_SERVICES } from '../src/system/embeds';
+import { SITE_HOVERS } from '../src/system/theme';
 import {
   LIST_VALUE_TYPES,
   LOOK_SETTINGS,
@@ -118,6 +119,10 @@ test('choice fields have options, each once, and labels only for them', () => {
 test('choices reuse the package’s own lists', () => {
   const tone = LOOK_SETTINGS.find((field) => field.name === 'tone');
   expect(tone?.type === 'choice' && tone.options).toBe(BLOCK_TONES);
+  // The block's hover has no default: left unset, it follows the page's.
+  const hover = LOOK_SETTINGS.find((field) => field.name === 'hover');
+  expect(hover?.type === 'choice' && hover.options).toBe(SITE_HOVERS);
+  expect(hover).not.toHaveProperty('default');
   const services = ui
     .blockInfo('link-embed')
     ?.settings.find((field) => field.name === 'services');
@@ -186,6 +191,27 @@ test('each block has at most one main link, and data to load is slow', () => {
   expect(mainLinkSetting('youtube-video')?.name).toBe('video');
   expect(mainLinkSetting('latest-videos')?.name).toBe('channel');
   expect(mainLinkSetting('testimonials')).toBeUndefined();
+});
+
+test('the text blocks have their settings', () => {
+  const field = (id: string, name: string) =>
+    ui.blockInfo(id)?.settings.find((setting) => setting.name === name);
+  // The heading's link name is a setting; its level is the app's.
+  expect(field('section-heading', 'title')?.required).toBe(true);
+  expect(field('section-heading', 'id')?.type).toBe('text');
+  expect(ui.blockInfo('section-heading')?.appOnly).toEqual(['headingAs']);
+  const text = field('text-block', 'text');
+  expect(text?.type).toBe('longText');
+  expect(text?.required).toBe(true);
+  expect(field('quote-block', 'quote')?.required).toBe(true);
+  expect(field('quote-block', 'avatar')?.type).toBe('picture');
+  // The spacer's height stops where the block does.
+  const rows = field('spacer', 'rows');
+  expect(rows?.type === 'number' && [rows.min, rows.max]).toEqual([
+    1,
+    ui.SPACER_MAX_ROWS,
+  ]);
+  expect(field('spacer', 'line')?.type).toBe('toggle');
 });
 
 test('the look settings are exactly the look a block takes', () => {

@@ -8,6 +8,21 @@ change when it moves to that version.
 
 ### Added
 
+- More hovers: `SiteTheme.hover` takes `tint` (the fill deepens), `zoom`
+  (the picture grows a little, clipped to the card) and `glow` (a line and
+  soft glow in the button colour), beside `lift` and `none`, and a block can
+  pick its own with the `hover` look prop (in `LOOK_SETTINGS` as "Under
+  the pointer"). Each has a matching press on tap
+  and shows when a keyboard reaches the link, with a focus ring; nothing moves
+  for visitors who ask for less motion. The featured link card and social
+  icons now take the hover too, and `data-hover-preview` shows it without the
+  pointer. Storybook's toolbar has a Hover menu, and `Pages/Hover` shows each.
+- Text blocks in a new `text` group, free in `core`: `SectionHeading` (a
+  heading a link can jump to, with a line of detail), `TextBlock` (bold,
+  italic, links, lists and emoji), `QuoteBlock` (a quote with who said it
+  and a small picture) and `Spacer` (a gap of whole grid rows, or a thin
+  line). What a creator types is never read as HTML (`parseRichText`,
+  `RichText`).
 - `EventCard`: one event with a date badge (MAR 15), a chip saying how far
   away it is in the visitor's language ("In 4 months", "Tomorrow",
   "Happening now"), the date and time with the event's time zone, the place,
@@ -26,13 +41,6 @@ change when it moves to that version.
 - `EventList` rows with a `dateTime` get "Add to calendar" too (`calendar`
   turns it off); rows take an `end` and a `timeZone`, and
   `EVENT_LIST_LABELS` has the calendar words.
-
-### Changed
-
-- Tracking reports a link to a file the page made itself (a `data:` or
-  `blob:` address) by its kind only, as `data:text/calendar`, not the whole
-  file.
-
 - `SocialCard`: one social profile with the platform's mark, the picture,
   name, handle and verified tick, the follower count written short by
   locale (`shortCount`: 1.1K, 860K) and a button in the platform's own word
@@ -83,6 +91,12 @@ change when it moves to that version.
 ### An app must change
 
 Nothing.
+
+### Changed
+
+- Tracking reports a link to a file the page made itself (a `data:` or
+  `blob:` address) by its kind only, as `data:text/calendar`, not the whole
+  file.
 
 ## 0.2.0 (2026-11-25)
 
