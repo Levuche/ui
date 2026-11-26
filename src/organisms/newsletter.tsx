@@ -10,7 +10,7 @@ import { EmailForm, type EmailFormLabels } from '../molecules/email-form';
 export function NewsletterBand({
   title,
   detail,
-  buttonLabel = 'Subscribe',
+  buttonLabel,
   placeholder,
   labels,
   layout = 'row',

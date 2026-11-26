@@ -8,6 +8,14 @@ change when it moves to that version.
 
 ### Added
 
+- Preview mode for the page editor: inside `<PreviewMode>`, every block
+  looks as it does live, but links and downloads don't open, forms don't
+  send, `useBlockActions` reports nothing (so no checkout starts) and
+  players from other sites and booking pages show a still placeholder
+  (`data-preview-placeholder`) instead of loading. Blocks stay in the tab
+  order so the editor can select them from the keyboard. Client blocks read
+  it with `usePreviewMode()`; `inPreview` and `previewStop` say what it
+  stops. `Editor/Preview mode` in Storybook presses every block in it.
 - More hovers: `SiteTheme.hover` takes `tint` (the fill deepens), `zoom`
   (the picture grows a little, clipped to the card) and `glow` (a line and
   soft glow in the button colour), beside `lift` and `none`, and a block can
@@ -46,6 +54,11 @@ change when it moves to that version.
   Play badges, words in `APP_BADGE_LABELS`). New grid kinds `tile` and
   `chip` in `BLOCK_SIZES`. Picture addresses are checked as `cssImageUrl`
   does and brand colours with `isSafeColor`.
+- The page's language: `SiteTheme.language` and `<CreatorTheme words>`, so
+  every block's own words, numbers and dates follow the page with no `labels`
+  on any block. Ready word sets in English, Hindi, Spanish, German, French and
+  Portuguese, each loaded on its own with `loadPageWords`; a block's own
+  `labels` and word props still win. Storybook's toolbar has a Language menu.
 - `SocialCard`: one social profile with the platform's mark, the picture,
   name, handle and verified tick, the follower count written short by
   locale (`shortCount`: 1.1K, 860K) and a button in the platform's own word
