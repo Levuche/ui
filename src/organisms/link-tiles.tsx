@@ -11,6 +11,8 @@ import {
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { cssImageUrl, type ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 /*
  * Single links in their own shapes, each a block the creator places on the
@@ -204,13 +206,7 @@ export type AppBadgeLabels = {
   googlePlay: string;
 };
 
-export const APP_BADGE_LABELS: AppBadgeLabels = {
-  list: 'Get the app',
-  appStoreLead: 'Download on the',
-  appStore: 'App Store',
-  googlePlayLead: 'Get it on',
-  googlePlay: 'Google Play',
-};
+export const APP_BADGE_LABELS: AppBadgeLabels = WORDS_EN.appBadges;
 
 /** One app store link. */
 export type AppBadgeLink = LinkBehavior & {
@@ -253,7 +249,7 @@ export function AppBadges({
   apps: AppBadgeLink[];
   labels?: Partial<AppBadgeLabels>;
 }) {
-  const labels = { ...APP_BADGE_LABELS, ...given };
+  const labels = usePageWords('appBadges', given);
   return (
     <Block
       as="nav"

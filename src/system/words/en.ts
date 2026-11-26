@@ -206,6 +206,13 @@ export const WORDS_EN = {
     post: 'Post {n}',
     on: '{name} on {platform}',
   },
+  appBadges: {
+    list: 'Get the app',
+    appStoreLead: 'Download on the',
+    appStore: 'App Store',
+    googlePlayLead: 'Get it on',
+    googlePlay: 'Google Play',
+  },
   props: {
     /** CreatorHeader `verifiedLabel`. */
     verified: 'Verified',
