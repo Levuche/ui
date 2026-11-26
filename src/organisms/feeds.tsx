@@ -18,11 +18,7 @@ import type { LiveProps } from '../system/live';
 import { columnSizes, type ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
 import { usePageLocale, usePageWords } from '../system/page-words';
-import {
-  consentNotice,
-  OUTSIDE_SERVICES,
-  type ConsentLabels,
-} from '../system/privacy';
+import { OUTSIDE_SERVICES, type ConsentLabels } from '../system/privacy';
 
 const subHeading = (tag: HeadingTag): HeadingTag =>
   tag === 'h2' ? 'h3' : tag === 'h3' ? 'h4' : 'p';
@@ -339,10 +335,7 @@ export function LiveStatus({
                   playLabel={words.play.replace('{channel}', status.channel)}
                   action="play_live"
                   consent={consent}
-                  notice={consentNotice(
-                    OUTSIDE_SERVICES.twitch.name,
-                    consentLabels
-                  )}
+                  site={OUTSIDE_SERVICES.twitch.name}
                   consentLabels={consentLabels}
                 />
               ) : null}

@@ -12,7 +12,7 @@ import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import type { ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
-import { usePageWords } from '../system/page-words';
+import { usePageLocale, usePageWords } from '../system/page-words';
 
 /* -------------------------------------------------------------- CourseCard */
 
@@ -75,6 +75,7 @@ export function CourseCard({
     headingAs?: HeadingTag;
   }) {
   const words = usePageWords('courseCard', labels);
+  const language = usePageLocale();
   return (
     <Block as="article" name="course-card" {...root}>
       <ItemHead
@@ -92,7 +93,12 @@ export function CourseCard({
           {lessons != null ? (
             <span className="inline-flex items-center gap-1.5">
               <VideoIcon size={16} />
-              {words.lessons.replace('{n}', String(lessons))}
+              {lessons === 1
+                ? words.oneLesson
+                : words.lessons.replace(
+                    '{n}',
+                    new Intl.NumberFormat(language ?? 'en-US').format(lessons)
+                  )}
             </span>
           ) : null}
           {duration ? (

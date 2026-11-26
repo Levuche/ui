@@ -32,7 +32,7 @@ export function TextStrip({
   separator = '✦',
   speed,
   direction = 'start',
-  label = 'Highlights',
+  label: labelProp,
   labels,
   ...root
 }: BlockRootProps & {
@@ -52,6 +52,8 @@ export function TextStrip({
   labels?: Partial<TextStripLabels>;
 }) {
   const words = usePageWords('textStrip', labels);
+  const own = usePageWords('props');
+  const label = labelProp ?? own.highlights;
   const phrases = items.map((item) => String(item).trim()).filter(Boolean);
   const view = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLUListElement>(null);

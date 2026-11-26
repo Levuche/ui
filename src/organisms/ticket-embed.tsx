@@ -16,7 +16,6 @@ import { isSafeHref } from '../system/href';
 import { usePageWords } from '../system/page-words';
 import { usePreviewMode } from '../system/preview-mode';
 import {
-  CONSENT_LABELS,
   consentNotice,
   OUTSIDE_SERVICES,
   type ConsentLabels,
@@ -79,6 +78,7 @@ export function TicketEmbed({
   onOpen?: () => void;
 }) {
   const words = usePageWords('ticketEmbed', labels);
+  const consentWords = usePageWords('consent', consentLabels);
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const frameRef = useRef<HTMLIFrameElement>(null);
@@ -160,9 +160,9 @@ export function TicketEmbed({
     <ConsentCover
       notice={consentNotice(
         OUTSIDE_SERVICES[tickets.service].name,
-        consentLabels
+        consentWords
       )}
-      load={{ ...CONSENT_LABELS, ...consentLabels }.load}
+      load={consentWords.load}
       title={name}
       action="tickets_load"
       onLoad={() => setAgreed(true)}

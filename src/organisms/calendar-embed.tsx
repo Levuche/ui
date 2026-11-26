@@ -18,7 +18,6 @@ import { calendarEmbed, type CalendarView } from '../system/embeds';
 import { usePageLocale, usePageWords } from '../system/page-words';
 import { usePreviewMode } from '../system/preview-mode';
 import {
-  CONSENT_LABELS,
   consentNotice,
   OUTSIDE_SERVICES,
   type ConsentLabels,
@@ -89,6 +88,7 @@ export function CalendarEmbed({
   headingAs?: HeadingTag;
 }) {
   const words = usePageWords('calendarEmbed', labels);
+  const consentWords = usePageWords('consent', consentLabels);
   const language = usePageLocale(locale);
   const preview = usePreviewMode();
   const place = useRef<HTMLDivElement>(null);
@@ -144,8 +144,8 @@ export function CalendarEmbed({
     />
   ) : (
     <ConsentCover
-      notice={consentNotice(OUTSIDE_SERVICES[page.service].name, consentLabels)}
-      load={{ ...CONSENT_LABELS, ...consentLabels }.load}
+      notice={consentNotice(OUTSIDE_SERVICES[page.service].name, consentWords)}
+      load={consentWords.load}
       title={name}
       action="calendar_load"
       onLoad={() => setAgreed(true)}

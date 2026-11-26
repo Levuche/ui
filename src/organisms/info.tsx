@@ -11,11 +11,7 @@ import type { LinkBehavior } from '../system/href';
 import type { ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
 import { usePageWords } from '../system/page-words';
-import {
-  consentNotice,
-  OUTSIDE_SERVICES,
-  type ConsentLabels,
-} from '../system/privacy';
+import { OUTSIDE_SERVICES, type ConsentLabels } from '../system/privacy';
 
 /* ---------------------------------------------------------------- StatsRow */
 
@@ -308,10 +304,7 @@ export function MapCard({
             allow=""
             frameClassName={MAP_STYLE_CLASSES[mapStyle]}
             consent={consent}
-            notice={consentNotice(
-              OUTSIDE_SERVICES[mapService(mapStyle)].name,
-              consentLabels
-            )}
+            site={OUTSIDE_SERVICES[mapService(mapStyle)].name}
             consentLabels={consentLabels}
           />
           {mapCaption ? (

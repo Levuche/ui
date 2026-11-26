@@ -113,6 +113,7 @@ export const WORDS_FR: PageWords = {
     close: 'Fermer',
   },
   courseCard: {
+    oneLesson: '1 leçon',
     lessons: '{n} leçons',
     button: 'Commencer',
   },
@@ -158,6 +159,14 @@ export const WORDS_FR: PageWords = {
   },
   embed: {
     play: 'Lire : {title}',
+  },
+  consent: {
+    notice:
+      'Ce contenu est chargé depuis {service}, qui verra votre adresse IP et peut déposer des cookies.',
+    load: 'Charger',
+  },
+  rating: {
+    stars: '{n} sur {max} étoiles',
   },
   liveStatus: {
     live: 'En direct',
@@ -291,6 +300,8 @@ export const WORDS_FR: PageWords = {
     close: 'Fermer',
   },
   props: {
+    highlights: 'Temps forts',
+    qrFor: 'Code QR pour {address}',
     verified: 'Vérifié',
     links: 'Liens',
     socialAccounts: 'Réseaux sociaux',

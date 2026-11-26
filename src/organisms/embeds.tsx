@@ -19,11 +19,7 @@ import { youtubeId } from './media';
 import type { ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
 import { usePageWords } from '../system/page-words';
-import {
-  consentNotice,
-  OUTSIDE_SERVICES,
-  type ConsentLabels,
-} from '../system/privacy';
+import { OUTSIDE_SERVICES, type ConsentLabels } from '../system/privacy';
 
 /** What every player from another site may do inside its frame. */
 const SANDBOX =
@@ -93,10 +89,7 @@ function EmbedBody({
           action={`play_${embed.service}`}
           tint={embed.tint}
           consent={consent}
-          notice={consentNotice(
-            OUTSIDE_SERVICES[embed.service].name,
-            consentLabels
-          )}
+          site={OUTSIDE_SERVICES[embed.service].name}
           consentLabels={consentLabels}
         />
       ) : (

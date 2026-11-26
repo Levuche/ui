@@ -434,7 +434,7 @@ export {
   type LeadMagnetLabels,
 } from './organisms/offers';
 export { TIP_JAR_LABELS, TipJar, type TipJarLabels } from './organisms/tip-jar';
-export { DiscountCode } from './organisms/discount';
+export { DiscountCode, DISCOUNT_CODE_LABELS } from './organisms/discount';
 export {
   COUNTDOWN_LABELS,
   Countdown,

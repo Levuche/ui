@@ -29,6 +29,7 @@ function AudioNotice({
   consent,
   consentLabels,
 }: AudioConsent & { sources: string[] }) {
+  const consentWords = usePageWords('consent', consentLabels);
   if (consent !== false) return null;
   const sites = [
     ...new Set(sources.map(siteName).filter((s): s is string => !!s)),
@@ -36,7 +37,7 @@ function AudioNotice({
   if (!sites.length) return null;
   return (
     <p data-consent="pending" className="text-site-text-2 m-0 text-sm">
-      {consentNotice(sites.join(', '), consentLabels)}
+      {consentNotice(sites.join(', '), consentWords)}
     </p>
   );
 }

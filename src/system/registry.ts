@@ -1591,7 +1591,12 @@ export const BLOCKS = [
         type: 'text',
         help: 'As "10% off the reel pack".',
       },
-      { name: 'labels', label: 'Words', type: 'words', from: 'COPY_LABELS' },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'DISCOUNT_CODE_LABELS',
+      },
     ],
     appOnly: ['copy'],
     privacy: LOADS_NOTHING,
@@ -2504,7 +2509,6 @@ export const BLOCKS = [
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Highlights',
       },
       {
         name: 'labels',

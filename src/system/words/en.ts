@@ -118,6 +118,7 @@ export const WORDS_EN = {
     close: 'Close',
   },
   courseCard: {
+    oneLesson: '1 lesson',
     lessons: '{n} lessons',
     button: 'Start learning',
   },
@@ -163,6 +164,16 @@ export const WORDS_EN = {
   },
   embed: {
     play: 'Play: {title}',
+  },
+  /** Every block's notice before it loads another site. {service} is filled in. */
+  consent: {
+    notice:
+      'This loads from {service}, which will see your IP address and may set cookies.',
+    load: 'Load',
+  },
+  /** Stars, read out by screen readers. */
+  rating: {
+    stars: '{n} out of {max} stars',
   },
   liveStatus: {
     live: 'Live now',
@@ -296,6 +307,10 @@ export const WORDS_EN = {
     close: 'Close',
   },
   props: {
+    /** TextStrip `label`. */
+    highlights: 'Highlights',
+    /** QrCode's picture name. */
+    qrFor: 'QR code for {address}',
     /** CreatorHeader `verifiedLabel`. */
     verified: 'Verified',
     /** LinkList `label`. */

@@ -112,6 +112,7 @@ export const WORDS_DE: PageWords = {
     close: 'Schließen',
   },
   courseCard: {
+    oneLesson: '1 Lektion',
     lessons: '{n} Lektionen',
     button: 'Jetzt lernen',
   },
@@ -158,6 +159,14 @@ export const WORDS_DE: PageWords = {
   },
   embed: {
     play: 'Abspielen: {title}',
+  },
+  consent: {
+    notice:
+      'Das wird von {service} geladen, das dabei deine IP-Adresse sieht und Cookies setzen kann.',
+    load: 'Laden',
+  },
+  rating: {
+    stars: '{n} von {max} Sternen',
   },
   liveStatus: {
     live: 'Jetzt live',
@@ -291,6 +300,8 @@ export const WORDS_DE: PageWords = {
     close: 'Schließen',
   },
   props: {
+    highlights: 'Highlights',
+    qrFor: 'QR-Code für {address}',
     verified: 'Verifiziert',
     links: 'Links',
     socialAccounts: 'Social-Media-Konten',

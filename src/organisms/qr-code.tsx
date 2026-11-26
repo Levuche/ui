@@ -122,7 +122,10 @@ export function QrCode({
     downloadLabelProp === undefined ? own.saveQr : downloadLabelProp;
   const ink = isSafeColor(dark) ? dark : '#000000';
   const paper = isSafeColor(light) ? light : '#ffffff';
-  const name = `QR code for ${value.replace(/^https?:\/\//, '')}`;
+  const name = own.qrFor.replace(
+    '{address}',
+    value.replace(/^https?:\/\//, '')
+  );
   const ownPicture = safeImageSource(src)?.src ?? null;
   const modules = ownPicture ? null : encode(value, level);
   const svg = modules?.length
