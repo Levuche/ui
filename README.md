@@ -25,7 +25,7 @@ Install a released version straight from GitHub (no npm account or token
 needed):
 
 ```bash
-npm install github:Levuche/ui#v0.2.0
+npm install github:Levuche/ui#v0.3.0
 ```
 
 The package ships TypeScript source. In a Next.js app:
