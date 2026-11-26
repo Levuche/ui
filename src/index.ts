@@ -220,6 +220,7 @@ export {
 export { SiteDialog } from './molecules/dialog';
 export { Segmented, type SegmentOption } from './molecules/segmented';
 export { CountUp, type NumberStyle } from './molecules/count-up';
+export { HiddenText, MessageComposer } from './molecules/message-composer';
 
 // Organisms: the blocks
 export { CreatorHeader } from './organisms/profile';
@@ -308,11 +309,32 @@ export { SiteGrid, type SiteGridBlock } from './templates/site-grid';
 export {
   CONTACT_FORM_LABELS,
   ContactForm,
+  MESSAGE_CARD_LABELS,
+  MessageCard,
   SaveContact,
   toVCard,
   type ContactCard,
   type ContactFormLabels,
+  type MessageCardLabels,
 } from './organisms/contact';
+export {
+  MESSAGE_CHANNELS,
+  MESSAGE_MAX_LENGTH,
+  SUBJECT_MAX_LENGTH,
+  cleanEmail,
+  cleanMessageTarget,
+  cleanMessageText,
+  cleanMessenger,
+  cleanPhone,
+  cleanTelegram,
+  hideText,
+  isMessageChannel,
+  messageHref,
+  messageTargetText,
+  revealText,
+  type MessageChannel,
+  type MessageLinkInput,
+} from './system/message';
 export {
   MAP_CARD_LABELS,
   MapCard,

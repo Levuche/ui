@@ -18,7 +18,10 @@ export type BlockAction = {
   block: string | null;
   /** The visible words on what was clicked, cut to 100 characters. */
   label: string;
-  /** Where a link goes. */
+  /**
+   * Where a link goes. For a link with data-href-private, without its query
+   * and fragment, so a message the visitor wrote isn't tracked.
+   */
   href?: string;
   /**
    * What the press buys, when the block sells through BuildBase: start the
@@ -76,7 +79,15 @@ export function readBlockAction(event: Event): BlockAction | null {
     action: named ?? fallback,
     block: control.closest('[data-block]')?.getAttribute('data-block') ?? null,
     label,
-    ...(control instanceof HTMLAnchorElement ? { href: control.href } : {}),
+    ...(control instanceof HTMLAnchorElement
+      ? {
+          // A link marked data-href-private carries what a visitor typed
+          // (a message card's text): report it without its query.
+          href: control.hasAttribute('data-href-private')
+            ? control.href.replace(/[?#].*$/s, '')
+            : control.href,
+        }
+      : {}),
     ...(sell ? { sell } : {}),
   };
 }

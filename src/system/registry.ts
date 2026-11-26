@@ -1,6 +1,7 @@
 import type { BlockKind } from './grid';
 import { BLOCK_TONES } from './look';
 import { EMBED_SERVICES } from './embeds';
+import { MESSAGE_CHANNELS } from './message';
 import {
   BUTTON_VARIANT_LABELS,
   BUTTON_VARIANT_OPTIONS,
@@ -1627,6 +1628,91 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...FORM_APP_ONLY, 'headingAs', 'children'],
+  },
+  {
+    id: 'message-card',
+    component: 'MessageCard',
+    kind: 'card',
+    group: 'forms',
+    client: false,
+    pack: 'core',
+    summary:
+      'A button to message on WhatsApp, Telegram, text, email or Messenger, with a ready message',
+    settings: [
+      {
+        name: 'channel',
+        label: 'Where they message you',
+        type: 'choice',
+        options: MESSAGE_CHANNELS,
+        optionLabels: {
+          whatsapp: 'WhatsApp',
+          telegram: 'Telegram',
+          sms: 'Text message',
+          email: 'Email',
+          messenger: 'Messenger',
+        },
+        required: true,
+        icon: 'choice',
+      },
+      {
+        name: 'to',
+        label: 'Number, username or email',
+        type: 'text',
+        required: true,
+        help: 'A phone number with its country code, a username or an email address.',
+        icon: 'phone',
+      },
+      {
+        name: 'name',
+        label: 'Name',
+        type: 'text',
+        required: true,
+        icon: 'person',
+      },
+      { name: 'picture', label: 'Picture', type: 'picture' },
+      { name: 'detail', label: 'Line under the name', type: 'longText' },
+      { name: 'message', label: 'Ready message', type: 'longText' },
+      {
+        name: 'subject',
+        label: 'Email subject',
+        type: 'text',
+        help: 'Email only.',
+      },
+      {
+        name: 'editable',
+        label: 'Visitors can change the message',
+        type: 'toggle',
+        default: false,
+      },
+      {
+        name: 'showTarget',
+        label: 'Show the number or address',
+        type: 'toggle',
+        default: true,
+      },
+      {
+        name: 'hideFromSource',
+        label: 'Keep the number out of the page code',
+        type: 'toggle',
+        default: true,
+        help: 'Off: the link also works without JavaScript.',
+      },
+      { name: 'buttonLabel', label: 'Words on the button', type: 'text' },
+      {
+        name: 'buttonVariant',
+        label: 'Button style',
+        type: 'choice',
+        options: BUTTON_VARIANT_OPTIONS,
+        optionLabels: BUTTON_VARIANT_LABELS,
+      },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'MESSAGE_CARD_LABELS',
+      },
+    ],
+    appOnly: ['headingAs'],
   },
   {
     id: 'save-contact',
