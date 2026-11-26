@@ -17,6 +17,13 @@ import {
 } from '../system/embeds';
 import { youtubeId } from './media';
 import type { ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
+import {
+  consentNotice,
+  OUTSIDE_SERVICES,
+  type ConsentLabels,
+} from '../system/privacy';
 
 /** What every player from another site may do inside its frame. */
 const SANDBOX =
@@ -27,7 +34,7 @@ export type EmbedLabels = {
   play: string;
 };
 
-export const EMBED_LABELS: EmbedLabels = { play: 'Play: {title}' };
+export const EMBED_LABELS: EmbedLabels = WORDS_EN.embed;
 
 type EmbedProps = BlockRootProps & {
   /** The link the creator pasted. */
@@ -40,6 +47,13 @@ type EmbedProps = BlockRootProps & {
   /** A picture shown until the visitor presses play. */
   poster?: ImageSrc | null;
   labels?: Partial<EmbedLabels>;
+  /**
+   * Whether the visitor agreed to the service, from the page's cookie
+   * notice. False shows a notice and a Load button first; leave it out on
+   * pages that don't ask.
+   */
+  consent?: boolean;
+  consentLabels?: Partial<ConsentLabels>;
   headingAs?: HeadingTag;
 };
 
@@ -56,10 +70,12 @@ function EmbedBody({
   detail,
   poster,
   labels,
+  consent,
+  consentLabels,
   headingAs = 'h3',
   ...root
 }: EmbedProps & { name: string; embed: Embed | null }) {
-  const words = { ...EMBED_LABELS, ...labels };
+  const words = usePageWords('embed', labels);
   return (
     <Block name={name} data-service={embed?.service} {...root}>
       {showTitle ? (
@@ -76,6 +92,12 @@ function EmbedBody({
           sandbox={SANDBOX}
           action={`play_${embed.service}`}
           tint={embed.tint}
+          consent={consent}
+          notice={consentNotice(
+            OUTSIDE_SERVICES[embed.service].name,
+            consentLabels
+          )}
+          consentLabels={consentLabels}
         />
       ) : (
         <LinkTile

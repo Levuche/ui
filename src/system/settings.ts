@@ -21,7 +21,8 @@ import {
   MIN_DIM,
 } from './background';
 import type { SellKind } from './sell';
-import { SITE_HOVERS, isSafeColor } from './theme';
+import { PAGE_LANGUAGES, type PageLanguage } from './language';
+import { SITE_HOVERS, isSafeColor, type SiteTheme } from './theme';
 
 /*
  * What a creator can set on each block, described as plain data, so the page
@@ -135,6 +136,11 @@ type SettingBase = {
 
 export type TextSetting = SettingBase & {
   type: 'text' | 'longText';
+  /**
+   * Words a block writes itself when the prop is left out (a button's words,
+   * a screen-reader name) have no default here: left empty, they follow the
+   * page's language (WORDS_EN.props and the other word sets).
+   */
   default?: string;
 };
 
@@ -362,6 +368,33 @@ export const COLOUR_SETTINGS = [
   { name: 'band', label: 'Band', type: 'colour' },
   { name: 'onBand', label: 'Text on the band', type: 'colour' },
 ] as const satisfies readonly SettingField[];
+
+/** Words for each ready language, in that language, for the editor's menu. */
+export const PAGE_LANGUAGE_LABELS: Readonly<Record<PageLanguage, string>> = {
+  en: 'English',
+  hi: 'हिन्दी (Hindi)',
+  es: 'Español (Spanish)',
+  de: 'Deutsch (German)',
+  fr: 'Français (French)',
+  pt: 'Português (Portuguese)',
+};
+
+/**
+ * What a creator sets once for the whole page, in SiteTheme, beside the
+ * colours (COLOUR_SETTINGS) and ready-made looks. Each name is a key of
+ * SiteTheme.
+ */
+export const PAGE_SETTINGS = [
+  {
+    name: 'language',
+    label: 'Page language',
+    type: 'choice',
+    options: PAGE_LANGUAGES,
+    optionLabels: PAGE_LANGUAGE_LABELS,
+    default: 'en',
+    help: 'The words blocks write themselves, and their numbers and dates, follow it.',
+  },
+] as const satisfies readonly (SettingField & { name: keyof SiteTheme })[];
 
 /**
  * The look every block shares (BlockLook), described once. Every block's
@@ -709,3 +742,16 @@ export const FORM_APP_ONLY = ['status', 'onSubmit', 'action'] as const;
 
 /** Props of a block whose data the app fetches (LiveProps). */
 export const LIVE_APP_ONLY = ['data', 'loading', 'error', 'updatedAt'] as const;
+
+/**
+ * The words a block that loads another site shows before a visitor agrees
+ * to it (see privacy.ts). The visitor's answer, `consent`, is app-only: the
+ * app reads it from the page's cookie notice.
+ */
+export const CONSENT_LABELS_SETTING = {
+  name: 'consentLabels',
+  label: 'Words before it loads',
+  type: 'words',
+  from: 'CONSENT_LABELS',
+  help: 'Shown to visitors who haven’t agreed to the other site yet.',
+} as const satisfies SettingField;

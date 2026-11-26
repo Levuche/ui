@@ -9,6 +9,13 @@ import { PlayFrame } from '../molecules/play-frame';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import type { ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
+import {
+  consentNotice,
+  OUTSIDE_SERVICES,
+  type ConsentLabels,
+} from '../system/privacy';
 
 /* ---------------------------------------------------------------- StatsRow */
 
@@ -163,12 +170,7 @@ export type MapCardLabels = {
   hours: string;
 };
 
-export const MAP_CARD_LABELS: MapCardLabels = {
-  showMap: 'Show {place} on a map',
-  map: 'Map of {place}',
-  directions: 'Get directions',
-  hours: 'Opening hours',
-};
+export const MAP_CARD_LABELS: MapCardLabels = WORDS_EN.mapCard;
 
 /** A day or days and when the place is open, such as Mon–Fri, 10 am–7 pm. */
 export type OpeningHours = { days: ReactNode; time: ReactNode };
@@ -211,6 +213,8 @@ export function MapCard({
   directionsHref,
   showMap = true,
   labels,
+  consent,
+  consentLabels,
   buttonVariant,
   headingAs = 'h3',
   children,
@@ -228,12 +232,19 @@ export function MapCard({
   directionsHref?: string;
   showMap?: boolean;
   labels?: Partial<MapCardLabels>;
+  /**
+   * Whether the visitor agreed to OpenStreetMap, from the page's cookie
+   * notice. False shows a notice and a Load button in place of the map's
+   * button; leave it out on pages that don't ask.
+   */
+  consent?: boolean;
+  consentLabels?: Partial<ConsentLabels>;
   buttonVariant?: SiteButtonVariant;
   headingAs?: HeadingTag;
   /** More, under the hours, such as a phone number. */
   children?: ReactNode;
 }) {
-  const words = { ...MAP_CARD_LABELS, ...labels };
+  const words = usePageWords('mapCard', labels);
   const hasPin =
     lat != null && lng != null && Number.isFinite(lat) && Number.isFinite(lng);
   const directions =
@@ -254,6 +265,12 @@ export function MapCard({
           playIcon={<MapPinIcon size={28} />}
           action="map_load"
           allow=""
+          consent={consent}
+          notice={consentNotice(
+            OUTSIDE_SERVICES.openstreetmap.name,
+            consentLabels
+          )}
+          consentLabels={consentLabels}
         />
       ) : null}
       <ItemHead title={place} headingAs={headingAs} />

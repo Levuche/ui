@@ -9,13 +9,12 @@ import {
   MotionToggle,
   type MotionToggleLabels,
 } from '../molecules/motion-toggle';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 export type TextStripLabels = MotionToggleLabels;
 
-export const TEXT_STRIP_LABELS: TextStripLabels = {
-  pause: 'Stop the moving words',
-  play: 'Move the words again',
-};
+export const TEXT_STRIP_LABELS: TextStripLabels = WORDS_EN.textStrip;
 
 const lessMotion = () =>
   typeof matchMedia === 'function' &&
@@ -52,7 +51,7 @@ export function TextStrip({
   label?: string;
   labels?: Partial<TextStripLabels>;
 }) {
-  const words = { ...TEXT_STRIP_LABELS, ...labels };
+  const words = usePageWords('textStrip', labels);
   const phrases = items.map((item) => String(item).trim()).filter(Boolean);
   const view = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLUListElement>(null);

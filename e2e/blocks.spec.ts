@@ -132,6 +132,35 @@ for (const [id, expected] of Object.entries(THEMES)) {
       await expect(band.getByRole('status')).toHaveText('Subscribed');
     });
 
+    test('link tiles are square, chips sit four to a row, badges name their store', async ({
+      page,
+    }) => {
+      const min = await tapMin(page);
+      const tiles = panel.getByTestId('link-tiles');
+      const tile = tiles.getByRole('link', { name: 'YouTube' });
+      await expect(tile).toHaveAttribute('target', '_blank');
+      const box = await tile.boundingBox();
+      expect(Math.abs((box?.width ?? 0) - (box?.height ?? 1))).toBeLessThan(2);
+      await expect(tile.locator('[data-arrow-badge]')).toHaveAttribute(
+        'aria-hidden',
+        'true'
+      );
+      const tops: number[] = [];
+      for (const name of ['Instagram', 'Blog', 'Shop', 'Email']) {
+        const chip = await tiles.getByRole('link', { name }).boundingBox();
+        expect(chip?.height ?? 0, name).toBeGreaterThanOrEqual(min);
+        tops.push(chip?.y ?? -1);
+      }
+      expect(new Set(tops).size).toBe(1);
+      const badges = tiles.getByRole('navigation', { name: 'Get the app' });
+      await expect(
+        badges.getByRole('link', { name: 'Download on the App Store' })
+      ).toHaveAttribute('target', '_blank');
+      await expect(
+        badges.getByRole('link', { name: 'Get it on Google Play' })
+      ).toHaveAttribute('data-action', 'app_store_click');
+    });
+
     test('social icons and the featured link open other sites in a new tab', async ({
       page,
     }) => {

@@ -6,6 +6,7 @@ import { DownloadIcon } from '../atoms/icons';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { cn } from '../system/cn';
 import { isSafeColor } from '../system/theme';
+import { usePageWords } from '../system/page-words';
 
 /**
  * How much of the code can be covered or damaged and still scan: about 7%
@@ -83,7 +84,7 @@ export function QrCode({
   light = '#ffffff',
   size = 'md',
   download = true,
-  downloadLabel = 'Save the QR code',
+  downloadLabel: downloadLabelProp,
   fileName = 'qr-code',
   buttonVariant = 'outline',
   headingAs = 'h3',
@@ -111,6 +112,9 @@ export function QrCode({
   buttonVariant?: SiteButtonVariant;
   headingAs?: HeadingTag;
 }) {
+  const own = usePageWords('props');
+  const downloadLabel =
+    downloadLabelProp === undefined ? own.saveQr : downloadLabelProp;
   const ink = isSafeColor(dark) ? dark : '#000000';
   const paper = isSafeColor(light) ? light : '#ffffff';
   const name = `QR code for ${value.replace(/^https?:\/\//, '')}`;

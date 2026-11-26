@@ -20,6 +20,8 @@ import {
   type SellProps,
 } from '../molecules/sell-button';
 import type { ImageSrc } from '../system/image';
+import { usePageWords } from '../system/page-words';
+import { WORDS_EN } from '../system/words/en';
 
 /**
  * A call or session to book: what it is, how long, the price, and a link to
@@ -35,7 +37,7 @@ export function BookingCard({
   sellState,
   sellLabels,
   renderBuy,
-  buttonLabel = 'Book a call',
+  buttonLabel: buttonLabelProp,
   buttonVariant = 'solid',
   image,
   headingAs = 'h3',
@@ -59,6 +61,9 @@ export function BookingCard({
     image?: ImageSrc | null;
     headingAs?: HeadingTag;
   }) {
+  const own = usePageWords('props');
+  const buttonLabel =
+    buttonLabelProp === undefined ? own.bookCall : buttonLabelProp;
   return (
     <Block as="article" name="booking-card" {...root}>
       <ItemHead
@@ -97,14 +102,14 @@ export function MembershipCard({
   title,
   price,
   was,
-  period = 'month',
+  period: periodProp,
   perks,
   href,
   sell,
   sellState,
   sellLabels,
   renderBuy,
-  buttonLabel = 'Join',
+  buttonLabel: buttonLabelProp,
   featured = false,
   featuredLabel,
   ribbon,
@@ -137,6 +142,10 @@ export function MembershipCard({
     ribbon?: ReactNode;
     headingAs?: HeadingTag;
   }) {
+  const own = usePageWords('props');
+  const period = periodProp === undefined ? own.month : periodProp;
+  const buttonLabel =
+    buttonLabelProp === undefined ? own.join : buttonLabelProp;
   return (
     <Block
       as="article"
@@ -188,9 +197,9 @@ export type LeadMagnetLabels = EmailFormLabels & { free: string };
 
 export const LEAD_MAGNET_LABELS: LeadMagnetLabels = {
   ...EMAIL_FORM_LABELS,
-  button: 'Send it to me',
-  sent: 'Sent! Check your inbox.',
-  free: 'Free',
+  button: WORDS_EN.props.sendIt,
+  sent: WORDS_EN.props.sentCheckInbox,
+  free: WORDS_EN.props.free,
 };
 
 /**
@@ -203,7 +212,7 @@ export function LeadMagnet({
   title,
   detail,
   image,
-  buttonLabel = 'Send it to me',
+  buttonLabel: buttonLabelProp,
   placeholder,
   labels,
   status,
@@ -226,12 +235,10 @@ export function LeadMagnet({
   action?: string | ((data: FormData) => void | Promise<void>);
   headingAs?: HeadingTag;
 }) {
-  const { free, ...formLabels } = {
-    ...LEAD_MAGNET_LABELS,
-    button: buttonLabel,
-    ...(placeholder ? { placeholder } : {}),
-    ...labels,
-  };
+  const own = usePageWords('props');
+  const buttonLabel =
+    buttonLabelProp === undefined ? own.sendIt : buttonLabelProp;
+  const { free = own.free, ...formLabels } = labels ?? {};
   return (
     <Block as="article" name="lead-magnet" {...root}>
       <ItemHead
@@ -247,7 +254,12 @@ export function LeadMagnet({
         status={status}
         action={action}
         onSubmit={onSubmit}
-        labels={formLabels}
+        labels={{
+          button: buttonLabel,
+          sent: own.sentCheckInbox,
+          ...(placeholder ? { placeholder } : {}),
+          ...formLabels,
+        }}
       >
         <SellField sell={sell} />
       </EmailForm>

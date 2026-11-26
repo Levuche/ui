@@ -5,6 +5,7 @@ import { CheckIcon } from '../atoms/icons';
 import { WordRing, type WordRingLabels } from '../molecules/word-ring';
 import { cn } from '../system/cn';
 import { toImageSource, type ImageSrc } from '../system/image';
+import { usePageWords } from '../system/page-words';
 
 const NAME_SIZES = {
   md: 'text-block-title',
@@ -38,7 +39,7 @@ export function CreatorHeader({
   avatarRing = false,
   badge,
   verified = false,
-  verifiedLabel = 'Verified',
+  verifiedLabel: verifiedLabelProp,
   nameSize = 'md',
   highlight,
   layout = 'stack',
@@ -85,6 +86,9 @@ export function CreatorHeader({
   /** Under the tagline, such as social icons or a button. */
   children?: ReactNode;
 }) {
+  const own = usePageWords('props');
+  const verifiedLabel =
+    verifiedLabelProp === undefined ? own.verified : verifiedLabelProp;
   // The header is at the top of the page, so its picture loads at once.
   const source = toImageSource(avatar);
   const picture = source ? { priority: true, ...source } : null;
