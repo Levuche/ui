@@ -11,11 +11,23 @@ change when it moves to that version.
 - More hovers: `SiteTheme.hover` takes `tint` (the fill deepens), `zoom`
   (the picture grows a little, clipped to the card) and `glow` (a line and
   soft glow in the button colour), beside `lift` and `none`, and a block can
-  pick its own with the `hover` look prop. Each has a matching press on tap
+  pick its own with the `hover` look prop (in `LOOK_SETTINGS` as "Under
+  the pointer"). Each has a matching press on tap
   and shows when a keyboard reaches the link, with a focus ring; nothing moves
   for visitors who ask for less motion. The featured link card and social
   icons now take the hover too, and `data-hover-preview` shows it without the
   pointer. Storybook's toolbar has a Hover menu, and `Pages/Hover` shows each.
+- Each block describes its settings, so the page editor can build its panel:
+  every `BLOCKS` entry has `settings` (field name, label, help, type,
+  default, required, `slow` for fields that load over the network, `main`
+  for the link a paste goes to, `forApp` for what the app reads, an icon
+  hint) and `appOnly` (props the app fills in). `LOOK_SETTINGS` describes
+  the shared look once. New: `SettingField` and its types, `SETTING_TYPES`,
+  `SETTING_ICONS`, `settingsPanel`, `mainLinkSetting`, `settingIcon`,
+  `fitsSetting`, `settingDefaults`, and `PACK_CHECKOUT_LABELS` and
+  `LEAD_MAGNET_LABELS` (the defaults those blocks already used). The type
+  check fails when a block's settings and props disagree. Storybook:
+  `Editor/Settings panel`.
 - Block backgrounds: every block takes `background`, a gradient through two
   or three theme colours, a faint pattern (lines, rings, dots, grid, waves)
   or a picture under a dim layer of the block's own colour. Colours are
