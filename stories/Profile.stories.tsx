@@ -131,7 +131,7 @@ export const WordRing: Story = {
     await expect(
       canvas.getAllByText('Chai • Stories • Since 2019')
     ).toHaveLength(1);
-    const ring = header.querySelector('[data-word-ring] svg')!;
+    const ring = header.querySelector('[data-word-ring] > svg')!;
     await expect(ring).toHaveAttribute('aria-hidden', 'true');
     await expect(ring.querySelector('textPath')?.textContent).toContain(
       'Chai • Stories • Since 2019 •'

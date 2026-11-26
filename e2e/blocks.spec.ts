@@ -264,7 +264,7 @@ for (const [id, expected] of Object.entries(THEMES)) {
       await expect(
         motion.getByText('Chai • Stories • Since 2019', { exact: true })
       ).toHaveCount(1);
-      const ring = motion.locator('[data-word-ring] svg');
+      const ring = motion.locator('[data-word-ring] > svg');
       await expect(ring).toHaveAttribute('aria-hidden', 'true');
       const turning = () =>
         ring.evaluate((el) => el.getAnimations()[0]?.playState);
