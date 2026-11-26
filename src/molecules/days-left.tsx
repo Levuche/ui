@@ -83,7 +83,7 @@ export function DaysLeft({
   return (
     <p
       className={cn(
-        'bg-site-surface-2 text-site-text m-0 inline-flex w-fit flex-wrap items-center gap-x-1.5 gap-y-0.5 rounded-full px-3 py-1 text-sm',
+        'border-site-border text-site-text m-0 inline-flex w-fit flex-wrap items-center gap-x-1.5 gap-y-0.5 rounded-full border px-3 py-1 text-sm',
         className
       )}
       data-ended={state?.ended ? '' : undefined}
