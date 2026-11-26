@@ -25,7 +25,7 @@ Install a released version straight from GitHub (no npm account or token
 needed):
 
 ```bash
-npm install github:Levuche/ui#v0.1.0
+npm install github:Levuche/ui#v0.2.0
 ```
 
 The package ships TypeScript source. In a Next.js app:
@@ -601,7 +601,10 @@ theme only lets plain colours and fonts into CSS, and
 Storybook (`stories/`, set up in `.storybook/`) has a story for each block
 and state, with its props as controls and docs built from them. The toolbar's
 Theme menu shows any story in the sample creator's light or dark scheme or in
-a creator's own theme, and `Pages/Creator page` shows a whole page in each.
+a creator's own theme, and `Pages/Creator page` shows a whole page in each. `Docs/Getting started` walks through installing and theming, and
+`Docs/Every block` lists every block with what it's for, its grid kind and
+whether it's free, read from the registry. `CHANGELOG.md` lists what changed
+in each release.
 
 Each story is also a test. `npm run test:stories` opens every story in
 Chromium (Vitest with the Storybook plugin), runs its play function, which
@@ -644,7 +647,9 @@ The same flow as Levuche/website:
 3. Release: bump `version` in `package.json` in a pull request into `dev`,
    then open a pull request from `dev` into `main` and merge it with a merge
    commit. Tag that commit on `main` (`git tag v0.2.0 && git push origin
-v0.2.0`).
+v0.2.0`). The release pull request into `dev` also turns `CHANGELOG.md`'s
+   Unreleased section into the new version's, with anything an app must
+   change.
 4. Each app moves to the new version in its own pull request
    (`npm install github:Levuche/ui#v0.2.0`), where its own tests run.
 
