@@ -130,6 +130,30 @@ for (const [id, expected] of Object.entries(THEMES)) {
       ).toHaveAttribute('target', '_blank');
     });
 
+    test('the social card links to the profile with a readable button', async ({
+      page,
+    }) => {
+      const card = panel
+        .getByTestId('social')
+        .locator('[data-block="social-card"]');
+      await expect(card).toHaveAttribute('data-platform', 'youtube');
+      await expect(card.getByText('86K')).toBeVisible();
+      const button = card.getByRole('link', {
+        name: 'Subscribe Desi Origins on YouTube',
+      });
+      await expect(button).toHaveAttribute(
+        'href',
+        'https://www.youtube.com/@desiorigins'
+      );
+      await expect(button).toHaveAttribute('target', '_blank');
+      await expect(button).toHaveAttribute('data-action', 'social_follow');
+      const box = await button.boundingBox();
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(await tapMin(page));
+      // Tinted: the brand's red, with white words on it.
+      await expect(button).toHaveCSS('background-color', 'rgb(204, 0, 0)');
+      await expect(button).toHaveCSS('color', 'rgb(255, 255, 255)');
+    });
+
     test('a press anywhere on the action card follows its link', async ({
       page,
     }) => {
