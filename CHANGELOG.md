@@ -8,6 +8,12 @@ change when it moves to that version.
 
 ### Added
 
+- Text blocks in a new `text` group, free in `core`: `SectionHeading` (a
+  heading a link can jump to, with a line of detail), `TextBlock` (bold,
+  italic, links, lists and emoji), `QuoteBlock` (a quote with who said it
+  and a small picture) and `Spacer` (a gap of whole grid rows, or a thin
+  line). What a creator types is never read as HTML (`parseRichText`,
+  `RichText`).
 - `TileGallery`: pictures and uploaded videos in square cells, each tile
   one cell, two wide, two tall or a big square of four (`span`), two
   columns on a phone. In the media pack.

@@ -255,6 +255,20 @@ for (const [id, expected] of Object.entries(THEMES)) {
       await expect(answer).toBeVisible();
     });
 
+    test('text blocks show bold words, lists, a line and a quote', async () => {
+      const text = panel.getByTestId('text');
+      await expect(text.locator(`#${id}-works`)).toContainText('My works');
+      await expect(text.locator('strong')).toHaveText('everyday things');
+      await expect(text.getByRole('listitem')).toHaveCount(2);
+      await expect(
+        text.getByRole('link', { name: 'Watch on YouTube' })
+      ).toHaveAttribute('target', '_blank');
+      await expect(text.getByRole('separator')).toBeVisible();
+      await expect(text.locator('blockquote')).toContainText(
+        'The best minute of my day.'
+      );
+    });
+
     test('pictures are described and a linked one opens in a new tab', async () => {
       const photos = panel.getByTestId('photos');
       await expect(photos.getByRole('img')).toHaveCount(3);
