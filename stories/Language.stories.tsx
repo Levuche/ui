@@ -76,7 +76,11 @@ const languageStory = (language: PageLanguage): Story => ({
     const credits = new Intl.NumberFormat(language).format(12000);
     await expect(
       canvas.getByRole('heading', {
-        name: plain(words.creditPack.credits.replace('{n}', credits)),
+        // Accessible names keep the space a number is grouped with, so
+        // compare them as the eye sees them.
+        name: (name) =>
+          plain(name) ===
+          plain(words.creditPack.credits.replace('{n}', credits)),
       })
     ).toBeVisible();
     await expect(
