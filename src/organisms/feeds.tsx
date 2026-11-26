@@ -12,6 +12,8 @@ import { Rating } from '../molecules/rating';
 import { cn } from '../system/cn';
 import type { LiveProps } from '../system/live';
 import { columnSizes, type ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageLocale, usePageWords } from '../system/page-words';
 import {
   consentNotice,
   OUTSIDE_SERVICES,
@@ -41,7 +43,7 @@ export function LatestVideos({
   limit = 4,
   columns = 2,
   channelHref,
-  channelLabel = 'See the channel',
+  channelLabel: channelLabelProp,
   headingAs = 'h2',
   ...root
 }: BlockRootProps &
@@ -53,6 +55,9 @@ export function LatestVideos({
     channelLabel?: ReactNode;
     headingAs?: HeadingTag;
   }) {
+  const own = usePageWords('props');
+  const channelLabel =
+    channelLabelProp === undefined ? own.seeChannel : channelLabelProp;
   const Item = subHeading(headingAs);
   return (
     <Block name="latest-videos" {...root}>
@@ -74,7 +79,7 @@ export function LatestVideos({
                     newTab
                     action="video_click"
                     data-lift=""
-                    className="flex flex-col gap-2 no-underline"
+                    className="rounded-block-inner flex flex-col gap-2 no-underline"
                   >
                     <Thumb
                       src={video.thumbnail}
@@ -222,13 +227,7 @@ export type LiveStatusLabels = {
   play: string;
 };
 
-export const LIVE_STATUS_LABELS: LiveStatusLabels = {
-  live: 'Live now',
-  offline: 'Offline',
-  viewers: '{n} watching',
-  watch: 'Watch on the channel',
-  play: 'Watch {channel} live',
-};
+export const LIVE_STATUS_LABELS: LiveStatusLabels = WORDS_EN.liveStatus;
 
 /**
  * Live or offline, from data the app reads from the streaming service. While
@@ -243,7 +242,7 @@ export function LiveStatus({
   labels,
   consent,
   consentLabels,
-  locale,
+  locale: localeProp,
   headingAs = 'h3',
   ...root
 }: BlockRootProps &
@@ -261,7 +260,8 @@ export function LiveStatus({
     locale?: string;
     headingAs?: HeadingTag;
   }) {
-  const words = { ...LIVE_STATUS_LABELS, ...labels };
+  const locale = usePageLocale(localeProp);
+  const words = usePageWords('liveStatus', labels);
   const Heading = headingAs;
   const hosts = (parents ?? []).filter((h) => /^[a-z0-9.-]+$/i.test(h));
   return (
@@ -358,10 +358,7 @@ export type EventItem = {
 
 export type EventListLabels = { tickets: string; soldOut: string };
 
-export const EVENT_LIST_LABELS: EventListLabels = {
-  tickets: 'Tickets',
-  soldOut: 'Sold out',
-};
+export const EVENT_LIST_LABELS: EventListLabels = WORDS_EN.eventList;
 
 /**
  * Upcoming events or tour dates with ticket links. Type them in, or let the
@@ -381,7 +378,7 @@ export function EventList({
     labels?: Partial<EventListLabels>;
     headingAs?: HeadingTag;
   }) {
-  const words = { ...EVENT_LIST_LABELS, ...labels };
+  const words = usePageWords('eventList', labels);
   const Item = subHeading(headingAs);
   return (
     <Block name="event-list" {...root}>
@@ -457,10 +454,8 @@ export type ReviewSummaryLabels = {
   all: string;
 };
 
-export const REVIEW_SUMMARY_LABELS: ReviewSummaryLabels = {
-  summary: '{rating} from {count} reviews',
-  all: 'Read all reviews',
-};
+export const REVIEW_SUMMARY_LABELS: ReviewSummaryLabels =
+  WORDS_EN.reviewSummary;
 
 /**
  * The star rating and a few recent reviews from a review site. `attribution`
@@ -475,7 +470,7 @@ export function ReviewSummary({
   attribution,
   limit = 3,
   labels,
-  locale,
+  locale: localeProp,
   headingAs = 'h2',
   ...root
 }: BlockRootProps &
@@ -487,7 +482,8 @@ export function ReviewSummary({
     locale?: string;
     headingAs?: HeadingTag;
   }) {
-  const words = { ...REVIEW_SUMMARY_LABELS, ...labels };
+  const locale = usePageLocale(localeProp);
+  const words = usePageWords('reviewSummary', labels);
   return (
     <Block name="review-summary" {...root}>
       {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
@@ -543,11 +539,8 @@ export function ReviewSummary({
 
 export type NowPlayingKind = 'listening' | 'reading' | 'watching';
 
-export const NOW_PLAYING_LABELS: Record<NowPlayingKind, string> = {
-  listening: 'Listening to',
-  reading: 'Reading',
-  watching: 'Watching',
-};
+export const NOW_PLAYING_LABELS: Record<NowPlayingKind, string> =
+  WORDS_EN.nowPlaying;
 
 /** A small card for what the creator is listening to, reading or watching. */
 export function NowPlaying({
@@ -567,7 +560,7 @@ export function NowPlaying({
   href?: string;
   labels?: Partial<Record<NowPlayingKind, string>>;
 }) {
-  const words = { ...NOW_PLAYING_LABELS, ...labels };
+  const words = usePageWords('nowPlaying', labels);
   const body = (
     <>
       {image !== undefined ? (

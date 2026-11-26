@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { cn } from '../system/cn';
 import { CopyButton, type CopyLabels } from '../molecules/copy-button';
+import { usePageWords } from '../system/page-words';
 
 /**
  * A discount code the visitor copies with one tap. On the notice colour by
@@ -21,6 +22,7 @@ export function DiscountCode({
   copy?: (text: string) => Promise<void>;
   labels?: Partial<CopyLabels>;
 }) {
+  const own = usePageWords('props');
   return (
     <Block
       name="discount-code"
@@ -40,8 +42,8 @@ export function DiscountCode({
         action="copy_code"
         className="flex-none"
         labels={{
-          copy: 'Copy code',
-          failedStatus: 'Couldn’t copy. The code is {text}.',
+          copy: own.copyCode,
+          failedStatus: own.copyCodeFailed,
           ...labels,
         }}
       />

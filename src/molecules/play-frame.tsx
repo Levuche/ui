@@ -16,6 +16,7 @@ import {
   toImageSource,
   type ImageSrc,
 } from '../system/image';
+import { usePreviewMode } from '../system/preview-mode';
 
 /** The shape of an embedded player. */
 export type FrameRatio = 'video' | 'vertical' | 'square' | 'audio' | 'tall';
@@ -44,6 +45,8 @@ const COVER_RATIOS: Record<FrameRatio, string> = {
  * With `consent={false}` (the visitor hasn't agreed to the site yet) it shows
  * `notice`, a line on what loading will share, and a Load button instead;
  * the press loads it.
+ * In preview mode (the page editor) it never loads: the picture and button
+ * stay as a still placeholder, and a press does nothing.
  */
 export function PlayFrame({
   src,
@@ -85,7 +88,10 @@ export function PlayFrame({
   consentLabels?: Partial<ConsentLabels>;
   className?: string;
 }) {
-  const [playing, setPlaying] = useState(autoLoad && consent !== false);
+  const preview = usePreviewMode();
+  const [playing, setPlaying] = useState(
+    autoLoad && consent !== false && !preview
+  );
   const [pressed, setPressed] = useState(false);
   const frameRef = useRef<HTMLIFrameElement>(null);
   // After a press, focus moves into what loaded, not back to the page.
@@ -98,7 +104,7 @@ export function PlayFrame({
     className
   );
   const cover = toImageSource(poster);
-  if (playing) {
+  if (playing && !preview) {
     return (
       <div className={frame}>
         <iframe
@@ -115,6 +121,7 @@ export function PlayFrame({
     );
   }
   const press = () => {
+    if (preview) return;
     setPlaying(true);
     setPressed(true);
     onPlay?.();
@@ -145,6 +152,7 @@ export function PlayFrame({
     <button
       type="button"
       data-action={action}
+      data-preview-placeholder={preview ? '' : undefined}
       onClick={press}
       aria-label={playLabel ?? `Play: ${title}`}
       className={cn(frame, 'cursor-pointer border-0 p-0')}

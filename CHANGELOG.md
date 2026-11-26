@@ -8,12 +8,72 @@ change when it moves to that version.
 
 ### Added
 
+- Preview mode for the page editor: inside `<PreviewMode>`, every block
+  looks as it does live, but links and downloads don't open, forms don't
+  send, `useBlockActions` reports nothing (so no checkout starts) and
+  players from other sites and booking pages show a still placeholder
+  (`data-preview-placeholder`) instead of loading. Blocks stay in the tab
+  order so the editor can select them from the keyboard. Client blocks read
+  it with `usePreviewMode()`; `inPreview` and `previewStop` say what it
+  stops. `Editor/Preview mode` in Storybook presses every block in it.
+- More hovers: `SiteTheme.hover` takes `tint` (the fill deepens), `zoom`
+  (the picture grows a little, clipped to the card) and `glow` (a line and
+  soft glow in the button colour), beside `lift` and `none`, and a block can
+  pick its own with the `hover` look prop (in `LOOK_SETTINGS` as "Under
+  the pointer"). Each has a matching press on tap
+  and shows when a keyboard reaches the link, with a focus ring; nothing moves
+  for visitors who ask for less motion. The featured link card and social
+  icons now take the hover too, and `data-hover-preview` shows it without the
+  pointer. Storybook's toolbar has a Hover menu, and `Pages/Hover` shows each.
 - Text blocks in a new `text` group, free in `core`: `SectionHeading` (a
   heading a link can jump to, with a line of detail), `TextBlock` (bold,
   italic, links, lists and emoji), `QuoteBlock` (a quote with who said it
   and a small picture) and `Spacer` (a gap of whole grid rows, or a thin
   line). What a creator types is never read as HTML (`parseRichText`,
   `RichText`).
+- Motion inside blocks. `effect` on every block's look (`BLOCK_EFFECTS`):
+  `float`, `pulse` and `shimmer` play for under five seconds, and `tilt`
+  leans towards the mouse. `<BlockEffects />` or `useBlockEffects()` once on
+  the page holds loops while a block is off screen and runs the tilt.
+  `TextStrip`, a band of words that scrolls across with a speed, direction,
+  separator and pause button (growth pack, page group). `CreatorHeader`
+  takes `wordRing`, words that turn in a ring around the picture, with a
+  pause button. Nothing moves for visitors who ask for less motion, moving
+  words are read to screen readers once, and both hold still off screen.
+  Also `WordRing`, `MotionToggle`, `useOnScreen` and the plain helpers
+  `motionSeconds`, `stripRepeats` and `wordRingShape`. `effect` is in
+  `LOOK_SETTINGS`, and `TextStrip` and the word ring have their settings.
+- Link tiles in new shapes. `LinkTile` takes `variant` (`row`, `icon`: a
+  square tile with a big logo or picture and an arrow badge, `chip`: a small
+  tile tinted in the link's brand colour, `tint`) and `look` (`preview`,
+  `favicon` or `text`: the site's preview picture, only its icon, or only
+  words, from `image` and the new `favicon`; the app reads both from the
+  link). `LinkList` takes the same `variant` and `look` (chips four to a
+  row, square tiles two). New blocks: `LinkCard` (one link with its site's
+  preview), `LogoTile`, `LinkChip` and `AppBadges` (App Store and Google
+  Play badges, words in `APP_BADGE_LABELS`). New grid kinds `tile` and
+  `chip` in `BLOCK_SIZES`. Picture addresses are checked as `cssImageUrl`
+  does and brand colours with `isSafeColor`.
+- The page's language: `SiteTheme.language` and `<CreatorTheme words>`, so
+  every block's own words, numbers and dates follow the page with no `labels`
+  on any block. Ready word sets in English, Hindi, Spanish, German, French and
+  Portuguese, each loaded on its own with `loadPageWords`; a block's own
+  `labels` and word props still win. Storybook's toolbar has a Language menu.
+- `TileGallery`: pictures and uploaded videos in square cells, each tile
+  one cell, two wide, two tall or a big square of four (`span`), two
+  columns on a phone. In the media pack.
+- `VideoTile`: a video file the creator uploaded (mp4, mov or webm), wide,
+  tall (9:16), square or 4:5, with its first frame or a cover picture. It
+  plays with sound only when pressed; `loop` plays it without sound while
+  on the screen, with pause and sound buttons, and never for visitors who
+  ask for less motion. Captions from `tracks` (WebVTT), a `transcriptHref`
+  link, and its words in `labels` (`VIDEO_TILE_LABELS`). In the media pack.
+- Captions over pictures: `captionStyle` on `SiteImage` (and on the new
+  blocks) puts the caption `below` the picture as before, on a frosted
+  `bar` over its bottom, or on a small `chip` in its corner.
+- `ImageCarousel` takes `counter`, a small "1/4" on the picture.
+- `safeImageSource`: a picture, only when its address is one a page may
+  load, for a picture that isn't an `<img>`, such as a video's cover.
 - Privacy and accessibility notes for each block: every `BLOCKS` entry has
   `privacy` (the other sites it can load, from `OUTSIDE_SERVICES`, the most
   cookies that may come with it, from `COOKIE_KINDS`, and a reason a visitor

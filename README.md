@@ -114,9 +114,18 @@ Every block reads only `--site-*` CSS variables. `<CreatorTheme>` sets them:
   shadow tinted with the accent) or `glass` (see-through and blurred over the
   page's background). It restyles every card on the page; a block that picks
   its own `shadow` keeps it. The page's background itself is set by the app.
-- `hover`: `lift` (the default) raises links and linked cards a little under
-  the pointer and presses them in on tap; `none` keeps them still. Neither
-  moves for visitors who ask for less motion.
+- `hover`: what links and linked cards do under the pointer, on tap and when
+  a keyboard reaches them. `lift` (the default) raises them a little and
+  presses them in on tap; `tint` deepens their fill; `zoom` grows the picture
+  inside a little, clipped to the card; `glow` draws a line and a soft glow in
+  the button colour inside the edge; `none` keeps them still. Nothing moves
+  for visitors who ask for less motion: colour changes stay, and `zoom`
+  tints instead. A block can pick its own with the `hover` look prop. Your
+  own linked card joins in with a `data-lift` attribute, and the page editor
+  can show a hover without the pointer with `data-hover-preview` (`press` for
+  the tap) on the card or anything around it.
+- `language`: the page's language, as a tag such as `hi`, `es` or `pt-BR`.
+  See "The page's language" below.
 
 Buttons also take `variant` (`solid`, `outline`, `soft`, `text`) and `size`
 (`sm`, `md`, `lg`), so creators can pick them per block.
@@ -134,10 +143,19 @@ creator can change one block without touching the others:
 | `align`      | `start`, `center`, `end`                                                    |
 | `shadow`     | `none`, `sm`, `md`, `lg`                                                    |
 | `motion`     | `none`, `fade`, `rise`, `scale` (off for visitors who ask for less)         |
+| `effect`     | `none`, `float`, `pulse`, `shimmer`, `tilt` (a small loop)                  |
 | `colors`     | this block's own colours, the same keys as the theme                        |
 | `font`       | this block's own font                                                       |
 | `background` | a gradient, a faint pattern or a picture behind the words (see below)       |
 | `hideOn`     | screens to hide it on: `phone`, `tablet`, `desktop`                         |
+| `hover`      | its links' hover: `lift`, `tint`, `zoom`, `glow`, `none`                    |
+
+`effect` keeps a block moving a little once it's on the page: `float`,
+`pulse` and `shimmer` each play for under five seconds, so they need no pause
+button, and `tilt` leans towards the mouse. None of them flashes or moves for
+visitors who ask for less motion. Put `<BlockEffects />` (or call
+`useBlockEffects()`) once on the page so loops hold still while a block is
+off screen and `tilt` follows the pointer; without it the loops still play.
 
 A tone swaps the colours inside the block, so text, links and buttons stay
 readable: in an `accent` block, solid buttons turn inside out. Text boxes keep
@@ -182,7 +200,8 @@ creator's theme and dark mode; a creator never types CSS.
 Behaviour is set the same way. Links take `newTab` (`auto` opens other
 sites in a new tab), `sponsored` and `nofollow`, and an unsafe address
 (`javascript:` and the like) shows its words without a link. Words a block
-shows take a `labels` prop, so a page can be in any language. Forms take
+shows take a `labels` prop, over the page's language (see "The page's
+language"). Forms take
 `status` (`idle`, `sending`, `sent`, `error`) from the app: the button spins
 while sending and the result is read out to screen readers.
 
@@ -370,6 +389,53 @@ export function BlockTracking({ children }: { children: React.ReactNode }) {
   Tracking & tags** in the BuildBase console.
 - Cookie consent isn't here: BuildBase's consent banner covers it.
 
+### Preview mode in the page editor
+
+The page editor ([Levuche/app#20](https://github.com/Levuche/app/issues/20))
+shows a creator's page with the same blocks, exactly as they look live. There
+a click should select a block, not open its link, send its form, start a
+checkout or load a player from another site. Wrap the canvas in
+`<PreviewMode>` once, and every block inside, including blocks added to the
+package later, behaves that way, with nothing to set on each block:
+
+```tsx
+'use client';
+import { PreviewMode, SitePage } from '@levuche/ui';
+
+<PreviewMode>
+  <SitePage>{/* the creator's blocks, as on the live page */}</SitePage>
+</PreviewMode>;
+```
+
+- **Links don't open and forms don't send.** A link, a download, a submit
+  button or a form inside is never followed or sent, and a form's own
+  `onSubmit` and React form actions don't run. Clicks still reach the page,
+  so the editor's own click handler can select the block.
+- **Nothing is tracked.** `useBlockActions` (and `readBlockAction`) report
+  nothing from inside a preview, so the editor adds no clicks to a creator's
+  numbers and never starts a checkout.
+- **Players stay still.** YouTube, Spotify and every other `PlayFrame`
+  player, the map, and a booking page show their picture or a placeholder,
+  marked `data-preview-placeholder`, and never load the other site, even
+  with `autoLoad`. Pop-ups (a booking page, a locked link) don't open, audio
+  doesn't play and the copy button copies nothing.
+- **Every block stays in the tab order.** Nothing is removed, hidden,
+  `inert` or given `tabindex="-1"`, so the editor can select blocks from the
+  keyboard. Enter on a link doesn't follow it.
+- **It doesn't change the layout.** It wraps the page in one element with
+  `display: contents` and `data-preview="on"`. `enabled={false}` turns it
+  off, also for one part inside a preview (`data-preview="off"`).
+
+Most blocks are Server Components, which can't read React context, so the
+rule isn't a prop on each block: `<PreviewMode>` stops what would leave the
+page where the browser hands it over, in the capture phase, whatever element
+did it (`previewStop(event)` says what it stops, and `inPreview(element)`
+whether an element is in a preview). Client blocks also read
+`usePreviewMode()` for what only they know, such as loading a player; an
+app's own client blocks and `renderBuy` buttons can do the same.
+`Editor/Preview mode` in Storybook presses every link, button and form of
+every block on the gallery and in the registry in preview mode.
+
 ### Sending forms to BuildBase Forms
 
 `NewsletterBand`, `LeadMagnet`, `ContactForm`, `PackCheckout` and `TipJar`
@@ -514,7 +580,7 @@ doesn't unlock a pack in Levuche.
 | Pack          | What's in it                                                                                                                                           |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `core` (free) | Profile, links, contact and newsletter, basic pictures and video, FAQs and testimonials, map and QR code, and every block that sells through BuildBase |
-| `growth`      | Countdown, discount code, locked link, top picks, stats, logo strip, timeline and review summary                                                       |
+| `growth`      | Countdown, discount code, locked link, top picks, stats, logo strip, text strip, timeline and review summary                                           |
 | `media`       | Carousel, before and after, reels, Spotify, TikTok, Instagram, link embed, audio player and podcast episodes                                           |
 | `feeds`       | Latest videos and posts, live status, events and now playing                                                                                           |
 | `developer`   | GitHub profile, contribution graph, repositories, package stats and tech stack                                                                         |
@@ -639,13 +705,58 @@ with the other sizes it comes in, so a phone downloads a small copy:
   are only workspace and profile pictures, so creator media needs an image
   service that resizes by address.
 
+### The page's language
+
+A creator picks the page's language once, and every block's own words
+(buttons, countdown units, "Copied", "Sold out", form messages, screen-reader
+names) and its numbers and dates follow it, with no `labels` on any block.
+Ready word sets come in English, Hindi, Spanish, German, French and
+Portuguese (`PAGE_LANGUAGES`), each in its own file, so a page loads only its
+own:
+
+```tsx
+// app/page.tsx, a server component.
+import { CreatorTheme, loadPageWords } from '@levuche/ui';
+
+<CreatorTheme theme={theme} words={await loadPageWords(theme.language)}>
+  ...
+</CreatorTheme>;
+```
+
+- `theme.language` puts `lang` on the page, so screen readers read it in that
+  language, and blocks write numbers and dates in it. A block's own `locale`
+  wins; without either, they use the visitor's own.
+- `words` are the words blocks write themselves, grouped by block
+  (`PageWords`; `WORDS_EN` is the English set). `loadPageWords` picks the set
+  for a language ("pt-BR" uses Portuguese) and falls back to English. Pass
+  only some groups or words to change just those across the page.
+- A block's own `labels`, and word props such as a tip jar's `buttonLabel`,
+  always win over the page's words, word by word. For a block in a second
+  language, pass that language's group as its `labels`:
+  `labels={(await loadPageWords('es')).countdown}`.
+- A language tag a creator typed is checked (`safeLanguage`); one the browser
+  can't read is dropped.
+- The page editor offers it from `PAGE_SETTINGS`, the settings a creator sets
+  once for the page, as a choice of the ready languages with
+  `PAGE_LANGUAGE_LABELS`. Block settings for words a block writes itself
+  (a button's words, a screen-reader name) have no English `default`, so a
+  new block left as it is follows the page.
+
+Blocks read the page's words with `usePageWords(group, labels)` and its
+locale with `usePageLocale(locale)`. In the browser these come from React
+context; in React Server Components, which can't read context,
+`<CreatorTheme>` keeps them for the rest of the request, so a request renders
+one page language. In Storybook, the toolbar's Language menu shows any story
+in each language, and **Pages/Page language** checks them.
+
 ### Right-to-left scripts and long text
 
 Blocks use start and end, not left and right, so `dir="rtl"` on the page, or
 on any element around the blocks, mirrors them for Arabic, Hebrew or Urdu:
 link icons sit on the right, the carousel's next slide is on the left (and the
 left arrow key moves to it), the before-and-after picture shows from the
-right, scrolling logos move right, and grid pages mirror their columns.
+right, scrolling logos and words move right, and grid pages mirror their
+columns.
 
 Long names, titles and addresses wrap inside their block, even a word with no
 place to break, so nothing spills off a phone; prices stay on one line. In
@@ -706,8 +817,8 @@ import { SiteGrid, type PageLayouts } from '@levuche/ui';
   in a grid on the left, two links or cards to a row where they fit, and the
   profile on the right. Set `side: true` on any block to put it in the
   profile's column too.
-- **Size limits:** each block has a `kind` (profile, link, links, card,
-  media, gallery, text or band), and `BLOCK_SIZES` gives each kind's smallest
+- **Size limits:** each block has a `kind` (profile, link, links, tile,
+  chip, card, media, gallery, text or band), and `BLOCK_SIZES` gives each kind's smallest
   and largest width and height in rem. `limitsFor(kind, screen)` turns those
   into the `minW`, `maxW`, `minH` and `maxH` an editor takes, in columns and
   rows for that screen.
@@ -753,20 +864,27 @@ through `SiteLink`, and one that isn't safe shows as plain words.
 | Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `contrastIssues`, `fixContrast`, `Block`, `withBlockLook`, `BlockLook`                                                                                                                                         |
 | Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Ribbon`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                                                   |
 | Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `ConsentCover`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton`, `MessageComposer` |
-| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                                                                                                  |
+| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`, `TextStrip`                                                                                                                                                                                                     |
 | Profile     | `CreatorHeader`, `SocialIcons`, `SocialCard`, `SaveContact`                                                                                                                                                                                                                   |
-| Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                                                                                        |
+| Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`, `LinkCard`, `LogoTile`, `LinkChip`, `AppBadges`                                                                                                                                                                       |
 | Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                                                      |
 | Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                                                          |
 | Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                                                                                                |
 | Text        | `SectionHeading`, `TextBlock`, `QuoteBlock`, `Spacer`, `RichText`                                                                                                                                                                                                             |
-| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `BeforeAfter`, `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                                                                                           |
+| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `TileGallery`, `VideoTile`, `BeforeAfter`, `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                                                               |
 | Forms       | `NewsletterBand`, `ContactForm`, `MessageCard`                                                                                                                                                                                                                                |
 | Feeds       | `LatestVideos`, `LatestPosts`, `LiveStatus`, `EventList`, `ReviewSummary`, `NowPlaying`                                                                                                                                                                                       |
 | Developer   | `GitHubProfile`, `ContributionGraph`, `RepoCard`, `RepoList`, `PackageStats`, `TechStack`                                                                                                                                                                                     |
 
 `BLOCKS` in the registry lists every block with its group, so this table
 is a summary; the registry is the full list.
+
+`TextStrip` is a band of words that scrolls across (`items`, `speed` in
+seconds a pass, `direction` `start` or `end`, and a `separator`).
+`CreatorHeader` can turn a ring of words around the picture (`wordRing`,
+`wordRingSpeed`). Both have a pause button (WCAG 2.2.2), hold still while
+off screen, stand still for visitors who ask for less motion, and are read
+to screen readers once, in order.
 
 `MessageCard` opens a chat on WhatsApp, Telegram, a text, email or
 Messenger with a message ready to send (`channel`, `to`, `message`, and
@@ -787,6 +905,18 @@ screen readers.
 `YouTubeVideo` shows a play button first and loads YouTube (privacy-enhanced
 mode) only when the visitor presses it. `youtubeId` reads the id from any
 YouTube address a creator pastes, including Shorts.
+
+`TileGallery` puts pictures and uploaded videos in square cells, each tile
+one cell or bigger (`span`: `1x1`, `2x1`, `1x2`, `2x2`), two columns on a
+phone and `columns` from 448 px up. `VideoTile` plays a video file the
+creator uploaded (mp4, mov or webm), wide or `tall`, with its first frame or
+a `poster` as the cover. Both play with sound only when pressed; with
+`loop` a video plays without sound, round and round, with pause and sound
+buttons, and never moves for visitors who ask for less motion. Captions come
+from `tracks` (WebVTT files). Captions on pictures (`captionStyle` on
+`SiteImage` and `TileGallery`) sit under the picture, on a frosted `bar`
+over its bottom, or on a small `chip` in its corner. `ImageCarousel` takes
+`counter` for a "1/4" on the picture.
 
 ## Work on it
 
@@ -819,7 +949,9 @@ and state, with its props as controls and docs built from them. The toolbar's
 Theme menu shows any story in the sample creator's light or dark scheme or in
 a creator's own theme, and `Pages/Creator page` shows a whole page in each. The
 Cards menu shows it in each card style, and `Pages/Card styles` shows a whole
-page in each. The Direction menu shows it right to left. `Docs/Getting started`
+page in each. The Hover menu shows each hover, and `Pages/Hover` hovers,
+presses and focuses links in each. The Direction menu shows it right to left, and the Language
+menu in each ready language. `Docs/Getting started`
 walks through installing and theming, and `Docs/Every block` lists every block
 with what it's for, its grid kind, whether it's free and how many settings
 it has, read from the registry. `Editor/Settings panel` previews the settings
@@ -846,8 +978,13 @@ variable, the same pair the website uses.
    before writing new markup, `--site-*` tokens only (no raw colours),
    `rounded-block` or `rounded-block-inner` for corners, `p-block` and
    `gap-block-gap` for spacing, and the size presets above (`min-h-control`
-   or more for anything tapped). Put words in a `labels` prop, links through
-   `SiteLink`, and add `'use client'` only if it has state.
+   or more for anything tapped). Put words in a `labels` prop, with their
+   English in a group of `src/system/words/en.ts` (and the same keys in every
+   other language's file there), read with `usePageWords`; links through
+   `SiteLink`, and add `'use client'` only if it has state. A client block
+   that loads another site, opens a pop-up or plays something checks
+   `usePreviewMode()` and doesn't, in the page editor (links and forms are
+   stopped for it).
 2. Add it to `BLOCKS` in `src/system/registry.ts`, with a `settings` entry
    for each prop a creator sets and the rest in `appOnly` (`npm run
 typecheck` says what's missing), and export it from `src/index.ts`.

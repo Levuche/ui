@@ -12,6 +12,9 @@ import { ConsentCover } from '../molecules/consent-cover';
 import { SiteDialog } from '../molecules/dialog';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { isSafeHref } from '../system/href';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
+import { usePreviewMode } from '../system/preview-mode';
 import {
   CONSENT_LABELS,
   consentNotice,
@@ -29,12 +32,7 @@ export type BookingEmbedLabels = {
   close: string;
 };
 
-export const BOOKING_EMBED_LABELS: BookingEmbedLabels = {
-  button: 'Pick a time',
-  frame: 'Booking: {title}',
-  fallback: 'Open the booking page',
-  close: 'Close',
-};
+export const BOOKING_EMBED_LABELS: BookingEmbedLabels = WORDS_EN.bookingEmbed;
 
 /** Only https pages go in a frame. */
 const isEmbeddable = (src: string) =>
@@ -46,6 +44,8 @@ const isEmbeddable = (src: string) =>
  * only when shown, runs in a sandbox, and always has a plain link to the same
  * page in case it doesn't load. With `consent={false}` it says which site it
  * loads from, and what that shares, before the visitor presses Load.
+ * In preview mode (the page editor) the booking page never loads: a still
+ * placeholder takes its place, and the button opens nothing.
  */
 export function BookingEmbed({
   src,
@@ -80,12 +80,13 @@ export function BookingEmbed({
   headingAs?: HeadingTag;
   onOpen?: () => void;
 }) {
-  const words = { ...BOOKING_EMBED_LABELS, ...labels };
+  const words = usePageWords('bookingEmbed', labels);
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const frameRef = useRef<HTMLIFrameElement>(null);
+  const preview = usePreviewMode();
   // After Load, focus moves into the booking page.
   useEffect(() => {
     if (agreed) frameRef.current?.focus();
@@ -94,7 +95,17 @@ export function BookingEmbed({
 
   const pageHeight = { height: `${Math.min(80, Math.max(24, height))}rem` };
   const shown = consent !== false || agreed;
-  const frame = shown ? (
+  const frame = preview ? (
+    <div
+      role="img"
+      aria-label={words.frame.replace('{title}', title)}
+      data-preview-placeholder=""
+      style={pageHeight}
+      className="bg-site-surface-2 text-site-text-2 rounded-block-inner flex w-full items-center justify-center"
+    >
+      <CalendarIcon size={32} />
+    </div>
+  ) : shown ? (
     <iframe
       ref={frameRef}
       src={src}
@@ -148,6 +159,7 @@ export function BookingEmbed({
             aria-haspopup="dialog"
             fullWidth
             onClick={() => {
+              if (preview) return;
               setOpen(true);
               dialog.current?.showModal();
               onOpen?.();

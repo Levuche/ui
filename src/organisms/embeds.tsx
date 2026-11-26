@@ -14,6 +14,8 @@ import {
 } from '../system/embeds';
 import { youtubeId } from './media';
 import type { ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 import {
   consentNotice,
   OUTSIDE_SERVICES,
@@ -29,7 +31,7 @@ export type EmbedLabels = {
   play: string;
 };
 
-export const EMBED_LABELS: EmbedLabels = { play: 'Play: {title}' };
+export const EMBED_LABELS: EmbedLabels = WORDS_EN.embed;
 
 type EmbedProps = BlockRootProps & {
   /** The link the creator pasted. */
@@ -70,7 +72,7 @@ function EmbedBody({
   headingAs = 'h3',
   ...root
 }: EmbedProps & { name: string; embed: Embed | null }) {
-  const words = { ...EMBED_LABELS, ...labels };
+  const words = usePageWords('embed', labels);
   return (
     <Block name={name} data-service={embed?.service} {...root}>
       {showTitle ? (

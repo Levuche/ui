@@ -18,6 +18,8 @@ import type { FormStatus } from '../system/state';
 import { Field } from '../molecules/field';
 import { FormNotice } from '../molecules/form-notice';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 import { HiddenText, MessageComposer } from '../molecules/message-composer';
 
 export type ContactFormLabels = {
@@ -29,14 +31,7 @@ export type ContactFormLabels = {
   error: ReactNode;
 };
 
-export const CONTACT_FORM_LABELS: ContactFormLabels = {
-  name: 'Your name',
-  email: 'Your email',
-  message: 'Message',
-  button: 'Send',
-  sent: 'Thanks! I’ll get back to you soon.',
-  error: 'That didn’t go through. Please try again.',
-};
+export const CONTACT_FORM_LABELS: ContactFormLabels = WORDS_EN.contactForm;
 
 /**
  * Name, email and a message, posted to `action` (a URL or a React server
@@ -75,7 +70,7 @@ export function ContactForm({
   /** More fields, above the button. */
   children?: ReactNode;
 }) {
-  const words = { ...CONTACT_FORM_LABELS, ...labels };
+  const words = usePageWords('contactForm', labels);
   const sent = status === 'sent' && hideWhenSent;
   const busy = status === 'sending';
   return (
@@ -191,7 +186,7 @@ export function SaveContact({
   contact,
   title,
   detail,
-  buttonLabel = 'Save contact',
+  buttonLabel: buttonLabelProp,
   buttonVariant,
   fileName,
   headingAs = 'h3',
@@ -206,6 +201,9 @@ export function SaveContact({
   fileName?: string;
   headingAs?: HeadingTag;
 }) {
+  const own = usePageWords('props');
+  const buttonLabel =
+    buttonLabelProp === undefined ? own.saveContact : buttonLabelProp;
   const file = `${(fileName ?? contact.name).replace(/[\\/:*?"<>|]/g, '')}.vcf`;
   const href = `data:text/vcard;charset=utf-8,${encodeURIComponent(
     toVCard(contact)
@@ -242,16 +240,7 @@ export type MessageCardLabels = Record<MessageChannel, string> & {
 };
 
 /** The button's words for each channel, and the card's other words. */
-export const MESSAGE_CARD_LABELS: MessageCardLabels = {
-  whatsapp: 'Message on WhatsApp',
-  telegram: 'Message on Telegram',
-  sms: 'Send a text',
-  email: 'Send an email',
-  messenger: 'Message on Messenger',
-  preview: 'Ready message',
-  message: 'Your message',
-  hint: 'Change it if you like, then send.',
-};
+export const MESSAGE_CARD_LABELS: MessageCardLabels = WORDS_EN.messageCard;
 
 const CHANNEL_ICONS: Record<MessageChannel, ReactNode> = {
   whatsapp: <ChatIcon size={18} />,
@@ -319,7 +308,7 @@ export function MessageCard({
   labels?: Partial<MessageCardLabels>;
   headingAs?: HeadingTag;
 }) {
-  const words = { ...MESSAGE_CARD_LABELS, ...labels };
+  const words = usePageWords('messageCard', labels);
   const target = cleanMessageTarget(channel, to);
   const shown = messageTargetText(channel, to);
   const text = cleanMessageText(message);

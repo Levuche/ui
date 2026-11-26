@@ -9,6 +9,8 @@
  * the action (`action.sell`), and a server action reads it with `readSell`.
  */
 
+import { WORDS_EN } from './words/en';
+
 /** An item from a seller: one-time, a subscription price, a booking or free. */
 export type ItemSell = {
   itemId: string;
@@ -62,11 +64,7 @@ export type SellLabels = {
   error: string;
 };
 
-export const SELL_LABELS: SellLabels = {
-  soldOut: 'Sold out',
-  unavailable: 'Not on sale right now',
-  error: 'That didn’t go through. Please try again.',
-};
+export const SELL_LABELS: SellLabels = WORDS_EN.sell;
 
 const ID = /^[A-Za-z0-9_-]{1,64}$/;
 const CODE = /^[A-Za-z0-9_-]{1,64}$/;

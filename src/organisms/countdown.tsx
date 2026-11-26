@@ -2,6 +2,8 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 /** The names of the units, as the visitor reads them. */
 export type CountdownLabels = {
@@ -11,12 +13,7 @@ export type CountdownLabels = {
   seconds: string;
 };
 
-export const COUNTDOWN_LABELS: CountdownLabels = {
-  days: 'days',
-  hours: 'hours',
-  minutes: 'minutes',
-  seconds: 'seconds',
-};
+export const COUNTDOWN_LABELS: CountdownLabels = WORDS_EN.countdown;
 
 const UNITS = [
   { key: 'days', ms: 86_400_000 },
@@ -43,7 +40,7 @@ export function timeLeft(to: Date | string, now: number) {
 export function Countdown({
   to,
   title,
-  doneLabel = 'It’s live',
+  doneLabel: doneLabelProp,
   doneContent,
   labels,
   showSeconds = true,
@@ -63,7 +60,9 @@ export function Countdown({
   /** Called once when time runs out in the visitor's browser. */
   onDone?: () => void;
 }) {
-  const words = { ...COUNTDOWN_LABELS, ...labels };
+  const own = usePageWords('props');
+  const doneLabel = doneLabelProp === undefined ? own.live : doneLabelProp;
+  const words = usePageWords('countdown', labels);
   // The clock starts in the browser, so the server and the first render
   // agree (no time until it has ticked once).
   const [ticked, setTicked] = useState<number | null>(null);

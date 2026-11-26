@@ -10,6 +10,8 @@ import { useControllableState } from '../system/state';
 import type { SellProps } from '../molecules/sell-button';
 import type { SellRef, SellState } from '../system/sell';
 import { MembershipCard } from './offers';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 /**
  * What a plan checks out for its yearly price: `yearlySell`, or the monthly
@@ -67,13 +69,7 @@ export type PricingTableLabels = {
   year: string;
 };
 
-export const PRICING_TABLE_LABELS: PricingTableLabels = {
-  billing: 'Billing',
-  monthly: 'Monthly',
-  yearly: 'Yearly',
-  month: 'month',
-  year: 'year',
-};
+export const PRICING_TABLE_LABELS: PricingTableLabels = WORDS_EN.pricingTable;
 
 const PLAN_COLUMNS = {
   2: '@xl:grid-cols-2',
@@ -119,7 +115,7 @@ export function PricingTable({
     cardTone?: BlockRootProps['tone'];
     headingAs?: HeadingTag;
   }) {
-  const words = { ...PRICING_TABLE_LABELS, ...labels };
+  const words = usePageWords('pricingTable', labels);
   const name = useId();
   const [shown, setShown] = useControllableState({
     value: period,

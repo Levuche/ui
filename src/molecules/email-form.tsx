@@ -4,6 +4,8 @@ import { SiteInput } from '../atoms/input';
 import { cn } from '../system/cn';
 import type { FormStatus } from '../system/state';
 import { FormNotice } from './form-notice';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 /** The words an email form shows; every one can be changed. */
 export type EmailFormLabels = {
@@ -17,13 +19,7 @@ export type EmailFormLabels = {
   error: ReactNode;
 };
 
-export const EMAIL_FORM_LABELS: EmailFormLabels = {
-  email: 'Email',
-  placeholder: 'you@email.com',
-  button: 'Subscribe',
-  sent: 'Thanks! Check your inbox.',
-  error: 'That didn’t go through. Please try again.',
-};
+export const EMAIL_FORM_LABELS: EmailFormLabels = WORDS_EN.emailForm;
 
 /**
  * An email box and a button. It sends `email` to `action` (a URL or a React
@@ -55,7 +51,7 @@ export function EmailForm({
   children?: ReactNode;
   className?: string;
 }) {
-  const words = { ...EMAIL_FORM_LABELS, ...labels };
+  const words = usePageWords('emailForm', labels);
   const sent = status === 'sent' && hideWhenSent;
   return (
     <form

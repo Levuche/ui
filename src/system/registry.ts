@@ -2,6 +2,8 @@ import type { BlockKind } from './grid';
 import { BLOCK_TONES } from './look';
 import { EMBED_SERVICES } from './embeds';
 import { MESSAGE_CHANNELS } from './message';
+import { CAPTION_STYLES, GALLERY_SPANS, VIDEO_RATIOS } from './gallery';
+import { MIN_MOTION_SECONDS } from './motion';
 import { SOCIAL_ACTIONS, SOCIAL_PLATFORMS } from './social';
 import {
   LOADS_NOTHING,
@@ -120,6 +122,80 @@ export type BlockInfo = {
   accessibility: BlockAccessibility;
 };
 
+/** Where a caption sits on a picture or video (CAPTION_STYLES). */
+const CAPTION_STYLE_SETTING = {
+  name: 'captionStyle',
+  label: 'Caption',
+  type: 'choice',
+  options: CAPTION_STYLES,
+  optionLabels: {
+    below: 'Under it',
+    bar: 'On a bar over it',
+    chip: 'On a label in the corner',
+  },
+  default: 'below',
+} as const satisfies SettingField;
+
+const GALLERY_SPAN_LABELS = {
+  '1x1': 'One cell',
+  '2x1': 'Two wide',
+  '1x2': 'Two tall',
+  '2x2': 'Big square',
+} as const;
+
+/** How an uploaded video plays, and its captions (VideoTrack). */
+const VIDEO_PLAY_SETTINGS = [
+  {
+    name: 'loop',
+    label: 'Loop without sound',
+    type: 'toggle',
+    default: false,
+    help: 'While on the screen, with buttons to pause it or turn the sound on. Always still for visitors who ask for less motion.',
+  },
+  {
+    name: 'tracks',
+    label: 'Captions',
+    type: 'list',
+    itemLabel: 'Captions file',
+    help: 'WebVTT (.vtt) files, from the same place as the video.',
+    fields: [
+      { name: 'src', label: 'File', type: 'link', required: true },
+      {
+        name: 'lang',
+        label: 'Language',
+        type: 'text',
+        required: true,
+        help: 'As "en" or "hi".',
+      },
+      {
+        name: 'label',
+        label: 'Name in the menu',
+        type: 'text',
+        required: true,
+        help: 'As "English".',
+      },
+      {
+        name: 'kind',
+        label: 'Kind',
+        type: 'choice',
+        options: ['captions', 'subtitles', 'descriptions'],
+        optionLabels: {
+          captions: 'Captions (words and sounds)',
+          subtitles: 'Subtitles (a translation)',
+          descriptions: 'Descriptions of what’s shown',
+        },
+        default: 'captions',
+      },
+      {
+        name: 'default',
+        label: 'On from the start',
+        type: 'toggle',
+        default: false,
+      },
+    ],
+  },
+] as const satisfies readonly SettingField[];
+
 export const BLOCKS = [
   {
     id: 'creator-header',
@@ -200,7 +276,6 @@ export const BLOCKS = [
         name: 'verifiedLabel',
         label: 'What screen readers say for the tick',
         type: 'text',
-        default: 'Verified',
       },
       {
         name: 'badge',
@@ -208,6 +283,29 @@ export const BLOCKS = [
         type: 'text',
         help: 'Beside the name, after the tick.',
         icon: 'tag',
+      },
+      {
+        name: 'wordRing',
+        label: 'Words around the picture',
+        type: 'text',
+        help: 'They turn slowly in a ring, as "Chai • Stories • Since 2019". Always still for visitors who ask for less motion.',
+      },
+      {
+        name: 'wordRingSpeed',
+        label: 'One turn takes',
+        type: 'number',
+        min: MIN_MOTION_SECONDS,
+        max: 120,
+        step: 1,
+        unit: 'seconds',
+        default: 24,
+        icon: 'clock',
+      },
+      {
+        name: 'wordRingLabels',
+        label: 'Words on the ring’s pause button',
+        type: 'words',
+        from: 'WORD_RING_LABELS',
       },
     ],
     appOnly: ['headingAs', 'children'],
@@ -263,7 +361,6 @@ export const BLOCKS = [
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Social accounts',
       },
     ],
     appOnly: [],
@@ -296,6 +393,18 @@ export const BLOCKS = [
           { name: 'image', label: 'Small picture', type: 'picture' },
           { name: 'imageAlt', label: 'What the picture shows', type: 'text' },
           {
+            name: 'favicon',
+            label: 'Site icon',
+            type: 'picture',
+            help: 'Filled in from the address.',
+          },
+          {
+            name: 'tint',
+            label: 'Brand colour',
+            type: 'colour',
+            help: 'For chips and square tiles.',
+          },
+          {
             name: 'trailing',
             label: 'At the end',
             type: 'text',
@@ -304,6 +413,33 @@ export const BLOCKS = [
           ...LINK_BEHAVIOR_SETTINGS,
         ],
         appOnly: ['icon'],
+      },
+      {
+        name: 'variant',
+        label: 'Shape',
+        type: 'choice',
+        options: ['row', 'icon', 'chip'],
+        optionLabels: {
+          row: 'Rows',
+          icon: 'Square tiles',
+          chip: 'Small chips',
+        },
+        default: 'row',
+        icon: 'layout',
+        help: 'Square tiles sit two to a row, chips four.',
+      },
+      {
+        name: 'look',
+        label: 'Show from the site',
+        type: 'choice',
+        options: ['preview', 'favicon', 'text'],
+        optionLabels: {
+          preview: 'Its preview picture',
+          favicon: 'Only its icon',
+          text: 'Only words',
+        },
+        help: 'Each link’s preview picture or icon, filled in from its address.',
+        icon: 'eye',
       },
       {
         name: 'tileStyle',
@@ -339,7 +475,6 @@ export const BLOCKS = [
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Links',
       },
     ],
     appOnly: [],
@@ -483,6 +618,293 @@ export const BLOCKS = [
     },
   },
   {
+    id: 'link-card',
+    component: 'LinkCard',
+    kind: 'link',
+    group: 'links',
+    client: false,
+    pack: 'core',
+    summary:
+      "One link that shows the site's preview picture, its icon or words",
+    settings: [
+      {
+        name: 'href',
+        label: 'Link',
+        type: 'link',
+        required: true,
+        main: true,
+        slow: true,
+        help: 'Its title, preview picture and icon can be filled in from the page.',
+      },
+      { name: 'title', label: 'Title', type: 'text', required: true },
+      { name: 'detail', label: 'Line under the title', type: 'text' },
+      {
+        name: 'look',
+        label: 'Show from the site',
+        type: 'choice',
+        options: ['preview', 'favicon', 'text'],
+        optionLabels: {
+          preview: 'Its preview picture',
+          favicon: 'Only its icon',
+          text: 'Only words',
+        },
+        default: 'preview',
+        help: 'With no preview picture, its icon shows.',
+        icon: 'eye',
+      },
+      {
+        name: 'image',
+        label: 'Preview picture',
+        type: 'picture',
+        help: 'Filled in from the link.',
+      },
+      {
+        name: 'imageAlt',
+        label: 'What the picture shows',
+        type: 'text',
+        default: '',
+        help: 'Leave empty when it only repeats the title.',
+      },
+      {
+        name: 'favicon',
+        label: 'Site icon',
+        type: 'picture',
+        help: 'Filled in from the link.',
+      },
+      {
+        name: 'tileStyle',
+        label: 'Style',
+        type: 'choice',
+        options: ['filled', 'outline', 'soft', 'plain'],
+        optionLabels: {
+          filled: 'Filled',
+          outline: 'Outline',
+          soft: 'Soft',
+          plain: 'Plain',
+        },
+        default: 'filled',
+      },
+      {
+        name: 'arrow',
+        label: 'Round arrow at the end',
+        type: 'toggle',
+        default: true,
+      },
+      ...LINK_BEHAVIOR_SETTINGS,
+    ],
+    appOnly: [],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches the card; Enter opens its link.',
+      screenReader:
+        'One link, read by its title and the line under it; its preview picture is read by its alt text or skipped.',
+    },
+  },
+  {
+    id: 'logo-tile',
+    component: 'LogoTile',
+    kind: 'tile',
+    group: 'links',
+    client: false,
+    pack: 'core',
+    summary: 'A square link with a big logo or picture and an arrow badge',
+    settings: [
+      {
+        name: 'href',
+        label: 'Link',
+        type: 'link',
+        required: true,
+        main: true,
+        slow: true,
+        help: 'Its picture and icon can be filled in from the page.',
+      },
+      { name: 'title', label: 'Title', type: 'text', required: true },
+      {
+        name: 'image',
+        label: 'Logo or picture',
+        type: 'picture',
+      },
+      {
+        name: 'imageAlt',
+        label: 'What the picture shows',
+        type: 'text',
+        default: '',
+        help: 'Leave empty when it only repeats the title.',
+      },
+      {
+        name: 'favicon',
+        label: 'Site icon',
+        type: 'picture',
+        help: 'Filled in from the link.',
+      },
+      {
+        name: 'look',
+        label: 'Show from the site',
+        type: 'choice',
+        options: ['preview', 'favicon', 'text'],
+        optionLabels: {
+          preview: 'Its preview picture',
+          favicon: 'Only its icon',
+          text: 'Only words',
+        },
+        help: 'Unset, the picture shows as a logo. Its preview picture fills the tile.',
+        icon: 'eye',
+      },
+      {
+        name: 'tileStyle',
+        label: 'Style',
+        type: 'choice',
+        options: ['filled', 'outline', 'soft', 'plain'],
+        optionLabels: {
+          filled: 'Filled',
+          outline: 'Outline',
+          soft: 'Soft',
+          plain: 'Plain',
+        },
+        default: 'filled',
+      },
+      {
+        name: 'tint',
+        label: 'Brand colour',
+        type: 'colour',
+        help: 'Washes the tile in this colour.',
+      },
+      ...LINK_BEHAVIOR_SETTINGS,
+    ],
+    appOnly: ['icon'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the tile; Enter opens its link.',
+      screenReader:
+        'One link, read by its title; the logo is read by its alt text or skipped when the title says it.',
+    },
+  },
+  {
+    id: 'link-chip',
+    component: 'LinkChip',
+    kind: 'chip',
+    group: 'links',
+    client: false,
+    pack: 'core',
+    summary: 'A small link tinted in its brand colour, four to a row',
+    settings: [
+      {
+        name: 'href',
+        label: 'Link',
+        type: 'link',
+        required: true,
+        main: true,
+        slow: true,
+        help: 'Its icon can be filled in from the page.',
+      },
+      {
+        name: 'title',
+        label: 'Title',
+        type: 'text',
+        required: true,
+        help: 'A word or two.',
+      },
+      { name: 'image', label: 'Small picture', type: 'picture' },
+      {
+        name: 'imageAlt',
+        label: 'What the picture shows',
+        type: 'text',
+        default: '',
+        help: 'Leave empty when it only repeats the title.',
+      },
+      {
+        name: 'favicon',
+        label: 'Site icon',
+        type: 'picture',
+        help: 'Filled in from the link.',
+      },
+      {
+        name: 'look',
+        label: 'Show from the site',
+        type: 'choice',
+        options: ['preview', 'favicon', 'text'],
+        optionLabels: {
+          preview: 'Its preview picture',
+          favicon: 'Only its icon',
+          text: 'Only words',
+        },
+        help: 'Unset, the small picture or icon shows.',
+        icon: 'eye',
+      },
+      {
+        name: 'tint',
+        label: 'Brand colour',
+        type: 'colour',
+        help: 'The accent colour when unset.',
+      },
+      ...LINK_BEHAVIOR_SETTINGS,
+    ],
+    appOnly: ['icon'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the chip; Enter opens its link.',
+      screenReader: 'One link, read by its words; its icon is skipped.',
+    },
+  },
+  {
+    id: 'app-badges',
+    component: 'AppBadges',
+    kind: 'link',
+    group: 'links',
+    client: false,
+    pack: 'core',
+    summary: 'Badges that link to an app in the App Store and Google Play',
+    settings: [
+      {
+        name: 'apps',
+        label: 'Stores',
+        type: 'list',
+        required: true,
+        itemLabel: 'Store',
+        max: 2,
+        fields: [
+          {
+            name: 'store',
+            label: 'Store',
+            type: 'choice',
+            required: true,
+            options: ['app-store', 'google-play'],
+            optionLabels: {
+              'app-store': 'App Store',
+              'google-play': 'Google Play',
+            },
+          },
+          {
+            name: 'href',
+            label: 'The app in the store',
+            type: 'link',
+            required: true,
+          },
+          {
+            name: 'badge',
+            label: 'The store’s badge picture',
+            type: 'picture',
+            help: 'Without one, the badge is drawn in the page’s colours.',
+          },
+          ...LINK_BEHAVIOR_SETTINGS,
+        ],
+      },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'APP_BADGE_LABELS',
+      },
+    ],
+    appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each badge; Enter opens its store page.',
+      screenReader:
+        'A labelled list of store links, each read as the store’s name.',
+    },
+  },
+  {
     id: 'pack-row',
     component: 'PackRow',
     kind: 'card',
@@ -514,7 +936,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Buy',
       },
       ...SELL_SETTINGS,
       ...LINK_BEHAVIOR_SETTINGS,
@@ -565,7 +986,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'I’ll take it',
       },
       { name: 'ribbon', label: 'Ribbon', type: 'text', icon: 'tag' },
       ...SELL_SETTINGS,
@@ -628,7 +1048,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on each button',
         type: 'text',
-        default: 'Buy',
       },
       SAVE_LABEL_SETTING,
       {
@@ -801,8 +1220,6 @@ export const BLOCKS = [
         name: 'consent',
         label: 'Consent line',
         type: 'longText',
-        default:
-          'I want to download now and understand I lose my 14-day right to cancel.',
         help: 'The buyer ticks it before buying.',
       },
       {
@@ -873,7 +1290,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Book a call',
       },
       {
         name: 'buttonVariant',
@@ -914,7 +1330,6 @@ export const BLOCKS = [
         name: 'period',
         label: 'Per',
         type: 'text',
-        default: 'month',
         help: 'Shown as "/ month".',
         icon: 'clock',
       },
@@ -939,7 +1354,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Join',
       },
       {
         name: 'featured',
@@ -990,7 +1404,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Send it to me',
       },
       {
         name: 'placeholder',
@@ -1022,7 +1435,7 @@ export const BLOCKS = [
     pack: 'core',
     summary: 'Pick an amount and leave a tip',
     settings: [
-      { name: 'title', label: 'Title', type: 'text', default: 'Leave a tip' },
+      { name: 'title', label: 'Title', type: 'text' },
       { name: 'detail', label: 'Line under the title', type: 'longText' },
       {
         name: 'amounts',
@@ -1059,7 +1472,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Tip',
       },
       {
         name: 'sell',
@@ -1132,7 +1544,6 @@ export const BLOCKS = [
         name: 'doneLabel',
         label: 'When time is up',
         type: 'text',
-        default: 'It’s live',
       },
       {
         name: 'doneContent',
@@ -1433,7 +1844,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Subscribe',
       },
       {
         name: 'placeholder',
@@ -1489,14 +1899,12 @@ export const BLOCKS = [
         name: 'credit',
         label: 'Credit line',
         type: 'text',
-        default: 'Made with Levuche',
       },
       { name: 'creditHref', label: 'Credit link', type: 'link' },
       {
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Site policies',
       },
     ],
     appOnly: [],
@@ -1525,6 +1933,7 @@ export const BLOCKS = [
         help: 'Empty if it’s only decoration.',
       },
       { name: 'caption', label: 'Caption', type: 'text' },
+      CAPTION_STYLE_SETTING,
       { name: 'href', label: 'Link', type: 'link', main: true },
       {
         name: 'ratio',
@@ -1618,10 +2027,16 @@ export const BLOCKS = [
       },
       { name: 'showDots', label: 'Dots', type: 'toggle', default: true },
       {
+        name: 'counter',
+        label: 'Slide number',
+        type: 'toggle',
+        default: false,
+        help: 'A small "1/4" on the picture.',
+      },
+      {
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Pictures',
         help: 'When there’s no title.',
       },
       {
@@ -1638,6 +2053,158 @@ export const BLOCKS = [
         'Arrow keys move between slides; Tab reaches the previous, next, pause and dot buttons. Autoplay stops while focus is inside.',
       screenReader:
         'A carousel named by its title; each slide is “slide n of m”, and the slide shown is read when it changes by hand.',
+    },
+  },
+  {
+    id: 'tile-gallery',
+    component: 'TileGallery',
+    kind: 'gallery',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'Pictures and videos in tiles of mixed sizes, captions on them',
+    settings: [
+      {
+        name: 'items',
+        label: 'Tiles',
+        type: 'list',
+        required: true,
+        itemLabel: 'Tile',
+        fields: [
+          {
+            name: 'src',
+            label: 'Picture',
+            type: 'picture',
+            help: 'For a video, its cover. Left empty: its first frame.',
+          },
+          {
+            name: 'alt',
+            label: 'What it shows',
+            type: 'text',
+            required: true,
+            help: 'It also names the link or the play button.',
+          },
+          {
+            name: 'video',
+            label: 'Video',
+            type: 'link',
+            help: 'An uploaded mp4, mov or webm file. Makes this a video tile.',
+            icon: 'video',
+          },
+          ...VIDEO_PLAY_SETTINGS,
+          {
+            name: 'span',
+            label: 'Size',
+            type: 'choice',
+            options: GALLERY_SPANS,
+            optionLabels: GALLERY_SPAN_LABELS,
+            default: '1x1',
+            icon: 'size',
+          },
+          { name: 'caption', label: 'Caption', type: 'text' },
+          {
+            name: 'href',
+            label: 'Link',
+            type: 'link',
+            help: 'For a picture. A video plays in place.',
+          },
+          ...LINK_BEHAVIOR_SETTINGS,
+        ],
+      },
+      { name: 'title', label: 'Title', type: 'text' },
+      {
+        name: 'columns',
+        label: 'Columns',
+        type: 'choice',
+        options: [2, 3, 4],
+        default: 3,
+        help: 'On a tablet or computer. Two on a phone.',
+        icon: 'layout',
+      },
+      { ...CAPTION_STYLE_SETTING, default: 'chip' },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'VIDEO_LABELS',
+      },
+    ],
+    appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab reaches each tile that has a link, and each video’s play and pause buttons.',
+      screenReader:
+        'A list of tiles, each picture read by its alt text and its caption; a video’s buttons say what they do.',
+    },
+  },
+  {
+    id: 'video-tile',
+    component: 'VideoTile',
+    kind: 'media',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'An uploaded video, wide or tall, that can loop without sound',
+    settings: [
+      {
+        name: 'src',
+        label: 'Video',
+        type: 'link',
+        required: true,
+        main: true,
+        help: 'An uploaded mp4, mov or webm file.',
+        icon: 'video',
+      },
+      {
+        name: 'title',
+        label: 'What it is',
+        type: 'text',
+        required: true,
+        help: 'For screen readers, and the play button’s name.',
+      },
+      {
+        name: 'poster',
+        label: 'Cover picture',
+        type: 'picture',
+        help: 'Left empty: the video’s first frame.',
+      },
+      {
+        name: 'ratio',
+        label: 'Shape',
+        type: 'choice',
+        options: VIDEO_RATIOS,
+        optionLabels: {
+          video: 'Wide (16:9)',
+          tall: 'Tall (9:16)',
+          square: 'Square',
+          portrait: 'Portrait (4:5)',
+        },
+        default: 'video',
+      },
+      ...VIDEO_PLAY_SETTINGS,
+      { name: 'caption', label: 'Caption', type: 'text' },
+      CAPTION_STYLE_SETTING,
+      {
+        name: 'transcriptHref',
+        label: 'Transcript',
+        type: 'link',
+        help: 'A page with the video’s words.',
+      },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'VIDEO_TILE_LABELS',
+      },
+    ],
+    appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab reaches the play and pause buttons; Enter or Space presses them. A looping video stands still for visitors who ask for less motion.',
+      screenReader:
+        'The video is named by its title; its buttons say what they do.',
     },
   },
   {
@@ -1772,7 +2339,75 @@ export const BLOCKS = [
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Brands',
+      },
+    ],
+    appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Nothing to press; a scrolling strip stops while hovered or focused, and stands still for visitors who ask for less motion.',
+      screenReader: 'A labelled list of logos, each read once by its alt text.',
+    },
+  },
+  {
+    id: 'text-strip',
+    component: 'TextStrip',
+    kind: 'band',
+    group: 'page',
+    client: true,
+    pack: 'growth',
+    summary: 'A band of words that scrolls across, with a pause button',
+    settings: [
+      {
+        name: 'items',
+        label: 'Words',
+        type: 'list',
+        of: 'text',
+        required: true,
+        itemLabel: 'Phrase',
+        min: 1,
+        help: 'Short phrases, as "New drop" or "Free shipping".',
+      },
+      {
+        name: 'separator',
+        label: 'Between phrases',
+        type: 'text',
+        default: '✦',
+        help: 'A mark or emoji. Left empty, none.',
+      },
+      {
+        name: 'speed',
+        label: 'One pass takes',
+        type: 'number',
+        min: MIN_MOTION_SECONDS,
+        max: 120,
+        step: 1,
+        unit: 'seconds',
+        default: 16,
+        icon: 'clock',
+      },
+      {
+        name: 'direction',
+        label: 'Moves towards',
+        type: 'choice',
+        options: ['start', 'end'],
+        optionLabels: {
+          start: 'Start of the line',
+          end: 'End of the line',
+        },
+        default: 'start',
+      },
+      {
+        name: 'label',
+        label: 'Name for screen readers',
+        type: 'text',
+        default: 'Highlights',
+      },
+      {
+        name: 'labels',
+        label: 'Words on the pause button',
+        type: 'words',
+        from: 'TEXT_STRIP_LABELS',
       },
     ],
     appOnly: [],
@@ -1979,7 +2614,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Save contact',
       },
       {
         name: 'buttonVariant',
@@ -2358,7 +2992,6 @@ export const BLOCKS = [
         name: 'downloadLabel',
         label: 'Words on it',
         type: 'text',
-        default: 'Save the QR code',
       },
       {
         name: 'fileName',
@@ -2828,7 +3461,6 @@ export const BLOCKS = [
         name: 'channelLabel',
         label: 'Its words',
         type: 'text',
-        default: 'See the channel',
       },
     ],
     appOnly: [...LIVE_APP_ONLY, 'headingAs'],
@@ -3606,7 +4238,6 @@ export const BLOCKS = [
         name: 'allLabel',
         label: 'Its words',
         type: 'text',
-        default: 'All episodes',
       },
       {
         name: 'labels',
