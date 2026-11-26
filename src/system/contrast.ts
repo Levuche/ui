@@ -1,3 +1,10 @@
+import {
+  cleanBackground,
+  type BackgroundFill,
+  type BackgroundInk,
+  type BlockBackground,
+} from './background';
+import type { BlockLook } from './look';
 import { isSafeColor, type SiteColors, type SiteTheme } from './theme';
 
 /*
@@ -193,6 +200,226 @@ export function contrastRatio(foreground: string, background: string) {
   if (!fg || !bg) return null;
   const back = over(bg, WHITE);
   return contrast(over(fg, back), back);
+}
+
+/* ---------- A block's own background ---------- */
+
+/** One way a block's background makes its words hard to read. */
+export type BackgroundIssue = {
+  /** What can't be read, in words a creator understands. */
+  label: string;
+  /** The contrast at its worst, to two decimals. */
+  ratio: number;
+  /** What it needs: 4.5, as for any text. */
+  needed: number;
+  /**
+   * The background changed only as far as it must to pass, where a change
+   * can: a stronger layer over a picture, or a fainter pattern. A gradient's
+   * colours are the creator's to pick again.
+   */
+  suggestion?: BlockBackground;
+};
+
+const FILL_NAMES: Record<BackgroundFill, string> = {
+  bg: 'page',
+  surface: 'card',
+  surface2: 'panel',
+  border: 'line',
+  accent: 'accent',
+  band: 'band',
+};
+
+/** The notice tone's colours, as in tokens.css. A theme doesn't change them. */
+const NOTICE = { fill: '#fff4dc', text: '#3d2a00' };
+
+type BlockPalette = {
+  /** The tone's fill: the colour behind the words, and over a picture. */
+  fill: Rgba;
+  /** The block's text colours, each with a name for the creator. */
+  texts: [string, Rgba][];
+  /** A theme colour as it reads inside the block's tone. */
+  color: (key: BackgroundFill | BackgroundInk) => Rgba;
+};
+
+/** `share` of `top` laid over `under`. */
+const mix = (top: Rgba, share: number, under: Rgba) =>
+  over({ ...top, a: share }, under);
+
+/**
+ * The colours inside a block: the scheme's, the creator's theme over them,
+ * the block's own colours over those, then swapped by the tone as tokens.css
+ * swaps them. Every colour is opaque, laid over the page.
+ */
+function blockPalette(
+  theme: SiteTheme,
+  look: Pick<BlockLook, 'tone' | 'colors'>
+): BlockPalette {
+  const scheme = theme.scheme === 'dark' ? 'dark' : 'light';
+  const base = scheme === 'dark' ? { r: 0, g: 0, b: 0, a: 1 } : WHITE;
+  const read = (value: unknown) =>
+    typeof value === 'string' && isSafeColor(value) ? parseColor(value) : null;
+  const raw = {} as Record<ColorKey, Rgba>;
+  for (const key of Object.keys(SCHEME_COLORS[scheme]) as ColorKey[]) {
+    raw[key] =
+      read(look.colors?.[key]) ??
+      read(theme.colors?.[key]) ??
+      (parseColor(SCHEME_COLORS[scheme][key]) as Rgba);
+  }
+  const page = over(raw.bg, base);
+  const c = {} as Record<ColorKey, Rgba>;
+  for (const key of Object.keys(raw) as ColorKey[]) {
+    c[key] = key === 'bg' ? page : over(raw[key], page);
+  }
+  const plain = (fill: Rgba): BlockPalette => ({
+    fill,
+    texts: [
+      ['Text', c.text],
+      ['Softer text', c.text2],
+    ],
+    color: (key) => c[key],
+  });
+  const strong = (fill: Rgba, on: Rgba, line: number, panel: number) => ({
+    fill,
+    texts: [['Text', on]] as [string, Rgba][],
+    color: (key: BackgroundFill | BackgroundInk) =>
+      key === 'surface'
+        ? fill
+        : key === 'text' || key === 'text2' || key === 'link'
+          ? on
+          : key === 'border'
+            ? mix(on, line, fill)
+            : key === 'surface2'
+              ? mix(on, panel, fill)
+              : c[key],
+  });
+  switch (look.tone) {
+    case 'muted':
+      return plain(mix(c.text, 0.06, c.bg));
+    case 'inset':
+      return plain(mix(c.text, 0.08, c.bg));
+    case 'outline':
+    case 'plain':
+      return plain(c.bg);
+    case 'accent':
+      return strong(c.accent, c.onAccent, 0.35, 0.16);
+    case 'band':
+      return strong(c.band, c.onBand, 0.35, 0.16);
+    case 'notice':
+      return strong(
+        parseColor(NOTICE.fill) as Rgba,
+        parseColor(NOTICE.text) as Rgba,
+        0.3,
+        0.12
+      );
+    default:
+      return plain(c.surface);
+  }
+}
+
+/**
+ * Text on a picture under a layer of `fill` at `dim` percent, against the
+ * worst picture there could be. Any pixel lands between the layer over black
+ * and the layer over white; if the text's own lightness is in that range,
+ * some picture hides it.
+ */
+function pictureRatio(text: Rgba, fill: Rgba, dim: number) {
+  const dark = mix(fill, dim / 100, { r: 0, g: 0, b: 0, a: 1 });
+  const light = mix(fill, dim / 100, WHITE);
+  const lum = luminance(text);
+  if (lum >= luminance(dark) && lum <= luminance(light)) return 1;
+  return Math.min(contrast(text, dark), contrast(text, light));
+}
+
+/** Text on a pattern's lines: the ink at `opacity` percent over the fill. */
+function patternRatio(
+  text: Rgba,
+  block: BlockPalette,
+  ink: Rgba,
+  opacity: number
+) {
+  return Math.min(
+    contrast(text, block.fill),
+    contrast(text, mix(ink, opacity / 100, block.fill))
+  );
+}
+
+/**
+ * Whether the words in a block can be read on its background, by WCAG 2.2 AA,
+ * in the page's theme: every gradient colour, the lines of a pattern, and
+ * any picture under its dim layer. Empty when everything can be read, or the
+ * block has no background. Each issue for a picture or pattern carries the
+ * smallest change that passes, for the editor to suggest.
+ */
+export function backgroundIssues(
+  look: Pick<BlockLook, 'background' | 'tone' | 'colors'>,
+  theme: SiteTheme = {}
+): BackgroundIssue[] {
+  const clean = cleanBackground(look.background);
+  if (!clean) return [];
+  const block = blockPalette(theme, look);
+  const round = (ratio: number) => Math.floor(ratio * 100) / 100;
+  const issues: BackgroundIssue[] = [];
+
+  if (clean.type === 'gradient') {
+    for (const stop of new Set(clean.stops)) {
+      for (const [label, text] of block.texts) {
+        const ratio = contrast(text, block.color(stop));
+        if (ratio >= TEXT_CONTRAST) continue;
+        issues.push({
+          label: `${label} on the gradient's ${FILL_NAMES[stop]} colour`,
+          ratio: round(ratio),
+          needed: TEXT_CONTRAST,
+        });
+      }
+    }
+    return issues;
+  }
+
+  const ratioAt = (text: Rgba, value: number) =>
+    clean.type === 'pattern'
+      ? patternRatio(text, block, block.color(clean.color), value)
+      : pictureRatio(text, block.fill, value);
+  const passes = (value: number) =>
+    block.texts.every(([, text]) => ratioAt(text, value) >= TEXT_CONTRAST);
+  // A picture needs a stronger layer; a pattern, fainter lines.
+  const current = clean.type === 'pattern' ? clean.opacity : clean.dim;
+  const steps =
+    clean.type === 'pattern'
+      ? Array.from({ length: current }, (_, i) => current - i)
+      : Array.from({ length: 101 - current }, (_, i) => current + i);
+  const value = steps.find(passes);
+  const suggestion: BlockBackground | undefined =
+    value === undefined
+      ? undefined
+      : clean.type === 'pattern'
+        ? { ...clean, opacity: value }
+        : { ...clean, dim: value };
+  const where = clean.type === 'pattern' ? 'the pattern' : 'the picture';
+  for (const [label, text] of block.texts) {
+    const ratio = ratioAt(text, current);
+    if (ratio >= TEXT_CONTRAST) continue;
+    issues.push({
+      label: `${label} on ${where}`,
+      ratio: round(ratio),
+      needed: TEXT_CONTRAST,
+      ...(suggestion ? { suggestion } : {}),
+    });
+  }
+  return issues;
+}
+
+/**
+ * The block's background with the change backgroundIssues suggests, so its
+ * words can be read: what an editor's "Fix" would save. Unchanged when it
+ * already passes or no change to it can help (a gradient's colours, or a
+ * tone whose own colours fail; see contrastIssues).
+ */
+export function fixBackground(
+  look: Pick<BlockLook, 'background' | 'tone' | 'colors'>,
+  theme: SiteTheme = {}
+): BlockBackground | undefined {
+  const fix = backgroundIssues(look, theme).find((issue) => issue.suggestion);
+  return fix?.suggestion ?? look.background;
 }
 
 /* ---------- Colour maths ---------- */

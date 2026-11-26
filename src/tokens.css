@@ -145,7 +145,12 @@
   --site-page-link: var(--site-link);
   --site-page-border: var(--site-border);
 }
-[data-site] [data-block]:is([data-tone='surface'], [data-tone='muted']) {
+[data-site]
+  [data-block]:is(
+    [data-tone='surface'],
+    [data-tone='muted'],
+    [data-tone='inset']
+  ) {
   --site-surface: var(--site-page-surface);
   --site-surface-2: var(--site-page-surface-2);
   --site-text: var(--site-page-text);
@@ -224,6 +229,109 @@
   --site-surface-2: color-mix(in oklab, var(--site-on-notice) 12%, transparent);
   --site-button: var(--site-on-notice);
   --site-on-button: var(--site-notice);
+}
+/*
+ * The inset tone: pressed into the page, a shade off the page's colour with a
+ * soft shadow inside its top edge. A block's own shadow replaces it.
+ */
+[data-block][data-tone='inset']:not([data-shadow]) {
+  box-shadow:
+    inset 0 2px 6px color-mix(in oklab, var(--site-text) 14%, transparent),
+    inset 0 0 0 1px color-mix(in oklab, var(--site-text) 6%, transparent);
+}
+/*
+ * A block's own background (see src/system/background.ts): a gradient, a
+ * pattern or a picture, over the tone's fill. --block-fill is that fill, the
+ * colour a picture is dimmed with so the tone's text stays readable on it.
+ */
+[data-block] {
+  --block-fill: var(--site-surface);
+}
+[data-block][data-tone='muted'] {
+  --block-fill: color-mix(in oklab, var(--site-text) 6%, var(--site-bg));
+}
+[data-block][data-tone='inset'] {
+  --block-fill: color-mix(in oklab, var(--site-text) 8%, var(--site-bg));
+}
+[data-block]:is([data-tone='outline'], [data-tone='plain']) {
+  --block-fill: var(--site-bg);
+}
+/* A plain block gets its padding back, so words don't touch the edge. */
+[data-block][data-tone='plain'][data-background] {
+  padding: var(--block-pad);
+}
+[data-block][data-background='gradient'] {
+  background-image: var(--block-gradient);
+}
+[data-block][data-background='image'] {
+  background-image:
+    linear-gradient(
+      color-mix(in oklab, var(--block-fill) var(--block-dim), transparent),
+      color-mix(in oklab, var(--block-fill) var(--block-dim), transparent)
+    ),
+    var(--block-picture);
+  background-size: cover;
+  background-position: var(--block-picture-position, center);
+  background-repeat: no-repeat;
+}
+/* Patterns: thin lines in --block-ink, a theme colour at a low strength. */
+[data-block][data-pattern='lines'] {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--block-ink) 0 1px,
+    transparent 1px 10px
+  );
+}
+[data-block][data-pattern='rings'] {
+  background-image: repeating-radial-gradient(
+    circle at 100% 0%,
+    var(--block-ink) 0 1px,
+    transparent 1px 14px
+  );
+}
+[data-block][data-pattern='dots'] {
+  background-image: radial-gradient(var(--block-ink) 1.5px, transparent 1.75px);
+  background-size: 16px 16px;
+}
+[data-block][data-pattern='grid'] {
+  background-image:
+    linear-gradient(var(--block-ink) 1px, transparent 1px),
+    linear-gradient(90deg, var(--block-ink) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+[data-block][data-pattern='waves'] {
+  background-image:
+    radial-gradient(
+      circle at 50% 100%,
+      transparent 7px,
+      var(--block-ink) 7px 8px,
+      transparent 8px
+    ),
+    radial-gradient(
+      circle at 50% 0%,
+      transparent 7px,
+      var(--block-ink) 7px 8px,
+      transparent 8px
+    );
+  background-size: 24px 12px;
+  background-position:
+    0 0,
+    12px 12px;
+}
+/* A gradient that drifts slowly; never for visitors who ask for less motion. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-block][data-background='gradient'][data-background-move] {
+    background-size: 200% 200%;
+    animation: levuche-drift 12s ease-in-out infinite alternate;
+  }
+}
+@keyframes levuche-drift {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 100% 50%;
+  }
 }
 /* How a block appears; never for visitors who ask for less motion. */
 @media (prefers-reduced-motion: no-preference) {

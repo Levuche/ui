@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from 'react';
+import { useId, type ChangeEvent, type ReactNode } from 'react';
 import { SiteInput, SiteTextarea } from '../atoms/input';
 import { cn } from '../system/cn';
 
@@ -24,6 +24,11 @@ export function Field({
   autoComplete?: string;
   placeholder?: string;
   defaultValue?: string;
+  /** With onChange, the field's value, for a field the block keeps. */
+  value?: string;
+  onChange?: (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
   rows?: number;
   maxLength?: number;
   readOnly?: boolean;
