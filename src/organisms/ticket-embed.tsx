@@ -123,7 +123,8 @@ export function TicketEmbed({
           icon={<TicketIcon size={18} />}
           action="tickets_open"
           fullWidth
-          onClick={onOpen}
+          // In the editor's preview the link goes nowhere, so nothing opened.
+          onClick={preview ? undefined : onOpen}
         >
           {words.button}
         </SiteLinkButton>

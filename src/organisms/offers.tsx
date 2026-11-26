@@ -236,9 +236,9 @@ export function LeadMagnet({
   headingAs?: HeadingTag;
 }) {
   const own = usePageWords('props');
-  const buttonLabel =
-    buttonLabelProp === undefined ? own.sendIt : buttonLabelProp;
   const { free = own.free, ...formLabels } = labels ?? {};
+  // The props win over `labels`, as for every other block.
+  const buttonLabel = buttonLabelProp ?? formLabels.button ?? own.sendIt;
   return (
     <Block as="article" name="lead-magnet" {...root}>
       <ItemHead
@@ -255,10 +255,10 @@ export function LeadMagnet({
         action={action}
         onSubmit={onSubmit}
         labels={{
-          button: buttonLabel,
           sent: own.sentCheckInbox,
-          ...(placeholder ? { placeholder } : {}),
           ...formLabels,
+          button: buttonLabel,
+          ...(placeholder ? { placeholder } : {}),
         }}
       >
         <SellField sell={sell} />

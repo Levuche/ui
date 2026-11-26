@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  useEffect,
   useRef,
   useState,
   useSyncExternalStore,
@@ -134,12 +135,22 @@ export function LockedLink({
     () => false
   );
 
+  // The button the visitor pressed is swapped for the link once they pass,
+  // so focus goes to the link rather than to the page.
+  const unlocked = useRef<HTMLElement>(null);
+  const focusLink = useRef(false);
+  useEffect(() => {
+    if (!passed || !focusLink.current) return;
+    focusLink.current = false;
+    unlocked.current?.querySelector('a')?.focus();
+  }, [passed]);
+
   const link = { newTab, sponsored, nofollow };
   const target = mode === 'code' ? opened : isSafeHref(href) ? href : null;
 
   if (mode !== 'code' && (passed || askedBefore) && target) {
     return (
-      <Block name="locked-link" {...root}>
+      <Block name="locked-link" ref={unlocked} {...root}>
         <SiteLinkButton
           href={target}
           {...link}
@@ -158,6 +169,7 @@ export function LockedLink({
   };
   const pass = () => {
     remember(key);
+    focusLink.current = true;
     setPassed(true);
     onUnlock?.();
     close();

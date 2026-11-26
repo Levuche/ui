@@ -16,7 +16,10 @@ export type LiveProps<T> = {
    * note; with none, it shows nothing, or this when it's words.
    */
   error?: boolean | ReactNode;
-  /** When the data was fetched, for the "updated" line. */
+  /**
+   * When the data was fetched. Blocks take it and keep it off the page, so
+   * the app can pass it with the data; none shows it yet.
+   */
   updatedAt?: Date | string;
 };
 

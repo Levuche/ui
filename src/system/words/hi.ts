@@ -32,6 +32,7 @@ export const WORDS_HI: PageWords = {
     error: 'यह नहीं हो सका। कृपया फिर से कोशिश करें।',
   },
   packCheckout: {
+    sent: 'धन्यवाद! आपका भुगतान हो गया।',
     error: 'भुगतान नहीं हो सका। कृपया फिर से कोशिश करें।',
   },
   creditPack: {

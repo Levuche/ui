@@ -225,7 +225,7 @@ export function directionsUrl(place: {
   address?: string;
 }) {
   const to =
-    place.lat != null && place.lng != null
+    Number.isFinite(place.lat) && Number.isFinite(place.lng)
       ? `${place.lat},${place.lng}`
       : (place.address ?? '');
   return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(to)}`;
@@ -272,8 +272,8 @@ export function MapCard({
   mapCaption?: ReactNode;
   labels?: Partial<MapCardLabels>;
   /**
-   * Whether the visitor agreed to OpenStreetMap, from the page's cookie
-   * notice. False shows a notice and a Load button in place of the map's
+   * Whether the visitor agreed to the map's site (OpenStreetMap, or Google
+   * Maps for `satellite`), from the page's cookie notice. False shows a notice and a Load button in place of the map's
    * button; leave it out on pages that don't ask.
    */
   consent?: boolean;
@@ -286,8 +286,9 @@ export function MapCard({
   const words = usePageWords('mapCard', labels);
   const hasPin =
     lat != null && lng != null && Number.isFinite(lat) && Number.isFinite(lng);
+  // A cleared field can be saved as an empty string: build the link then.
   const directions =
-    directionsHref ??
+    directionsHref?.trim() ||
     directionsUrl({
       lat,
       lng,

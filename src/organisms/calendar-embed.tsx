@@ -1,6 +1,12 @@
 'use client';
 
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLinkButton } from '../atoms/button';
 import { CalendarIcon } from '../atoms/icons';
@@ -89,6 +95,11 @@ export function CalendarEmbed({
   // Undefined until the block is drawn and its colour read.
   const [background, setBackground] = useState<string | null>();
   const [agreed, setAgreed] = useState(false);
+  const frameRef = useRef<HTMLIFrameElement>(null);
+  // After Load, focus moves into the calendar, as in the other frames.
+  useEffect(() => {
+    if (agreed) frameRef.current?.focus();
+  }, [agreed, background]);
   // The colour behind the calendar is known only once it's drawn, so the
   // frame waits for it rather than load twice.
   useLayoutEffect(() => {
@@ -123,6 +134,7 @@ export function CalendarEmbed({
     still
   ) : shown ? (
     <iframe
+      ref={frameRef}
       src={page.src}
       title={name}
       loading="lazy"

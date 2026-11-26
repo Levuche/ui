@@ -38,6 +38,7 @@ export function SlotPicker({
   data,
   loading,
   error,
+  updatedAt,
   sell,
   sellState,
   sellLabels,
@@ -128,7 +129,12 @@ export function SlotPicker({
       {title ? (
         <ItemHead title={title} detail={detail} headingAs={headingAs} />
       ) : null}
-      <LiveData data={data} loading={loading} error={error}>
+      <LiveData
+        data={data}
+        loading={loading}
+        error={error}
+        updatedAt={updatedAt}
+      >
         {() =>
           days.length === 0 ? (
             <p className="text-site-text-2 m-0 text-sm">{words.none}</p>

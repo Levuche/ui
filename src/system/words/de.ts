@@ -32,6 +32,7 @@ export const WORDS_DE: PageWords = {
     error: 'Das hat nicht geklappt. Bitte versuch es noch einmal.',
   },
   packCheckout: {
+    sent: 'Danke! Deine Zahlung ist eingegangen.',
     error: 'Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.',
   },
   creditPack: {

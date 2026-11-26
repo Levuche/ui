@@ -109,6 +109,7 @@ export function PodcastEpisodes({
   data,
   loading,
   error,
+  updatedAt,
   title,
   limit = 5,
   allHref,
@@ -134,7 +135,12 @@ export function PodcastEpisodes({
   return (
     <Block name="podcast-episodes" {...root}>
       {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
-      <LiveData data={data} loading={loading} error={error}>
+      <LiveData
+        data={data}
+        loading={loading}
+        error={error}
+        updatedAt={updatedAt}
+      >
         {(episodes) => (
           <>
             <ul className="m-0 flex list-none flex-col gap-2 p-0">

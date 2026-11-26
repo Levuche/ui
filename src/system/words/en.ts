@@ -39,6 +39,7 @@ export const WORDS_EN = {
     error: 'That didn’t go through. Please try again.',
   },
   packCheckout: {
+    sent: 'Thank you! Your payment went through.',
     error: 'The payment didn’t go through. Please try again.',
   },
   creditPack: {

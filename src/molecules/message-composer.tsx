@@ -64,6 +64,12 @@ export function MessageComposer({
 }) {
   const hydrated = useHydrated();
   const [text, setText] = useState(message);
+  // A new `message` (the creator editing it) replaces what's typed.
+  const [shown, setShown] = useState(message);
+  if (shown !== message) {
+    setShown(message);
+    setText(message);
+  }
   const target = to && hidden ? (hydrated ? revealText(to) : null) : to;
   const attrs = linkAttrs(
     target ? messageHref({ channel, to: target, message: text, subject }) : null

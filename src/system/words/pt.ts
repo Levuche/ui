@@ -32,6 +32,7 @@ export const WORDS_PT: PageWords = {
     error: 'Não deu certo. Tente de novo.',
   },
   packCheckout: {
+    sent: 'Obrigado! Seu pagamento foi concluído.',
     error: 'O pagamento não foi concluído. Tente de novo.',
   },
   creditPack: {

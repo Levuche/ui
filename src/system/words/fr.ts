@@ -33,6 +33,7 @@ export const WORDS_FR: PageWords = {
     error: 'Ça n’a pas marché. Veuillez réessayer.',
   },
   packCheckout: {
+    sent: 'Merci ! Votre paiement a bien été reçu.',
     error: 'Le paiement n’a pas abouti. Veuillez réessayer.',
   },
   creditPack: {

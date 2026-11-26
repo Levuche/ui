@@ -11,6 +11,7 @@ import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { imageAttrs, toImageSource, type ImageSrc } from '../system/image';
 import { usePageWords } from '../system/page-words';
+import { motionSeconds } from '../system/motion';
 
 /**
  * One picture, with an optional caption, and a link if given. The caption
@@ -104,7 +105,7 @@ export function LogoStrip({
   title,
   logos,
   mode = 'still',
-  speed = 30,
+  speed,
   logoHeight = 32,
   muted = true,
   label: labelProp,
@@ -186,7 +187,7 @@ export function LogoStrip({
         </p>
       ) : null}
       {scrolling ? (
-        <LogoMarquee seconds={Math.max(5, speed)} labels={labels}>
+        <LogoMarquee seconds={motionSeconds(speed, 30)} labels={labels}>
           {logos.map((logo, i) => item(logo, i))}
           {/* The second copy makes the loop seamless; screen readers skip it. */}
           {logos.map((logo, i) => item(logo, i, true))}

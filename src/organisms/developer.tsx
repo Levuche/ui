@@ -47,6 +47,7 @@ export function GitHubProfile({
   data,
   loading,
   error,
+  updatedAt,
   labels,
   locale: localeProp,
   headingAs = 'h3',
@@ -66,6 +67,7 @@ export function GitHubProfile({
         data={data}
         loading={loading}
         error={error}
+        updatedAt={updatedAt}
         skeleton={
           <span className="flex items-center gap-3">
             <Skeleton shape="circle" />
@@ -161,6 +163,7 @@ export function ContributionGraph({
   data,
   loading,
   error,
+  updatedAt,
   title,
   labels,
   locale: localeProp,
@@ -183,6 +186,7 @@ export function ContributionGraph({
         data={data}
         loading={loading}
         error={error}
+        updatedAt={updatedAt}
         skeleton={<Skeleton shape="box" className="aspect-[53/7]" />}
       >
         {(year) => {
@@ -303,6 +307,7 @@ export function RepoCard({
   data,
   loading,
   error,
+  updatedAt,
   labels,
   locale: localeProp,
   headingAs = 'h3',
@@ -317,7 +322,12 @@ export function RepoCard({
   const words = usePageWords('repo', labels);
   return (
     <Block as="article" name="repo-card" {...root}>
-      <LiveData data={data} loading={loading} error={error}>
+      <LiveData
+        data={data}
+        loading={loading}
+        error={error}
+        updatedAt={updatedAt}
+      >
         {(repo) => (
           <RepoBody
             repo={repo}
@@ -336,6 +346,7 @@ export function RepoList({
   data,
   loading,
   error,
+  updatedAt,
   title,
   columns = 2,
   labels,
@@ -356,7 +367,12 @@ export function RepoList({
   return (
     <Block name="repo-list" {...root}>
       {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
-      <LiveData data={data} loading={loading} error={error}>
+      <LiveData
+        data={data}
+        loading={loading}
+        error={error}
+        updatedAt={updatedAt}
+      >
         {(repos) => (
           <ul
             className={cn(
@@ -410,6 +426,7 @@ export function PackageStats({
   data,
   loading,
   error,
+  updatedAt,
   labels,
   locale: localeProp,
   headingAs = 'h3',
@@ -425,7 +442,12 @@ export function PackageStats({
   const Heading = headingAs;
   return (
     <Block name="package-stats" {...root}>
-      <LiveData data={data} loading={loading} error={error}>
+      <LiveData
+        data={data}
+        loading={loading}
+        error={error}
+        updatedAt={updatedAt}
+      >
         {(pkg) => (
           <>
             <Heading className="m-0 inline-flex items-center gap-2 font-mono text-base font-bold">

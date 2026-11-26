@@ -8,6 +8,7 @@ import { SellButton, type SellProps } from '../molecules/sell-button';
 import type { HeadingTag } from '../molecules/item-head';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
+import { sellJson } from '../system/sell';
 
 /**
  * What sits beside an action card's title:
@@ -128,6 +129,8 @@ export function ActionCard({
     /** The press's name in tracking. Defaults to buy with `sell`, else link_click. */
     action?: string;
   }) {
+  // A sell that can't check out falls back to the link, as SellButton does.
+  const selling = Boolean(sellJson(sell));
   return (
     <Block
       as="article"
@@ -150,14 +153,14 @@ export function ActionCard({
         sellState={sellState}
         sellLabels={sellLabels}
         renderBuy={renderBuy}
-        action={action ?? (sell ? 'buy' : 'link_click')}
+        action={action ?? (selling ? 'buy' : 'link_click')}
         newTab={newTab}
         sponsored={sponsored}
         nofollow={nofollow}
         // The bar's ::after covers the card, so a press anywhere on the card
         // is a press on it.
         className={
-          sell
+          selling
             ? "[&>button]:after:absolute [&>button]:after:inset-0 [&>button]:after:content-['']"
             : "after:absolute after:inset-0 after:content-['']"
         }

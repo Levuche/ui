@@ -183,7 +183,7 @@ export function InstagramPost(props: EmbedProps) {
 /**
  * Any link from a service on the list (YouTube, Spotify, TikTok, Instagram,
  * Vimeo, SoundCloud, Loom, Apple Music and Deezer) plays in place. Anything
- * else is shown as a link. `services` narrows the list.
+ * else is shown as a link. `services` narrows the list; empty allows all.
  */
 export function LinkEmbed({
   services,
