@@ -167,6 +167,9 @@ test('every pasted-link player loads from its listed hosts', () => {
     ['youtube-video', 'youtube'],
     ['map-card', 'openstreetmap'],
     ['booking-embed', 'booking'],
+    ['calendar-embed', 'googlecalendar'],
+    ['calendar-embed', 'outlookcalendar'],
+    ['ticket-embed', 'luma'],
     ['live-status', 'twitch'],
   ] as const) {
     expect(blockInfo(id)?.privacy.services, id).toContain(service);

@@ -157,6 +157,12 @@ export const CalendarIcon = (p: IconProps) => (
     <path d="M3 10h18M8 3v4M16 3v4" />
   </Svg>
 );
+export const TicketIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z" />
+    <path d="M14 6v12" strokeDasharray="2 2" />
+  </Svg>
+);
 export const ClockIcon = (p: IconProps) => (
   <Svg {...p}>
     <circle cx="12" cy="12" r="9" />
