@@ -151,20 +151,20 @@ test('text a creator types is never read as HTML', () => {
       text: '<script>alert(1)</script> <img src=x onerror=alert(1)> **<b>hi</b>**\n- <i>x</i>',
     })
   );
-  expect(out).not.toMatch(/<script|<img|<b>|<i>/);
+  expect(out).not.toMatch(/<script|<img|<b>|<i>/i);
   expect(out).toContain('&lt;script&gt;');
   expect(out).toContain('<strong>&lt;b&gt;hi&lt;/b&gt;</strong>');
   const quote = html(
     createElement(QuoteBlock, { quote: '<script>x</script>', name: '<b>A</b>' })
   );
-  expect(quote).not.toMatch(/<script|<b>/);
+  expect(quote).not.toMatch(/<script|<b>/i);
   const heading = html(
     createElement(SectionHeading, {
       title: '<h1>Hi</h1>',
       detail: '<img src=x>',
     })
   );
-  expect(heading).not.toMatch(/<h1|<img/);
+  expect(heading).not.toMatch(/<h1|<img/i);
 });
 
 test('unsafe links show as words, safe ones as links', () => {
@@ -227,4 +227,11 @@ test('a spacer is whole grid rows tall, 1 to 12', () => {
   const line = html(createElement(Spacer, { line: true }));
   expect(line).toContain('<hr');
   expect(line).not.toContain('aria-hidden');
+});
+
+test('long runs of punctuation or hyphens stay fast', () => {
+  const start = performance.now();
+  expect(anchorId('-'.repeat(100_000) + 'a' + '-'.repeat(100_000))).toBe('a');
+  parseRichText('https://example.com/' + '!'.repeat(100_000) + 'x');
+  expect(performance.now() - start).toBeLessThan(1000);
 });

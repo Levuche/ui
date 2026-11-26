@@ -191,7 +191,7 @@ export function parseInline(
       const url = WORD.test(before) ? null : URL.exec(src.slice(i));
       if (url) {
         // Punctuation at the end belongs to the sentence, not the link.
-        let href = url[0].replace(/[.,;:!?'’]+$/, '');
+        let href = trimEnd(url[0], ".,;:!?'’");
         // A ) closes the link only if the link opened one.
         while (
           href.endsWith(')') &&
@@ -231,12 +231,24 @@ export function richTextWords(text: string | null | undefined): string {
  */
 export function anchorId(value: string | null | undefined): string {
   if (typeof value !== 'string') return '';
-  return value
+  const id = value
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
-    .replace(/[^\p{L}\p{M}\p{N}]+/gu, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 64)
-    .replace(/-+$/, '');
+    .replace(/[^\p{L}\p{M}\p{N}]+/gu, '-');
+  return trimEnd(trimStart(id, '-').slice(0, 64), '-');
+}
+
+/** `value` without any of `chars` at its start. A loop, not a regex, so long runs stay fast. */
+function trimStart(value: string, chars: string): string {
+  let start = 0;
+  while (start < value.length && chars.includes(value[start]!)) start++;
+  return value.slice(start);
+}
+
+/** `value` without any of `chars` at its end. */
+function trimEnd(value: string, chars: string): string {
+  let end = value.length;
+  while (end > 0 && chars.includes(value[end - 1]!)) end--;
+  return value.slice(0, end);
 }
