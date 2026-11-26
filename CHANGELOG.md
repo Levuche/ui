@@ -66,6 +66,8 @@ problem, so each rule now holds in every block.
 
 ### Fixed
 
+- `TextStrip` draws its separator at full strength. At 70% it failed AA
+  contrast on the band colour when the separator was a word.
 - `ContributionGraph` pads a short first week at the start and a short last
   week at the end, so days line up under their weekday.
 - `TechStack` logos load at their drawn size.
