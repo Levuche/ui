@@ -18,6 +18,7 @@ const GROUP_NAMES: Record<BlockGroup, string> = {
   forms: 'Forms',
   feeds: 'Feeds',
   developer: 'Developer',
+  text: 'Text',
   page: 'Page',
 };
 

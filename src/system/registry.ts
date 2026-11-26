@@ -86,6 +86,7 @@ export const BLOCK_GROUPS = [
   'forms',
   'feeds',
   'developer',
+  'text',
   'page',
 ] as const;
 export type BlockGroup = (typeof BLOCK_GROUPS)[number];
@@ -2103,6 +2104,120 @@ export const BLOCKS = [
     accessibility: {
       keyboard: 'Nothing to press, besides any links.',
       screenReader: 'An ordered list of milestones, each with its date.',
+    },
+  },
+  {
+    id: 'section-heading',
+    component: 'SectionHeading',
+    kind: 'text',
+    group: 'text',
+    client: false,
+    pack: 'core',
+    summary: 'A heading that starts a part of the page, with a line of detail',
+    settings: [
+      { name: 'title', label: 'Heading', type: 'text', required: true },
+      { name: 'detail', label: 'Line under the heading', type: 'longText' },
+      {
+        name: 'id',
+        label: 'Name for links',
+        type: 'text',
+        help: 'A link to #this-name jumps here. Letters, numbers and hyphens.',
+        icon: 'link',
+      },
+    ],
+    appOnly: ['headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'The heading at its level, so it shows in the page’s list of headings, then its line of detail.',
+    },
+  },
+  {
+    id: 'text-block',
+    component: 'TextBlock',
+    kind: 'text',
+    group: 'text',
+    client: false,
+    pack: 'core',
+    summary: 'Paragraphs and lists, with bold, italic, links and emoji',
+    settings: [
+      {
+        name: 'text',
+        label: 'Text',
+        type: 'longText',
+        required: true,
+        help: '**bold**, *italic*, [words](https://…) for a link, and lines starting with - or 1. for a list. Leave an empty line between paragraphs.',
+      },
+    ],
+    appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press, besides any links.',
+      screenReader:
+        'Paragraphs, and lists as lists with their item count; bold and italic words read as words, links by their text.',
+    },
+  },
+  {
+    id: 'quote-block',
+    component: 'QuoteBlock',
+    kind: 'band',
+    group: 'text',
+    client: false,
+    pack: 'core',
+    summary: 'A quote, with who said it and a small picture',
+    settings: [
+      { name: 'quote', label: 'Quote', type: 'longText', required: true },
+      { name: 'name', label: 'Who said it', type: 'text', icon: 'person' },
+      { name: 'detail', label: 'About them', type: 'text' },
+      {
+        name: 'avatar',
+        label: 'Their picture',
+        type: 'picture',
+        help: 'Shows next to their name.',
+      },
+    ],
+    appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'A quote, then who said it and what they do; the big quote mark and the picture are skipped, since the name is read.',
+    },
+  },
+  {
+    id: 'spacer',
+    component: 'Spacer',
+    kind: 'text',
+    group: 'text',
+    client: false,
+    pack: 'core',
+    summary: 'An empty gap or a thin line between blocks',
+    settings: [
+      {
+        name: 'rows',
+        label: 'Height',
+        type: 'number',
+        min: 1,
+        max: 12,
+        step: 1,
+        unit: 'rows',
+        default: 1,
+        icon: 'size',
+      },
+      {
+        name: 'line',
+        label: 'Draw a line across',
+        type: 'toggle',
+        default: false,
+      },
+    ],
+    appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'A gap is skipped; a line is read as a separator between parts of the page.',
     },
   },
   {

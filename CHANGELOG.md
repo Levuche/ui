@@ -8,6 +8,12 @@ change when it moves to that version.
 
 ### Added
 
+- Text blocks in a new `text` group, free in `core`: `SectionHeading` (a
+  heading a link can jump to, with a line of detail), `TextBlock` (bold,
+  italic, links, lists and emoji), `QuoteBlock` (a quote with who said it
+  and a small picture) and `Spacer` (a gap of whole grid rows, or a thin
+  line). What a creator types is never read as HTML (`parseRichText`,
+  `RichText`).
 - Privacy and accessibility notes for each block: every `BLOCKS` entry has
   `privacy` (the other sites it can load, from `OUTSIDE_SERVICES`, the most
   cookies that may come with it, from `COOKIE_KINDS`, and a reason a visitor

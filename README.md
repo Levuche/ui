@@ -730,6 +730,22 @@ In Storybook, **Pages/Grid page** shows the sample page on each screen, and a
 creator's own desktop arrangement. Each story checks where the blocks landed,
 that no block covers another and that the page never scrolls sideways.
 
+### Headings, text and quotes
+
+`SectionHeading` starts a part of the page ("My works"), with a line of
+detail; give it an `id` and any link to `#that-id` jumps to it (`anchorId`
+cleans what a creator typed). `TextBlock` takes the creator's words in a
+small format: `**bold**`, `*italic*`, `[words](https://…)`, lines starting
+`- ` or `1. ` for lists, a blank line between paragraphs, and emoji as they
+are. `QuoteBlock` shows a quote with who said it and a small picture, and
+`Spacer` leaves a gap of whole grid rows (`rows`), or draws a thin `line`, so
+nobody needs an empty heading to make room. All four are in the free `core`
+pack.
+
+What a creator types is read into plain data (`parseRichText`) and drawn as
+React elements, never as HTML, so it can't add tags or run code; links go
+through `SiteLink`, and one that isn't safe shows as plain words.
+
 ## What's in it
 
 | Group       | Blocks                                                                                                                                                                                                                                                                        |
@@ -743,6 +759,7 @@ that no block covers another and that the page never scrolls sideways.
 | Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                                                      |
 | Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                                                          |
 | Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                                                                                                |
+| Text        | `SectionHeading`, `TextBlock`, `QuoteBlock`, `Spacer`, `RichText`                                                                                                                                                                                                             |
 | Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `BeforeAfter`, `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                                                                                           |
 | Forms       | `NewsletterBand`, `ContactForm`, `MessageCard`                                                                                                                                                                                                                                |
 | Feeds       | `LatestVideos`, `LatestPosts`, `LiveStatus`, `EventList`, `ReviewSummary`, `NowPlaying`                                                                                                                                                                                       |
