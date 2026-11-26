@@ -23,6 +23,18 @@ change when it moves to that version.
   and a small picture) and `Spacer` (a gap of whole grid rows, or a thin
   line). What a creator types is never read as HTML (`parseRichText`,
   `RichText`).
+- Motion inside blocks. `effect` on every block's look (`BLOCK_EFFECTS`):
+  `float`, `pulse` and `shimmer` play for under five seconds, and `tilt`
+  leans towards the mouse. `<BlockEffects />` or `useBlockEffects()` once on
+  the page holds loops while a block is off screen and runs the tilt.
+  `TextStrip`, a band of words that scrolls across with a speed, direction,
+  separator and pause button (growth pack, page group). `CreatorHeader`
+  takes `wordRing`, words that turn in a ring around the picture, with a
+  pause button. Nothing moves for visitors who ask for less motion, moving
+  words are read to screen readers once, and both hold still off screen.
+  Also `WordRing`, `MotionToggle`, `useOnScreen` and the plain helpers
+  `motionSeconds`, `stripRepeats` and `wordRingShape`. `effect` is in
+  `LOOK_SETTINGS`, and `TextStrip` and the word ring have their settings.
 - The page's language: `SiteTheme.language` and `<CreatorTheme words>`, so
   every block's own words, numbers and dates follow the page with no `labels`
   on any block. Ready word sets in English, Hindi, Spanish, German, French and

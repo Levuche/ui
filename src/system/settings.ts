@@ -1,5 +1,6 @@
 import {
   BLOCK_ALIGNS,
+  BLOCK_EFFECTS,
   BLOCK_MOTIONS,
   BLOCK_RADII,
   BLOCK_SCALES,
@@ -587,6 +588,22 @@ export const LOOK_SETTINGS = [
     },
     default: 'none',
     help: 'Always still for visitors who ask for less motion.',
+  },
+  {
+    name: 'effect',
+    label: 'Gentle movement',
+    type: 'choice',
+    options: BLOCK_EFFECTS,
+    optionLabels: {
+      none: 'None',
+      float: 'Float',
+      pulse: 'Pulse',
+      shimmer: 'Shimmer',
+      tilt: 'Lean towards the pointer',
+    },
+    default: 'none',
+    help: 'A short loop once the block is on the page. Always still for visitors who ask for less motion.',
+    icon: 'eye',
   },
   {
     name: 'hover',

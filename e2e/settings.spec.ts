@@ -6,7 +6,8 @@ import {
   settingsPanel,
   type BlockInfo,
 } from '../src/system/registry';
-import { BLOCK_TONES, splitLook } from '../src/system/look';
+import { BLOCK_EFFECTS, BLOCK_TONES, splitLook } from '../src/system/look';
+import { MIN_MOTION_SECONDS } from '../src/system/motion';
 import { EMBED_SERVICES } from '../src/system/embeds';
 import { SITE_HOVERS } from '../src/system/theme';
 import {
@@ -131,6 +132,30 @@ test('choices reuse the package’s own lists', () => {
     .blockInfo('pricing-table')
     ?.settings.find((field) => field.name === 'cardTone');
   expect(cardTone?.type === 'choice' && cardTone.options).toBe(BLOCK_TONES);
+  const effect = LOOK_SETTINGS.find((field) => field.name === 'effect');
+  expect(effect?.type === 'choice' && effect.options).toBe(BLOCK_EFFECTS);
+});
+
+test('moving words have settings, and no speed can race past', () => {
+  const strip = ui.blockInfo('text-strip')?.settings ?? [];
+  expect(strip.map((field) => field.name)).toEqual([
+    'items',
+    'separator',
+    'speed',
+    'direction',
+    'label',
+    'labels',
+  ]);
+  const header = ui.blockInfo('creator-header')?.settings ?? [];
+  const names = header.map((field) => field.name as string);
+  for (const name of ['wordRing', 'wordRingSpeed', 'wordRingLabels']) {
+    expect(names).toContain(name);
+  }
+  for (const field of [...strip, ...header]) {
+    if (field.type === 'number' && field.unit === 'seconds') {
+      expect(field.min, field.name).toBe(MIN_MOTION_SECONDS);
+    }
+  }
 });
 
 test('every default fits its field', () => {
