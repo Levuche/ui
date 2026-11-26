@@ -2,6 +2,7 @@ import {
   AppIcon,
   BookingCard,
   Countdown,
+  GoalTracker,
   DiscountCode,
   FaqList,
   FeaturedLink,
@@ -196,6 +197,17 @@ export function SamplePage({ words = SAMPLE_WORDS }: { words?: SampleWords }) {
           code="ORIGINS10"
           detail="10% off the reel pack"
           copy={() => Promise.resolve()}
+        />
+        <GoalTracker
+          title="Film the spice series"
+          deadline={new Date(SAMPLE_NOW + 30 * 86_400_000).toISOString()}
+          now={SAMPLE_NOW}
+          bar="steps"
+          items={[
+            { label: 'Write the scripts', done: true },
+            { label: 'Film five episodes', done: true },
+            { label: 'Edit and post' },
+          ]}
         />
       </SiteSection>
       <SiteSection title="Work with me">
