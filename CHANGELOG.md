@@ -8,6 +8,14 @@ change when it moves to that version.
 
 ### Added
 
+- Preview mode for the page editor: inside `<PreviewMode>`, every block
+  looks as it does live, but links and downloads don't open, forms don't
+  send, `useBlockActions` reports nothing (so no checkout starts) and
+  players from other sites and booking pages show a still placeholder
+  (`data-preview-placeholder`) instead of loading. Blocks stay in the tab
+  order so the editor can select them from the keyboard. Client blocks read
+  it with `usePreviewMode()`; `inPreview` and `previewStop` say what it
+  stops. `Editor/Preview mode` in Storybook presses every block in it.
 - More hovers: `SiteTheme.hover` takes `tint` (the fill deepens), `zoom`
   (the picture grows a little, clipped to the card) and `glow` (a line and
   soft glow in the button colour), beside `lift` and `none`, and a block can

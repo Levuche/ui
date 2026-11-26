@@ -18,6 +18,7 @@ import { SiteDialog } from '../molecules/dialog';
 import { Field } from '../molecules/field';
 import { FormNotice } from '../molecules/form-notice';
 import { isSafeHref, type LinkBehavior } from '../system/href';
+import { usePreviewMode } from '../system/preview-mode';
 import type { FormStatus } from '../system/state';
 
 /**
@@ -135,6 +136,7 @@ export function LockedLink({
   const [denied, setDenied] = useState(false);
   const [status, setStatus] = useState<FormStatus>('idle');
   const [opened, setOpened] = useState<string | null>(null);
+  const preview = usePreviewMode();
 
   // Asked already in this tab? Read after hydration, so server and browser agree.
   const askedBefore = useSyncExternalStore(
@@ -201,6 +203,8 @@ export function LockedLink({
         aria-haspopup="dialog"
         fullWidth
         onClick={() => {
+          // The page editor selects the block; nothing opens.
+          if (preview) return;
           setDenied(false);
           dialog.current?.showModal();
         }}

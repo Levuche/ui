@@ -7,6 +7,7 @@ import { Thumb } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import { isSafeMediaSrc } from '../system/href';
 import type { ImageSrc } from '../system/image';
+import { usePreviewMode } from '../system/preview-mode';
 
 export type AudioBarLabels = {
   /** {title} is filled in. */
@@ -69,11 +70,13 @@ export function AudioBar({
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState(0);
   const [total, setTotal] = useState(0);
+  const preview = usePreviewMode();
   if (!isSafeMediaSrc(src)) return null;
 
   const toggle = () => {
     const el = audio.current;
-    if (!el) return;
+    // The page editor selects the block; nothing downloads or plays.
+    if (!el || preview) return;
     if (el.paused) {
       document.querySelectorAll('audio').forEach((other) => {
         if (other !== el) other.pause();
