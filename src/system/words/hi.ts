@@ -205,6 +205,13 @@ export const WORDS_HI: PageWords = {
     open: 'साइन अप करें',
     close: 'बंद करें',
   },
+  appBadges: {
+    list: 'ऐप पाएँ',
+    appStoreLead: 'डाउनलोड करें',
+    appStore: 'App Store',
+    googlePlayLead: 'इसे पाएँ',
+    googlePlay: 'Google Play',
+  },
   props: {
     verified: 'सत्यापित',
     links: 'लिंक',

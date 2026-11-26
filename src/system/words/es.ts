@@ -207,6 +207,13 @@ export const WORDS_ES: PageWords = {
     open: 'Suscribirse',
     close: 'Cerrar',
   },
+  appBadges: {
+    list: 'Descarga la app',
+    appStoreLead: 'Descárgalo en el',
+    appStore: 'App Store',
+    googlePlayLead: 'Disponible en',
+    googlePlay: 'Google Play',
+  },
   props: {
     verified: 'Verificado',
     links: 'Enlaces',

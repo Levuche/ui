@@ -207,6 +207,13 @@ export const WORDS_DE: PageWords = {
     open: 'Anmelden',
     close: 'Schließen',
   },
+  appBadges: {
+    list: 'Hol dir die App',
+    appStoreLead: 'Laden im',
+    appStore: 'App Store',
+    googlePlayLead: 'Jetzt bei',
+    googlePlay: 'Google Play',
+  },
   props: {
     verified: 'Verifiziert',
     links: 'Links',
