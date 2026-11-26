@@ -81,7 +81,7 @@ function Media({ media }: { media: ActionCardMedia }) {
           aria-label={media.liveLabel ?? live}
           className="bg-site-button ring-site-surface absolute end-0.5 bottom-0.5 size-4 rounded-full ring-3"
         >
-          <span className="bg-site-button absolute inset-0 rounded-full motion-safe:animate-ping" />
+          <span className="bg-site-button absolute inset-0 rounded-full motion-safe:animate-[levuche-live-ping_1s_cubic-bezier(0,0,0.2,1)_4]" />
         </span>
       ) : null}
     </span>

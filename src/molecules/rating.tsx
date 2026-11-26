@@ -3,8 +3,20 @@ import { cn } from '../system/cn';
 import { usePageLocale, usePageWords } from '../system/page-words';
 
 /**
+ * How full each of `max` stars is, from 0 to 1, for a score of `value`:
+ * 4.8 of 5 is four full stars and one 80% full, to the tenth.
+ */
+export function starFills(value: number, max = 5): number[] {
+  const score = Number.isFinite(value) ? Math.max(0, Math.min(max, value)) : 0;
+  return Array.from(
+    { length: max },
+    (_, s) => Math.round(Math.max(0, Math.min(1, score - s)) * 10) / 10
+  );
+}
+
+/**
  * A score out of `max` as stars, read out in the page's language as "4.8 out
- * of 5 stars": the stars are rounded, the words aren't.
+ * of 5 stars". A part score fills part of a star, so 4.8 doesn't look like 5.
  */
 export function Rating({
   value,
@@ -22,7 +34,6 @@ export function Rating({
 }) {
   const words = usePageWords('rating');
   const locale = usePageLocale();
-  const stars = Math.max(0, Math.min(max, Math.round(value)));
   const score = Number.isFinite(value)
     ? new Intl.NumberFormat(locale ?? 'en-US', {
         maximumFractionDigits: 1,
@@ -36,13 +47,25 @@ export function Rating({
       }
       className={cn('text-site-link inline-flex gap-0.5', className)}
     >
-      {Array.from({ length: max }, (_, s) => (
-        <StarIcon
-          key={s}
-          size={size}
-          fill={s < stars ? 'currentColor' : 'none'}
-        />
-      ))}
+      {starFills(value, max).map((fill, s) =>
+        fill === 1 || fill === 0 ? (
+          <StarIcon
+            key={s}
+            size={size}
+            fill={fill === 1 ? 'currentColor' : 'none'}
+          />
+        ) : (
+          <span key={s} className="relative inline-flex">
+            <StarIcon size={size} fill="none" />
+            <span
+              className="absolute inset-y-0 start-0 overflow-hidden"
+              style={{ width: `${fill * 100}%` }}
+            >
+              <StarIcon size={size} fill="currentColor" />
+            </span>
+          </span>
+        )
+      )}
     </span>
   );
 }

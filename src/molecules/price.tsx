@@ -50,6 +50,20 @@ export function priceSaving(value: string, was: string): string | null {
 }
 
 /**
+ * The whole percent a year's price saves over twelve months of the monthly
+ * one ("₹299" a month, "₹2,999" a year: 16), or null when the two can't be
+ * compared or the year saves less than 1%.
+ */
+export function yearlySaving(monthly: string, yearly: string): number | null {
+  const month = readAmount(monthly);
+  const year = readAmount(yearly);
+  if (!month || !year || !(month.number > 0)) return null;
+  if (month.prefix !== year.prefix || month.suffix !== year.suffix) return null;
+  const percent = Math.floor((1 - year.number / (month.number * 12)) * 100);
+  return percent >= 1 ? percent : null;
+}
+
+/**
  * A price as the creator wrote it ("$40", "Free", "₹499"), with an optional
  * period ("/ month") and an old price struck through.
  */

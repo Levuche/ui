@@ -3,8 +3,9 @@ import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLinkButton, type SiteButtonVariant } from '../atoms/button';
 import { ClockIcon, MapPinIcon } from '../atoms/icons';
 import { SiteLink } from '../atoms/link';
+import { Thumb } from '../atoms/thumb';
 import { CountUp, type NumberStyle } from '../molecules/count-up';
-import { ItemHead, type HeadingTag } from '../molecules/item-head';
+import { ItemHead, subHeading, type HeadingTag } from '../molecules/item-head';
 import { PlayFrame } from '../molecules/play-frame';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
@@ -109,8 +110,7 @@ export function Timeline({
   title?: ReactNode;
   headingAs?: HeadingTag;
 }) {
-  const ItemHeading =
-    headingAs === 'h2' ? 'h3' : headingAs === 'h3' ? 'h4' : 'h5';
+  const ItemHeading = subHeading(headingAs);
   return (
     <Block name="timeline" {...root}>
       {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
@@ -184,16 +184,16 @@ export function mapEmbedUrl(lat: number, lng: number, zoom = 0.006) {
 /** How the map looks: the usual map, a pale or a dark one, or from above. */
 export type MapStyle = 'standard' | 'light' | 'dark' | 'satellite';
 
-/**
- * The map's address for a style. The street map comes from OpenStreetMap;
- * the view from above from Google Maps, as OpenStreetMap has none. Neither
- * needs a key.
- */
 /** The site a map in this style loads from. */
 export function mapService(style?: MapStyle) {
   return style === 'satellite' ? 'googlemaps' : 'openstreetmap';
 }
 
+/**
+ * The map's address for a style. The street map comes from OpenStreetMap;
+ * the view from above from Google Maps, as OpenStreetMap has none. Neither
+ * needs a key.
+ */
 export function mapFrameUrl(lat: number, lng: number, style?: MapStyle) {
   if (style === 'satellite') {
     return `https://maps.google.com/maps?q=${lat.toFixed(5)},${lng.toFixed(5)}&t=k&z=17&output=embed`;
@@ -257,7 +257,7 @@ export function MapCard({
   lat?: number;
   lng?: number;
   hours?: OpeningHours[];
-  /** A picture of the place, shown until the map loads. */
+  /** A picture of the place: until the map loads, or on its own with no map. */
   image?: ImageSrc | null;
   /** Your own directions link. Built from the pin or address if left out. */
   directionsHref?: string;
@@ -314,6 +314,9 @@ export function MapCard({
             </p>
           ) : null}
         </div>
+      ) : image !== undefined && image !== null ? (
+        // No map to load: the picture of the place on its own.
+        <Thumb src={image} ratio="video" className="w-full" />
       ) : null}
       <ItemHead title={place} headingAs={headingAs} />
       {address ? (

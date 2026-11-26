@@ -98,7 +98,7 @@ test('every block that loads another site can wait for consent', () => {
 });
 
 test('every block that puts a frame or player on the page lists a service', () => {
-  const players = /<(iframe|PlayFrame|EmbedBody|AudioBar)\b/;
+  const players = /<(iframe|PlayFrame|EmbedBody|AudioBar|VideoFrame)\b/;
   let found = 0;
   for (const region of ALL_REGIONS) {
     const block = BLOCKS.find((b) => b.component === region.name);
@@ -109,7 +109,8 @@ test('every block that puts a frame or player on the page lists a service', () =
       `${block.id} loads another site, so its privacy note lists it`
     ).toBeGreaterThan(0);
   }
-  // The check found the players: YouTube, the embeds, map, booking, live, audio.
+  // The check found the players: YouTube, the embeds, map, booking, live,
+  // audio and videos from another site.
   expect(found).toBeGreaterThanOrEqual(10);
 });
 

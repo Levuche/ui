@@ -45,6 +45,7 @@ export function AudioBar({
   detail,
   image,
   transcriptHref,
+  href,
   labels,
   onPlay,
   className,
@@ -57,6 +58,8 @@ export function AudioBar({
   image?: ImageSrc | null;
   /** A page with the words, for visitors who can't listen. */
   transcriptHref?: string;
+  /** The track's or episode's own page; its title links there. */
+  href?: string;
   labels?: Partial<AudioBarLabels>;
   onPlay?: () => void;
   className?: string;
@@ -116,7 +119,15 @@ export function AudioBar({
         {playing ? <PauseIcon size={20} /> : <PlayIcon size={20} />}
       </button>
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <p className="m-0 truncate text-sm font-semibold">{title}</p>
+        <p className="m-0 truncate text-sm font-semibold">
+          {href ? (
+            <SiteLink href={href} newTab action="audio_open">
+              {title}
+            </SiteLink>
+          ) : (
+            title
+          )}
+        </p>
         {detail ? (
           <p className="text-site-text-2 m-0 truncate text-xs">{detail}</p>
         ) : null}

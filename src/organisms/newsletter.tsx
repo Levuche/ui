@@ -6,6 +6,7 @@ import { DialogButton } from '../molecules/dialog-button';
 import { EmailForm, type EmailFormLabels } from '../molecules/email-form';
 import { WORDS_EN } from '../system/words/en';
 import { usePageWords } from '../system/page-words';
+import type { HeadingTag } from '../molecules/item-head';
 
 /** The words of the compact tile (`display="tile"`). */
 export type NewsletterTileLabels = {
@@ -35,9 +36,12 @@ export function NewsletterBand({
   status,
   onSubmit,
   action,
+  headingAs: Heading = 'h3',
   ...root
 }: BlockRootProps & {
   title: ReactNode;
+  /** The title's level on the page. `p` when it's only for looks. */
+  headingAs?: HeadingTag;
   detail?: ReactNode;
   buttonLabel?: string;
   placeholder?: string;
@@ -62,7 +66,7 @@ export function NewsletterBand({
   };
   const heading = (
     <div className="flex flex-col gap-1">
-      <strong>{title}</strong>
+      <Heading className="m-0 font-bold">{title}</Heading>
       {detail ? <p className="text-site-text-2 m-0 text-sm">{detail}</p> : null}
     </div>
   );

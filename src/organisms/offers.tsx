@@ -12,7 +12,11 @@ import {
   EmailForm,
   type EmailFormLabels,
 } from '../molecules/email-form';
-import { ItemHead, type HeadingTag } from '../molecules/item-head';
+import {
+  ItemHead,
+  type HeadingTag,
+  type SubHeadingTag,
+} from '../molecules/item-head';
 import { Price } from '../molecules/price';
 import {
   SellButton,
@@ -140,7 +144,7 @@ export function MembershipCard({
     featuredLabel?: string;
     /** A small tilted label over the top corner, such as "Best value". */
     ribbon?: ReactNode;
-    headingAs?: HeadingTag;
+    headingAs?: HeadingTag | SubHeadingTag;
   }) {
   const own = usePageWords('props');
   const period = periodProp === undefined ? own.month : periodProp;

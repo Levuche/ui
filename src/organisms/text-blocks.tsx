@@ -22,7 +22,7 @@ import { anchorId } from '../system/rich-text';
 /**
  * A heading that starts a part of the page, such as "My works" or "Let's
  * connect", with an optional line of detail under it. Give it an `id` and a
- * link elsewhere can jump to it (#my-works); the id is cleaned to letters,
+ * link elsewhere can jump to it (#my-works); the id is cleaned to small letters,
  * digits and hyphens. On a grid page it takes the whole width of its column.
  */
 export function SectionHeading({

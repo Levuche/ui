@@ -23,6 +23,8 @@ export const Running: Story = {
   play: async ({ canvas }) => {
     const timer = canvas.getByRole('timer');
     await expect(timer).toHaveTextContent('02days03hours04minutes05seconds');
+    // The status line is in the page from the start, so "done" is announced.
+    await expect(canvas.getByRole('status')).toBeEmptyDOMElement();
     await expect(timeLeft(new Date(NOW + 61_000), NOW)).toEqual([
       { label: 'days', value: 0 },
       { label: 'hours', value: 0 },

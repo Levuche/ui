@@ -140,6 +140,8 @@ export function QrCode({
     <Block name="qr-code" defaults={{ align: 'center' }} size={size} {...root}>
       {title ? (
         <ItemHead title={title} detail={detail} headingAs={headingAs} />
+      ) : detail ? (
+        <p className="text-site-text-2 m-0 text-sm">{detail}</p>
       ) : null}
       {picture ? (
         <img
