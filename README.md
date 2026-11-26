@@ -78,6 +78,24 @@ const theme: SiteTheme = {
 The app provides `react`, `clsx`, `tailwind-merge` and Tailwind CSS v4
 (peer dependencies).
 
+### Colours a visitor can read
+
+`isSafeColor` only checks that a colour is a plain value. In the theme editor,
+`contrastIssues(theme)` says which of the creator's pairs are too faint to
+read by WCAG 2.2 AA (4.5:1 for text, 3:1 for buttons against the page): text
+and softer text on the page and on cards, links, button text on the accent,
+text on the band, and buttons against the page. Each issue has a `label` to
+show, its `ratio`, what it `needed`, the colour to `change` (the one the
+creator picked) and a `suggestion`: the nearest colour, same hue, that
+passes. `fixContrast(theme)` applies every suggestion, for a "Fix all"
+button, and `contrastRatio(a, b)` measures any two colours.
+
+```tsx
+contrastIssues({ colors: { accent: '#fbbf24', onAccent: '#ffffff' } });
+// [{ label: 'Button text on the accent colour', ratio: 1.66, needed: 4.5,
+//    change: 'onAccent', suggestion: '#545454', ... }, ...]
+```
+
 ## Theming
 
 Every block reads only `--site-*` CSS variables. `<CreatorTheme>` sets them:
@@ -518,7 +536,7 @@ that no block covers another and that the page never scrolls sideways.
 
 | Group       | Blocks                                                                                                                                                                                                                                     |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `Block`, `withBlockLook`, `BlockLook`                                                                                                                                       |
+| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `contrastIssues`, `fixContrast`, `Block`, `withBlockLook`, `BlockLook`                                                                                                      |
 | Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                          |
 | Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton` |
 | Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                                                               |
@@ -567,7 +585,8 @@ phone sizes, and check that each theme reaches every block, tap targets
 tab, the video loading only on play, the checkout's consent box, newsletter validation, no sideways
 scrolling, and accessibility with axe (WCAG 2.2 AA, no serious or critical
 problems). `e2e/theme.spec.ts` checks the YouTube address reader and that a
-theme only lets plain colours and fonts into CSS.
+theme only lets plain colours and fonts into CSS, and
+`e2e/contrast.spec.ts` checks the contrast warnings and their suggestions.
 
 ### Storybook
 
