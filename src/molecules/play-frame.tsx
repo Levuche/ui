@@ -42,7 +42,7 @@ const COVER_RATIOS: Record<FrameRatio, string> = {
  * the button, for players that are only a few kilobytes.
  *
  * With `consent={false}` (the visitor hasn't agreed to the site yet) it shows
- * `notice`, a line on what loading will share, and a Load button instead;
+ * a line on what loading will share, and a Load button instead;
  * the press loads it.
  * In preview mode (the page editor) it never loads: the picture and button
  * stay as a still placeholder, and a press does nothing.

@@ -289,8 +289,11 @@ reach a service.
 Every registry entry has a `privacy` note: the other sites the block can
 load in a visitor's browser (`services`, from `OUTSIDE_SERVICES`), the most
 cookies that may come with it (`cookies`: `none`, `needed`, `preferences`,
-`statistics` or `marketing`) and a `reason` a visitor can read. Players,
-maps and booking pages load nothing until a press; feed and developer
+`statistics` or `marketing`) and a `reason` a visitor can read. Players load only on a press, unless
+`autoLoad` is set for a small one. Maps, calendars and booking pages in the
+page load when they're shown. Pass `consent={false}` while the visitor
+hasn't agreed to that site in your cookie notice: every one of these then
+shows what loading would share and a Load button first. Feed and developer
 blocks show data your server fetched (see above).
 
 `CalendarEmbed` and `TicketEmbed` take only links they can check: a Google
