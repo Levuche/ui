@@ -117,6 +117,22 @@ export const WideOnAPhone: Story = {
   },
 };
 
+/** On a tablet: tickets and the calendar button side by side. */
+export const WideOnATablet: Story = {
+  globals: onScreen('tablet'),
+  play: async ({ canvas, canvasElement }) => {
+    const block = card(canvasElement);
+    const tickets = canvas.getByRole('link', { name: /^Get tickets/ });
+    const open = block.querySelector('summary')!;
+    await expect(
+      Math.abs(
+        open.getBoundingClientRect().top - tickets.getBoundingClientRect().top
+      )
+    ).toBeLessThan(2);
+    await expect(block.scrollWidth).toBeLessThanOrEqual(block.clientWidth);
+  },
+};
+
 /** A picture behind the words, dimmed so they stay readable. */
 export const WithPicture: Story = {
   args: { image: picture },
