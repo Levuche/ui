@@ -8,6 +8,17 @@ change when it moves to that version.
 
 ### Added
 
+- Motion inside blocks. `effect` on every block's look (`BLOCK_EFFECTS`):
+  `float`, `pulse` and `shimmer` play for under five seconds, and `tilt`
+  leans towards the mouse. `<BlockEffects />` or `useBlockEffects()` once on
+  the page holds loops while a block is off screen and runs the tilt.
+  `TextStrip`, a band of words that scrolls across with a speed, direction,
+  separator and pause button (growth pack, page group). `CreatorHeader`
+  takes `wordRing`, words that turn in a ring around the picture, with a
+  pause button. Nothing moves for visitors who ask for less motion, moving
+  words are read to screen readers once, and both hold still off screen.
+  Also `WordRing`, `MotionToggle`, `useOnScreen` and the plain helpers
+  `motionSeconds`, `stripRepeats` and `wordRingShape`.
 - `MessageCard`: a card that opens a chat on WhatsApp, Telegram, a text,
   email or Messenger with a message ready to send, shown in a chat bubble.
   The visitor can change the message first (`editable`), the number or

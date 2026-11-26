@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect } from 'storybook/test';
+import { expect, userEvent, waitFor } from 'storybook/test';
 import { Avatar, CreatorHeader, CreatorTheme } from '../src';
+import { expectTapSize } from './expect-tap-size';
 
 const meta = {
   title: 'Blocks/Profile',
@@ -111,5 +112,62 @@ export const HeaderWithPicture: Story = {
   play: async ({ canvasElement }) => {
     const image = canvasElement.querySelector('header img');
     await expect(image).toHaveAttribute('loading', 'eager');
+  },
+};
+
+/**
+ * Words in a ring that turns slowly around the picture. Screen readers hear
+ * them once, in order; the pause button stops the ring, and it stays still
+ * for visitors who ask for less motion.
+ */
+export const WordRing: Story = {
+  args: {
+    wordRing: 'Chai • Stories • Since 2019',
+    avatarSize: 96,
+  },
+  play: async ({ canvas }) => {
+    const header = canvas.getByRole('banner');
+    // Read once: the drawn ring is hidden, the words are there as text.
+    await expect(
+      canvas.getAllByText('Chai • Stories • Since 2019')
+    ).toHaveLength(1);
+    const ring = header.querySelector('[data-word-ring] svg')!;
+    await expect(ring).toHaveAttribute('aria-hidden', 'true');
+    await expect(ring.querySelector('textPath')?.textContent).toContain(
+      'Chai • Stories • Since 2019 •'
+    );
+    // The ring goes round the picture, centred on it.
+    const picture = canvas.getByText('DO').getBoundingClientRect();
+    const box = ring.getBoundingClientRect();
+    await expect(box.width).toBeGreaterThan(picture.width + 20);
+    await expect(
+      Math.abs(box.left + box.width / 2 - (picture.left + picture.width / 2))
+    ).toBeLessThan(1);
+    const [turn] = ring.getAnimations();
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      await expect(turn).toBeUndefined();
+      return;
+    }
+    await expect(turn).toBeDefined();
+    const pause = canvas.getByRole('button', {
+      name: 'Stop the turning words',
+    });
+    await expectTapSize(pause, 'ring pause button');
+    await userEvent.click(pause);
+    await waitFor(() => expect(turn?.playState).toBe('paused'));
+    await expect(
+      canvas.getByRole('button', { name: 'Turn the words again' })
+    ).toBeVisible();
+  },
+};
+
+/** The ring works beside the name too. */
+export const WordRingInARow: Story = {
+  args: { wordRing: 'Chai • Stories', layout: 'row', align: 'start' },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText('Chai • Stories')).toBeInTheDocument();
+    await expect(
+      canvas.getByRole('heading', { name: 'Desi Origins' })
+    ).toBeVisible();
   },
 };

@@ -42,6 +42,7 @@ export {
 } from './system/looks';
 export {
   BLOCK_ALIGNS,
+  BLOCK_EFFECTS,
   BLOCK_MOTIONS,
   BLOCK_RADII,
   BLOCK_SCALES,
@@ -51,6 +52,7 @@ export {
   lookProps,
   splitLook,
   type BlockAlign,
+  type BlockEffect,
   type BlockLook,
   type BlockMotion,
   type BlockRadius,
@@ -60,6 +62,15 @@ export {
   type BlockTone,
   type LookProps,
 } from './system/look';
+export { BlockEffects, useBlockEffects, useOnScreen } from './system/effects';
+export {
+  MAX_STRIP_REPEATS,
+  MIN_MOTION_SECONDS,
+  motionSeconds,
+  stripRepeats,
+  wordRingShape,
+  type WordRingShape,
+} from './system/motion';
 export {
   isExternalHref,
   isSafeHref,
@@ -182,6 +193,15 @@ export { SiteDialog } from './molecules/dialog';
 export { Segmented, type SegmentOption } from './molecules/segmented';
 export { CountUp, type NumberStyle } from './molecules/count-up';
 export { HiddenText, MessageComposer } from './molecules/message-composer';
+export {
+  MotionToggle,
+  type MotionToggleLabels,
+} from './molecules/motion-toggle';
+export {
+  WORD_RING_LABELS,
+  WordRing,
+  type WordRingLabels,
+} from './molecules/word-ring';
 
 // Organisms: the blocks
 export { CreatorHeader } from './organisms/profile';
@@ -248,6 +268,11 @@ export { FaqList, Testimonials } from './organisms/trust';
 export { ReelGrid, YouTubeVideo, youtubeId } from './organisms/media';
 export { ImageGrid } from './organisms/images';
 export { LogoStrip, SiteImage, type Logo } from './organisms/pictures';
+export {
+  TEXT_STRIP_LABELS,
+  TextStrip,
+  type TextStripLabels,
+} from './organisms/text-strip';
 export {
   CAROUSEL_LABELS,
   ImageCarousel,

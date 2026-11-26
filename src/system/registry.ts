@@ -312,6 +312,15 @@ export const BLOCKS = [
     summary: 'Brand logos in a row, still or scrolling',
   },
   {
+    id: 'text-strip',
+    component: 'TextStrip',
+    kind: 'band',
+    group: 'page',
+    client: true,
+    pack: 'growth',
+    summary: 'A band of words that scrolls across, with a pause button',
+  },
+  {
     id: 'contact-form',
     component: 'ContactForm',
     kind: 'card',

@@ -29,6 +29,7 @@ import {
   SiteLinkButton,
   SiteSection,
   SiteText,
+  TextStrip,
   VideoIcon,
   YouTubeVideo,
   type SiteTheme,
@@ -320,6 +321,18 @@ function Panel({
                 answer: '100 prompts, a guide and 12 templates.',
               },
             ]}
+          />
+        </Group>
+
+        <Group id={id} name="motion" title="Moving words">
+          <CreatorHeader
+            name="Desi Origins"
+            headingAs="p"
+            wordRing="Chai • Stories • Since 2019"
+          />
+          <TextStrip
+            label="Shop news"
+            items={['New drop', 'Free shipping', 'Made in Pune']}
           />
         </Group>
 
