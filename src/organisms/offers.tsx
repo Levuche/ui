@@ -7,7 +7,11 @@ import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import type { FormStatus } from '../system/state';
 import { CheckList } from '../molecules/check-list';
-import { EmailForm, type EmailFormLabels } from '../molecules/email-form';
+import {
+  EMAIL_FORM_LABELS,
+  EmailForm,
+  type EmailFormLabels,
+} from '../molecules/email-form';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { Price } from '../molecules/price';
 import {
@@ -182,6 +186,13 @@ export function MembershipCard({
 /** The words a lead magnet shows. */
 export type LeadMagnetLabels = EmailFormLabels & { free: string };
 
+export const LEAD_MAGNET_LABELS: LeadMagnetLabels = {
+  ...EMAIL_FORM_LABELS,
+  button: 'Send it to me',
+  sent: 'Sent! Check your inbox.',
+  free: 'Free',
+};
+
 /**
  * Something free in return for an email address, such as a guide: the
  * visitor types their address and the creator's app sends it. `status` is
@@ -215,7 +226,12 @@ export function LeadMagnet({
   action?: string | ((data: FormData) => void | Promise<void>);
   headingAs?: HeadingTag;
 }) {
-  const { free = 'Free', ...formLabels } = labels ?? {};
+  const { free, ...formLabels } = {
+    ...LEAD_MAGNET_LABELS,
+    button: buttonLabel,
+    ...(placeholder ? { placeholder } : {}),
+    ...labels,
+  };
   return (
     <Block as="article" name="lead-magnet" {...root}>
       <ItemHead
@@ -231,12 +247,7 @@ export function LeadMagnet({
         status={status}
         action={action}
         onSubmit={onSubmit}
-        labels={{
-          button: buttonLabel,
-          sent: 'Sent! Check your inbox.',
-          ...(placeholder ? { placeholder } : {}),
-          ...formLabels,
-        }}
+        labels={formLabels}
       >
         <SellField sell={sell} />
       </EmailForm>
