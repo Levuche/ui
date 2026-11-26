@@ -13,6 +13,15 @@ change when it moves to that version.
   on any block. Ready word sets in English, Hindi, Spanish, German, French and
   Portuguese, each loaded on its own with `loadPageWords`; a block's own
   `labels` and word props still win. Storybook's toolbar has a Language menu.
+- `SocialCard`: one social profile with the platform's mark, the picture,
+  name, handle and verified tick, the follower count written short by
+  locale (`shortCount`: 1.1K, 860K) and a button in the platform's own word
+  (Follow, Subscribe, Connect, Join server...), which the creator can
+  change. Tinted in the brand's colour or the theme's; 1x1, 2x1 and 2x2
+  tiles, where 2x2 shows the latest posts with their views, passed in as
+  `LiveProps`. 16 platforms in `SOCIAL_PLATFORMS`; the profile link is made
+  from the handle where it can be (`socialProfileHref`). Free, in the
+  profile group; presses are tracked as `social_follow` and `social_post`.
 - Each block describes its settings, so the page editor can build its panel:
   every `BLOCKS` entry has `settings` (field name, label, help, type,
   default, required, `slow` for fields that load over the network, `main`
