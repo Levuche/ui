@@ -53,9 +53,21 @@ problem, so each rule now holds in every block.
   `MapCard` shows its picture when there's no map. `QrCode` and `EmbedBody`
   show their detail line when there's no title.
 - A `CreatorFooter` story with checks.
+- Tests that every block works with every setting, each way. On the server
+  (`e2e/every-setting.spec.ts`), each block renders with only what's
+  required, with everything set, and with each choice, toggle, number,
+  empty list and long line, with no React warnings; every setting and look
+  setting has to change the page; and each loading, failed, sending, sent,
+  sold-out and unavailable state has to show. In the browser
+  (`stories/EverySetting.stories.tsx`), each group of blocks is checked for
+  accessibility with everything set and mounted each of those ways with its
+  effects running, and the two settings that only act in a browser,
+  `YouTubeVideo`'s `start` and `StatsRow`'s `animate`, are checked there.
 
 ### Fixed
 
+- `TextStrip` draws its separator at full strength. At 70% it failed AA
+  contrast on the band colour when the separator was a word.
 - `ContributionGraph` pads a short first week at the start and a short last
   week at the end, so days line up under their weekday.
 - `TechStack` logos load at their drawn size.

@@ -100,11 +100,9 @@ export function TextStrip({
         {separatorMark ? (
           <span
             aria-hidden="true"
-            className={cn(
-              'opacity-70',
-              // Still, the last phrase needs no separator after it.
-              !hidden && i === count - 1 && 'motion-reduce:hidden'
-            )}
+            // Full strength, as the separator can be a word (AA contrast).
+            // Still, the last phrase needs no separator after it.
+            className={cn(!hidden && i === count - 1 && 'motion-reduce:hidden')}
           >
             {separatorMark}
           </span>

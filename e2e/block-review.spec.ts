@@ -1,10 +1,13 @@
 import { readdirSync, readFileSync } from 'node:fs';
+import { createElement } from 'react';
+import { renderToString } from 'react-dom/server';
 import { expect, test } from '@playwright/test';
 import {
   contributionCells,
   LOCAL_TIME_CITY_IDS,
   starFills,
   subHeading,
+  TextStrip,
   yearlySaving,
 } from '../src';
 import { mediaWaits } from '../src/molecules/media-notice';
@@ -137,4 +140,17 @@ test('nothing moves forever without a pause button (WCAG 2.2.2)', () => {
   }
   // The logo strip, the text strip and the word ring.
   expect(endless).toBe(3);
+});
+
+test('a text strip draws its separator as strongly as its words', () => {
+  // A separator can be a word, so it meets the same contrast as the phrases.
+  const html = renderToString(
+    createElement(TextStrip, {
+      items: ['New drop', 'Made in Pune'],
+      separator: 'and',
+    })
+  );
+  const separators = [...html.matchAll(/<span aria-hidden="true"[^>]*>and</g)];
+  expect(separators.length).toBeGreaterThan(0);
+  for (const [tag] of separators) expect(tag).not.toMatch(/opacity/);
 });
