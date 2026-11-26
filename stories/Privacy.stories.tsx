@@ -75,7 +75,7 @@ export const VideoAfterConsent: Story = {
   play: async ({ canvas, canvasElement }) => {
     await expect(canvasElement.querySelector('[data-consent]')).toBeNull();
     await expect(
-      canvas.getByRole('button', { name: 'Play video: How tea came to India' })
+      canvas.getByRole('button', { name: 'Play: How tea came to India' })
     ).toBeVisible();
   },
 };

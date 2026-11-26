@@ -113,7 +113,7 @@ export function YouTubeVideo({
   vertical?: boolean;
   /** Start this many seconds in. */
   start?: number;
-  /** The play button's name; defaults to "Play video: {title}". */
+  /** The play button's name; defaults to "Play: {title}" in the page’s language. */
   playLabel?: string;
   /**
    * Whether the visitor agreed to YouTube, from the page's cookie notice.

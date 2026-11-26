@@ -1805,7 +1805,7 @@ export const BLOCKS = [
         name: 'playLabel',
         label: 'Play button’s name',
         type: 'text',
-        help: 'Left empty: "Play video: {title}".',
+        help: 'Left empty: "Play: {title}", in the page’s language.',
       },
       CONSENT_LABELS_SETTING,
     ],

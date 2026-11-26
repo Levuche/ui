@@ -79,7 +79,7 @@ for (const [id, expected] of Object.entries(THEMES)) {
       const video = panel.getByTestId('video');
       await expect(video.locator('iframe')).toHaveCount(0);
       await video
-        .getByRole('button', { name: 'Play video: How tea came to India' })
+        .getByRole('button', { name: 'Play: How tea came to India' })
         .click();
       const frame = video.locator('iframe');
       await expect(frame).toHaveAttribute('title', 'How tea came to India');
