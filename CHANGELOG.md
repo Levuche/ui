@@ -8,6 +8,31 @@ change when it moves to that version.
 
 ### Added
 
+- `EventCard`: one event with a date badge (MAR 15), a chip saying how far
+  away it is in the visitor's language ("In 4 months", "Tomorrow",
+  "Happening now"), the date and time with the event's time zone, the place,
+  tickets through a link or `sell`, and "Add to calendar". `2x1` and `2x2`
+  tiles; a soft accent wash when there's no picture; an "Ended" state once
+  it's over. The app can pass what it read from the event's page in
+  `details` (with a loading skeleton) to fill the fields left empty. Free,
+  in the offers group; presses are tracked as `event_tickets`,
+  `calendar_open`, `calendar_google` and `calendar_ics`.
+- `AddToCalendar`: a Google Calendar link and an .ics download, made from
+  the event's fields with no new dependency and no JavaScript, so it is
+  hydration-safe. The time helpers are exported from `calendar.ts`
+  (`eventSpan`, `googleCalendarHref`, `icsText`, `icsHref`, `howFar`,
+  `eventWhen`, `zonedToUtc` and more): time zones, all-day and floating
+  times, ICS escaping and line folding.
+- `EventList` rows with a `dateTime` get "Add to calendar" too (`calendar`
+  turns it off); rows take an `end` and a `timeZone`, and
+  `EVENT_LIST_LABELS` has the calendar words.
+
+### Changed
+
+- Tracking reports a link to a file the page made itself (a `data:` or
+  `blob:` address) by its kind only, as `data:text/calendar`, not the whole
+  file.
+
 - `SocialCard`: one social profile with the platform's mark, the picture,
   name, handle and verified tick, the follower count written short by
   locale (`shortCount`: 1.1K, 860K) and a button in the platform's own word

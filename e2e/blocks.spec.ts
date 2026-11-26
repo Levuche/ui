@@ -221,6 +221,40 @@ for (const [id, expected] of Object.entries(THEMES)) {
       );
     });
 
+    test('the event card says how far away it is and adds to a calendar', async ({
+      page,
+    }) => {
+      const card = panel
+        .getByTestId('promo')
+        .locator('[data-block="event-card"]');
+      await expect(card).toHaveAttribute('data-state', 'upcoming');
+      await expect(card.locator('[data-chip]')).toHaveText('In 3 months');
+      await expect(card.locator('time')).toHaveAttribute(
+        'datetime',
+        '2027-03-15T13:30:00.000Z'
+      );
+      await expect(
+        card.getByRole('link', { name: 'Get tickets: Live cooking night' })
+      ).toHaveAttribute('href', 'https://example.com/tickets');
+      const open = card.locator('summary');
+      const box = await open.boundingBox();
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(await tapMin(page));
+      const google = card.getByRole('link', { name: 'Google Calendar' });
+      await expect(google).toBeHidden();
+      await open.click();
+      await expect(google).toBeVisible();
+      const params = new URL((await google.getAttribute('href'))!).searchParams;
+      expect(params.get('dates')).toBe('20270315T133000Z/20270315T163000Z');
+      expect(params.get('ctz')).toBe('Asia/Kolkata');
+      const file = card.getByRole('link', { name: 'Other calendars (.ics)' });
+      await expect(file).toHaveAttribute('download', 'live-cooking-night.ics');
+      const href = (await file.getAttribute('href'))!;
+      expect(href.startsWith('data:text/calendar;charset=utf-8,')).toBe(true);
+      const text = decodeURIComponent(href.slice(href.indexOf(',') + 1));
+      expect(text).toContain('DTSTART:20270315T133000Z');
+      expect(text).toContain('LOCATION:The Old Hall\\, Pune');
+    });
+
     test('a locked link stays out of the page until the code is right', async ({
       page,
     }) => {

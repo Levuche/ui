@@ -82,10 +82,14 @@ export function readBlockAction(event: Event): BlockAction | null {
     ...(control instanceof HTMLAnchorElement
       ? {
           // A link marked data-href-private carries what a visitor typed
-          // (a message card's text): report it without its query.
-          href: control.hasAttribute('data-href-private')
-            ? control.href.replace(/[?#].*$/s, '')
-            : control.href,
+          // (a message card's text): report it without its query. A file
+          // the page made itself (an .ics download) would carry the whole
+          // file: report only what kind of file it is.
+          href: /^(data|blob):/i.test(control.href)
+            ? control.href.replace(/^(data:[^;,]*|blob:).*$/is, '$1')
+            : control.hasAttribute('data-href-private')
+              ? control.href.replace(/[?#].*$/s, '')
+              : control.href,
         }
       : {}),
     ...(sell ? { sell } : {}),

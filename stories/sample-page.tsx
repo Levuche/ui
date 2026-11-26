@@ -2,6 +2,7 @@ import {
   AppIcon,
   BookingCard,
   Countdown,
+  EventCard,
   DiscountCode,
   FaqList,
   FeaturedLink,
@@ -190,6 +191,16 @@ export function SamplePage({ words = SAMPLE_WORDS }: { words?: SampleWords }) {
         <Countdown
           title="The caption playbook drops in"
           to={new Date(SAMPLE_NOW + 3 * 86_400_000 + 5 * 3_600_000)}
+          now={SAMPLE_NOW}
+        />
+        <EventCard
+          title="Live cooking night"
+          start="2027-03-15T19:00"
+          end="2027-03-15T22:00"
+          timeZone="Asia/Kolkata"
+          venue="The Old Hall"
+          city="Pune"
+          href="https://example.com/tickets"
           now={SAMPLE_NOW}
         />
         <DiscountCode

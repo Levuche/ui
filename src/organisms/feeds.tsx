@@ -5,6 +5,11 @@ import { CalendarIcon, MapPinIcon } from '../atoms/icons';
 import { SiteLink } from '../atoms/link';
 import { Badge } from '../atoms/text';
 import { Thumb } from '../atoms/thumb';
+import {
+  AddToCalendar,
+  CALENDAR_LABELS,
+  type CalendarLabels,
+} from '../molecules/add-to-calendar';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { LiveData } from '../molecules/live-data';
 import { PlayFrame } from '../molecules/play-frame';
@@ -327,7 +332,15 @@ export function LiveStatus({
 export type EventItem = {
   /** As the visitor reads it, such as "Sat 6 Dec". */
   date: string;
+  /**
+   * When it starts, as "2026-12-06T19:00" or "2026-12-06" (see calendar.ts).
+   * With it, the row gets an "Add to calendar" button.
+   */
   dateTime?: string;
+  /** When it ends; for an all-day event, its last day. */
+  end?: string;
+  /** Where it happens, as "Europe/London". */
+  timeZone?: string;
   title: string;
   venue?: string;
   city?: string;
@@ -336,28 +349,36 @@ export type EventItem = {
   soldOut?: boolean;
 };
 
-export type EventListLabels = { tickets: string; soldOut: string };
+export type EventListLabels = CalendarLabels & {
+  tickets: string;
+  soldOut: string;
+};
 
 export const EVENT_LIST_LABELS: EventListLabels = {
+  ...CALENDAR_LABELS,
   tickets: 'Tickets',
   soldOut: 'Sold out',
 };
 
 /**
  * Upcoming events or tour dates with ticket links. Type them in, or let the
- * app pass them from a tour-dates feed.
+ * app pass them from a tour-dates feed. A row whose `dateTime` can be read
+ * gets "Add to calendar" too, unless `calendar` is off.
  */
 export function EventList({
   data,
   loading,
   error,
   title,
+  calendar = true,
   labels,
   headingAs = 'h2',
   ...root
 }: BlockRootProps &
   LiveProps<EventItem[]> & {
     title?: ReactNode;
+    /** Show "Add to calendar" on each row with a `dateTime`. */
+    calendar?: boolean;
     labels?: Partial<EventListLabels>;
     headingAs?: HeadingTag;
   }) {
@@ -372,7 +393,7 @@ export function EventList({
             {events.map((event, n) => (
               <li
                 key={n}
-                className="border-site-border flex flex-wrap items-center gap-3 border-b pb-3 last:border-0 last:pb-0"
+                className="border-site-border flex flex-wrap items-start gap-3 border-b pb-3 last:border-0 last:pb-0"
               >
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <time
@@ -392,19 +413,40 @@ export function EventList({
                     </p>
                   ) : null}
                 </div>
-                {event.soldOut ? (
-                  <Badge tone="outline">{words.soldOut}</Badge>
-                ) : event.href ? (
-                  <SiteLinkButton
-                    href={event.href}
-                    newTab
-                    size="sm"
-                    action="event_tickets"
-                    aria-label={`${words.tickets}: ${event.title}, ${event.date}`}
-                  >
-                    {words.tickets}
-                  </SiteLinkButton>
-                ) : null}
+                <div className="flex flex-wrap items-start gap-2">
+                  {event.soldOut ? (
+                    <Badge tone="outline" className="mt-2.5">
+                      {words.soldOut}
+                    </Badge>
+                  ) : event.href ? (
+                    <SiteLinkButton
+                      href={event.href}
+                      newTab
+                      size="sm"
+                      action="event_tickets"
+                      aria-label={`${words.tickets}: ${event.title}, ${event.date}`}
+                    >
+                      {words.tickets}
+                    </SiteLinkButton>
+                  ) : null}
+                  {calendar && event.dateTime ? (
+                    <AddToCalendar
+                      event={{
+                        title: event.title,
+                        start: event.dateTime,
+                        end: event.end,
+                        timeZone: event.timeZone,
+                        location:
+                          [event.venue, event.city]
+                            .filter(Boolean)
+                            .join(', ') || undefined,
+                        url: event.href,
+                      }}
+                      labels={words}
+                      context={`${event.title}, ${event.date}`}
+                    />
+                  ) : null}
+                </div>
               </li>
             ))}
           </ul>
