@@ -890,6 +890,16 @@ seconds a pass, `direction` `start` or `end`, and a `separator`).
 off screen, stand still for visitors who ask for less motion, and are read
 to screen readers once, in order.
 
+`CreatorHeader` can set the creator's name apart from the rest of the text:
+`nameColor` (`text`, `accent` or `link` from the theme), `nameTint` (a
+colour of their own, used only when `isSafeColor` passes), `nameCase`
+(`upper` for capitals) and `nameWeight` (`medium` to `black`).
+`SectionHeading` takes the same as `titleColor`, `titleTint`, `titleCase`
+and `titleWeight`. Capitals are only a style, so screen readers hear the
+words as typed. `nameColorIssue(name, look, theme)` says when the colour is
+too faint to read on its block, as `contrastIssues` does for a theme, and
+suggests the theme's text colour.
+
 `MessageCard` opens a chat on WhatsApp, Telegram, a text, email or
 Messenger with a message ready to send (`channel`, `to`, `message`, and
 `subject` for email). `messageHref` builds the link on its own: phone

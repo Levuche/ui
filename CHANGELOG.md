@@ -4,6 +4,23 @@ What changed in each release of `@levuche/ui`, newest first. Each release
 pull request into `dev` adds its section here, with anything an app must
 change when it moves to that version.
 
+## Unreleased
+
+### Added
+
+- The creator's name in its own style: `CreatorHeader` `nameColor` (`text`,
+  `accent` or `link`), `nameTint` (a colour of the creator's own, checked
+  with `isSafeColor`), `nameCase` (`upper` for capitals) and `nameWeight`
+  (`medium`, `semibold`, `bold` or `black`). `SectionHeading` takes the same
+  as `titleColor`, `titleTint`, `titleCase` and `titleWeight`. Each is off
+  until set, so pages look as before. `nameColorIssue` warns when the colour
+  is too faint on its block; `nameLook` gives the classes and style for any
+  other heading.
+
+### An app must change
+
+Nothing.
+
 ## 0.3.0 (2026-11-26)
 
 Everything the page editor in the app needs: each block describes its
