@@ -1,4 +1,11 @@
-import { BLOCKS, BLOCK_GROUPS, isPaidPack, type BlockGroup } from '../../src';
+import {
+  BLOCKS,
+  BLOCK_GROUPS,
+  OUTSIDE_SERVICES,
+  isPaidPack,
+  type BlockGroup,
+  type BlockPrivacy,
+} from '../../src';
 
 /** Each group's name in the editor's menu. */
 const GROUP_NAMES: Record<BlockGroup, string> = {
@@ -14,10 +21,21 @@ const GROUP_NAMES: Record<BlockGroup, string> = {
   page: 'Page',
 };
 
+/** The sites a block loads from, and the most it may set. */
+function loadsFrom(privacy: BlockPrivacy) {
+  const sites = privacy.services.map((id) => OUTSIDE_SERVICES[id].name);
+  const cookies =
+    privacy.cookies === 'none' ? 'no cookies' : `cookies: ${privacy.cookies}`;
+  return sites.length
+    ? `${sites.join(', ')} (${cookies})`
+    : `Nothing (${cookies})`;
+}
+
 /*
  * Every block in the registry, by group, with what it's for, its grid kind,
- * whether it's free and how many settings it has. Read from BLOCKS, so this
- * page never falls behind the code.
+ * whether it's free, how many settings it has, what it loads from other
+ * sites and how it works with a keyboard and a screen reader. Read from
+ * BLOCKS, so this page never falls behind the code.
  */
 export function BlockTable() {
   return (
@@ -38,6 +56,8 @@ export function BlockTable() {
                   <th>Grid kind</th>
                   <th>In Levuche</th>
                   <th>Settings</th>
+                  <th>Loads from</th>
+                  <th>Keyboard and screen reader</th>
                 </tr>
               </thead>
               <tbody>
@@ -54,6 +74,11 @@ export function BlockTable() {
                         : 'Free'}
                     </td>
                     <td>{block.settings.length}</td>
+                    <td>{loadsFrom(block.privacy)}</td>
+                    <td>
+                      <p>{block.accessibility.keyboard}</p>
+                      <p>{block.accessibility.screenReader}</p>
+                    </td>
                   </tr>
                 ))}
               </tbody>

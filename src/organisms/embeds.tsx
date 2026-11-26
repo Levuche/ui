@@ -14,6 +14,11 @@ import {
 } from '../system/embeds';
 import { youtubeId } from './media';
 import type { ImageSrc } from '../system/image';
+import {
+  consentNotice,
+  OUTSIDE_SERVICES,
+  type ConsentLabels,
+} from '../system/privacy';
 
 /** What every player from another site may do inside its frame. */
 const SANDBOX =
@@ -37,6 +42,13 @@ type EmbedProps = BlockRootProps & {
   /** A picture shown until the visitor presses play. */
   poster?: ImageSrc | null;
   labels?: Partial<EmbedLabels>;
+  /**
+   * Whether the visitor agreed to the service, from the page's cookie
+   * notice. False shows a notice and a Load button first; leave it out on
+   * pages that don't ask.
+   */
+  consent?: boolean;
+  consentLabels?: Partial<ConsentLabels>;
   headingAs?: HeadingTag;
 };
 
@@ -53,6 +65,8 @@ function EmbedBody({
   detail,
   poster,
   labels,
+  consent,
+  consentLabels,
   headingAs = 'h3',
   ...root
 }: EmbedProps & { name: string; embed: Embed | null }) {
@@ -72,6 +86,12 @@ function EmbedBody({
           playIcon={<PlayIcon size={28} />}
           sandbox={SANDBOX}
           action={`play_${embed.service}`}
+          consent={consent}
+          notice={consentNotice(
+            OUTSIDE_SERVICES[embed.service].name,
+            consentLabels
+          )}
+          consentLabels={consentLabels}
         />
       ) : (
         <LinkTile

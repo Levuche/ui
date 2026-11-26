@@ -12,6 +12,11 @@ import { Rating } from '../molecules/rating';
 import { cn } from '../system/cn';
 import type { LiveProps } from '../system/live';
 import { columnSizes, type ImageSrc } from '../system/image';
+import {
+  consentNotice,
+  OUTSIDE_SERVICES,
+  type ConsentLabels,
+} from '../system/privacy';
 
 const subHeading = (tag: HeadingTag): HeadingTag =>
   tag === 'h2' ? 'h3' : tag === 'h3' ? 'h4' : 'p';
@@ -236,6 +241,8 @@ export function LiveStatus({
   error,
   parents,
   labels,
+  consent,
+  consentLabels,
   locale,
   headingAs = 'h3',
   ...root
@@ -244,6 +251,13 @@ export function LiveStatus({
     /** The page's own hosts, such as ["levuche.com"], for Twitch's player. */
     parents?: string[];
     labels?: Partial<LiveStatusLabels>;
+    /**
+     * Whether the visitor agreed to Twitch, from the page's cookie notice.
+     * False shows a notice and a Load button in place of the player's
+     * button; leave it out on pages that don't ask.
+     */
+    consent?: boolean;
+    consentLabels?: Partial<ConsentLabels>;
     locale?: string;
     headingAs?: HeadingTag;
   }) {
@@ -302,6 +316,12 @@ export function LiveStatus({
                   title={status.title ?? status.channel}
                   playLabel={words.play.replace('{channel}', status.channel)}
                   action="play_live"
+                  consent={consent}
+                  notice={consentNotice(
+                    OUTSIDE_SERVICES.twitch.name,
+                    consentLabels
+                  )}
+                  consentLabels={consentLabels}
                 />
               ) : null}
               <SiteLinkButton

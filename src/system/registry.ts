@@ -3,8 +3,18 @@ import { BLOCK_TONES } from './look';
 import { EMBED_SERVICES } from './embeds';
 import { MESSAGE_CHANNELS } from './message';
 import {
+  LOADS_NOTHING,
+  SERVER_FETCHED,
+  addUpPrivacy,
+  type BlockAccessibility,
+  type BlockPrivacy,
+  type PageBlock,
+  type PagePrivacy,
+} from './privacy';
+import {
   BUTTON_VARIANT_LABELS,
   BUTTON_VARIANT_OPTIONS,
+  CONSENT_LABELS_SETTING,
   FORM_APP_ONLY,
   LINK_BEHAVIOR_SETTINGS,
   LIVE_APP_ONLY,
@@ -29,7 +39,21 @@ import {
  * `settings` for what a creator sets, `appOnly` for the props the app fills
  * in. src/settings-check.ts fails the type check when they and the block's
  * props disagree, so a new prop needs its setting written here.
+ *
+ * And each entry has two notes for the page and the docs: `privacy`, what it
+ * loads from other sites and the cookies that may come with it (see
+ * privacy.ts), and `accessibility`, how it's used with a keyboard and what a
+ * screen reader hears. A block that loads another site lists it, and takes
+ * `consent` (e2e/privacy.spec.ts checks both).
  */
+
+/** The note for a form: it sends only when the visitor submits it. */
+const SENDS_ON_SUBMIT = {
+  services: [],
+  cookies: 'none',
+  reason:
+    'Sends what you type to this site only when you submit it; loads nothing from other sites.',
+} as const satisfies BlockPrivacy;
 
 /*
  * Packs say which blocks a creator gets free in Levuche and which they unlock
@@ -88,6 +112,10 @@ export type BlockInfo = {
    * fetches, form status, the locale, headingAs, children and the like.
    */
   appOnly: readonly string[];
+  /** What it loads from other sites, and the cookies that may come with it. */
+  privacy: BlockPrivacy;
+  /** How it's used with a keyboard, and what a screen reader hears. */
+  accessibility: BlockAccessibility;
 };
 
 export const BLOCKS = [
@@ -181,6 +209,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['headingAs', 'children'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'The name as a heading, then the tagline; the picture is described by its alt text and the tick by its own words.',
+    },
   },
   {
     id: 'social-icons',
@@ -231,6 +265,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each icon; Enter opens it.',
+      screenReader:
+        'A navigation list; each icon is read by the account’s name.',
+    },
   },
   {
     id: 'link-list',
@@ -301,6 +341,11 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader: 'A navigation list of links, each read by its words.',
+    },
   },
   {
     id: 'action-card',
@@ -382,6 +427,13 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY, 'headingAs', 'action'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab reaches the card’s link or button; Enter or Space presses it.',
+      screenReader:
+        'The title, the details and the button’s words; a live badge is read as its label.',
+    },
   },
   {
     id: 'featured-link',
@@ -422,6 +474,11 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader: 'One link, read by its title, with the picture’s alt text.',
+    },
   },
   {
     id: 'pack-row',
@@ -461,6 +518,12 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the buy button; Enter or Space presses it.',
+      screenReader:
+        'The product’s name, its price (and the old price) and the button; buying news is read out as it happens.',
+    },
   },
   {
     id: 'featured-pack',
@@ -506,6 +569,12 @@ export const BLOCKS = [
       ...SELL_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY, 'headingAs', 'action'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the buy button; Enter or Space presses it.',
+      screenReader:
+        'The product as a heading, what’s in it as a list, the price and the button; buying news is read out.',
+    },
   },
   {
     id: 'pack-grid',
@@ -568,6 +637,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['renderBuy'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab moves from product to product; Enter or Space presses a buy button.',
+      screenReader: 'A list of products, each with its name, price and button.',
+    },
   },
   {
     id: 'credit-pack',
@@ -633,6 +708,12 @@ export const BLOCKS = [
       ...SELL_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY, 'locale', 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the buy button; Enter or Space presses it.',
+      screenReader:
+        'The pack’s name, how many credits, the price and the button.',
+    },
   },
   {
     id: 'slot-picker',
@@ -684,6 +765,13 @@ export const BLOCKS = [
       'onChange',
       'headingAs',
     ],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab moves between the day and time groups; arrow keys pick within one; Tab then reaches the book button.',
+      screenReader:
+        'Two labelled groups of choices (day, then time), each read with how many there are, then the button.',
+    },
   },
   {
     id: 'pack-checkout',
@@ -736,6 +824,13 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...FORM_APP_ONLY],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab reaches the download consent box (Space ticks it), then the buy button.',
+      screenReader:
+        'The product, the price, the consent box with its words, and the button.',
+    },
   },
   {
     id: 'booking-card',
@@ -790,6 +885,11 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY, 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the book button; Enter or Space presses it.',
+      screenReader: 'The session’s name, its length and price, and the button.',
+    },
   },
   {
     id: 'membership-card',
@@ -858,6 +958,12 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY, 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the join button; Enter or Space presses it.',
+      screenReader:
+        'The tier’s name, its price, what members get as a list, and the button.',
+    },
   },
   {
     id: 'lead-magnet',
@@ -898,6 +1004,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...FORM_APP_ONLY, 'headingAs'],
+    privacy: SENDS_ON_SUBMIT,
+    accessibility: {
+      keyboard: 'Tab reaches the email box and the button; Enter sends.',
+      screenReader:
+        'The offer, the labelled email box, and the form’s result read out when it arrives.',
+    },
   },
   {
     id: 'tip-jar',
@@ -957,6 +1069,13 @@ export const BLOCKS = [
       { name: 'labels', label: 'Words', type: 'words', from: 'TIP_JAR_LABELS' },
     ],
     appOnly: [...FORM_APP_ONLY, 'icon'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Arrow keys pick an amount; Tab reaches the box for your own amount and the button.',
+      screenReader:
+        'A labelled group of amounts, the amount box, and the button.',
+    },
   },
   {
     id: 'discount-code',
@@ -983,6 +1102,12 @@ export const BLOCKS = [
       { name: 'labels', label: 'Words', type: 'words', from: 'COPY_LABELS' },
     ],
     appOnly: ['copy'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the copy button; Enter or Space copies the code.',
+      screenReader:
+        'The code and the button; “copied” or “couldn’t copy” is read out.',
+    },
   },
   {
     id: 'countdown',
@@ -1021,6 +1146,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['now', 'onDone'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'A timer that isn’t read out every second; when it ends, the end words are read once.',
+    },
   },
   {
     id: 'testimonials',
@@ -1077,6 +1208,11 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press, besides any links in the quotes.',
+      screenReader: 'Each quote, who said it and a star rating read as words.',
+    },
   },
   {
     id: 'faq-list',
@@ -1114,6 +1250,13 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab reaches each question; Enter or Space opens or closes its answer.',
+      screenReader:
+        'Each question as a button that says whether it’s open, then its answer.',
+    },
   },
   {
     id: 'youtube-video',
@@ -1168,8 +1311,21 @@ export const BLOCKS = [
         type: 'text',
         help: 'Left empty: "Play video: {title}".',
       },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: [],
+    appOnly: ['consent'],
+    privacy: {
+      services: ['youtube'],
+      cookies: 'marketing',
+      reason:
+        'Plays the video from YouTube’s privacy-enhanced player; once it loads, YouTube sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the play (or Load) button; Enter or Space loads the video and moves focus into it.',
+      screenReader:
+        'A button named by the video’s title; YouTube’s own player once it loads.',
+    },
   },
   {
     id: 'reel-grid',
@@ -1202,6 +1358,11 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each reel that has a link; Enter opens it.',
+      screenReader: 'A list of reels, each link named by its label.',
+    },
   },
   {
     id: 'image-grid',
@@ -1249,6 +1410,11 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each picture that has a link.',
+      screenReader: 'Each picture’s alt text, and its caption.',
+    },
   },
   {
     id: 'newsletter-band',
@@ -1290,6 +1456,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...FORM_APP_ONLY],
+    privacy: SENDS_ON_SUBMIT,
+    accessibility: {
+      keyboard: 'Tab reaches the email box and the button; Enter sends.',
+      screenReader:
+        'The heading, the labelled email box, and the form’s result read out when it arrives.',
+    },
   },
   {
     id: 'creator-footer',
@@ -1326,6 +1498,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'A labelled navigation of policy links, then the credit line.',
+    },
   },
   {
     id: 'site-image',
@@ -1365,6 +1543,11 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the picture when it’s a link.',
+      screenReader: 'The picture’s alt text and its caption.',
+    },
   },
   {
     id: 'image-carousel',
@@ -1447,6 +1630,13 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['index', 'onIndexChange'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Arrow keys move between slides; Tab reaches the previous, next, pause and dot buttons. Autoplay stops while focus is inside.',
+      screenReader:
+        'A carousel named by its title; each slide is “slide n of m”, and the slide shown is read when it changes by hand.',
+    },
   },
   {
     id: 'before-after',
@@ -1510,6 +1700,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['position', 'onPositionChange'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the slider; arrow keys, Home and End move it.',
+      screenReader:
+        'A slider named by its label, read as how much of each picture shows, with both pictures’ alt text.',
+    },
   },
   {
     id: 'logo-strip',
@@ -1578,6 +1774,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Nothing to press; a scrolling strip stops while hovered or focused, and stands still for visitors who ask for less motion.',
+      screenReader: 'A labelled list of logos, each read once by its alt text.',
+    },
   },
   {
     id: 'contact-form',
@@ -1628,6 +1830,13 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...FORM_APP_ONLY, 'headingAs', 'children'],
+    privacy: SENDS_ON_SUBMIT,
+    accessibility: {
+      keyboard:
+        'Tab moves through name, email, message and the send button; Enter in a box sends.',
+      screenReader:
+        'Each box by its label and hint, errors on the boxes they’re about, and the result read out.',
+    },
   },
   {
     id: 'message-card',
@@ -1713,6 +1922,18 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['headingAs'],
+    privacy: {
+      services: [],
+      cookies: 'none',
+      reason:
+        'Opens your chat or email app with the message ready; loads nothing from other sites before you press it.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the message box (when it can be changed) and the button; Enter or Space opens your app.',
+      screenReader:
+        'The message, the labelled box, and a button named by where it opens.',
+    },
   },
   {
     id: 'save-contact',
@@ -1773,6 +1994,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab reaches the save button; Enter downloads the contact card.',
+      screenReader: 'A link that downloads, named by its words.',
+    },
   },
   {
     id: 'stats-row',
@@ -1824,6 +2051,12 @@ export const BLOCKS = [
       { name: 'animate', label: 'Count up', type: 'toggle', default: true },
     ],
     appOnly: ['locale', 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'Each number and its label, read as the final number, never as it counts up.',
+    },
   },
   {
     id: 'timeline',
@@ -1865,6 +2098,11 @@ export const BLOCKS = [
       { name: 'title', label: 'Title', type: 'text' },
     ],
     appOnly: ['headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press, besides any links.',
+      screenReader: 'An ordered list of milestones, each with its date.',
+    },
   },
   {
     id: 'map-card',
@@ -1937,8 +2175,21 @@ export const BLOCKS = [
         type: 'words',
         from: 'MAP_CARD_LABELS',
       },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs', 'children'],
+    appOnly: ['headingAs', 'children', 'consent'],
+    privacy: {
+      services: ['openstreetmap'],
+      cookies: 'needed',
+      reason:
+        'Loads the map from OpenStreetMap when you press it, which sees your IP address; directions open in your maps app or site.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the map (or Load) button, then directions; Enter loads the map and moves focus into it.',
+      screenReader:
+        'The place as a heading, the address, the opening hours as a labelled list, and the directions link.',
+    },
   },
   {
     id: 'qr-code',
@@ -2009,6 +2260,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['encode', 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the download button; Enter downloads the code.',
+      screenReader:
+        'The code as a picture named by what it opens, and the address under it.',
+    },
   },
   {
     id: 'locked-link',
@@ -2084,6 +2341,18 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: ['unlock', 'rememberAs', 'onUnlock'],
+    privacy: {
+      services: [],
+      cookies: 'needed',
+      reason:
+        'Remembers in this tab that you unlocked the link, until the tab closes; loads nothing from other sites.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the button; Enter opens a dialog that keeps focus inside, Escape closes it and focus goes back.',
+      screenReader:
+        'A button that says it opens a dialog; the dialog is named by its title, and a wrong code is read out.',
+    },
   },
   {
     id: 'course-card',
@@ -2141,6 +2410,12 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY, 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the buy button; Enter or Space presses it.',
+      screenReader:
+        'The course as a heading, its lessons, length and price, and the button.',
+    },
   },
   {
     id: 'pricing-table',
@@ -2252,6 +2527,13 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: ['renderBuy', 'period', 'onPeriodChange', 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Arrow keys switch monthly and yearly; Tab moves through each plan’s button.',
+      screenReader:
+        'A labelled monthly or yearly choice, then each plan with its price, what’s in it and its button.',
+    },
   },
   {
     id: 'top-picks',
@@ -2306,6 +2588,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'A list of products, each link named by its title, with affiliate links marked in words.',
+    },
   },
   {
     id: 'booking-embed',
@@ -2360,8 +2648,21 @@ export const BLOCKS = [
         type: 'words',
         from: 'BOOKING_EMBED_LABELS',
       },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs', 'onOpen'],
+    appOnly: ['headingAs', 'onOpen', 'consent'],
+    privacy: {
+      services: ['booking'],
+      cookies: 'marketing',
+      reason:
+        'Shows the creator’s booking site inside the page; that site sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the button; Enter opens the booking page in a dialog (Escape closes it), or Load shows it in the page and moves focus into it.',
+      screenReader:
+        'A button that says it opens a dialog; the booking page is named by its title, with a plain link to it as well.',
+    },
   },
   {
     id: 'latest-videos',
@@ -2415,6 +2716,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...LIVE_APP_ONLY, 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'A list of videos, each link named by its title; “Loading” while there’s no data.',
+    },
   },
   {
     id: 'latest-posts',
@@ -2455,6 +2762,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...LIVE_APP_ONLY, 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'A list of posts, each link named by its title, with its date; “Loading” while there’s no data.',
+    },
   },
   {
     id: 'live-status',
@@ -2482,8 +2795,21 @@ export const BLOCKS = [
         type: 'words',
         from: 'LIVE_STATUS_LABELS',
       },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: [...LIVE_APP_ONLY, 'parents', 'locale', 'headingAs'],
+    appOnly: [...LIVE_APP_ONLY, 'parents', 'locale', 'headingAs', 'consent'],
+    privacy: {
+      services: ['twitch'],
+      cookies: 'marketing',
+      reason:
+        'Shows whether the channel is live from data this site fetched; the Twitch player loads only when you press it, and Twitch may set cookies then.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the player (or Load) button and the channel link; Enter loads the player and moves focus into it.',
+      screenReader:
+        'The channel as a heading, “live” or “offline” in words, the title and viewers, and the link.',
+    },
   },
   {
     id: 'event-list',
@@ -2526,6 +2852,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['loading', 'error', 'updatedAt', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each ticket link; Enter opens it.',
+      screenReader:
+        'A list of events, each with its date and place; each ticket link says which event it’s for.',
+    },
   },
   {
     id: 'review-summary',
@@ -2572,6 +2904,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...LIVE_APP_ONLY, 'locale', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'The rating read as words (“4.8 out of 5 stars”), the count, and each review.',
+    },
   },
   {
     id: 'now-playing',
@@ -2613,6 +2951,11 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader: 'What’s playing or being read, by title and who made it.',
+    },
   },
   {
     id: 'github-profile',
@@ -2637,6 +2980,12 @@ export const BLOCKS = [
       { name: 'labels', label: 'Words', type: 'words', from: 'GITHUB_LABELS' },
     ],
     appOnly: [...LIVE_APP_ONLY, 'locale', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'The name as a heading, the bio, and followers, repos and stars as labelled numbers.',
+    },
   },
   {
     id: 'contribution-graph',
@@ -2667,6 +3016,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...LIVE_APP_ONLY, 'locale', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'The year’s total and the streaks in words; the squares are hidden from screen readers.',
+    },
   },
   {
     id: 'repo-card',
@@ -2691,6 +3046,12 @@ export const BLOCKS = [
       { name: 'labels', label: 'Words', type: 'words', from: 'REPO_LABELS' },
     ],
     appOnly: [...LIVE_APP_ONLY, 'locale', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'The repository’s name as a link, its description, language, and stars and forks with their words.',
+    },
   },
   {
     id: 'repo-list',
@@ -2724,6 +3085,12 @@ export const BLOCKS = [
       { name: 'labels', label: 'Words', type: 'words', from: 'REPO_LABELS' },
     ],
     appOnly: [...LIVE_APP_ONLY, 'locale', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'A list of repositories, each with its stars and forks in words.',
+    },
   },
   {
     id: 'package-stats',
@@ -2748,6 +3115,12 @@ export const BLOCKS = [
       { name: 'labels', label: 'Words', type: 'words', from: 'PACKAGE_LABELS' },
     ],
     appOnly: [...LIVE_APP_ONLY, 'locale', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'The version and downloads as labelled numbers; the chart is a picture named by its label.',
+    },
   },
   {
     id: 'tech-stack',
@@ -2773,6 +3146,12 @@ export const BLOCKS = [
       { name: 'title', label: 'Title', type: 'text' },
     ],
     appOnly: ['headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each chip that has a link.',
+      screenReader:
+        'A list of tools, each by its name; the logos are decoration.',
+    },
   },
   {
     id: 'spotify-embed',
@@ -2814,8 +3193,21 @@ export const BLOCKS = [
         help: 'Shown until play is pressed.',
       },
       { name: 'labels', label: 'Words', type: 'words', from: 'EMBED_LABELS' },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs'],
+    appOnly: ['headingAs', 'consent'],
+    privacy: {
+      services: ['spotify'],
+      cookies: 'marketing',
+      reason:
+        'Plays from Spotify once you press play; Spotify then sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the play (or Load) button; Enter or Space loads the player and moves focus into it.',
+      screenReader:
+        'A button named by what’s playing; Spotify’s own player once it loads.',
+    },
   },
   {
     id: 'tiktok-video',
@@ -2856,8 +3248,21 @@ export const BLOCKS = [
         help: 'Shown until play is pressed.',
       },
       { name: 'labels', label: 'Words', type: 'words', from: 'EMBED_LABELS' },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs'],
+    appOnly: ['headingAs', 'consent'],
+    privacy: {
+      services: ['tiktok'],
+      cookies: 'marketing',
+      reason:
+        'Plays from TikTok once you press play; TikTok then sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the play (or Load) button; Enter or Space loads the video and moves focus into it.',
+      screenReader:
+        'A button named by the video’s title; TikTok’s own player once it loads.',
+    },
   },
   {
     id: 'instagram-post',
@@ -2899,8 +3304,21 @@ export const BLOCKS = [
         help: 'Shown until play is pressed.',
       },
       { name: 'labels', label: 'Words', type: 'words', from: 'EMBED_LABELS' },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs'],
+    appOnly: ['headingAs', 'consent'],
+    privacy: {
+      services: ['instagram'],
+      cookies: 'marketing',
+      reason:
+        'Shows the post from Instagram once you press play; Instagram then sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the play (or Load) button; Enter or Space loads the post and moves focus into it.',
+      screenReader:
+        'A button named by the post’s title; Instagram’s own post once it loads.',
+    },
   },
   {
     id: 'link-embed',
@@ -2949,8 +3367,29 @@ export const BLOCKS = [
         help: 'Left empty: all of them.',
       },
       { name: 'labels', label: 'Words', type: 'words', from: 'EMBED_LABELS' },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs'],
+    appOnly: ['headingAs', 'consent'],
+    privacy: {
+      services: [
+        'youtube',
+        'spotify',
+        'tiktok',
+        'instagram',
+        'vimeo',
+        'soundcloud',
+        'loom',
+      ],
+      cookies: 'marketing',
+      reason:
+        'Plays from the service the link is on (such as YouTube or Spotify) once you press play; it then sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the play (or Load) button, or the link when it can’t play; Enter loads it and moves focus into it.',
+      screenReader:
+        'A button named by the title, or a plain link when the service isn’t on the list.',
+    },
   },
   {
     id: 'audio-player',
@@ -2995,8 +3434,21 @@ export const BLOCKS = [
         type: 'words',
         from: 'AUDIO_BAR_LABELS',
       },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs'],
+    appOnly: ['headingAs', 'consent'],
+    privacy: {
+      services: ['audio-host'],
+      cookies: 'none',
+      reason:
+        'Downloads the audio only when you press play, from the site it’s on, which sees your IP address.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches play, then the position slider (arrow keys move it) and the transcript link.',
+      screenReader:
+        'A play button named by the track, the position as “time of total”, and the transcript link.',
+    },
   },
   {
     id: 'podcast-episodes',
@@ -3046,8 +3498,21 @@ export const BLOCKS = [
         type: 'words',
         from: 'AUDIO_BAR_LABELS',
       },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: [...LIVE_APP_ONLY, 'headingAs'],
+    appOnly: [...LIVE_APP_ONLY, 'headingAs', 'consent'],
+    privacy: {
+      services: ['audio-host'],
+      cookies: 'none',
+      reason:
+        'Downloads an episode only when you press play, from the podcast’s host, which sees your IP address.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches each episode’s play button, its slider (arrow keys move it) and its links.',
+      screenReader:
+        'A list of episodes, each with a play button named by its title and its position as “time of total”.',
+    },
   },
 ] as const satisfies readonly BlockInfo[];
 
@@ -3086,4 +3551,14 @@ export function mainLinkSetting(id: string): LinkSetting | undefined {
     (field): field is LinkSetting =>
       field.type === 'link' && field.main === true
   );
+}
+
+/**
+ * Every outside service and kind of cookie a page's blocks may lead to, for
+ * its cookie notice and privacy page, from each block's `privacy` note. Pass
+ * a block as `{ id, services }` when you know which services it really
+ * loads, as the one a LinkEmbed link plays.
+ */
+export function pagePrivacy(blocks: readonly PageBlock[]): PagePrivacy {
+  return addUpPrivacy(blocks, (id) => blockInfo(id)?.privacy);
 }

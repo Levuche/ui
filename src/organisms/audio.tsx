@@ -6,6 +6,39 @@ import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { LiveData } from '../molecules/live-data';
 import type { LiveProps } from '../system/live';
 import type { ImageSrc } from '../system/image';
+import { consentNotice, siteName, type ConsentLabels } from '../system/privacy';
+
+type AudioConsent = {
+  /**
+   * Whether the visitor agreed to the sites the audio is on, from the page's
+   * cookie notice. False shows a line on what pressing play shares; leave it
+   * out on pages that don't ask. Audio on the page's own site needs none.
+   */
+  consent?: boolean;
+  /** `load` isn't used: the play button loads the audio. */
+  consentLabels?: Partial<ConsentLabels>;
+};
+
+/**
+ * The line under a player, when the visitor hasn't agreed to the sites its
+ * audio is on. Nothing downloads before play, so play is the agreement.
+ */
+function AudioNotice({
+  sources,
+  consent,
+  consentLabels,
+}: AudioConsent & { sources: string[] }) {
+  if (consent !== false) return null;
+  const sites = [
+    ...new Set(sources.map(siteName).filter((s): s is string => !!s)),
+  ];
+  if (!sites.length) return null;
+  return (
+    <p data-consent="pending" className="text-site-text-2 m-0 text-sm">
+      {consentNotice(sites.join(', '), consentLabels)}
+    </p>
+  );
+}
 
 /** One track: play, pause, a bar to move through it, and the time. */
 export function AudioPlayer({
@@ -16,21 +49,24 @@ export function AudioPlayer({
   transcriptHref,
   heading,
   labels,
+  consent,
+  consentLabels,
   headingAs = 'h3',
   ...root
-}: BlockRootProps & {
-  src: string;
-  title: string;
-  /** Such as the artist. */
-  detail?: ReactNode;
-  image?: ImageSrc | null;
-  /** A page with the words, for visitors who can't listen. */
-  transcriptHref?: string;
-  /** A heading above the player, such as "My new single". */
-  heading?: ReactNode;
-  labels?: Partial<AudioBarLabels>;
-  headingAs?: HeadingTag;
-}) {
+}: BlockRootProps &
+  AudioConsent & {
+    src: string;
+    title: string;
+    /** Such as the artist. */
+    detail?: ReactNode;
+    image?: ImageSrc | null;
+    /** A page with the words, for visitors who can't listen. */
+    transcriptHref?: string;
+    /** A heading above the player, such as "My new single". */
+    heading?: ReactNode;
+    labels?: Partial<AudioBarLabels>;
+    headingAs?: HeadingTag;
+  }) {
   return (
     <Block name="audio-player" {...root}>
       {heading ? <ItemHead title={heading} headingAs={headingAs} /> : null}
@@ -41,6 +77,11 @@ export function AudioPlayer({
         image={image}
         transcriptHref={transcriptHref}
         labels={labels}
+      />
+      <AudioNotice
+        sources={[src]}
+        consent={consent}
+        consentLabels={consentLabels}
       />
     </Block>
   );
@@ -72,9 +113,12 @@ export function PodcastEpisodes({
   allHref,
   allLabel = 'All episodes',
   labels,
+  consent,
+  consentLabels,
   headingAs = 'h2',
   ...root
 }: BlockRootProps &
+  AudioConsent &
   LiveProps<PodcastEpisode[]> & {
     title?: ReactNode;
     limit?: number;
@@ -104,6 +148,11 @@ export function PodcastEpisodes({
                 </li>
               ))}
             </ul>
+            <AudioNotice
+              sources={episodes.slice(0, limit).map((e) => e.audioUrl)}
+              consent={consent}
+              consentLabels={consentLabels}
+            />
             {allHref ? (
               <SiteLink
                 href={allHref}
