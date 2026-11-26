@@ -4,7 +4,11 @@ What changed in each release of `@levuche/ui`, newest first. Each release
 pull request into `dev` adds its section here, with anything an app must
 change when it moves to that version.
 
-## Unreleased
+## 0.3.0 (2026-11-26)
+
+Everything the page editor in the app needs: each block describes its
+settings, ready-made looks, block backgrounds, preview mode, privacy and
+accessibility notes, and one page language, with 21 new blocks.
 
 ### Added
 
@@ -190,6 +194,38 @@ change when it moves to that version.
   kind and whether it's free, read from the registry.
 - README and stories: tracking clicks and sign-ups, and sending forms, with
   BuildBase.
+- `ActionCard`: a bold card in the accent colour, or any tone, with a
+  title, a line of detail and a bar across the bottom that says what happens
+  next. Beside the title it shows a picture, up to three covers fanned out
+  for a bundle, or the creator's photo with a dot while they're live. The
+  whole card is one press, a link or, with `sell`, a checkout through
+  BuildBase. `ribbon` puts a small tilted label ("Most popular") over the
+  corner of `ActionCard`, `FeaturedPack`, `MembershipCard` and a
+  `PricingTable` plan (`Ribbon` atom).
+- Card styles for the whole page: `SiteTheme.cards` is `flat` (as before),
+  `outlined`, `raised` (a soft shadow tinted by the accent) or `glass`, and
+  `SiteTheme.hover` lifts links and linked pictures a little under the
+  pointer. Both stay still for visitors who ask for less motion. Storybook's
+  toolbar has a Cards menu.
+- Colour checks for a creator's theme: `contrastIssues(theme)` lists each
+  pair the blocks draw that fails WCAG 2.2 AA, with the ratio, the colour to
+  change and a nearby colour that passes; `fixContrast(theme)` applies every
+  suggestion; `contrastRatio(a, b)` measures any two colours.
+- Pictures in the right size: every picture block takes a plain address or
+  an `ImageSource` with `srcSet`, `width`, `height` and `priority`, tells
+  the browser how wide it shows so a phone gets a small copy, and keeps its
+  space while it loads (`toImageSource`, `columnSizes`, `imageAttrs`).
+- Right-to-left scripts: `dir="rtl"` on the page or around the blocks
+  mirrors every block and grid page, and long words wrap inside their block.
+  Storybook's toolbar has a Direction menu.
+- `fitHeights(layout, measured, blocks)`: gives each block in a page
+  editor's grid the rows its measured height needs, so the editor matches
+  the live page.
+- `CreatorHeader` `verified` (a tick, with `verifiedLabel`), `nameSize`
+  (`lg` or `xl`) and `highlight` (some words of the tagline in italics and
+  the theme's new `displayFont`); `LinkTile` `image` and `trailing="arrow"`;
+  `SocialIcons` `iconStyle="chip"`; and with `was`, a price says what the
+  visitor saves ("Save $8"), changed with `saveLabel` (`priceSaving`).
 
 ### Changed
 
@@ -208,16 +244,24 @@ change when it moves to that version.
   `formatNextFree`) on the card before it's opened; `FeaturedPack` `href`, a
   checkout on another site for a product not sold through BuildBase, and
   `duration` on `FeaturedPack` and `PackRow` for a service.
+- Tracking reports a link to a file the page made itself (a `data:` or
+  `blob:` address) by its kind only, as `data:text/calendar`, not the whole
+  file.
+
+### Fixed
+
+- `CreatorHeader` centres its picture, name and tagline, as it was meant
+  to; `align="start"` and `"end"` still line them up on that side.
+- In right-to-left scripts, the carousel's arrows, arrow keys and swipes go
+  the right way, the before-and-after picture starts on the right side,
+  scrolling logos leave no gap, and the contact form's hidden field no
+  longer widens the page.
+- The photo ring in `CreatorHeader` leaves a see-through gap on any
+  background, not one filled with the card colour.
 
 ### An app must change
 
 Nothing.
-
-### Changed
-
-- Tracking reports a link to a file the page made itself (a `data:` or
-  `blob:` address) by its kind only, as `data:text/calendar`, not the whole
-  file.
 
 ## 0.2.0 (2026-11-25)
 
