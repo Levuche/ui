@@ -2,6 +2,7 @@ import type { BlockKind } from './grid';
 import { BLOCK_TONES } from './look';
 import { EMBED_SERVICES } from './embeds';
 import { MESSAGE_CHANNELS } from './message';
+import { MIN_MOTION_SECONDS } from './motion';
 import { SOCIAL_ACTIONS, SOCIAL_PLATFORMS } from './social';
 import {
   BUTTON_VARIANT_LABELS,
@@ -180,6 +181,29 @@ export const BLOCKS = [
         type: 'text',
         help: 'Beside the name, after the tick.',
         icon: 'tag',
+      },
+      {
+        name: 'wordRing',
+        label: 'Words around the picture',
+        type: 'text',
+        help: 'They turn slowly in a ring, as "Chai • Stories • Since 2019". Always still for visitors who ask for less motion.',
+      },
+      {
+        name: 'wordRingSpeed',
+        label: 'One turn takes',
+        type: 'number',
+        min: MIN_MOTION_SECONDS,
+        max: 120,
+        step: 1,
+        unit: 'seconds',
+        default: 24,
+        icon: 'clock',
+      },
+      {
+        name: 'wordRingLabels',
+        label: 'Words on the ring’s pause button',
+        type: 'words',
+        from: 'WORD_RING_LABELS',
       },
     ],
     appOnly: ['headingAs', 'children'],
@@ -1880,6 +1904,69 @@ export const BLOCKS = [
         label: 'Name for screen readers',
         type: 'text',
         default: 'Brands',
+      },
+    ],
+    appOnly: [],
+  },
+  {
+    id: 'text-strip',
+    component: 'TextStrip',
+    kind: 'band',
+    group: 'page',
+    client: true,
+    pack: 'growth',
+    summary: 'A band of words that scrolls across, with a pause button',
+    settings: [
+      {
+        name: 'items',
+        label: 'Words',
+        type: 'list',
+        of: 'text',
+        required: true,
+        itemLabel: 'Phrase',
+        min: 1,
+        help: 'Short phrases, as "New drop" or "Free shipping".',
+      },
+      {
+        name: 'separator',
+        label: 'Between phrases',
+        type: 'text',
+        default: '✦',
+        help: 'A mark or emoji. Left empty, none.',
+      },
+      {
+        name: 'speed',
+        label: 'One pass takes',
+        type: 'number',
+        min: MIN_MOTION_SECONDS,
+        max: 120,
+        step: 1,
+        unit: 'seconds',
+        default: 16,
+        icon: 'clock',
+      },
+      {
+        name: 'direction',
+        label: 'Moves towards',
+        type: 'choice',
+        options: ['start', 'end'],
+        optionLabels: {
+          start: 'Start of the line',
+          end: 'End of the line',
+        },
+        default: 'start',
+      },
+      {
+        name: 'label',
+        label: 'Name for screen readers',
+        type: 'text',
+        default: 'Highlights',
+      },
+      {
+        name: 'labels',
+        label: 'Words on the pause button',
+        type: 'words',
+        from: 'TEXT_STRIP_LABELS',
       },
     ],
     appOnly: [],

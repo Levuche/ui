@@ -128,6 +128,7 @@ export function FeaturedLink({
     <Block
       name="featured-link"
       defaults={{ tone: 'surface' }}
+      data-lift=""
       {...root}
       className={cn('overflow-hidden p-0', root.className)}
     >
@@ -188,6 +189,7 @@ export function SocialIcons({
               aria-label={name}
               title={name}
               action="social_click"
+              data-lift=""
               {...link}
               className={cn(
                 'text-site-text size-control-md inline-flex items-center justify-center rounded-full',
