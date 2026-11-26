@@ -55,6 +55,20 @@ change when it moves to that version.
 - README and stories: tracking clicks and sign-ups, and sending forms, with
   BuildBase.
 
+### Changed
+
+- New options on blocks already in use, each off until set, so pages look
+  as before: `CreatorHeader` `initialsFont="display"` sets the initials in
+  the theme's display font (and `Avatar` `initialsFont`); `MapCard`
+  `mapStyle` (`light`, `dark`, `satellite`) and `mapCaption`, a line over
+  the map's corner (`mapFrameUrl`); `NewsletterBand` `display="tile"`, a
+  small tile whose one button opens the form in a pop-up (`tileLabels`,
+  `NEWSLETTER_TILE_LABELS`, and `DialogButton` for any such button);
+  `BookingEmbed` `duration` and `nextFree` (with `timeZone`, `locale` and
+  `formatNextFree`) on the card before it's opened; `FeaturedPack` `href`, a
+  checkout on another site for a product not sold through BuildBase, and
+  `duration` on `FeaturedPack` and `PackRow` for a service.
+
 ### An app must change
 
 Nothing.

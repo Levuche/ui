@@ -40,6 +40,7 @@ export function PlayFrame({
   action = 'play',
   onPlay,
   className,
+  frameClassName,
 }: {
   /** The player's address, from a trusted maker (see each block). */
   src: string;
@@ -58,6 +59,8 @@ export function PlayFrame({
   action?: string;
   onPlay?: () => void;
   className?: string;
+  /** Classes on the player itself, not on the picture before it loads. */
+  frameClassName?: string;
 }) {
   const [playing, setPlaying] = useState(autoLoad);
   const frame = cn(
@@ -76,7 +79,7 @@ export function PlayFrame({
           allow={allow}
           allowFullScreen
           loading={autoLoad ? 'lazy' : undefined}
-          className="absolute inset-0 size-full border-0"
+          className={cn('absolute inset-0 size-full border-0', frameClassName)}
         />
       </div>
     );

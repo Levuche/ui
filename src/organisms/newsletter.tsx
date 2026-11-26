@@ -1,11 +1,27 @@
 import type { FormEventHandler, ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
+import { EmailIcon } from '../atoms/icons';
 import type { FormStatus } from '../system/state';
+import { DialogButton } from '../molecules/dialog-button';
 import { EmailForm, type EmailFormLabels } from '../molecules/email-form';
+
+/** The words of the compact tile (`display="tile"`). */
+export type NewsletterTileLabels = {
+  /** The button that opens the sign-up. */
+  open: string;
+  /** The button that closes it. */
+  close: string;
+};
+
+export const NEWSLETTER_TILE_LABELS: NewsletterTileLabels = {
+  open: 'Sign up',
+  close: 'Close',
+};
 
 /**
  * The newsletter sign-up, on the creator's band colour by default. `status`
- * is how the sign-up went (see EmailForm).
+ * is how the sign-up went (see EmailForm). `display="tile"` makes it a small
+ * tile with one button that opens the form in a pop-up.
  */
 export function NewsletterBand({
   title,
@@ -14,6 +30,8 @@ export function NewsletterBand({
   placeholder,
   labels,
   layout = 'row',
+  display = 'band',
+  tileLabels,
   status,
   onSubmit,
   action,
@@ -26,29 +44,71 @@ export function NewsletterBand({
   labels?: Partial<EmailFormLabels>;
   /** `row` puts the button beside the box; `stack` under it. */
   layout?: 'row' | 'stack';
+  /**
+   * `band` shows the form in the block; `tile` shows a compact tile with one
+   * button, and the form in a pop-up.
+   */
+  display?: 'band' | 'tile';
+  tileLabels?: Partial<NewsletterTileLabels>;
   status?: FormStatus;
   onSubmit?: FormEventHandler<HTMLFormElement>;
   action?: string | ((data: FormData) => void | Promise<void>);
 }) {
+  const formLabels = {
+    button: buttonLabel,
+    ...(placeholder ? { placeholder } : {}),
+    ...labels,
+  };
+  const heading = (
+    <div className="flex flex-col gap-1">
+      <strong>{title}</strong>
+      {detail ? <p className="text-site-text-2 m-0 text-sm">{detail}</p> : null}
+    </div>
+  );
+
+  if (display === 'tile') {
+    const words = { ...NEWSLETTER_TILE_LABELS, ...tileLabels };
+    return (
+      <Block
+        name="newsletter-band"
+        data-display="tile"
+        defaults={{ tone: 'band' }}
+        {...root}
+      >
+        {heading}
+        <DialogButton
+          label={words.open}
+          title={title}
+          closeLabel={words.close}
+          variant="outline"
+          icon={<EmailIcon size={18} />}
+          action="newsletter_open"
+        >
+          {detail ? (
+            <p className="text-site-text-2 m-0 text-sm">{detail}</p>
+          ) : null}
+          <EmailForm
+            layout="stack"
+            status={status}
+            action={action}
+            onSubmit={onSubmit}
+            labels={formLabels}
+          />
+        </DialogButton>
+      </Block>
+    );
+  }
+
   return (
     <Block name="newsletter-band" defaults={{ tone: 'band' }} {...root}>
-      <div className="flex flex-col gap-1">
-        <strong>{title}</strong>
-        {detail ? (
-          <p className="text-site-text-2 m-0 text-sm">{detail}</p>
-        ) : null}
-      </div>
+      {heading}
       <EmailForm
         layout={layout}
         status={status}
         action={action}
         onSubmit={onSubmit}
         buttonVariant="outline"
-        labels={{
-          button: buttonLabel,
-          ...(placeholder ? { placeholder } : {}),
-          ...labels,
-        }}
+        labels={formLabels}
       />
     </Block>
   );

@@ -21,6 +21,7 @@ export function Avatar({
   size = 48,
   shape = 'circle',
   ring = false,
+  initialsFont = 'body',
   alt = '',
   className,
 }: {
@@ -32,6 +33,8 @@ export function Avatar({
   shape?: 'circle' | 'rounded' | 'square';
   /** A ring in the button colour around it. */
   ring?: boolean;
+  /** The initials' font: the page's own, or the theme's display font. */
+  initialsFont?: 'body' | 'display';
   alt?: string;
   className?: string;
 }) {
@@ -66,6 +69,8 @@ export function Avatar({
       style={style}
       className={cn(
         'bg-site-button text-site-on-button inline-flex items-center justify-center font-bold',
+        initialsFont === 'display' &&
+          'font-[family-name:var(--site-display-font,var(--site-font))]',
         classes
       )}
     >

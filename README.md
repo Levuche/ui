@@ -452,6 +452,10 @@ page.
   `referralHref(href, code)` puts a creator's own code on a link as `?ref=`.
 - `BookingEmbed` stays for booking pages outside BuildBase; `SlotPicker`
   is the BuildBase way.
+- A product sold on another site: give `FeaturedPack` (or `PackRow`) an
+  `href` to that checkout instead of `sell`. `BookingEmbed` can show
+  `duration` and the next free time (`nextFree`, with `timeZone`), which
+  the app reads from the booking service.
 
 ### Free and paid blocks
 

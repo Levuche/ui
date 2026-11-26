@@ -35,6 +35,7 @@ export function CreatorHeader({
   avatarSize = 76,
   avatarShape = 'circle',
   avatarRing = false,
+  initialsFont = 'body',
   badge,
   verified = false,
   verifiedLabel = 'Verified',
@@ -51,6 +52,11 @@ export function CreatorHeader({
   avatarSize?: number;
   avatarShape?: 'circle' | 'rounded' | 'square';
   avatarRing?: boolean;
+  /**
+   * The font of the initials shown when there's no picture: the page's own,
+   * or the theme's display font.
+   */
+  initialsFont?: 'body' | 'display';
   /** Beside the name, after the verified tick. */
   badge?: ReactNode;
   /** A tick in the button colour beside the name. */
@@ -116,6 +122,7 @@ export function CreatorHeader({
             size={avatarSize}
             shape={avatarShape}
             ring={avatarRing}
+            initialsFont={initialsFont}
           />
           <div className="flex min-w-0 flex-col gap-1">{words}</div>
         </div>
@@ -129,6 +136,7 @@ export function CreatorHeader({
             size={avatarSize}
             shape={avatarShape}
             ring={avatarRing}
+            initialsFont={initialsFont}
           />
           {words}
         </div>
