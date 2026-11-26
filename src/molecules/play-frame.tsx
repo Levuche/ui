@@ -9,6 +9,7 @@ import {
   toImageSource,
   type ImageSrc,
 } from '../system/image';
+import { usePreviewMode } from '../system/preview-mode';
 
 /** The shape of an embedded player. */
 export type FrameRatio = 'video' | 'vertical' | 'square' | 'audio' | 'tall';
@@ -26,6 +27,9 @@ const FRAME_RATIOS: Record<FrameRatio, string> = {
  * when the visitor presses play. Until then it's a picture and a button, so
  * the page stays fast and the other site sets no cookies. `autoLoad` skips
  * the button, for players that are only a few kilobytes.
+ *
+ * In preview mode (the page editor) it never loads: the picture and button
+ * stay as a still placeholder, and a press does nothing.
  */
 export function PlayFrame({
   src,
@@ -62,14 +66,15 @@ export function PlayFrame({
   /** Classes on the player itself, not on the picture before it loads. */
   frameClassName?: string;
 }) {
-  const [playing, setPlaying] = useState(autoLoad);
+  const preview = usePreviewMode();
+  const [playing, setPlaying] = useState(autoLoad && !preview);
   const frame = cn(
     'bg-site-surface-2 rounded-block-inner relative block w-full overflow-hidden',
     FRAME_RATIOS[ratio] ?? FRAME_RATIOS.video,
     className
   );
   const cover = toImageSource(poster);
-  if (playing) {
+  if (playing && !preview) {
     return (
       <div className={frame}>
         <iframe
@@ -88,7 +93,9 @@ export function PlayFrame({
     <button
       type="button"
       data-action={action}
+      data-preview-placeholder={preview ? '' : undefined}
       onClick={() => {
+        if (preview) return;
         setPlaying(true);
         onPlay?.();
       }}

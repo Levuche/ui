@@ -1,16 +1,15 @@
 import type { ReactNode } from 'react';
 import { Skeleton } from '../atoms/skeleton';
 import { liveView, type LiveProps } from '../system/live';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 export type LiveDataLabels = {
   loading: string;
   stale: ReactNode;
 };
 
-export const LIVE_DATA_LABELS: LiveDataLabels = {
-  loading: 'Loading',
-  stale: 'Couldn’t refresh just now; showing the last update.',
-};
+export const LIVE_DATA_LABELS: LiveDataLabels = WORDS_EN.liveData;
 
 /** A few skeleton lines, the usual stand-in while data loads. */
 export function SkeletonLines({ lines = 3 }: { lines?: number }) {
@@ -45,7 +44,7 @@ export function LiveData<T>({
   labels?: Partial<LiveDataLabels>;
   children: (data: T) => ReactNode;
 }) {
-  const words = { ...LIVE_DATA_LABELS, ...labels };
+  const words = usePageWords('liveData', labels);
   const view = liveView({ data, loading, error });
   if (view === 'loading') {
     return (

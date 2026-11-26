@@ -22,6 +22,8 @@ import {
   type SocialCount,
   type SocialPlatform,
 } from '../system/social';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 /** One of the creator's latest posts, as the app reads it from the platform. */
 export type SocialPost = {
@@ -51,23 +53,7 @@ export type SocialCardLabels = Record<SocialAction, string> &
     on: string;
   };
 
-export const SOCIAL_CARD_LABELS: SocialCardLabels = {
-  follow: 'Follow',
-  subscribe: 'Subscribe',
-  connect: 'Connect',
-  addFriend: 'Add friend',
-  join: 'Join server',
-  message: 'Message',
-  followers: '{n} followers',
-  subscribers: '{n} subscribers',
-  members: '{n} members',
-  connections: '{n} connections',
-  views: '{n} views',
-  verified: 'Verified',
-  posts: 'Latest posts',
-  post: 'Post {n}',
-  on: '{name} on {platform}',
-};
+export const SOCIAL_CARD_LABELS: SocialCardLabels = WORDS_EN.socialCard;
 
 /** How much of the grid the card takes, in half-row tiles. */
 export const SOCIAL_CARD_TILES = ['1x1', '2x1', '2x2'] as const;
@@ -189,7 +175,7 @@ export function SocialCard({
   headingAs?: HeadingTag;
 }) {
   const info = SOCIAL_PLATFORM_INFO[platform] ?? SOCIAL_PLATFORM_INFO.x;
-  const words = { ...SOCIAL_CARD_LABELS, ...labels };
+  const words = usePageWords('socialCard', labels);
   const at = socialHandleText(platform, handle);
   const title = name?.trim() || at || info.name;
   const link = href ?? socialProfileHref(platform, handle);

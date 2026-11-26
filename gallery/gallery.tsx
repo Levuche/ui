@@ -104,7 +104,7 @@ export function Gallery() {
   );
 }
 
-function Panel({
+export function Panel({
   id,
   title,
   theme,

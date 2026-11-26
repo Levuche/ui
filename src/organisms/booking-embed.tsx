@@ -12,6 +12,9 @@ import { SiteDialog } from '../molecules/dialog';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { isSafeHref } from '../system/href';
 import { useHydrated, useVisitorLocale } from '../system/locale';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
+import { usePreviewMode } from '../system/preview-mode';
 
 export type BookingEmbedLabels = {
   button: string;
@@ -26,14 +29,7 @@ export type BookingEmbedLabels = {
   nextFree: string;
 };
 
-export const BOOKING_EMBED_LABELS: BookingEmbedLabels = {
-  button: 'Pick a time',
-  frame: 'Booking: {title}',
-  fallback: 'Open the booking page',
-  close: 'Close',
-  length: 'Length',
-  nextFree: 'Next free: {time}',
-};
+export const BOOKING_EMBED_LABELS: BookingEmbedLabels = WORDS_EN.bookingEmbed;
 
 /** Only https pages go in a frame. */
 const isEmbeddable = (src: string) =>
@@ -72,6 +68,8 @@ export function formatNextFree(
  * only when shown, runs in a sandbox, and always has a plain link to the same
  * page in case it doesn't load. `duration` and `nextFree` show how long a
  * booking is and when the next free time is, before the page is opened.
+ * In preview mode (the page editor) the booking page never loads: a still
+ * placeholder takes its place, and the button opens nothing.
  */
 export function BookingEmbed({
   src,
@@ -112,10 +110,11 @@ export function BookingEmbed({
   headingAs?: HeadingTag;
   onOpen?: () => void;
 }) {
-  const words = { ...BOOKING_EMBED_LABELS, ...labels };
+  const words = usePageWords('bookingEmbed', labels);
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
+  const preview = usePreviewMode();
   const hydrated = useHydrated();
   const shownLocale = useVisitorLocale(locale);
   if (!isEmbeddable(src)) return null;
@@ -155,7 +154,17 @@ export function BookingEmbed({
       </ul>
     ) : null;
 
-  const frame = (
+  const frame = preview ? (
+    <div
+      role="img"
+      aria-label={words.frame.replace('{title}', title)}
+      data-preview-placeholder=""
+      style={{ height: `${Math.min(80, Math.max(24, height))}rem` }}
+      className="bg-site-surface-2 text-site-text-2 rounded-block-inner flex w-full items-center justify-center"
+    >
+      <CalendarIcon size={32} />
+    </div>
+  ) : (
     <iframe
       src={src}
       title={words.frame.replace('{title}', title)}
@@ -197,6 +206,7 @@ export function BookingEmbed({
             aria-haspopup="dialog"
             fullWidth
             onClick={() => {
+              if (preview) return;
               setOpen(true);
               dialog.current?.showModal();
               onOpen?.();

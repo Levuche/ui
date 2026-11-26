@@ -4,6 +4,8 @@ import { EmailIcon } from '../atoms/icons';
 import type { FormStatus } from '../system/state';
 import { DialogButton } from '../molecules/dialog-button';
 import { EmailForm, type EmailFormLabels } from '../molecules/email-form';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 /** The words of the compact tile (`display="tile"`). */
 export type NewsletterTileLabels = {
@@ -13,10 +15,8 @@ export type NewsletterTileLabels = {
   close: string;
 };
 
-export const NEWSLETTER_TILE_LABELS: NewsletterTileLabels = {
-  open: 'Sign up',
-  close: 'Close',
-};
+export const NEWSLETTER_TILE_LABELS: NewsletterTileLabels =
+  WORDS_EN.newsletterTile;
 
 /**
  * The newsletter sign-up, on the creator's band colour by default. `status`
@@ -26,7 +26,7 @@ export const NEWSLETTER_TILE_LABELS: NewsletterTileLabels = {
 export function NewsletterBand({
   title,
   detail,
-  buttonLabel = 'Subscribe',
+  buttonLabel,
   placeholder,
   labels,
   layout = 'row',
@@ -54,6 +54,7 @@ export function NewsletterBand({
   onSubmit?: FormEventHandler<HTMLFormElement>;
   action?: string | ((data: FormData) => void | Promise<void>);
 }) {
+  const words = usePageWords('newsletterTile', tileLabels);
   const formLabels = {
     button: buttonLabel,
     ...(placeholder ? { placeholder } : {}),
@@ -67,7 +68,6 @@ export function NewsletterBand({
   );
 
   if (display === 'tile') {
-    const words = { ...NEWSLETTER_TILE_LABELS, ...tileLabels };
     return (
       <Block
         name="newsletter-band"

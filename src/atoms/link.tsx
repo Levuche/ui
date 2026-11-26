@@ -5,7 +5,8 @@ import { linkAttrs, type LinkBehavior } from '../system/href';
  * A link on a creator's page. It checks the address first: a link that isn't
  * safe (javascript: and the like) shows its words without a link. Other
  * sites open in a new tab unless `newTab` says otherwise. `action` names the
- * click for analytics (see useBlockActions), such as "buy".
+ * click for analytics (see useBlockActions), such as "buy". Inside
+ * <PreviewMode> (the page editor) it isn't followed and isn't reported.
  */
 export function SiteLink({
   href,

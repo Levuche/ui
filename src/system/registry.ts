@@ -182,7 +182,6 @@ export const BLOCKS = [
         name: 'verifiedLabel',
         label: 'What screen readers say for the tick',
         type: 'text',
-        default: 'Verified',
       },
       {
         name: 'badge',
@@ -262,7 +261,6 @@ export const BLOCKS = [
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Social accounts',
       },
     ],
     appOnly: [],
@@ -332,7 +330,6 @@ export const BLOCKS = [
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Links',
       },
     ],
     appOnly: [],
@@ -497,7 +494,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Buy',
       },
       ...SELL_SETTINGS,
       ...LINK_BEHAVIOR_SETTINGS,
@@ -549,7 +545,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'I’ll take it',
       },
       { name: 'ribbon', label: 'Ribbon', type: 'text', icon: 'tag' },
       ...SELL_SETTINGS,
@@ -614,7 +609,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on each button',
         type: 'text',
-        default: 'Buy',
       },
       SAVE_LABEL_SETTING,
       {
@@ -768,8 +762,6 @@ export const BLOCKS = [
         name: 'consent',
         label: 'Consent line',
         type: 'longText',
-        default:
-          'I want to download now and understand I lose my 14-day right to cancel.',
         help: 'The buyer ticks it before buying.',
       },
       {
@@ -833,7 +825,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Book a call',
       },
       {
         name: 'buttonVariant',
@@ -869,7 +860,6 @@ export const BLOCKS = [
         name: 'period',
         label: 'Per',
         type: 'text',
-        default: 'month',
         help: 'Shown as "/ month".',
         icon: 'clock',
       },
@@ -894,7 +884,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Join',
       },
       {
         name: 'featured',
@@ -939,7 +928,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Send it to me',
       },
       {
         name: 'placeholder',
@@ -965,7 +953,7 @@ export const BLOCKS = [
     pack: 'core',
     summary: 'Pick an amount and leave a tip',
     settings: [
-      { name: 'title', label: 'Title', type: 'text', default: 'Leave a tip' },
+      { name: 'title', label: 'Title', type: 'text' },
       { name: 'detail', label: 'Line under the title', type: 'longText' },
       {
         name: 'amounts',
@@ -1002,7 +990,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Tip',
       },
       {
         name: 'sell',
@@ -1062,7 +1049,6 @@ export const BLOCKS = [
         name: 'doneLabel',
         label: 'When time is up',
         type: 'text',
-        default: 'It’s live',
       },
       {
         name: 'doneContent',
@@ -1322,7 +1308,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Subscribe',
       },
       {
         name: 'placeholder',
@@ -1390,14 +1375,12 @@ export const BLOCKS = [
         name: 'credit',
         label: 'Credit line',
         type: 'text',
-        default: 'Made with Levuche',
       },
       { name: 'creditHref', label: 'Credit link', type: 'link' },
       {
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Site policies',
       },
     ],
     appOnly: [],
@@ -1511,7 +1494,6 @@ export const BLOCKS = [
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Pictures',
         help: 'When there’s no title.',
       },
       {
@@ -1649,7 +1631,6 @@ export const BLOCKS = [
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Brands',
       },
     ],
     appOnly: [],
@@ -1894,7 +1875,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Save contact',
       },
       {
         name: 'buttonVariant',
@@ -2238,7 +2218,6 @@ export const BLOCKS = [
         name: 'downloadLabel',
         label: 'Words on it',
         type: 'text',
-        default: 'Save the QR code',
       },
       {
         name: 'fileName',
@@ -2672,7 +2651,6 @@ export const BLOCKS = [
         name: 'channelLabel',
         label: 'Its words',
         type: 'text',
-        default: 'See the channel',
       },
     ],
     appOnly: [...LIVE_APP_ONLY, 'headingAs'],
@@ -3299,7 +3277,6 @@ export const BLOCKS = [
         name: 'allLabel',
         label: 'Its words',
         type: 'text',
-        default: 'All episodes',
       },
       {
         name: 'labels',
