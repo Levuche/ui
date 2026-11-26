@@ -59,6 +59,21 @@ change when it moves to that version.
   on any block. Ready word sets in English, Hindi, Spanish, German, French and
   Portuguese, each loaded on its own with `loadPageWords`; a block's own
   `labels` and word props still win. Storybook's toolbar has a Language menu.
+- `TileGallery`: pictures and uploaded videos in square cells, each tile
+  one cell, two wide, two tall or a big square of four (`span`), two
+  columns on a phone. In the media pack.
+- `VideoTile`: a video file the creator uploaded (mp4, mov or webm), wide,
+  tall (9:16), square or 4:5, with its first frame or a cover picture. It
+  plays with sound only when pressed; `loop` plays it without sound while
+  on the screen, with pause and sound buttons, and never for visitors who
+  ask for less motion. Captions from `tracks` (WebVTT), a `transcriptHref`
+  link, and its words in `labels` (`VIDEO_TILE_LABELS`). In the media pack.
+- Captions over pictures: `captionStyle` on `SiteImage` (and on the new
+  blocks) puts the caption `below` the picture as before, on a frosted
+  `bar` over its bottom, or on a small `chip` in its corner.
+- `ImageCarousel` takes `counter`, a small "1/4" on the picture.
+- `safeImageSource`: a picture, only when its address is one a page may
+  load, for a picture that isn't an `<img>`, such as a video's cover.
 - `SocialCard`: one social profile with the platform's mark, the picture,
   name, handle and verified tick, the follower count written short by
   locale (`shortCount`: 1.1K, 860K) and a button in the platform's own word

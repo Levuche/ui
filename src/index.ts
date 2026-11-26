@@ -406,6 +406,25 @@ export {
   type TextStripLabels,
 } from './organisms/text-strip';
 export {
+  CAPTION_STYLES,
+  GALLERY_SPANS,
+  VIDEO_RATIOS,
+  type CaptionStyle,
+  type GallerySpan,
+  type VideoRatio,
+} from './system/gallery';
+export {
+  VIDEO_LABELS,
+  type VideoLabels,
+  type VideoTrack,
+} from './molecules/video-frame';
+export {
+  VIDEO_TILE_LABELS,
+  VideoTile,
+  type VideoTileLabels,
+} from './organisms/video';
+export { TileGallery, type GalleryItem } from './organisms/tile-gallery';
+export {
   CAROUSEL_LABELS,
   ImageCarousel,
   type CarouselLabels,
@@ -579,6 +598,7 @@ export {
 export {
   columnSizes,
   cssImageUrl,
+  safeImageSource,
   imageAttrs,
   toImageSource,
   type ImageSource,

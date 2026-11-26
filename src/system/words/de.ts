@@ -214,6 +214,17 @@ export const WORDS_DE: PageWords = {
     googlePlayLead: 'Jetzt bei',
     googlePlay: 'Google Play',
   },
+  video: {
+    play: '{title} abspielen',
+    pause: '{title} pausieren',
+    soundOn: '{title} mit Ton abspielen',
+  },
+  videoTile: {
+    play: '{title} abspielen',
+    pause: '{title} pausieren',
+    soundOn: '{title} mit Ton abspielen',
+    transcript: 'Transkript',
+  },
   props: {
     verified: 'Verifiziert',
     links: 'Links',

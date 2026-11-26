@@ -219,6 +219,17 @@ export const WORDS_EN = {
     googlePlayLead: 'Get it on',
     googlePlay: 'Google Play',
   },
+  video: {
+    play: 'Play {title}',
+    pause: 'Pause {title}',
+    soundOn: 'Play {title} with sound',
+  },
+  videoTile: {
+    play: 'Play {title}',
+    pause: 'Pause {title}',
+    soundOn: 'Play {title} with sound',
+    transcript: 'Transcript',
+  },
   props: {
     /** CreatorHeader `verifiedLabel`. */
     verified: 'Verified',

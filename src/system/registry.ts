@@ -2,6 +2,7 @@ import type { BlockKind } from './grid';
 import { BLOCK_TONES } from './look';
 import { EMBED_SERVICES } from './embeds';
 import { MESSAGE_CHANNELS } from './message';
+import { CAPTION_STYLES, GALLERY_SPANS, VIDEO_RATIOS } from './gallery';
 import { MIN_MOTION_SECONDS } from './motion';
 import { SOCIAL_ACTIONS, SOCIAL_PLATFORMS } from './social';
 import {
@@ -92,6 +93,80 @@ export type BlockInfo = {
    */
   appOnly: readonly string[];
 };
+
+/** Where a caption sits on a picture or video (CAPTION_STYLES). */
+const CAPTION_STYLE_SETTING = {
+  name: 'captionStyle',
+  label: 'Caption',
+  type: 'choice',
+  options: CAPTION_STYLES,
+  optionLabels: {
+    below: 'Under it',
+    bar: 'On a bar over it',
+    chip: 'On a label in the corner',
+  },
+  default: 'below',
+} as const satisfies SettingField;
+
+const GALLERY_SPAN_LABELS = {
+  '1x1': 'One cell',
+  '2x1': 'Two wide',
+  '1x2': 'Two tall',
+  '2x2': 'Big square',
+} as const;
+
+/** How an uploaded video plays, and its captions (VideoTrack). */
+const VIDEO_PLAY_SETTINGS = [
+  {
+    name: 'loop',
+    label: 'Loop without sound',
+    type: 'toggle',
+    default: false,
+    help: 'While on the screen, with buttons to pause it or turn the sound on. Always still for visitors who ask for less motion.',
+  },
+  {
+    name: 'tracks',
+    label: 'Captions',
+    type: 'list',
+    itemLabel: 'Captions file',
+    help: 'WebVTT (.vtt) files, from the same place as the video.',
+    fields: [
+      { name: 'src', label: 'File', type: 'link', required: true },
+      {
+        name: 'lang',
+        label: 'Language',
+        type: 'text',
+        required: true,
+        help: 'As "en" or "hi".',
+      },
+      {
+        name: 'label',
+        label: 'Name in the menu',
+        type: 'text',
+        required: true,
+        help: 'As "English".',
+      },
+      {
+        name: 'kind',
+        label: 'Kind',
+        type: 'choice',
+        options: ['captions', 'subtitles', 'descriptions'],
+        optionLabels: {
+          captions: 'Captions (words and sounds)',
+          subtitles: 'Subtitles (a translation)',
+          descriptions: 'Descriptions of what’s shown',
+        },
+        default: 'captions',
+      },
+      {
+        name: 'default',
+        label: 'On from the start',
+        type: 'toggle',
+        default: false,
+      },
+    ],
+  },
+] as const satisfies readonly SettingField[];
 
 export const BLOCKS = [
   {
@@ -1706,6 +1781,7 @@ export const BLOCKS = [
         help: 'Empty if it’s only decoration.',
       },
       { name: 'caption', label: 'Caption', type: 'text' },
+      CAPTION_STYLE_SETTING,
       { name: 'href', label: 'Link', type: 'link', main: true },
       {
         name: 'ratio',
@@ -1794,6 +1870,13 @@ export const BLOCKS = [
       },
       { name: 'showDots', label: 'Dots', type: 'toggle', default: true },
       {
+        name: 'counter',
+        label: 'Slide number',
+        type: 'toggle',
+        default: false,
+        help: 'A small "1/4" on the picture.',
+      },
+      {
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
@@ -1807,6 +1890,144 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['index', 'onIndexChange'],
+  },
+  {
+    id: 'tile-gallery',
+    component: 'TileGallery',
+    kind: 'gallery',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'Pictures and videos in tiles of mixed sizes, captions on them',
+    settings: [
+      {
+        name: 'items',
+        label: 'Tiles',
+        type: 'list',
+        required: true,
+        itemLabel: 'Tile',
+        fields: [
+          {
+            name: 'src',
+            label: 'Picture',
+            type: 'picture',
+            help: 'For a video, its cover. Left empty: its first frame.',
+          },
+          {
+            name: 'alt',
+            label: 'What it shows',
+            type: 'text',
+            required: true,
+            help: 'It also names the link or the play button.',
+          },
+          {
+            name: 'video',
+            label: 'Video',
+            type: 'link',
+            help: 'An uploaded mp4, mov or webm file. Makes this a video tile.',
+            icon: 'video',
+          },
+          ...VIDEO_PLAY_SETTINGS,
+          {
+            name: 'span',
+            label: 'Size',
+            type: 'choice',
+            options: GALLERY_SPANS,
+            optionLabels: GALLERY_SPAN_LABELS,
+            default: '1x1',
+            icon: 'size',
+          },
+          { name: 'caption', label: 'Caption', type: 'text' },
+          {
+            name: 'href',
+            label: 'Link',
+            type: 'link',
+            help: 'For a picture. A video plays in place.',
+          },
+          ...LINK_BEHAVIOR_SETTINGS,
+        ],
+      },
+      { name: 'title', label: 'Title', type: 'text' },
+      {
+        name: 'columns',
+        label: 'Columns',
+        type: 'choice',
+        options: [2, 3, 4],
+        default: 3,
+        help: 'On a tablet or computer. Two on a phone.',
+        icon: 'layout',
+      },
+      { ...CAPTION_STYLE_SETTING, default: 'chip' },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'VIDEO_LABELS',
+      },
+    ],
+    appOnly: [],
+  },
+  {
+    id: 'video-tile',
+    component: 'VideoTile',
+    kind: 'media',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'An uploaded video, wide or tall, that can loop without sound',
+    settings: [
+      {
+        name: 'src',
+        label: 'Video',
+        type: 'link',
+        required: true,
+        main: true,
+        help: 'An uploaded mp4, mov or webm file.',
+        icon: 'video',
+      },
+      {
+        name: 'title',
+        label: 'What it is',
+        type: 'text',
+        required: true,
+        help: 'For screen readers, and the play button’s name.',
+      },
+      {
+        name: 'poster',
+        label: 'Cover picture',
+        type: 'picture',
+        help: 'Left empty: the video’s first frame.',
+      },
+      {
+        name: 'ratio',
+        label: 'Shape',
+        type: 'choice',
+        options: VIDEO_RATIOS,
+        optionLabels: {
+          video: 'Wide (16:9)',
+          tall: 'Tall (9:16)',
+          square: 'Square',
+          portrait: 'Portrait (4:5)',
+        },
+        default: 'video',
+      },
+      ...VIDEO_PLAY_SETTINGS,
+      { name: 'caption', label: 'Caption', type: 'text' },
+      CAPTION_STYLE_SETTING,
+      {
+        name: 'transcriptHref',
+        label: 'Transcript',
+        type: 'link',
+        help: 'A page with the video’s words.',
+      },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'VIDEO_TILE_LABELS',
+      },
+    ],
+    appOnly: [],
   },
   {
     id: 'before-after',

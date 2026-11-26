@@ -212,6 +212,17 @@ export const WORDS_HI: PageWords = {
     googlePlayLead: 'इसे पाएँ',
     googlePlay: 'Google Play',
   },
+  video: {
+    play: '{title} चलाएँ',
+    pause: '{title} रोकें',
+    soundOn: '{title} आवाज़ के साथ चलाएँ',
+  },
+  videoTile: {
+    play: '{title} चलाएँ',
+    pause: '{title} रोकें',
+    soundOn: '{title} आवाज़ के साथ चलाएँ',
+    transcript: 'ट्रांसक्रिप्ट',
+  },
   props: {
     verified: 'सत्यापित',
     links: 'लिंक',

@@ -74,6 +74,7 @@ export function ImageCarousel({
   autoplay,
   loop = true,
   showDots = true,
+  counter = false,
   labels,
   label: labelProp,
   ...root
@@ -89,6 +90,8 @@ export function ImageCarousel({
   /** Next from the last slide goes back to the first. */
   loop?: boolean;
   showDots?: boolean;
+  /** A small "1/4" on the picture, for the slide shown and how many there are. */
+  counter?: boolean;
   labels?: Partial<CarouselLabels>;
   /** The carousel's name for screen readers, when there's no title. */
   label?: string;
@@ -244,6 +247,16 @@ export function ImageCarousel({
             </div>
           ))}
         </div>
+        {counter && total > 1 ? (
+          // Screen readers already hear "Slide 1 of 4" from the slide itself.
+          <span
+            aria-hidden
+            data-carousel-counter=""
+            className="bg-site-text text-site-surface rounded-block-inner pointer-events-none absolute end-2 top-2 px-2 py-1 text-xs font-semibold tabular-nums"
+          >
+            {current + 1}/{total}
+          </span>
+        ) : null}
         {total > 1 ? (
           <>
             <button

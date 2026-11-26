@@ -213,6 +213,17 @@ export const WORDS_PT: PageWords = {
     googlePlayLead: 'Disponível no',
     googlePlay: 'Google Play',
   },
+  video: {
+    play: 'Reproduzir {title}',
+    pause: 'Pausar {title}',
+    soundOn: 'Reproduzir {title} com som',
+  },
+  videoTile: {
+    play: 'Reproduzir {title}',
+    pause: 'Pausar {title}',
+    soundOn: 'Reproduzir {title} com som',
+    transcript: 'Transcrição',
+  },
   props: {
     verified: 'Verificado',
     links: 'Links',

@@ -80,6 +80,8 @@ test('each block’s English labels are the English word set', () => {
     ['pricingTable', ui.PRICING_TABLE_LABELS],
     ['bookingEmbed', ui.BOOKING_EMBED_LABELS],
     ['newsletterTile', ui.NEWSLETTER_TILE_LABELS],
+    ['video', ui.VIDEO_LABELS],
+    ['videoTile', ui.VIDEO_TILE_LABELS],
     ['appBadges', ui.APP_BADGE_LABELS],
     ['github', ui.GITHUB_LABELS],
     ['contributions', ui.CONTRIBUTION_LABELS],
