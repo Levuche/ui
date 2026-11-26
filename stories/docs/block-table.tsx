@@ -15,9 +15,9 @@ const GROUP_NAMES: Record<BlockGroup, string> = {
 };
 
 /*
- * Every block in the registry, by group, with what it's for, its grid kind
- * and whether it's free. Read from BLOCKS, so this page never falls behind
- * the code.
+ * Every block in the registry, by group, with what it's for, its grid kind,
+ * whether it's free and how many settings it has. Read from BLOCKS, so this
+ * page never falls behind the code.
  */
 export function BlockTable() {
   return (
@@ -37,6 +37,7 @@ export function BlockTable() {
                   <th>What it's for</th>
                   <th>Grid kind</th>
                   <th>In Levuche</th>
+                  <th>Settings</th>
                 </tr>
               </thead>
               <tbody>
@@ -52,6 +53,7 @@ export function BlockTable() {
                         ? `Paid (${block.pack} pack)`
                         : 'Free'}
                     </td>
+                    <td>{block.settings.length}</td>
                   </tr>
                 ))}
               </tbody>
