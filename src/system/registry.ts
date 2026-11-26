@@ -321,6 +321,16 @@ export const BLOCKS = [
     summary: 'Name, email and a message',
   },
   {
+    id: 'message-card',
+    component: 'MessageCard',
+    kind: 'card',
+    group: 'forms',
+    client: false,
+    pack: 'core',
+    summary:
+      'A button to message on WhatsApp, Telegram, text, email or Messenger, with a ready message',
+  },
+  {
     id: 'save-contact',
     component: 'SaveContact',
     kind: 'link',
