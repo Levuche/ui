@@ -8,6 +8,17 @@ change when it moves to that version.
 
 ### Added
 
+- Music players for SoundCloud, Apple Music and Deezer, beside Spotify:
+  `SoundCloudEmbed` (a track or playlist, compact or with big artwork, in
+  the page's button colour), `AppleMusicEmbed` (a song, album or playlist)
+  and `DeezerEmbed` (a track, album or playlist), all in the media pack.
+  Like `SpotifyEmbed`, each loads the other site only when play is pressed
+  and shows the link as a plain tile when it can't play it. `LinkEmbed`
+  plays Apple Music and Deezer links too (`applemusic` and `deezer` in
+  `EMBED_SERVICES`), and its SoundCloud player is a little taller, so it
+  isn't cut off, and takes the page's colour. New: `appleMusicEmbed`,
+  `deezerEmbed`, `tintedSrc`, `colorHex`, the `track` player shape and
+  `PlayFrame`'s `tint`.
 - Each block describes its settings, so the page editor can build its panel:
   every `BLOCKS` entry has `settings` (field name, label, help, type,
   default, required, `slow` for fields that load over the network, `main`

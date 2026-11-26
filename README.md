@@ -465,7 +465,7 @@ doesn't unlock a pack in Levuche.
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `core` (free) | Profile, links, contact and newsletter, basic pictures and video, FAQs and testimonials, map and QR code, and every block that sells through BuildBase |
 | `growth`      | Countdown, discount code, locked link, top picks, stats, logo strip, timeline and review summary                                                       |
-| `media`       | Carousel, before and after, reels, Spotify, TikTok, Instagram, link embed, audio player and podcast episodes                                           |
+| `media`       | Carousel, before and after, reels, Spotify, SoundCloud, Apple Music, Deezer, TikTok, Instagram, link embed, audio player and podcast episodes          |
 | `feeds`       | Latest videos and posts, live status, events and now playing                                                                                           |
 | `developer`   | GitHub profile, contribution graph, repositories, package stats and tech stack                                                                         |
 
@@ -693,7 +693,7 @@ that no block covers another and that the page never scrolls sideways.
 | Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                                      |
 | Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                                          |
 | Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                                                                                |
-| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `BeforeAfter`, `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                                                                           |
+| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `BeforeAfter`, `SpotifyEmbed`, `SoundCloudEmbed`, `AppleMusicEmbed`, `DeezerEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                      |
 | Forms       | `NewsletterBand`, `ContactForm`, `MessageCard`                                                                                                                                                                                                                |
 | Feeds       | `LatestVideos`, `LatestPosts`, `LiveStatus`, `EventList`, `ReviewSummary`, `NowPlaying`                                                                                                                                                                       |
 | Developer   | `GitHubProfile`, `ContributionGraph`, `RepoCard`, `RepoList`, `PackageStats`, `TechStack`                                                                                                                                                                     |

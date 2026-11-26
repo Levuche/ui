@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from 'react';
 import { PlayIcon } from '../atoms/icons';
 import { cn } from '../system/cn';
+import { tintedSrc } from '../system/embeds';
 import {
   columnSizes,
   imageAttrs,
@@ -11,13 +12,15 @@ import {
 } from '../system/image';
 
 /** The shape of an embedded player. */
-export type FrameRatio = 'video' | 'vertical' | 'square' | 'audio' | 'tall';
+export type FrameRatio =
+  'video' | 'vertical' | 'square' | 'audio' | 'track' | 'tall';
 
 const FRAME_RATIOS: Record<FrameRatio, string> = {
   video: 'aspect-video',
   vertical: 'mx-auto aspect-[9/16] max-w-90',
   square: 'aspect-square',
   audio: 'h-38',
+  track: 'h-44',
   tall: 'h-88',
 };
 
@@ -38,6 +41,7 @@ export function PlayFrame({
   playIcon,
   sandbox,
   action = 'play',
+  tint,
   onPlay,
   className,
 }: {
@@ -56,10 +60,18 @@ export function PlayFrame({
   sandbox?: string;
   /** What the press is called in `onAction`. */
   action?: string;
+  /**
+   * For a player that takes a colour: the setting in `src` that gets the
+   * page's button colour, as #rrggbb, when play is pressed.
+   */
+  tint?: string;
   onPlay?: () => void;
   className?: string;
 }) {
   const [playing, setPlaying] = useState(autoLoad);
+  // Read from the page when play is pressed, so the server and the first
+  // render agree and the player matches the theme around it.
+  const [color, setColor] = useState<string | null>(null);
   const frame = cn(
     'bg-site-surface-2 rounded-block-inner relative block w-full overflow-hidden',
     FRAME_RATIOS[ratio] ?? FRAME_RATIOS.video,
@@ -70,7 +82,7 @@ export function PlayFrame({
     return (
       <div className={frame}>
         <iframe
-          src={src}
+          src={tintedSrc(src, tint, color)}
           sandbox={sandbox}
           title={title}
           allow={allow}
@@ -85,7 +97,14 @@ export function PlayFrame({
     <button
       type="button"
       data-action={action}
-      onClick={() => {
+      onClick={(event) => {
+        if (tint) {
+          setColor(
+            getComputedStyle(event.currentTarget)
+              .getPropertyValue('--site-button')
+              .trim() || null
+          );
+        }
         setPlaying(true);
         onPlay?.();
       }}

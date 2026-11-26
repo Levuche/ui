@@ -76,7 +76,8 @@ export type PageLayouts = Partial<Record<GridScreen, GridLayout>>;
  *   MapCard, QrCode, CourseCard, BookingEmbed, GitHubProfile, RepoCard,
  *   PackageStats, AudioPlayer
  * - media: YouTubeVideo, SiteImage, ImageCarousel, BeforeAfter, SpotifyEmbed,
- *   TikTokVideo, InstagramPost, LinkEmbed
+ *   SoundCloudEmbed, AppleMusicEmbed, DeezerEmbed, TikTokVideo, InstagramPost,
+ *   LinkEmbed
  * - gallery: ImageGrid, ReelGrid, PackGrid, RepoList
  * - text: SiteText, Testimonials, FaqList, Timeline, TechStack
  * - band: NewsletterBand, PackCheckout, CreatorFooter, LogoStrip, StatsRow,
