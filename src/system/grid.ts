@@ -79,9 +79,10 @@ export type PageLayouts = Partial<Record<GridScreen, GridLayout>>;
  *   SoundCloudEmbed, AppleMusicEmbed, DeezerEmbed, TikTokVideo, InstagramPost,
  *   LinkEmbed
  * - gallery: ImageGrid, ReelGrid, PackGrid, RepoList
- * - text: SiteText, Testimonials, FaqList, Timeline, TechStack
+ * - text: SiteText, Testimonials, FaqList, Timeline, TechStack, SectionHeading,
+ *   TextBlock, Spacer
  * - band: NewsletterBand, PackCheckout, CreatorFooter, LogoStrip, StatsRow,
- *   PricingTable, ContributionGraph
+ *   PricingTable, ContributionGraph, QuoteBlock
  *
  * Every block's kind is also in BLOCKS, in registry.ts.
  */
