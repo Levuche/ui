@@ -34,9 +34,22 @@ export {
   contrastRatio,
   fixBackground,
   fixContrast,
+  nameColorIssue,
   type BackgroundIssue,
   type ContrastIssue,
+  type NameColorIssue,
 } from './system/contrast';
+export {
+  NAME_CASES,
+  NAME_COLORS,
+  NAME_WEIGHTS,
+  nameLook,
+  nameTint,
+  type NameCase,
+  type NameColor,
+  type NameLook,
+  type NameWeight,
+} from './system/name-style';
 export {
   SITE_LOOKS,
   SITE_LOOK_NAMES,

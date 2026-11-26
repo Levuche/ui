@@ -15,6 +15,7 @@ import {
 } from './progress';
 import { CAPTION_STYLES, GALLERY_SPANS, VIDEO_RATIOS } from './gallery';
 import { MIN_MOTION_SECONDS } from './motion';
+import { NAME_CASES, NAME_COLORS, NAME_WEIGHTS } from './name-style';
 import { SOCIAL_ACTIONS, SOCIAL_PLATFORMS } from './social';
 import {
   LOADS_NOTHING,
@@ -276,6 +277,41 @@ export const BLOCKS = [
         options: ['md', 'lg', 'xl'],
         optionLabels: { md: 'Medium', lg: 'Large', xl: 'Extra large' },
         default: 'md',
+      },
+      {
+        name: 'nameColor',
+        label: 'Name colour',
+        type: 'choice',
+        options: NAME_COLORS,
+        optionLabels: { text: 'Text', accent: 'Accent', link: 'Links' },
+        default: 'text',
+      },
+      {
+        name: 'nameTint',
+        label: 'Own name colour',
+        type: 'colour',
+        help: 'In place of the name colour. The editor warns when it’s too faint to read.',
+      },
+      {
+        name: 'nameCase',
+        label: 'Name letters',
+        type: 'choice',
+        options: NAME_CASES,
+        optionLabels: { normal: 'As typed', upper: 'Capitals' },
+        default: 'normal',
+      },
+      {
+        name: 'nameWeight',
+        label: 'Name weight',
+        type: 'choice',
+        options: NAME_WEIGHTS,
+        optionLabels: {
+          medium: 'Medium',
+          semibold: 'Semibold',
+          bold: 'Bold',
+          black: 'Black',
+        },
+        default: 'bold',
       },
       {
         name: 'layout',
@@ -2817,6 +2853,41 @@ export const BLOCKS = [
         type: 'text',
         help: 'A link to #this-name jumps here. Letters, numbers and hyphens.',
         icon: 'link',
+      },
+      {
+        name: 'titleColor',
+        label: 'Heading colour',
+        type: 'choice',
+        options: NAME_COLORS,
+        optionLabels: { text: 'Text', accent: 'Accent', link: 'Links' },
+        default: 'text',
+      },
+      {
+        name: 'titleTint',
+        label: 'Own heading colour',
+        type: 'colour',
+        help: 'In place of the heading colour. The editor warns when it’s too faint to read.',
+      },
+      {
+        name: 'titleCase',
+        label: 'Heading letters',
+        type: 'choice',
+        options: NAME_CASES,
+        optionLabels: { normal: 'As typed', upper: 'Capitals' },
+        default: 'normal',
+      },
+      {
+        name: 'titleWeight',
+        label: 'Heading weight',
+        type: 'choice',
+        options: NAME_WEIGHTS,
+        optionLabels: {
+          medium: 'Medium',
+          semibold: 'Semibold',
+          bold: 'Bold',
+          black: 'Black',
+        },
+        default: 'bold',
       },
     ],
     appOnly: ['headingAs'],
