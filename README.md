@@ -141,11 +141,19 @@ creator can change one block without touching the others:
 | `align`      | `start`, `center`, `end`                                                    |
 | `shadow`     | `none`, `sm`, `md`, `lg`                                                    |
 | `motion`     | `none`, `fade`, `rise`, `scale` (off for visitors who ask for less)         |
+| `effect`     | `none`, `float`, `pulse`, `shimmer`, `tilt` (a small loop)                  |
 | `colors`     | this block's own colours, the same keys as the theme                        |
 | `font`       | this block's own font                                                       |
 | `background` | a gradient, a faint pattern or a picture behind the words (see below)       |
 | `hideOn`     | screens to hide it on: `phone`, `tablet`, `desktop`                         |
 | `hover`      | its links' hover: `lift`, `tint`, `zoom`, `glow`, `none`                    |
+
+`effect` keeps a block moving a little once it's on the page: `float`,
+`pulse` and `shimmer` each play for under five seconds, so they need no pause
+button, and `tilt` leans towards the mouse. None of them flashes or moves for
+visitors who ask for less motion. Put `<BlockEffects />` (or call
+`useBlockEffects()`) once on the page so loops hold still while a block is
+off screen and `tilt` follows the pointer; without it the loops still play.
 
 A tone swaps the colours inside the block, so text, links and buttons stay
 readable: in an `accent` block, solid buttons turn inside out. Text boxes keep
@@ -476,7 +484,7 @@ doesn't unlock a pack in Levuche.
 | Pack          | What's in it                                                                                                                                           |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `core` (free) | Profile, links, contact and newsletter, basic pictures and video, FAQs and testimonials, map and QR code, and every block that sells through BuildBase |
-| `growth`      | Countdown, discount code, locked link, top picks, stats, logo strip, timeline and review summary                                                       |
+| `growth`      | Countdown, discount code, locked link, top picks, stats, logo strip, text strip, timeline and review summary                                           |
 | `media`       | Carousel, before and after, reels, Spotify, TikTok, Instagram, link embed, audio player and podcast episodes                                           |
 | `feeds`       | Latest videos and posts, live status, events and now playing                                                                                           |
 | `developer`   | GitHub profile, contribution graph, repositories, package stats and tech stack                                                                         |
@@ -607,7 +615,8 @@ Blocks use start and end, not left and right, so `dir="rtl"` on the page, or
 on any element around the blocks, mirrors them for Arabic, Hebrew or Urdu:
 link icons sit on the right, the carousel's next slide is on the left (and the
 left arrow key moves to it), the before-and-after picture shows from the
-right, scrolling logos move right, and grid pages mirror their columns.
+right, scrolling logos and words move right, and grid pages mirror their
+columns.
 
 Long names, titles and addresses wrap inside their block, even a word with no
 place to break, so nothing spills off a phone; prices stay on one line. In
@@ -715,7 +724,7 @@ through `SiteLink`, and one that isn't safe shows as plain words.
 | Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `contrastIssues`, `fixContrast`, `Block`, `withBlockLook`, `BlockLook`                                                                                                                         |
 | Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Ribbon`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                                   |
 | Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton`, `MessageComposer` |
-| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                                                                                  |
+| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`, `TextStrip`                                                                                                                                                                                     |
 | Profile     | `CreatorHeader`, `SocialIcons`, `SocialCard`, `SaveContact`                                                                                                                                                                                                   |
 | Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                                                                        |
 | Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                                      |
@@ -729,6 +738,13 @@ through `SiteLink`, and one that isn't safe shows as plain words.
 
 `BLOCKS` in the registry lists every block with its group, so this table
 is a summary; the registry is the full list.
+
+`TextStrip` is a band of words that scrolls across (`items`, `speed` in
+seconds a pass, `direction` `start` or `end`, and a `separator`).
+`CreatorHeader` can turn a ring of words around the picture (`wordRing`,
+`wordRingSpeed`). Both have a pause button (WCAG 2.2.2), hold still while
+off screen, stand still for visitors who ask for less motion, and are read
+to screen readers once, in order.
 
 `MessageCard` opens a chat on WhatsApp, Telegram, a text, email or
 Messenger with a message ready to send (`channel`, `to`, `message`, and

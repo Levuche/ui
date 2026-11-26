@@ -72,6 +72,28 @@ export type BlockShadow = (typeof BLOCK_SHADOWS)[number];
 export const BLOCK_MOTIONS = ['none', 'fade', 'rise', 'scale'] as const;
 export type BlockMotion = (typeof BLOCK_MOTIONS)[number];
 
+/**
+ * A small loop the block keeps doing once it's on the page:
+ *
+ * - float: drifts gently up and down
+ * - pulse: swells a little and settles
+ * - shimmer: a soft sheen sweeps across it
+ * - tilt: leans a little towards the pointer (needs useBlockEffects)
+ *
+ * Float, pulse and shimmer play for under five seconds, so they need no pause
+ * button (WCAG 2.2.2), and hold still while the block is off screen when the
+ * page uses useBlockEffects. None of them flashes, and all of them are off
+ * for visitors who ask their device for less motion.
+ */
+export const BLOCK_EFFECTS = [
+  'none',
+  'float',
+  'pulse',
+  'shimmer',
+  'tilt',
+] as const;
+export type BlockEffect = (typeof BLOCK_EFFECTS)[number];
+
 /** The screens a block can be hidden on, when it's not on a grid page. */
 export const BLOCK_SCREENS = ['phone', 'tablet', 'desktop'] as const;
 export type BlockScreen = (typeof BLOCK_SCREENS)[number];
@@ -84,6 +106,8 @@ export type BlockLook = {
   align?: BlockAlign;
   shadow?: BlockShadow;
   motion?: BlockMotion;
+  /** A small loop the block keeps doing; see BlockEffect. */
+  effect?: BlockEffect;
   /** This block's own colours, over the page theme's. Same keys as a theme. */
   colors?: SiteColors;
   /** This block's own font, as a CSS font-family list. */
@@ -109,6 +133,7 @@ const LOOK_KEYS = [
   'align',
   'shadow',
   'motion',
+  'effect',
   'colors',
   'font',
   'background',
@@ -178,6 +203,7 @@ export type LookProps = {
   'data-block-size': BlockScale;
   'data-radius': BlockRadius;
   'data-motion'?: BlockMotion;
+  'data-effect'?: BlockEffect;
   /** Set when the block picks its own shadow, which wins over the card style. */
   'data-shadow'?: BlockShadow;
   /** Set when the block has its own background (see background.ts). */
@@ -213,6 +239,7 @@ export function lookProps(
   const align = oneOf(BLOCK_ALIGNS, look.align) ?? defaults.align;
   const shadow = oneOf(BLOCK_SHADOWS, look.shadow) ?? defaults.shadow;
   const motion = oneOf(BLOCK_MOTIONS, look.motion) ?? defaults.motion;
+  const effect = oneOf(BLOCK_EFFECTS, look.effect) ?? defaults.effect;
   const hover = oneOf(SITE_HOVERS, look.hover) ?? defaults.hover;
   const hideOn = (look.hideOn ?? defaults.hideOn ?? []).filter((screen) =>
     BLOCK_SCREENS.includes(screen)
@@ -241,6 +268,7 @@ export function lookProps(
     'data-block-size': size,
     'data-radius': radius,
     ...(motion && motion !== 'none' ? { 'data-motion': motion } : {}),
+    ...(effect && effect !== 'none' ? { 'data-effect': effect } : {}),
     ...(shadow ? { 'data-shadow': shadow } : {}),
     ...background,
     ...(hover ? { 'data-hover': hover } : {}),

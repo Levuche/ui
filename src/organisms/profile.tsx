@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Avatar } from '../atoms/avatar';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { CheckIcon } from '../atoms/icons';
+import { WordRing, type WordRingLabels } from '../molecules/word-ring';
 import { cn } from '../system/cn';
 import { toImageSource, type ImageSrc } from '../system/image';
 
@@ -43,6 +44,9 @@ export function CreatorHeader({
   highlight,
   layout = 'stack',
   headingAs: Heading = 'h1',
+  wordRing,
+  wordRingSpeed,
+  wordRingLabels,
   children,
   ...root
 }: BlockRootProps & {
@@ -74,6 +78,16 @@ export function CreatorHeader({
   layout?: 'stack' | 'row';
   /** 'h1' on the creator's own page; 'p' inside a preview on another page. */
   headingAs?: 'h1' | 'h2' | 'p';
+  /**
+   * Words that turn slowly in a ring around the picture, such as "Chai •
+   * Stories • Since 2019". It has a pause button and stays still for
+   * visitors who ask for less motion; screen readers hear the words once.
+   */
+  wordRing?: string;
+  /** Seconds for one turn of the ring, at least 5. */
+  wordRingSpeed?: number;
+  /** What the ring's pause button says. */
+  wordRingLabels?: Partial<WordRingLabels>;
   /** Under the tagline, such as social icons or a button. */
   children?: ReactNode;
 }) {
@@ -107,6 +121,28 @@ export function CreatorHeader({
       ) : null}
     </>
   );
+  const avatarImage = (
+    <Avatar
+      name={name}
+      src={picture}
+      size={avatarSize}
+      shape={avatarShape}
+      ring={avatarRing}
+      initialsFont={initialsFont}
+    />
+  );
+  const photo = wordRing?.trim() ? (
+    <WordRing
+      words={wordRing}
+      size={avatarSize}
+      speed={wordRingSpeed}
+      labels={wordRingLabels}
+    >
+      {avatarImage}
+    </WordRing>
+  ) : (
+    avatarImage
+  );
   return (
     <Block
       as="header"
@@ -116,28 +152,14 @@ export function CreatorHeader({
     >
       {layout === 'row' ? (
         <div className="flex items-center gap-3 text-start">
-          <Avatar
-            name={name}
-            src={picture}
-            size={avatarSize}
-            shape={avatarShape}
-            ring={avatarRing}
-            initialsFont={initialsFont}
-          />
+          {photo}
           <div className="flex min-w-0 flex-col gap-1">{words}</div>
         </div>
       ) : (
         // Lines up with the block's own align. Tailwind has no items-inherit
         // class, so the style says it.
         <div className="flex flex-col gap-2" style={{ alignItems: 'inherit' }}>
-          <Avatar
-            name={name}
-            src={picture}
-            size={avatarSize}
-            shape={avatarShape}
-            ring={avatarRing}
-            initialsFont={initialsFont}
-          />
+          {photo}
           {words}
         </div>
       )}

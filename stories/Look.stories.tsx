@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
 import { expect } from 'storybook/test';
 import {
+  BLOCK_EFFECTS,
   BLOCK_TONES,
   BookingCard,
   Block,
@@ -13,9 +14,10 @@ import {
 
 /*
  * The look every block shares: tone, size, corners, alignment, shadow,
- * motion, its own colours and font, and screens to hide it on. One creator
- * setting restyles any block the same way, because each block spreads
- * lookProps() on its outermost element and CSS does the rest.
+ * motion, a small loop (effect), its own colours and font, and screens to
+ * hide it on. One creator setting restyles any block the same way, because
+ * each block spreads lookProps() on its outermost element and CSS does the
+ * rest.
  */
 const meta = {
   title: 'System/Look',
@@ -32,6 +34,7 @@ const meta = {
     radius: 'theme',
     shadow: 'none',
     motion: 'none',
+    effect: 'none',
   },
   argTypes: {
     tone: { control: 'select', options: [...BLOCK_TONES] },
@@ -46,6 +49,7 @@ const meta = {
       control: 'inline-radio',
       options: ['none', 'fade', 'rise', 'scale'],
     },
+    effect: { control: 'inline-radio', options: [...BLOCK_EFFECTS] },
   },
 } satisfies Meta<typeof BookingCard>;
 
