@@ -5,8 +5,8 @@ import { cn } from '../system/cn';
 /**
  * What a block shows in place of another site's player, map or page until
  * the visitor agrees: a line on what loading will share and a button that
- * loads it. The button's name ends with what it loads, for screen readers;
- * the notice is its description.
+ * loads it. The button's name starts with its words and ends with what it
+ * loads, for screen readers; the notice is its description.
  */
 export function ConsentCover({
   notice,
@@ -50,11 +50,11 @@ export function ConsentCover({
         <SiteButton
           size="sm"
           action={action}
+          aria-label={`${load}: ${title}`}
           aria-describedby={noticeId}
           onClick={onLoad}
         >
           {load}
-          <span className="sr-only">: {title}</span>
         </SiteButton>
       </div>
     </div>
