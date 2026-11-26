@@ -25,7 +25,7 @@ Install a released version straight from GitHub (no npm account or token
 needed):
 
 ```bash
-npm install github:Levuche/ui#v0.1.0
+npm install github:Levuche/ui#v0.2.0
 ```
 
 The package ships TypeScript source. In a Next.js app:
@@ -539,6 +539,14 @@ import { SiteGrid, type PageLayouts } from '@levuche/ui';
   each one inside the 10 columns and its size limits, moves a block down if it
   would cover another, and adds new blocks at the bottom. `SiteGrid` runs it
   on every layout it's given.
+- **Heights in an editor:** on the page a row grows to fit what's in it, but
+  a drag-and-drop editor's rows are fixed, so a tall block can look cut short
+  there and seem to run into the one below. Measure each block in the editor
+  (a `ResizeObserver` on each one, say), then pass the heights in px to
+  `fitHeights(layout, measured, blocks)` before showing or saving the layout.
+  Each block grows to the rows it needs, up to its kind's largest height,
+  never shrinks, keeps lining up with a card beside it, and pushes anything
+  under it down.
 - **Reading order:** screen readers and the Tab key follow the order of
   `blocks`, whatever the arrangement, so put the profile first.
 
@@ -608,7 +616,10 @@ Storybook (`stories/`, set up in `.storybook/`) has a story for each block
 and state, with its props as controls and docs built from them. The toolbar's
 Theme menu shows any story in the sample creator's light or dark scheme or in
 a creator's own theme, and `Pages/Creator page` shows a whole page in each.
-The Direction menu shows it right to left.
+The Direction menu shows it right to left. `Docs/Getting started` walks
+through installing and theming, and `Docs/Every block` lists every block with
+what it's for, its grid kind and whether it's free, read from the registry.
+`CHANGELOG.md` lists what changed in each release.
 
 Each story is also a test. `npm run test:stories` opens every story in
 Chromium (Vitest with the Storybook plugin), runs its play function, which
@@ -651,7 +662,9 @@ The same flow as Levuche/website:
 3. Release: bump `version` in `package.json` in a pull request into `dev`,
    then open a pull request from `dev` into `main` and merge it with a merge
    commit. Tag that commit on `main` (`git tag v0.2.0 && git push origin
-v0.2.0`).
+v0.2.0`). The release pull request into `dev` also turns `CHANGELOG.md`'s
+   Unreleased section into the new version's, with anything an app must
+   change.
 4. Each app moves to the new version in its own pull request
    (`npm install github:Levuche/ui#v0.2.0`), where its own tests run.
 
