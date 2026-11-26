@@ -16,6 +16,15 @@ change when it moves to that version.
   less motion. `backgroundIssues` and `fixBackground` check and fix the
   words' contrast on a background, as `contrastIssues` does for a theme.
 - The `inset` tone: a block pressed into the page.
+- `MessageCard`: a card that opens a chat on WhatsApp, Telegram, a text,
+  email or Messenger with a message ready to send, shown in a chat bubble.
+  The visitor can change the message first (`editable`), the number or
+  address stays out of the page's HTML, and a press is tracked as
+  `contact`. Links come from `messageHref`, which checks numbers, usernames
+  and addresses strictly and encodes the message. Free, in the forms group.
+- Tracking: a link marked `data-href-private` is reported without its query,
+  so a message a visitor wrote isn't tracked.
+- `Field` takes `value` and `onChange`; `ChatIcon` and `SendIcon`.
 - Ready-made looks (`SITE_LOOKS`: clean, soft, bold, night, paper and
   terminal), each a whole `SiteTheme` that passes the contrast checks, and
   `siteLook` to lay a creator's own changes over one. Storybook's toolbar has
