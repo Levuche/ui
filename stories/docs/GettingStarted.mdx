@@ -1,0 +1,120 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Docs/Getting started" />
+
+# Getting started
+
+Levuche UI is the blocks a creator's page is built from: a header, links,
+things to sell, videos, forms and more. Every block takes the creator's
+theme, works on a phone, a tablet and a desktop, and passes WCAG 2.2 AA.
+
+## 1. Install a released version
+
+From a tag on GitHub, with no npm account or token:
+
+```bash
+npm install github:Levuche/ui#v0.2.0
+```
+
+The package ships TypeScript source. In a Next.js app, let Next build it:
+
+```ts
+// next.config.ts
+const nextConfig = { transpilePackages: ['@levuche/ui'] };
+```
+
+The app provides `react`, `clsx`, `tailwind-merge` and Tailwind CSS v4.
+
+## 2. Import the tokens
+
+Once, in the app's global CSS, after Tailwind:
+
+```css
+@import 'tailwindcss';
+@import '@levuche/ui/tokens.css';
+/* Let Tailwind see the classes the blocks use. */
+@source '../../node_modules/@levuche/ui/src';
+```
+
+## 3. Theme the page with `CreatorTheme`
+
+Everything inside takes the creator's colours, corners, button shape and
+font. Every field is optional, and colours or fonts that aren't safe are
+ignored.
+
+```tsx
+import {
+  CreatorTheme,
+  CreatorHeader,
+  LinkList,
+  type SiteTheme,
+} from '@levuche/ui';
+
+const theme: SiteTheme = {
+  scheme: 'dark',
+  colors: { accent: '#0f766e', onAccent: '#ffffff' },
+  corners: 'square',
+  buttonShape: 'rounded',
+  font: "'Sora', sans-serif",
+};
+
+<CreatorTheme theme={theme}>
+  <CreatorHeader name="Desi Origins" tagline="How everyday things began" />
+  <LinkList links={[{ label: 'YouTube', href: 'https://youtube.com/@x' }]} />
+</CreatorTheme>;
+```
+
+Add `dir="rtl"` around the page for Arabic, Hebrew or Urdu.
+
+## 4. Lay the page out
+
+A simple page is a column: put the blocks in `SitePage`, which fills a phone
+and stops at 576 px from a tablet up.
+
+For a page the creator arranges themselves, `SiteGrid` places each block on a
+10-column grid, with its own arrangement for a phone, a tablet and a desktop.
+Each block's **grid kind** (see [Every block](?path=/docs/docs-every-block--docs))
+sets how small and large it can be. With no saved layout, each screen gets a
+sensible arrangement of its own.
+
+```tsx
+import { SiteGrid } from '@levuche/ui';
+
+<SiteGrid
+  as="main"
+  blocks={[
+    {
+      id: 'profile',
+      kind: 'profile',
+      children: <CreatorHeader name="Desi Origins" />,
+    },
+    {
+      id: 'video',
+      kind: 'media',
+      children: <YouTubeVideo video="…" title="…" />,
+    },
+  ]}
+  layouts={savedLayouts /* or leave it out */}
+/>;
+```
+
+## 5. Change any block's look
+
+Every block takes the same look props: `tone`, `size`, `radius`, `align`,
+`shadow`, `motion`, `colors`, `font` and `hideOn`, so one block can stand out,
+or hide on one screen, without new code.
+Words a visitor sees can be changed with the block's `labels` prop, for
+another language.
+
+## Do and don't
+
+- **Do** pass the creator's own words and links as props; every link goes
+  through `SiteLink`, which only lets safe addresses through.
+- **Do** give pictures an `alt` that says what they show, or leave it empty
+  when the words next to them already say it.
+- **Do** give pictures their other sizes with `srcSet` when the app has them.
+- **Don't** put a block's colours in its `className`; use the theme or the
+  look props, so the creator's theme still reaches it.
+- **Don't** wrap a block in another link or button; blocks that open
+  something are already links.
+- **Don't** fix a block's width in px; let the page or the grid size it.

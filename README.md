@@ -25,7 +25,7 @@ Install a released version straight from GitHub (no npm account or token
 needed):
 
 ```bash
-npm install github:Levuche/ui#v0.1.0
+npm install github:Levuche/ui#v0.2.0
 ```
 
 The package ships TypeScript source. In a Next.js app:
@@ -77,6 +77,24 @@ const theme: SiteTheme = {
 
 The app provides `react`, `clsx`, `tailwind-merge` and Tailwind CSS v4
 (peer dependencies).
+
+### Colours a visitor can read
+
+`isSafeColor` only checks that a colour is a plain value. In the theme editor,
+`contrastIssues(theme)` says which of the creator's pairs are too faint to
+read by WCAG 2.2 AA (4.5:1 for text, 3:1 for buttons against the page): text
+and softer text on the page and on cards, links, button text on the accent,
+text on the band, and buttons against the page. Each issue has a `label` to
+show, its `ratio`, what it `needed`, the colour to `change` (the one the
+creator picked) and a `suggestion`: the nearest colour, same hue, that
+passes. `fixContrast(theme)` applies every suggestion, for a "Fix all"
+button, and `contrastRatio(a, b)` measures any two colours.
+
+```tsx
+contrastIssues({ colors: { accent: '#fbbf24', onAccent: '#ffffff' } });
+// [{ label: 'Button text on the accent colour', ratio: 1.66, needed: 4.5,
+//    change: 'onAccent', suggestion: '#545454', ... }, ...]
+```
 
 ## Theming
 
@@ -537,6 +555,14 @@ import { SiteGrid, type PageLayouts } from '@levuche/ui';
   each one inside the 10 columns and its size limits, moves a block down if it
   would cover another, and adds new blocks at the bottom. `SiteGrid` runs it
   on every layout it's given.
+- **Heights in an editor:** on the page a row grows to fit what's in it, but
+  a drag-and-drop editor's rows are fixed, so a tall block can look cut short
+  there and seem to run into the one below. Measure each block in the editor
+  (a `ResizeObserver` on each one, say), then pass the heights in px to
+  `fitHeights(layout, measured, blocks)` before showing or saving the layout.
+  Each block grows to the rows it needs, up to its kind's largest height,
+  never shrinks, keeps lining up with a card beside it, and pushes anything
+  under it down.
 - **Reading order:** screen readers and the Tab key follow the order of
   `blocks`, whatever the arrangement, so put the profile first.
 
@@ -548,7 +574,7 @@ that no block covers another and that the page never scrolls sideways.
 
 | Group       | Blocks                                                                                                                                                                                                                                     |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `Block`, `withBlockLook`, `BlockLook`                                                                                                                                       |
+| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `contrastIssues`, `fixContrast`, `Block`, `withBlockLook`, `BlockLook`                                                                                                      |
 | Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                          |
 | Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton` |
 | Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                                                               |
@@ -597,14 +623,18 @@ phone sizes, and check that each theme reaches every block, tap targets
 tab, the video loading only on play, the checkout's consent box, newsletter validation, no sideways
 scrolling, and accessibility with axe (WCAG 2.2 AA, no serious or critical
 problems). `e2e/theme.spec.ts` checks the YouTube address reader and that a
-theme only lets plain colours and fonts into CSS.
+theme only lets plain colours and fonts into CSS, and
+`e2e/contrast.spec.ts` checks the contrast warnings and their suggestions.
 
 ### Storybook
 
 Storybook (`stories/`, set up in `.storybook/`) has a story for each block
 and state, with its props as controls and docs built from them. The toolbar's
 Theme menu shows any story in the sample creator's light or dark scheme or in
-a creator's own theme, and `Pages/Creator page` shows a whole page in each.
+a creator's own theme, and `Pages/Creator page` shows a whole page in each. `Docs/Getting started` walks through installing and theming, and
+`Docs/Every block` lists every block with what it's for, its grid kind and
+whether it's free, read from the registry. `CHANGELOG.md` lists what changed
+in each release.
 
 Each story is also a test. `npm run test:stories` opens every story in
 Chromium (Vitest with the Storybook plugin), runs its play function, which
@@ -647,7 +677,9 @@ The same flow as Levuche/website:
 3. Release: bump `version` in `package.json` in a pull request into `dev`,
    then open a pull request from `dev` into `main` and merge it with a merge
    commit. Tag that commit on `main` (`git tag v0.2.0 && git push origin
-v0.2.0`).
+v0.2.0`). The release pull request into `dev` also turns `CHANGELOG.md`'s
+   Unreleased section into the new version's, with anything an app must
+   change.
 4. Each app moves to the new version in its own pull request
    (`npm install github:Levuche/ui#v0.2.0`), where its own tests run.
 
