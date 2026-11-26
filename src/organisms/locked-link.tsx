@@ -237,7 +237,11 @@ export function LockedLink({
         ) : null}
 
         {mode === 'code' && !opened ? (
-          <form onSubmit={submit} className="flex flex-col gap-3">
+          <form
+            onSubmit={submit}
+            data-action="lock_unlock"
+            className="flex flex-col gap-3"
+          >
             <Field
               label={words.code}
               name="code"

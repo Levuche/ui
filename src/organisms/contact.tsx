@@ -77,6 +77,8 @@ export function ContactForm({
     <Block
       as="form"
       name="contact-form"
+      // A submit is reported from the form, not its button.
+      data-action="contact"
       action={action}
       method={typeof action === 'string' ? 'post' : undefined}
       onSubmit={onSubmit}
