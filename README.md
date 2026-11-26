@@ -656,8 +656,8 @@ import { SiteGrid, type PageLayouts } from '@levuche/ui';
   in a grid on the left, two links or cards to a row where they fit, and the
   profile on the right. Set `side: true` on any block to put it in the
   profile's column too.
-- **Size limits:** each block has a `kind` (profile, link, links, card,
-  media, gallery, text or band), and `BLOCK_SIZES` gives each kind's smallest
+- **Size limits:** each block has a `kind` (profile, link, links, tile,
+  chip, card, media, gallery, text or band), and `BLOCK_SIZES` gives each kind's smallest
   and largest width and height in rem. `limitsFor(kind, screen)` turns those
   into the `minW`, `maxW`, `minH` and `maxH` an editor takes, in columns and
   rows for that screen.
@@ -689,7 +689,7 @@ that no block covers another and that the page never scrolls sideways.
 | Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton`, `MessageComposer` |
 | Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                                                                                  |
 | Profile     | `CreatorHeader`, `SocialIcons`, `SaveContact`                                                                                                                                                                                                                 |
-| Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                                                                        |
+| Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`, `LinkCard`, `LogoTile`, `LinkChip`, `AppBadges`                                                                                                                                                       |
 | Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                                      |
 | Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                                          |
 | Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                                                                                |

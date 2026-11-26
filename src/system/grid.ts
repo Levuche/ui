@@ -113,7 +113,7 @@ export const BLOCK_SIZES: Record<BlockKind, BlockSize> = {
   link: { minWidth: 10, minHeight: 3, maxHeight: 7, half: true },
   links: { minWidth: 15, minHeight: 7 },
   tile: { minWidth: 7, maxWidth: 18, minHeight: 7, maxHeight: 18, half: true },
-  chip: { minWidth: 4.5, maxWidth: 11, minHeight: 3, maxHeight: 5, half: true },
+  chip: { minWidth: 3.5, maxWidth: 11, minHeight: 3, maxHeight: 5, half: true },
   card: { minWidth: 15, minHeight: 7, half: true },
   media: { minWidth: 18, minHeight: 11 },
   gallery: { minWidth: 15, minHeight: 7 },

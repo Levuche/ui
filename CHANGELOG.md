@@ -8,6 +8,17 @@ change when it moves to that version.
 
 ### Added
 
+- Link tiles in new shapes. `LinkTile` takes `variant` (`row`, `icon`: a
+  square tile with a big logo or picture and an arrow badge, `chip`: a small
+  tile tinted in the link's brand colour, `tint`) and `look` (`preview`,
+  `favicon` or `text`: the site's preview picture, only its icon, or only
+  words, from `image` and the new `favicon`; the app reads both from the
+  link). `LinkList` takes the same `variant` and `look` (chips four to a
+  row, square tiles two). New blocks: `LinkCard` (one link with its site's
+  preview), `LogoTile`, `LinkChip` and `AppBadges` (App Store and Google
+  Play badges, words in `APP_BADGE_LABELS`). New grid kinds `tile` and
+  `chip` in `BLOCK_SIZES`. Picture addresses are checked as `cssImageUrl`
+  does and brand colours with `isSafeColor`.
 - Each block describes its settings, so the page editor can build its panel:
   every `BLOCKS` entry has `settings` (field name, label, help, type,
   default, required, `slow` for fields that load over the network, `main`
