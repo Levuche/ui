@@ -114,9 +114,16 @@ Every block reads only `--site-*` CSS variables. `<CreatorTheme>` sets them:
   shadow tinted with the accent) or `glass` (see-through and blurred over the
   page's background). It restyles every card on the page; a block that picks
   its own `shadow` keeps it. The page's background itself is set by the app.
-- `hover`: `lift` (the default) raises links and linked cards a little under
-  the pointer and presses them in on tap; `none` keeps them still. Neither
-  moves for visitors who ask for less motion.
+- `hover`: what links and linked cards do under the pointer, on tap and when
+  a keyboard reaches them. `lift` (the default) raises them a little and
+  presses them in on tap; `tint` deepens their fill; `zoom` grows the picture
+  inside a little, clipped to the card; `glow` draws a line and a soft glow in
+  the button colour inside the edge; `none` keeps them still. Nothing moves
+  for visitors who ask for less motion: colour changes stay, and `zoom`
+  tints instead. A block can pick its own with the `hover` look prop. Your
+  own linked card joins in with a `data-lift` attribute, and the page editor
+  can show a hover without the pointer with `data-hover-preview` (`press` for
+  the tap) on the card or anything around it.
 
 Buttons also take `variant` (`solid`, `outline`, `soft`, `text`) and `size`
 (`sm`, `md`, `lg`), so creators can pick them per block.
@@ -134,10 +141,19 @@ creator can change one block without touching the others:
 | `align`      | `start`, `center`, `end`                                                    |
 | `shadow`     | `none`, `sm`, `md`, `lg`                                                    |
 | `motion`     | `none`, `fade`, `rise`, `scale` (off for visitors who ask for less)         |
+| `effect`     | `none`, `float`, `pulse`, `shimmer`, `tilt` (a small loop)                  |
 | `colors`     | this block's own colours, the same keys as the theme                        |
 | `font`       | this block's own font                                                       |
 | `background` | a gradient, a faint pattern or a picture behind the words (see below)       |
 | `hideOn`     | screens to hide it on: `phone`, `tablet`, `desktop`                         |
+| `hover`      | its links' hover: `lift`, `tint`, `zoom`, `glow`, `none`                    |
+
+`effect` keeps a block moving a little once it's on the page: `float`,
+`pulse` and `shimmer` each play for under five seconds, so they need no pause
+button, and `tilt` leans towards the mouse. None of them flashes or moves for
+visitors who ask for less motion. Put `<BlockEffects />` (or call
+`useBlockEffects()`) once on the page so loops hold still while a block is
+off screen and `tilt` follows the pointer; without it the loops still play.
 
 A tone swaps the colours inside the block, so text, links and buttons stay
 readable: in an `accent` block, solid buttons turn inside out. Text boxes keep
@@ -464,7 +480,7 @@ doesn't unlock a pack in Levuche.
 | Pack          | What's in it                                                                                                                                           |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `core` (free) | Profile, links, contact and newsletter, basic pictures and video, FAQs and testimonials, map and QR code, and every block that sells through BuildBase |
-| `growth`      | Countdown, discount code, locked link, top picks, stats, logo strip, timeline and review summary                                                       |
+| `growth`      | Countdown, discount code, locked link, top picks, stats, logo strip, text strip, timeline and review summary                                           |
 | `media`       | Carousel, before and after, reels, Spotify, SoundCloud, Apple Music, Deezer, TikTok, Instagram, link embed, audio player and podcast episodes          |
 | `feeds`       | Latest videos and posts, live status, events and now playing                                                                                           |
 | `developer`   | GitHub profile, contribution graph, repositories, package stats and tech stack                                                                         |
@@ -595,7 +611,8 @@ Blocks use start and end, not left and right, so `dir="rtl"` on the page, or
 on any element around the blocks, mirrors them for Arabic, Hebrew or Urdu:
 link icons sit on the right, the carousel's next slide is on the left (and the
 left arrow key moves to it), the before-and-after picture shows from the
-right, scrolling logos move right, and grid pages mirror their columns.
+right, scrolling logos and words move right, and grid pages mirror their
+columns.
 
 Long names, titles and addresses wrap inside their block, even a word with no
 place to break, so nothing spills off a phone; prices stay on one line. In
@@ -703,7 +720,7 @@ through `SiteLink`, and one that isn't safe shows as plain words.
 | Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `contrastIssues`, `fixContrast`, `Block`, `withBlockLook`, `BlockLook`                                                                                                                         |
 | Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Ribbon`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                                   |
 | Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton`, `MessageComposer` |
-| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                                                                                  |
+| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`, `TextStrip`                                                                                                                                                                                     |
 | Profile     | `CreatorHeader`, `SocialIcons`, `SocialCard`, `SaveContact`                                                                                                                                                                                                   |
 | Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                                                                        |
 | Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                                      |
@@ -717,6 +734,13 @@ through `SiteLink`, and one that isn't safe shows as plain words.
 
 `BLOCKS` in the registry lists every block with its group, so this table
 is a summary; the registry is the full list.
+
+`TextStrip` is a band of words that scrolls across (`items`, `speed` in
+seconds a pass, `direction` `start` or `end`, and a `separator`).
+`CreatorHeader` can turn a ring of words around the picture (`wordRing`,
+`wordRingSpeed`). Both have a pause button (WCAG 2.2.2), hold still while
+off screen, stand still for visitors who ask for less motion, and are read
+to screen readers once, in order.
 
 `MessageCard` opens a chat on WhatsApp, Telegram, a text, email or
 Messenger with a message ready to send (`channel`, `to`, `message`, and
@@ -769,7 +793,8 @@ and state, with its props as controls and docs built from them. The toolbar's
 Theme menu shows any story in the sample creator's light or dark scheme or in
 a creator's own theme, and `Pages/Creator page` shows a whole page in each. The
 Cards menu shows it in each card style, and `Pages/Card styles` shows a whole
-page in each. The Direction menu shows it right to left. `Docs/Getting started`
+page in each. The Hover menu shows each hover, and `Pages/Hover` hovers,
+presses and focuses links in each. The Direction menu shows it right to left. `Docs/Getting started`
 walks through installing and theming, and `Docs/Every block` lists every block
 with what it's for, its grid kind, whether it's free and how many settings
 it has, read from the registry. `Editor/Settings panel` previews the settings

@@ -8,12 +8,33 @@ change when it moves to that version.
 
 ### Added
 
+- More hovers: `SiteTheme.hover` takes `tint` (the fill deepens), `zoom`
+  (the picture grows a little, clipped to the card) and `glow` (a line and
+  soft glow in the button colour), beside `lift` and `none`, and a block can
+  pick its own with the `hover` look prop (in `LOOK_SETTINGS` as "Under
+  the pointer"). Each has a matching press on tap
+  and shows when a keyboard reaches the link, with a focus ring; nothing moves
+  for visitors who ask for less motion. The featured link card and social
+  icons now take the hover too, and `data-hover-preview` shows it without the
+  pointer. Storybook's toolbar has a Hover menu, and `Pages/Hover` shows each.
 - Text blocks in a new `text` group, free in `core`: `SectionHeading` (a
   heading a link can jump to, with a line of detail), `TextBlock` (bold,
   italic, links, lists and emoji), `QuoteBlock` (a quote with who said it
   and a small picture) and `Spacer` (a gap of whole grid rows, or a thin
   line). What a creator types is never read as HTML (`parseRichText`,
   `RichText`).
+- Motion inside blocks. `effect` on every block's look (`BLOCK_EFFECTS`):
+  `float`, `pulse` and `shimmer` play for under five seconds, and `tilt`
+  leans towards the mouse. `<BlockEffects />` or `useBlockEffects()` once on
+  the page holds loops while a block is off screen and runs the tilt.
+  `TextStrip`, a band of words that scrolls across with a speed, direction,
+  separator and pause button (growth pack, page group). `CreatorHeader`
+  takes `wordRing`, words that turn in a ring around the picture, with a
+  pause button. Nothing moves for visitors who ask for less motion, moving
+  words are read to screen readers once, and both hold still off screen.
+  Also `WordRing`, `MotionToggle`, `useOnScreen` and the plain helpers
+  `motionSeconds`, `stripRepeats` and `wordRingShape`. `effect` is in
+  `LOOK_SETTINGS`, and `TextStrip` and the word ring have their settings.
 - Music players for SoundCloud, Apple Music and Deezer, beside Spotify:
   `SoundCloudEmbed` (a track or playlist, compact or with big artwork, in
   the page's button colour), `AppleMusicEmbed` (a song, album or playlist)

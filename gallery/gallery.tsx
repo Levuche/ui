@@ -35,6 +35,7 @@ import {
   SoundCloudEmbed,
   Spacer,
   TextBlock,
+  TextStrip,
   VideoIcon,
   YouTubeVideo,
   type SiteTheme,
@@ -362,6 +363,18 @@ function Panel({
             quote="The best minute of my day."
             name="Meera K."
             avatar={null}
+          />
+        </Group>
+
+        <Group id={id} name="motion" title="Moving words">
+          <CreatorHeader
+            name="Desi Origins"
+            headingAs="p"
+            wordRing="Chai • Stories • Since 2019"
+          />
+          <TextStrip
+            label="Shop news"
+            items={['New drop', 'Free shipping', 'Made in Pune']}
           />
         </Group>
 
