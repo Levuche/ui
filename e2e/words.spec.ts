@@ -96,6 +96,7 @@ test('each block’s English labels are the English word set', () => {
     ['calendar', ui.CALENDAR_LABELS],
     ['eventCard', ui.EVENT_CARD_LABELS],
     ['localTime', ui.LOCAL_TIME_LABELS],
+    ['logoStrip', ui.LOGO_STRIP_LABELS],
     ['reviewSummary', ui.REVIEW_SUMMARY_LABELS],
     ['nowPlaying', ui.NOW_PLAYING_LABELS],
   ];
@@ -194,10 +195,19 @@ test('the moving words and the social card follow the page language', () => {
         platform: 'instagram',
         handle: 'desiorigins',
         followers: 1200,
+      }),
+      createElement(ui.LogoStrip, {
+        mode: 'scroll',
+        logos: [
+          { src: '/a.svg', alt: 'A' },
+          { src: '/b.svg', alt: 'B' },
+        ],
       })
     )
   );
   expect(html).toContain(WORDS_DE.textStrip.pause);
+  expect(html).toContain(WORDS_DE.logoStrip.pause);
+  expect(html).not.toContain(WORDS_EN.logoStrip.pause);
   expect(html).toContain(WORDS_DE.wordRing.pause);
   expect(html).toContain(WORDS_DE.socialCard.follow);
   expect(html).not.toContain(WORDS_EN.textStrip.pause);

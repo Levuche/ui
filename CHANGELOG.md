@@ -6,6 +6,14 @@ change when it moves to that version.
 
 ## Unreleased
 
+### Changed
+
+- `LogoStrip` with `mode="scroll"` has a pause button, as `TextStrip` does
+  (WCAG 2.2.2 asks for one on anything that moves for more than five
+  seconds), and holds still while it's off screen. Its words are in the
+  page's language, or set with `labels` (`LOGO_STRIP_LABELS`). A still row
+  is unchanged.
+
 ### Added
 
 - The creator's name in its own style: `CreatorHeader` `nameColor` (`text`,

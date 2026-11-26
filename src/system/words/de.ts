@@ -275,6 +275,10 @@ export const WORDS_DE: PageWords = {
     hours: '{n} Std.',
     minutes: '{n} Min.',
   },
+  logoStrip: {
+    pause: 'Laufende Logos anhalten',
+    play: 'Logos wieder laufen lassen',
+  },
   props: {
     verified: 'Verifiziert',
     links: 'Links',

@@ -886,9 +886,10 @@ is a summary; the registry is the full list.
 `TextStrip` is a band of words that scrolls across (`items`, `speed` in
 seconds a pass, `direction` `start` or `end`, and a `separator`).
 `CreatorHeader` can turn a ring of words around the picture (`wordRing`,
-`wordRingSpeed`). Both have a pause button (WCAG 2.2.2), hold still while
-off screen, stand still for visitors who ask for less motion, and are read
-to screen readers once, in order.
+`wordRingSpeed`), and `LogoStrip` with `mode="scroll"` moves its logos
+across. All three have a pause button (WCAG 2.2.2), hold still while off
+screen, stand still for visitors who ask for less motion, and are read to
+screen readers once, in order.
 
 `CreatorHeader` can set the creator's name apart from the rest of the text:
 `nameColor` (`text`, `accent` or `link` from the theme), `nameTint` (a

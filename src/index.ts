@@ -462,7 +462,13 @@ export {
 } from './system/rich-text';
 export { ReelGrid, YouTubeVideo, youtubeId } from './organisms/media';
 export { ImageGrid } from './organisms/images';
-export { LogoStrip, SiteImage, type Logo } from './organisms/pictures';
+export {
+  LOGO_STRIP_LABELS,
+  LogoStrip,
+  SiteImage,
+  type Logo,
+  type LogoStripLabels,
+} from './organisms/pictures';
 export {
   TEXT_STRIP_LABELS,
   TextStrip,

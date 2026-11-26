@@ -273,6 +273,10 @@ export const WORDS_HI: PageWords = {
     hours: '{n} घं',
     minutes: '{n} मि',
   },
+  logoStrip: {
+    pause: 'चलते लोगो रोकें',
+    play: 'लोगो फिर से चलाएँ',
+  },
   props: {
     verified: 'सत्यापित',
     links: 'लिंक',

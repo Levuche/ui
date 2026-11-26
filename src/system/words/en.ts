@@ -280,6 +280,10 @@ export const WORDS_EN = {
     hours: '{n} h',
     minutes: '{n} min',
   },
+  logoStrip: {
+    pause: 'Stop the moving logos',
+    play: 'Move the logos again',
+  },
   props: {
     /** CreatorHeader `verifiedLabel`. */
     verified: 'Verified',
