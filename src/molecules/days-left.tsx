@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react';
 import { CalendarIcon } from '../atoms/icons';
 import { cn } from '../system/cn';
 import { useHydrated, useVisitorLocale } from '../system/locale';
+import { usePageWords } from '../system/page-words';
 import {
   deadlineState,
   fillTemplate,
   formatDeadline,
 } from '../system/progress';
+import { WORDS_EN } from '../system/words/en';
 
 /** The words of a DaysLeft chip. {date} and {n} are filled in. */
 export type DaysLeftLabels = {
@@ -22,12 +24,7 @@ export type DaysLeftLabels = {
   ended: string;
 };
 
-export const DAYS_LEFT_LABELS: DaysLeftLabels = {
-  due: 'Due {date}',
-  days: '{n} days left',
-  oneDay: '1 day left',
-  ended: 'Ended',
-};
+export const DAYS_LEFT_LABELS: DaysLeftLabels = WORDS_EN.daysLeft;
 
 /**
  * A deadline as a chip: its date, and the days left once the page is
@@ -53,7 +50,7 @@ export function DaysLeft({
   labels?: Partial<DaysLeftLabels>;
   className?: string;
 }) {
-  const words = { ...DAYS_LEFT_LABELS, ...labels };
+  const words = usePageWords('daysLeft', labels);
   const hydrated = useHydrated();
   const shownLocale = useVisitorLocale(locale);
   // The clock starts in the browser, so the server and the first render

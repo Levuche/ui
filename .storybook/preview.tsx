@@ -1,12 +1,14 @@
 import type { Preview } from '@storybook/react-vite';
 import {
   CreatorTheme,
+  PAGE_LANGUAGES,
   SITE_LOOKS,
   SITE_LOOK_NAMES,
   siteLook,
   type SiteCardStyle,
   type SiteHover,
 } from '../src';
+import { LANGUAGES } from '../stories/languages';
 import { SCREENS } from '../stories/screens';
 import { THEMES, type ThemeName } from '../stories/themes';
 import './preview.css';
@@ -15,13 +17,15 @@ const preview: Preview = {
   // Pick the creator theme from the toolbar; a story can fix one with
   // `globals: { theme: 'dark' }`. Direction does the same for right-to-left
   // scripts, such as Arabic, Hebrew and Urdu. A ready-made look replaces the
-  // theme, card style and hover with its own.
+  // theme, card style and hover with its own. Language sets the page's language, so
+  // every block's own words and numbers follow it.
   initialGlobals: {
     theme: 'light',
     cards: 'flat',
     hover: 'lift',
     look: 'none',
     direction: 'ltr',
+    language: 'en',
   },
   globalTypes: {
     theme: {
@@ -93,6 +97,18 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    language: {
+      description: 'The page’s language',
+      toolbar: {
+        title: 'Language',
+        icon: 'globe',
+        items: PAGE_LANGUAGES.map((value) => ({
+          value,
+          title: LANGUAGES[value].title,
+        })),
+        dynamicTitle: true,
+      },
+    },
   },
   decorators: [
     (Story, context) => {
@@ -101,18 +117,24 @@ const preview: Preview = {
       const wide = context.parameters.frame === 'wide';
       const dir = context.globals.direction === 'rtl' ? 'rtl' : 'ltr';
       const look = SITE_LOOK_NAMES.find((n) => n === context.globals.look);
+      // English is the blocks' own default, so it needs nothing set.
+      const language = PAGE_LANGUAGES.find(
+        (value) => value !== 'en' && value === context.globals.language
+      );
       return (
         <CreatorTheme
           dir={dir}
-          theme={
-            look
+          theme={{
+            ...(look
               ? siteLook(look)
               : {
                   ...THEMES[name].theme,
                   cards: (context.globals.cards ?? 'flat') as SiteCardStyle,
                   hover: (context.globals.hover ?? 'lift') as SiteHover,
-                }
-          }
+                }),
+            language,
+          }}
+          words={language ? LANGUAGES[language].words : undefined}
           className="min-h-screen p-5"
           data-testid="story-theme"
         >

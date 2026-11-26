@@ -121,6 +121,18 @@ export const PauseIcon = (p: IconProps) => (
     <path d="M9 5v14M15 5v14" />
   </Svg>
 );
+export const SoundOnIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 9v6h4l5 4V5L8 9H4z" />
+    <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" />
+  </Svg>
+);
+export const SoundOffIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 9v6h4l5 4V5L8 9H4z" />
+    <path d="M17 9.5l5 5M22 9.5l-5 5" />
+  </Svg>
+);
 export const ArrowsHorizontalIcon = (p: IconProps) => (
   <Svg {...p}>
     <path d="M8 7l-5 5 5 5M16 7l5 5-5 5" />

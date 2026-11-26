@@ -1,4 +1,5 @@
 import { cn } from '../system/cn';
+import { usePageWords } from '../system/page-words';
 
 type Amount = {
   number: number;
@@ -56,7 +57,7 @@ export function Price({
   value,
   period,
   was,
-  saveLabel = 'Save {amount}',
+  saveLabel: saveLabelProp,
   size = 'md',
   className,
 }: {
@@ -73,6 +74,8 @@ export function Price({
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }) {
+  const own = usePageWords('props');
+  const saveLabel = saveLabelProp === undefined ? own.save : saveLabelProp;
   const sizes = { sm: 'text-sm', md: 'text-base', lg: 'text-2xl' };
   const saving = was && saveLabel ? priceSaving(value, was) : null;
   return (
@@ -84,7 +87,7 @@ export function Price({
     >
       {was ? (
         <s className="text-site-text-2 text-sm whitespace-nowrap tabular-nums">
-          <span className="sr-only">Was </span>
+          <span className="sr-only">{own.was} </span>
           {was}
         </s>
       ) : null}

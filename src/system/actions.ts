@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, type RefObject } from 'react';
+import { inPreview } from './preview';
 import { readSell, type SellRef } from './sell';
 
 /*
@@ -35,11 +36,12 @@ export type BlockAction = {
  * Reads a click or submit event into a BlockAction, or null when it wasn't
  * on a link, a button or a form. A link, button or form can name its action
  * with data-action, such as data-action="buy". A form's action is reported
- * only when it's sent, never for a click inside it.
+ * only when it's sent, never for a click inside it. Nothing is reported from
+ * a block in preview mode (see PreviewMode): the editor isn't a visit.
  */
 export function readBlockAction(event: Event): BlockAction | null {
   const target = event.target;
-  if (!(target instanceof Element)) return null;
+  if (!(target instanceof Element) || inPreview(target)) return null;
   const control =
     event.type === 'submit'
       ? target.closest('form')

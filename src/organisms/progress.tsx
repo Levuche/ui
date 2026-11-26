@@ -3,13 +3,11 @@ import { Block, type BlockRootProps } from '../atoms/block';
 import { CheckIcon } from '../atoms/icons';
 import { ProgressBar } from '../atoms/progress-bar';
 import { Badge } from '../atoms/text';
-import {
-  DAYS_LEFT_LABELS,
-  DaysLeft,
-  type DaysLeftLabels,
-} from '../molecules/days-left';
+import { DaysLeft, type DaysLeftLabels } from '../molecules/days-left';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { cn } from '../system/cn';
+import { usePageLocale, usePageWords } from '../system/page-words';
+import { WORDS_EN } from '../system/words/en';
 import {
   doneCount,
   fillTemplate,
@@ -48,15 +46,7 @@ export type GoalTrackerLabels = DaysLeftLabels & {
   notDone: string;
 };
 
-export const GOAL_TRACKER_LABELS: GoalTrackerLabels = {
-  ...DAYS_LEFT_LABELS,
-  items: '{done} of {total} done',
-  amount: '{current} of {target}',
-  reached: 'Goal reached',
-  list: 'Steps',
-  done: 'Done',
-  notDone: 'Not done yet',
-};
+export const GOAL_TRACKER_LABELS: GoalTrackerLabels = WORDS_EN.goalTracker;
 
 /**
  * A goal and how far along it is: a title, a deadline with the days left,
@@ -81,7 +71,7 @@ export function GoalTracker({
   steps = 10,
   showPercent = true,
   labels,
-  locale,
+  locale: localeProp,
   now,
   headingAs: Heading = 'h3',
   ...root
@@ -110,7 +100,8 @@ export function GoalTracker({
   now?: number;
   headingAs?: HeadingTag;
 }) {
-  const words = { ...GOAL_TRACKER_LABELS, ...labels };
+  const locale = usePageLocale(localeProp);
+  const words = usePageWords('goalTracker', labels);
   const headingId = useId();
   const byAmount = target !== undefined && target !== null;
 
@@ -231,9 +222,7 @@ export type ProgressListLabels = {
   amount: string;
 };
 
-export const PROGRESS_LIST_LABELS: ProgressListLabels = {
-  amount: '{value} of {max}',
-};
+export const PROGRESS_LIST_LABELS: ProgressListLabels = WORDS_EN.progressList;
 
 /**
  * Bars in a list, one per skill, rating or language, with a name and its
@@ -249,7 +238,7 @@ export function ProgressList({
   bar = 'smooth',
   steps = 10,
   labels,
-  locale,
+  locale: localeProp,
   headingAs = 'h3',
   ...root
 }: BlockRootProps & {
@@ -266,7 +255,8 @@ export function ProgressList({
   locale?: string;
   headingAs?: HeadingTag;
 }) {
-  const words = { ...PROGRESS_LIST_LABELS, ...labels };
+  const locale = usePageLocale(localeProp);
+  const words = usePageWords('progressList', labels);
   const id = useId();
   return (
     <Block name="progress-list" {...root}>

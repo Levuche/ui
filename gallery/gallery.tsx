@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
 import {
   ActionCard,
+  AppBadges,
   AppIcon,
+  TileGallery,
   BookingCard,
   Countdown,
   DiscountCode,
@@ -21,7 +23,9 @@ import {
   EmailIcon,
   FeaturedPack,
   GlobeIcon,
+  LinkChip,
   LinkList,
+  LogoTile,
   PackGrid,
   PackRow,
   ProgressList,
@@ -34,8 +38,10 @@ import {
   SiteLinkButton,
   SiteSection,
   SiteText,
+  SoundCloudEmbed,
   Spacer,
   TextBlock,
+  TextStrip,
   VideoIcon,
   YouTubeVideo,
   type SiteTheme,
@@ -105,7 +111,7 @@ export function Gallery() {
   );
 }
 
-function Panel({
+export function Panel({
   id,
   title,
   theme,
@@ -234,11 +240,65 @@ function Panel({
           />
         </Group>
 
+        <Group id={id} name="link-tiles" title="Link tiles">
+          <div className="grid grid-cols-2 gap-3">
+            <LogoTile
+              href="https://www.youtube.com/@example"
+              title="YouTube"
+              icon={<VideoIcon />}
+            />
+            <LogoTile
+              href="https://example.com/app"
+              title="Get the app"
+              icon={<AppIcon />}
+              tint="#0f766e"
+            />
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            <LinkChip
+              href="https://www.instagram.com/example"
+              title="Instagram"
+              icon={<CameraIcon size={20} />}
+            />
+            <LinkChip
+              href="https://example.com/blog"
+              title="Blog"
+              icon={<GlobeIcon size={20} />}
+            />
+            <LinkChip
+              href="https://example.com/shop"
+              title="Shop"
+              icon={<ShareIcon size={20} />}
+            />
+            <LinkChip
+              href="mailto:hello@example.com"
+              title="Email"
+              icon={<EmailIcon size={20} />}
+            />
+          </div>
+          <AppBadges
+            apps={[
+              { store: 'app-store', href: 'https://apps.apple.com/app/id0' },
+              {
+                store: 'google-play',
+                href: 'https://play.google.com/store/apps/details?id=com.example',
+              },
+            ]}
+          />
+        </Group>
+
         <Group id={id} name="video" title="Video">
           <YouTubeVideo
             video="https://www.youtube.com/watch?v=M7lc1UVf-VE"
             title="How tea came to India"
             poster={null}
+          />
+        </Group>
+
+        <Group id={id} name="music" title="Music">
+          <SoundCloudEmbed
+            url="https://soundcloud.com/desi-origins/chai-at-dawn"
+            title="Chai at dawn"
           />
         </Group>
 
@@ -349,6 +409,22 @@ function Panel({
           />
         </Group>
 
+        <Group id={id} name="gallery" title="Gallery">
+          <TileGallery
+            items={[
+              {
+                alt: 'Chai on a clay stove',
+                span: '2x2',
+                caption: 'Morning chai',
+                href: 'https://example.com/chai',
+              },
+              { alt: 'A spice market in Kochi', span: '1x2', caption: 'Kochi' },
+              { alt: 'Tea leaves drying in Assam', span: '2x1' },
+              { alt: 'Hills above Darjeeling' },
+            ]}
+          />
+        </Group>
+
         <Group id={id} name="reviews" title="Reviews and questions">
           <Testimonials
             items={[
@@ -387,6 +463,18 @@ function Panel({
             quote="The best minute of my day."
             name="Meera K."
             avatar={null}
+          />
+        </Group>
+
+        <Group id={id} name="motion" title="Moving words">
+          <CreatorHeader
+            name="Desi Origins"
+            headingAs="p"
+            wordRing="Chai • Stories • Since 2019"
+          />
+          <TextStrip
+            label="Shop news"
+            items={['New drop', 'Free shipping', 'Made in Pune']}
           />
         </Group>
 
