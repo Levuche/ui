@@ -2,6 +2,7 @@
 @import '../src/tokens.css';
 @source '../src';
 @source '../stories';
+@source '../gallery';
 
 body {
   margin: 0;
