@@ -188,7 +188,7 @@ export const Glow: Story = {
     const tile = firstTile(canvasElement);
     await expect(hoverVar(tile, 'line')).toBe('2px');
     const end = await showHover(page, tile);
-    await expect(layer(tile).boxShadow).toMatch(/inset 0px 0px 0px 2px/);
+    await expect(layer(tile).boxShadow).toMatch(/0px 0px 0px 2px inset/);
     await expect(still(tile)).toBe(true);
     await end();
   },
@@ -222,14 +222,16 @@ export const None: Story = {
 export const OneBlockItsOwn: Story = {
   globals: { hover: 'tint' },
   args: { featuredHover: 'zoom', linksHover: 'glow' },
-  play: async ({ canvasElement, canvas }) => {
+  play: async ({ canvasElement }) => {
     const card = featuredCard(canvasElement);
     await expect(card).toHaveAttribute('data-hover', 'zoom');
     await expect(hoverVar(card, 'zoom')).toBe('1.06');
     const tile = firstTile(canvasElement);
     await expect(hoverVar(tile, 'line')).toBe('2px');
     await expect(hoverVar(tile, 'fill')).toBe('0%');
-    const chip = canvas.getByRole('link', { name: 'Instagram' });
+    const chip = within(
+      canvasElement.querySelector<HTMLElement>('[data-block="social-icons"]')!
+    ).getByRole('link', { name: 'Instagram' });
     await expect(hoverVar(chip, 'fill')).toBe('8%');
     await expect(hoverVar(chip, 'line')).toBe('0px');
   },
