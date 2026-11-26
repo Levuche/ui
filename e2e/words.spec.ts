@@ -95,6 +95,7 @@ test('each block’s English labels are the English word set', () => {
     ['eventList', ui.EVENT_LIST_LABELS],
     ['calendar', ui.CALENDAR_LABELS],
     ['eventCard', ui.EVENT_CARD_LABELS],
+    ['localTime', ui.LOCAL_TIME_LABELS],
     ['reviewSummary', ui.REVIEW_SUMMARY_LABELS],
     ['nowPlaying', ui.NOW_PLAYING_LABELS],
   ];

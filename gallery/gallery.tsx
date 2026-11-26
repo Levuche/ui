@@ -26,6 +26,7 @@ import {
   GlobeIcon,
   LinkChip,
   LinkList,
+  LocalTime,
   LogoTile,
   PackGrid,
   PackRow,
@@ -55,7 +56,7 @@ import {
   TipJarDemo,
 } from './demos';
 
-/** A fixed clock for the countdown, so the gallery never changes. */
+/** A fixed clock for the countdown and local time, so the gallery never changes. */
 const NOW = Date.UTC(2026, 11, 1, 9, 0, 0);
 
 const THEMES: { id: string; title: string; theme: SiteTheme }[] = [
@@ -204,6 +205,26 @@ export function Panel({
             verified
             icon={<VideoIcon size={22} />}
             headingAs="p"
+          />
+        </Group>
+
+        <Group id={id} name="time" title="Local time">
+          <LocalTime
+            city="mumbai"
+            cityName="Kochi"
+            now={NOW}
+            live={false}
+            locale="en-US"
+            visitorTimeZone="Europe/London"
+            hours={{ from: '09:00', to: '18:00' }}
+          />
+          <LocalTime
+            city="london"
+            tile="2x2"
+            clock={24}
+            locale="en-GB"
+            visitorTimeZone="Asia/Kolkata"
+            data-testid="live-time"
           />
         </Group>
 

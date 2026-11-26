@@ -263,6 +263,16 @@ export const WORDS_HI: PageWords = {
     loading: 'इवेंट लोड हो रहा है',
     untitled: 'इवेंट',
   },
+  localTime: {
+    title: 'मेरा स्थानीय समय',
+    open: 'अभी उपलब्ध',
+    away: 'अभी दूर',
+    ahead: 'आपसे {time} आगे',
+    behind: 'आपसे {time} पीछे',
+    same: 'आपके जैसा ही समय',
+    hours: '{n} घं',
+    minutes: '{n} मि',
+  },
   props: {
     verified: 'सत्यापित',
     links: 'लिंक',

@@ -31,6 +31,19 @@ change when it moves to that version.
   the target, rounding down so 100% means done), `filledSteps`,
   `formatAmount`, `formatPercent`, `currencyCode`, `deadlineState` and
   `formatDeadline`.
+- `LocalTime`: the creator's local time, so visitors in other countries know
+  whether it's a good moment to message or book. A title, the time large and
+  the date and city small under it, from a list of cities mapped to time
+  zones (`LOCAL_TIME_CITY_IDS`), or the creator's own IANA `timeZone` (one
+  Intl doesn't know falls back to the city's). 12-hour, 24-hour or the
+  visitor's own way, in the visitor's language once the page runs. Optional
+  "4 h 30 min ahead of you", worked out in the visitor's browser, and an
+  "Open now" or "Away" chip from the creator's working hours (past midnight
+  too). The server writes the time from `now`, or a placeholder without it;
+  the browser moves it on once a minute, only while it's on screen and the
+  tab is showing, with nothing read out on each change. Sizes 2x1 and 2x2,
+  free in `core`. The time-zone maths is exported on its own (`zoneOffset`,
+  `offsetFromVisitor`, `describeOffset`, `isOpenAt`, `localTimeZone`...).
 - More hovers: `SiteTheme.hover` takes `tint` (the fill deepens), `zoom`
   (the picture grows a little, clipped to the card) and `glow` (a line and
   soft glow in the button colour), beside `lift` and `none`, and a block can

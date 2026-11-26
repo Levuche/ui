@@ -265,6 +265,16 @@ export const WORDS_FR: PageWords = {
     loading: 'Chargement de l’événement',
     untitled: 'Événement',
   },
+  localTime: {
+    title: 'Mon heure locale',
+    open: 'Disponible',
+    away: 'Absent',
+    ahead: '{time} d’avance sur vous',
+    behind: '{time} de retard sur vous',
+    same: 'Même heure que vous',
+    hours: '{n} h',
+    minutes: '{n} min',
+  },
   props: {
     verified: 'Vérifié',
     links: 'Liens',

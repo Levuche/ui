@@ -869,7 +869,7 @@ through `SiteLink`, and one that isn't safe shows as plain words.
 | Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Ribbon`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, `ProgressBar`, icons                                                                                                                                                 |
 | Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `ConsentCover`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `DaysLeft`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton`, `MessageComposer`, `AddToCalendar` |
 | Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`, `TextStrip`                                                                                                                                                                                                                                  |
-| Profile     | `CreatorHeader`, `SocialIcons`, `SocialCard`, `SaveContact`                                                                                                                                                                                                                                                |
+| Profile     | `CreatorHeader`, `SocialIcons`, `SocialCard`, `SaveContact`, `LocalTime`                                                                                                                                                                                                                                   |
 | Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`, `LinkCard`, `LogoTile`, `LinkChip`, `AppBadges`                                                                                                                                                                                                    |
 | Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                                                                                   |
 | Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`, `EventCard`                                                                                                                                                                                          |
@@ -903,7 +903,12 @@ visitor change the message first.
 or the payment, or sell through BuildBase with `sell` (see below). `LeadMagnet`, `TipJar` and `NewsletterBand` are forms: give
 them an `action` to post to, or an `onSubmit`. `TipJar` sends `amount`.
 `Countdown` ticks in the visitor's browser (pass `now` to freeze it in a
-preview).
+preview). `LocalTime` shows the creator's time in their city: the server
+writes the time from `now` (or a placeholder without it), and the browser
+moves it on once a minute while it's on screen, with how far ahead or behind
+the visitor that is and an "Open now" chip from the creator's hours. The
+time-zone maths (`localTimeZone`, `zoneOffset`, `describeOffset`,
+`isOpenAt`...) is exported on its own.
 
 `EventCard` is one event: a date badge, a chip saying how far away it is
 ("In 4 months", in the visitor's language), the date and time with the

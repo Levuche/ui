@@ -3,6 +3,12 @@ import { BLOCK_TONES } from './look';
 import { EMBED_SERVICES } from './embeds';
 import { MESSAGE_CHANNELS } from './message';
 import {
+  LOCAL_TIME_CITY_IDS,
+  LOCAL_TIME_CITY_LABELS,
+  LOCAL_TIME_CLOCKS,
+  LOCAL_TIME_DAYS,
+} from './local-time';
+import {
   MAX_PROGRESS_STEPS,
   PROGRESS_BAR_STYLES,
   PROGRESS_VALUE_STYLES,
@@ -4964,6 +4970,134 @@ export const BLOCKS = [
         'Tab reaches the ticket link and the Add to calendar button; Enter or Space opens its two calendar links.',
       screenReader:
         'The event as a heading, its date and time, and how far away it is; the ticket link and the calendar button say which event they are for.',
+    },
+  },
+  {
+    id: 'local-time',
+    component: 'LocalTime',
+    kind: 'card',
+    group: 'profile',
+    client: true,
+    pack: 'core',
+    summary:
+      'The creator’s local time, with how far ahead or behind the visitor it is',
+    settings: [
+      {
+        name: 'city',
+        label: 'City',
+        type: 'choice',
+        options: LOCAL_TIME_CITY_IDS,
+        optionLabels: LOCAL_TIME_CITY_LABELS,
+        required: true,
+        icon: 'place',
+      },
+      {
+        name: 'cityName',
+        label: 'City name shown',
+        type: 'text',
+        help: 'Your own words for the place, as "Kochi". Left empty, the city’s name.',
+      },
+      {
+        name: 'timeZone',
+        label: 'Time zone',
+        type: 'text',
+        help: 'Only if the city’s isn’t yours: a zone such as "Asia/Kolkata". One that can’t be read is left out.',
+        icon: 'clock',
+      },
+      {
+        name: 'clock',
+        label: 'Clock',
+        type: 'choice',
+        options: LOCAL_TIME_CLOCKS,
+        optionLabels: {
+          auto: 'As the visitor writes it',
+          '12': '12 hour (3:05 PM)',
+          '24': '24 hour (15:05)',
+        },
+        default: 'auto',
+        icon: 'clock',
+      },
+      {
+        name: 'showDate',
+        label: 'Show the date',
+        type: 'toggle',
+        default: true,
+      },
+      {
+        name: 'showCity',
+        label: 'Show the city',
+        type: 'toggle',
+        default: true,
+      },
+      {
+        name: 'showOffset',
+        label: 'Show how far ahead or behind the visitor',
+        type: 'toggle',
+        default: true,
+        help: 'As "4 h 30 min ahead of you", worked out in the visitor’s browser.',
+      },
+      {
+        name: 'hours',
+        label: 'Working hours',
+        type: 'group',
+        help: 'Shows "Open now" or "Away". Left empty, no chip.',
+        icon: 'clock',
+        fields: [
+          {
+            name: 'from',
+            label: 'From',
+            type: 'text',
+            required: true,
+            help: '24-hour, as "09:00".',
+          },
+          {
+            name: 'to',
+            label: 'Until',
+            type: 'text',
+            required: true,
+            help: '24-hour, as "17:30". Earlier than From runs past midnight.',
+          },
+          {
+            name: 'days',
+            label: 'Days',
+            type: 'choice',
+            options: LOCAL_TIME_DAYS,
+            optionLabels: {
+              mon: 'Monday',
+              tue: 'Tuesday',
+              wed: 'Wednesday',
+              thu: 'Thursday',
+              fri: 'Friday',
+              sat: 'Saturday',
+              sun: 'Sunday',
+            },
+            multiple: true,
+            default: ['mon', 'tue', 'wed', 'thu', 'fri'],
+          },
+        ],
+      },
+      {
+        name: 'tile',
+        label: 'Size',
+        type: 'choice',
+        options: ['2x1', '2x2'],
+        optionLabels: { '2x1': 'Wide', '2x2': 'Large' },
+        default: '2x1',
+        icon: 'size',
+      },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'LOCAL_TIME_LABELS',
+      },
+    ],
+    appOnly: ['locale', 'now', 'live', 'visitorTimeZone'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'The title, the creator’s time and city, how far ahead or behind the visitor that is, and whether they’re open now; the time isn’t announced as it ticks.',
     },
   },
 ] as const satisfies readonly BlockInfo[];

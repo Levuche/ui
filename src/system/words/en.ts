@@ -270,6 +270,16 @@ export const WORDS_EN = {
     loading: 'Loading the event',
     untitled: 'Event',
   },
+  localTime: {
+    title: 'My local time',
+    open: 'Open now',
+    away: 'Away',
+    ahead: '{time} ahead of you',
+    behind: '{time} behind you',
+    same: 'Same time as you',
+    hours: '{n} h',
+    minutes: '{n} min',
+  },
   props: {
     /** CreatorHeader `verifiedLabel`. */
     verified: 'Verified',

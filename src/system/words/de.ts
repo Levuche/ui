@@ -265,6 +265,16 @@ export const WORDS_DE: PageWords = {
     loading: 'Veranstaltung wird geladen',
     untitled: 'Veranstaltung',
   },
+  localTime: {
+    title: 'Meine Ortszeit',
+    open: 'Jetzt erreichbar',
+    away: 'Abwesend',
+    ahead: '{time} vor dir',
+    behind: '{time} hinter dir',
+    same: 'Gleiche Zeit wie bei dir',
+    hours: '{n} Std.',
+    minutes: '{n} Min.',
+  },
   props: {
     verified: 'Verifiziert',
     links: 'Links',

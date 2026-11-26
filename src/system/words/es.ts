@@ -265,6 +265,16 @@ export const WORDS_ES: PageWords = {
     loading: 'Cargando el evento',
     untitled: 'Evento',
   },
+  localTime: {
+    title: 'Mi hora local',
+    open: 'Abierto ahora',
+    away: 'Ausente',
+    ahead: '{time} por delante de ti',
+    behind: '{time} por detrás de ti',
+    same: 'La misma hora que tú',
+    hours: '{n} h',
+    minutes: '{n} min',
+  },
   props: {
     verified: 'Verificado',
     links: 'Enlaces',

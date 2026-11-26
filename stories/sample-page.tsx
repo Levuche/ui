@@ -23,6 +23,7 @@ import {
   FeaturedPack,
   GlobeIcon,
   LinkList,
+  LocalTime,
   NewsletterBand,
   PackCheckout,
   PackRow,
@@ -115,7 +116,7 @@ export const SAMPLE_FAQ = [
   },
 ];
 
-/** A fixed clock for the sample page's countdown, so it never changes. */
+/** A fixed clock for the sample page's countdown and local time, so they never change. */
 const SAMPLE_NOW = Date.UTC(2026, 11, 1, 9, 0, 0);
 
 /** The words on the sample page a creator writes themselves. */
@@ -168,6 +169,15 @@ export function SamplePage({ words = SAMPLE_WORDS }: { words?: SampleWords }) {
         name={words.name}
         followers={128000}
         tile="2x1"
+      />
+      <LocalTime
+        city="mumbai"
+        cityName="Kochi"
+        now={SAMPLE_NOW}
+        live={false}
+        locale="en-US"
+        visitorTimeZone="Europe/London"
+        hours={{ from: '09:00', to: '18:00' }}
       />
       <SiteSection title="Latest video">
         <YouTubeVideo

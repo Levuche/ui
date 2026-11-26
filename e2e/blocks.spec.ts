@@ -257,6 +257,46 @@ for (const [id, expected] of Object.entries(THEMES)) {
       await expect(tips.getByRole('status')).toHaveText('Tip of 25 started');
     });
 
+    test('the local time shows the creator’s time, day, city and offset', async () => {
+      const block = panel
+        .getByTestId('time')
+        .locator('[data-block="local-time"]')
+        .first();
+      // The gallery's clock: Tuesday 1 December, 09:00 UTC, 14:30 in Kochi.
+      const time = block.locator('time');
+      await expect(time).toHaveText('2:30PM');
+      await expect(time).toHaveAttribute('datetime', '2026-12-01T14:30+05:30');
+      await expect(block.getByText('Tue, Dec 1')).toBeVisible();
+      await expect(block.getByText('Kochi')).toBeVisible();
+      await expect(block.getByText('5 h 30 min ahead of you')).toBeVisible();
+      await expect(block.getByText('Open now')).toBeVisible();
+      await expect(block.locator('[aria-live]')).toHaveCount(0);
+    });
+
+    test('the live local time moves on each minute, only while on screen', async ({
+      page,
+    }) => {
+      await page.clock.install({ time: new Date('2026-12-01T09:00:00Z') });
+      await page.reload();
+      const live = panel.getByTestId('live-time');
+      const time = live.locator('time');
+      await live.scrollIntoViewIfNeeded();
+      await expect(time).toHaveText('09:00');
+      await expect(live.getByText('5 h 30 min behind you')).toBeVisible();
+      await page.clock.runFor(60_000);
+      await expect(time).toHaveText('09:01');
+      // Off screen it stops, and catches up when it's back.
+      await page.evaluate(() =>
+        window.scrollTo(0, document.documentElement.scrollHeight)
+      );
+      await expect(live).not.toBeInViewport();
+      await page.waitForTimeout(200);
+      await page.clock.runFor(120_000);
+      await expect(time).toHaveText('09:01');
+      await live.scrollIntoViewIfNeeded();
+      await expect(time).toHaveText('09:03');
+    });
+
     test('the code copies with one tap and the countdown shows time left', async ({
       page,
       context,
