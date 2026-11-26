@@ -14,6 +14,17 @@ change when it moves to that version.
   page's language, or set with `labels` (`LOGO_STRIP_LABELS`). A still row
   is unchanged.
 
+### Added
+
+- The creator's name in its own style: `CreatorHeader` `nameColor` (`text`,
+  `accent` or `link`), `nameTint` (a colour of the creator's own, checked
+  with `isSafeColor`), `nameCase` (`upper` for capitals) and `nameWeight`
+  (`medium`, `semibold`, `bold` or `black`). `SectionHeading` takes the same
+  as `titleColor`, `titleTint`, `titleCase` and `titleWeight`. Each is off
+  until set, so pages look as before. `nameColorIssue` warns when the colour
+  is too faint on its block; `nameLook` gives the classes and style for any
+  other heading.
+
 ### An app must change
 
 Nothing.

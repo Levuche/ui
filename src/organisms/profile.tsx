@@ -5,6 +5,12 @@ import { CheckIcon } from '../atoms/icons';
 import { WordRing, type WordRingLabels } from '../molecules/word-ring';
 import { cn } from '../system/cn';
 import { toImageSource, type ImageSrc } from '../system/image';
+import {
+  nameLook,
+  type NameCase,
+  type NameColor,
+  type NameWeight,
+} from '../system/name-style';
 import { usePageWords } from '../system/page-words';
 
 const NAME_SIZES = {
@@ -42,6 +48,10 @@ export function CreatorHeader({
   verified = false,
   verifiedLabel: verifiedLabelProp,
   nameSize = 'md',
+  nameColor,
+  nameTint,
+  nameCase,
+  nameWeight,
   highlight,
   layout = 'stack',
   headingAs: Heading = 'h1',
@@ -70,6 +80,18 @@ export function CreatorHeader({
   verifiedLabel?: string;
   /** `lg` and `xl` make the name bigger, for a page that leads with it. */
   nameSize?: 'md' | 'lg' | 'xl';
+  /** The name's colour from the theme: text (as the rest), accent or links. */
+  nameColor?: NameColor;
+  /**
+   * A colour of the creator's own for the name, in place of `nameColor`.
+   * Only a plain colour is used (isSafeColor); nameColorIssue says whether
+   * it can be read on the block.
+   */
+  nameTint?: string;
+  /** `upper` writes the name in capitals; screen readers hear it as typed. */
+  nameCase?: NameCase;
+  /** How heavy the name is: bold if left out. */
+  nameWeight?: NameWeight;
   /**
    * Words of the tagline to set apart, in italics and the theme's display
    * font. The tagline must be plain text that contains them.
@@ -93,6 +115,12 @@ export function CreatorHeader({
   children?: ReactNode;
 }) {
   const own = usePageWords('props');
+  const nameStyle = nameLook({
+    color: nameColor,
+    tint: nameTint,
+    case: nameCase,
+    weight: nameWeight,
+  });
   const verifiedLabel =
     verifiedLabelProp === undefined ? own.verified : verifiedLabelProp;
   // The header is at the top of the page, so its picture loads at once.
@@ -102,9 +130,11 @@ export function CreatorHeader({
     <>
       <Heading
         className={cn(
-          'text-site-text m-0 inline-flex items-center gap-1.5 font-bold',
-          NAME_SIZES[nameSize] ?? NAME_SIZES.md
+          'm-0 inline-flex items-center gap-1.5',
+          NAME_SIZES[nameSize] ?? NAME_SIZES.md,
+          nameStyle.className
         )}
+        style={nameStyle.style}
       >
         {name}
         {verified ? (

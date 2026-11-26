@@ -5,6 +5,12 @@ import { RichText } from '../molecules/rich-text';
 import { cn } from '../system/cn';
 import { GRID_GAP, GRID_ROW } from '../system/grid';
 import type { ImageSrc } from '../system/image';
+import {
+  nameLook,
+  type NameCase,
+  type NameColor,
+  type NameWeight,
+} from '../system/name-style';
 import { anchorId } from '../system/rich-text';
 
 /*
@@ -24,14 +30,35 @@ export function SectionHeading({
   detail,
   headingAs = 'h2',
   id,
+  titleColor,
+  titleTint,
+  titleCase,
+  titleWeight,
   ...root
 }: BlockRootProps & {
   title: string;
   detail?: string;
+  /** The heading's colour from the theme: text (as the rest), accent or links. */
+  titleColor?: NameColor;
+  /**
+   * A colour of the creator's own for the heading, in place of
+   * `titleColor`. Only a plain colour is used (isSafeColor).
+   */
+  titleTint?: string;
+  /** `upper` writes the heading in capitals; screen readers hear it as typed. */
+  titleCase?: NameCase;
+  /** How heavy the heading is: bold if left out. */
+  titleWeight?: NameWeight;
   /** The heading's level on the page. `p` when it's only for looks. */
   headingAs?: 'h2' | 'h3' | 'p';
 }) {
   const anchor = anchorId(id) || undefined;
+  const titleStyle = nameLook({
+    color: titleColor,
+    tint: titleTint,
+    case: titleCase,
+    weight: titleWeight,
+  });
   return (
     <Block
       name="section-heading"
@@ -43,7 +70,11 @@ export function SectionHeading({
       <SiteHeading
         as={headingAs}
         size="lg"
-        className="text-[calc(var(--block-title)*1.35)] text-balance"
+        className={cn(
+          'text-[calc(var(--block-title)*1.35)] text-balance',
+          titleStyle.className
+        )}
+        style={titleStyle.style}
       >
         {title}
       </SiteHeading>
