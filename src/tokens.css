@@ -266,9 +266,22 @@
   --color-site-field: var(--site-field, var(--site-bg));
   --color-site-on-field: var(--site-on-field, var(--site-text));
 }
-/* LogoStrip's scrolling row: the list is drawn twice and moves by half. */
+/*
+ * LogoStrip's scrolling row: the list is drawn twice and moves by half, to
+ * the left, or to the right in a right-to-left script (--marquee-to).
+ */
 @keyframes levuche-marquee {
   to {
-    translate: -50% 0;
+    translate: var(--marquee-to, -50%) 0;
+  }
+}
+/*
+ * Long names, titles and addresses wrap inside their block, even a word with
+ * no place to break, so nothing spills off a phone. In the base layer, so a
+ * block's own classes still win.
+ */
+@layer base {
+  [data-block] {
+    overflow-wrap: anywhere;
   }
 }
