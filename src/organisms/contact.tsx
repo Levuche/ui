@@ -178,6 +178,10 @@ export function toVCard(card: ContactCard) {
   return lines.filter(Boolean).join('\r\n');
 }
 
+/** Half of a UTF-16 pair, without its other half. */
+const LONE_SURROGATE =
+  /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/g;
+
 /**
  * "Save my contact": a button that downloads the creator's contact card, which
  * a phone offers to add to its contacts. Works without JavaScript.
@@ -204,9 +208,16 @@ export function SaveContact({
   const own = usePageWords('props');
   const buttonLabel =
     buttonLabelProp === undefined ? own.saveContact : buttonLabelProp;
-  const file = `${(fileName ?? contact.name).replace(/[\\/:*?"<>|]/g, '')}.vcf`;
+  const file = `${
+    [fileName, contact.name]
+      .map((name) =>
+        typeof name === 'string' ? name.replace(/[\\/:*?"<>|]/g, '').trim() : ''
+      )
+      .find(Boolean) ?? 'contact'
+  }.vcf`;
+  // A broken emoji (half of a pair) would make encodeURIComponent throw.
   const href = `data:text/vcard;charset=utf-8,${encodeURIComponent(
-    toVCard(contact)
+    toVCard(contact).replace(LONE_SURROGATE, '\ufffd')
   )}`;
   return (
     <Block name="save-contact" {...root}>

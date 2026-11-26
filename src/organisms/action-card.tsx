@@ -46,7 +46,12 @@ function Media({ media }: { media: ActionCardMedia }) {
     );
   }
   if (media.type === 'covers') {
-    const covers = media.covers.slice(0, 3);
+    // Saved settings can leave the list out.
+    const covers = (Array.isArray(media.covers) ? media.covers : []).slice(
+      0,
+      3
+    );
+    if (covers.length === 0) return null;
     return (
       <span className="relative isolate block h-20 w-24 flex-none">
         {covers.map((cover, i) => (

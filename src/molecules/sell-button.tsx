@@ -23,6 +23,11 @@ export type BuyRender = {
   label: ReactNode;
   /** The press's name, such as "buy" or "book". */
   action: string;
+  /**
+   * True until the visitor has chosen what the press needs, such as a time.
+   * The app's button should be off while it is.
+   */
+  disabled: boolean;
 };
 
 /** The props every selling block shares. */
@@ -75,7 +80,15 @@ export function SellButton({
   if (sell && json) {
     if (renderBuy) {
       return (
-        <>{renderBuy({ sell, state: sellState, label: children, action })}</>
+        <>
+          {renderBuy({
+            sell,
+            state: sellState,
+            label: children,
+            action,
+            disabled,
+          })}
+        </>
       );
     }
     const closed = sellState === 'sold_out' || sellState === 'unavailable';

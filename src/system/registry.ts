@@ -1529,8 +1529,8 @@ export const BLOCKS = [
         name: 'defaultAmount',
         label: 'Picked at first',
         type: 'number',
-        min: 0,
-        help: 'Left empty: the middle amount.',
+        min: 1,
+        help: 'Left empty: the middle amount. One that isn’t among the amounts starts in the Other box.',
       },
       {
         name: 'currency',

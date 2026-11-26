@@ -5,6 +5,7 @@ import { siteButtonClasses, type SiteButtonVariant } from '../atoms/button';
 import { DownloadIcon } from '../atoms/icons';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { cn } from '../system/cn';
+import { safeImageSource } from '../system/image';
 import { isSafeColor } from '../system/theme';
 import { usePageWords } from '../system/page-words';
 
@@ -82,7 +83,7 @@ export function QrCode({
   caption,
   dark = '#000000',
   light = '#ffffff',
-  size = 'md',
+  size,
   download = true,
   downloadLabel: downloadLabelProp,
   fileName = 'qr-code',
@@ -96,7 +97,10 @@ export function QrCode({
   encode?: QrEncoder;
   /** How much damage the code survives. Defaults to M. */
   level?: QrLevel;
-  /** A picture of the code, instead of `encode`. */
+  /**
+   * A picture of the code, instead of `encode`. An address a page may not
+   * load is ignored, and the code is drawn from `value`.
+   */
   src?: string | null;
   title?: ReactNode;
   detail?: ReactNode;
@@ -104,6 +108,7 @@ export function QrCode({
   caption?: ReactNode;
   dark?: string;
   light?: string;
+  /** The block's size, as on every block; it also sets the code's width. */
   size?: 'sm' | 'md' | 'lg';
   download?: boolean;
   downloadLabel?: ReactNode;
@@ -118,17 +123,18 @@ export function QrCode({
   const ink = isSafeColor(dark) ? dark : '#000000';
   const paper = isSafeColor(light) ? light : '#ffffff';
   const name = `QR code for ${value.replace(/^https?:\/\//, '')}`;
-  const modules = src ? null : encode(value, level);
+  const ownPicture = safeImageSource(src)?.src ?? null;
+  const modules = ownPicture ? null : encode(value, level);
   const svg = modules?.length
     ? qrSvg(modules, { dark: ink, light: paper, title: name })
     : null;
   const picture = svg
     ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
-    : (src ?? null);
-  const width = { sm: 'w-32', md: 'w-44', lg: 'w-60' }[size];
+    : ownPicture;
+  const width = { sm: 'w-32', md: 'w-44', lg: 'w-60' }[size ?? 'md'];
   const file = `${fileName.replace(/[\\/:*?"<>|]/g, '')}.${svg ? 'svg' : 'png'}`;
   return (
-    <Block name="qr-code" defaults={{ align: 'center' }} {...root}>
+    <Block name="qr-code" defaults={{ align: 'center' }} size={size} {...root}>
       {title ? (
         <ItemHead title={title} detail={detail} headingAs={headingAs} />
       ) : null}
