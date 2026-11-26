@@ -2,10 +2,27 @@ import type { BlockKind } from './grid';
 import { BLOCK_TONES } from './look';
 import { EMBED_SERVICES } from './embeds';
 import { MESSAGE_CHANNELS } from './message';
+import {
+  MAX_PROGRESS_STEPS,
+  PROGRESS_BAR_STYLES,
+  PROGRESS_VALUE_STYLES,
+} from './progress';
+import { CAPTION_STYLES, GALLERY_SPANS, VIDEO_RATIOS } from './gallery';
+import { MIN_MOTION_SECONDS } from './motion';
 import { SOCIAL_ACTIONS, SOCIAL_PLATFORMS } from './social';
+import {
+  LOADS_NOTHING,
+  SERVER_FETCHED,
+  addUpPrivacy,
+  type BlockAccessibility,
+  type BlockPrivacy,
+  type PageBlock,
+  type PagePrivacy,
+} from './privacy';
 import {
   BUTTON_VARIANT_LABELS,
   BUTTON_VARIANT_OPTIONS,
+  CONSENT_LABELS_SETTING,
   FORM_APP_ONLY,
   LINK_BEHAVIOR_SETTINGS,
   LIVE_APP_ONLY,
@@ -30,7 +47,21 @@ import {
  * `settings` for what a creator sets, `appOnly` for the props the app fills
  * in. src/settings-check.ts fails the type check when they and the block's
  * props disagree, so a new prop needs its setting written here.
+ *
+ * And each entry has two notes for the page and the docs: `privacy`, what it
+ * loads from other sites and the cookies that may come with it (see
+ * privacy.ts), and `accessibility`, how it's used with a keyboard and what a
+ * screen reader hears. A block that loads another site lists it, and takes
+ * `consent` (e2e/privacy.spec.ts checks both).
  */
+
+/** The note for a form: it sends only when the visitor submits it. */
+const SENDS_ON_SUBMIT = {
+  services: [],
+  cookies: 'none',
+  reason:
+    'Sends what you type to this site only when you submit it; loads nothing from other sites.',
+} as const satisfies BlockPrivacy;
 
 /*
  * Packs say which blocks a creator gets free in Levuche and which they unlock
@@ -90,7 +121,85 @@ export type BlockInfo = {
    * fetches, form status, the locale, headingAs, children and the like.
    */
   appOnly: readonly string[];
+  /** What it loads from other sites, and the cookies that may come with it. */
+  privacy: BlockPrivacy;
+  /** How it's used with a keyboard, and what a screen reader hears. */
+  accessibility: BlockAccessibility;
 };
+
+/** Where a caption sits on a picture or video (CAPTION_STYLES). */
+const CAPTION_STYLE_SETTING = {
+  name: 'captionStyle',
+  label: 'Caption',
+  type: 'choice',
+  options: CAPTION_STYLES,
+  optionLabels: {
+    below: 'Under it',
+    bar: 'On a bar over it',
+    chip: 'On a label in the corner',
+  },
+  default: 'below',
+} as const satisfies SettingField;
+
+const GALLERY_SPAN_LABELS = {
+  '1x1': 'One cell',
+  '2x1': 'Two wide',
+  '1x2': 'Two tall',
+  '2x2': 'Big square',
+} as const;
+
+/** How an uploaded video plays, and its captions (VideoTrack). */
+const VIDEO_PLAY_SETTINGS = [
+  {
+    name: 'loop',
+    label: 'Loop without sound',
+    type: 'toggle',
+    default: false,
+    help: 'While on the screen, with buttons to pause it or turn the sound on. Always still for visitors who ask for less motion.',
+  },
+  {
+    name: 'tracks',
+    label: 'Captions',
+    type: 'list',
+    itemLabel: 'Captions file',
+    help: 'WebVTT (.vtt) files, from the same place as the video.',
+    fields: [
+      { name: 'src', label: 'File', type: 'link', required: true },
+      {
+        name: 'lang',
+        label: 'Language',
+        type: 'text',
+        required: true,
+        help: 'As "en" or "hi".',
+      },
+      {
+        name: 'label',
+        label: 'Name in the menu',
+        type: 'text',
+        required: true,
+        help: 'As "English".',
+      },
+      {
+        name: 'kind',
+        label: 'Kind',
+        type: 'choice',
+        options: ['captions', 'subtitles', 'descriptions'],
+        optionLabels: {
+          captions: 'Captions (words and sounds)',
+          subtitles: 'Subtitles (a translation)',
+          descriptions: 'Descriptions of what’s shown',
+        },
+        default: 'captions',
+      },
+      {
+        name: 'default',
+        label: 'On from the start',
+        type: 'toggle',
+        default: false,
+      },
+    ],
+  },
+] as const satisfies readonly SettingField[];
 
 export const BLOCKS = [
   {
@@ -146,6 +255,15 @@ export const BLOCKS = [
         default: false,
       },
       {
+        name: 'initialsFont',
+        label: 'Initials font',
+        type: 'choice',
+        options: ['body', 'display'],
+        optionLabels: { body: 'Page font', display: 'Display font' },
+        default: 'body',
+        help: 'For the initials shown when there’s no picture.',
+      },
+      {
         name: 'nameSize',
         label: 'Name size',
         type: 'choice',
@@ -172,7 +290,6 @@ export const BLOCKS = [
         name: 'verifiedLabel',
         label: 'What screen readers say for the tick',
         type: 'text',
-        default: 'Verified',
       },
       {
         name: 'badge',
@@ -181,8 +298,37 @@ export const BLOCKS = [
         help: 'Beside the name, after the tick.',
         icon: 'tag',
       },
+      {
+        name: 'wordRing',
+        label: 'Words around the picture',
+        type: 'text',
+        help: 'They turn slowly in a ring, as "Chai • Stories • Since 2019". Always still for visitors who ask for less motion.',
+      },
+      {
+        name: 'wordRingSpeed',
+        label: 'One turn takes',
+        type: 'number',
+        min: MIN_MOTION_SECONDS,
+        max: 120,
+        step: 1,
+        unit: 'seconds',
+        default: 24,
+        icon: 'clock',
+      },
+      {
+        name: 'wordRingLabels',
+        label: 'Words on the ring’s pause button',
+        type: 'words',
+        from: 'WORD_RING_LABELS',
+      },
     ],
     appOnly: ['headingAs', 'children'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'The name as a heading, then the tagline; the picture is described by its alt text and the tick by its own words.',
+    },
   },
   {
     id: 'social-icons',
@@ -229,10 +375,15 @@ export const BLOCKS = [
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Social accounts',
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each icon; Enter opens it.',
+      screenReader:
+        'A navigation list; each icon is read by the account’s name.',
+    },
   },
   {
     id: 'link-list',
@@ -256,6 +407,18 @@ export const BLOCKS = [
           { name: 'image', label: 'Small picture', type: 'picture' },
           { name: 'imageAlt', label: 'What the picture shows', type: 'text' },
           {
+            name: 'favicon',
+            label: 'Site icon',
+            type: 'picture',
+            help: 'Filled in from the address.',
+          },
+          {
+            name: 'tint',
+            label: 'Brand colour',
+            type: 'colour',
+            help: 'For chips and square tiles.',
+          },
+          {
             name: 'trailing',
             label: 'At the end',
             type: 'text',
@@ -264,6 +427,33 @@ export const BLOCKS = [
           ...LINK_BEHAVIOR_SETTINGS,
         ],
         appOnly: ['icon'],
+      },
+      {
+        name: 'variant',
+        label: 'Shape',
+        type: 'choice',
+        options: ['row', 'icon', 'chip'],
+        optionLabels: {
+          row: 'Rows',
+          icon: 'Square tiles',
+          chip: 'Small chips',
+        },
+        default: 'row',
+        icon: 'layout',
+        help: 'Square tiles sit two to a row, chips four.',
+      },
+      {
+        name: 'look',
+        label: 'Show from the site',
+        type: 'choice',
+        options: ['preview', 'favicon', 'text'],
+        optionLabels: {
+          preview: 'Its preview picture',
+          favicon: 'Only its icon',
+          text: 'Only words',
+        },
+        help: 'Each link’s preview picture or icon, filled in from its address.',
+        icon: 'eye',
       },
       {
         name: 'tileStyle',
@@ -299,10 +489,14 @@ export const BLOCKS = [
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Links',
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader: 'A navigation list of links, each read by its words.',
+    },
   },
   {
     id: 'action-card',
@@ -384,6 +578,13 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY, 'headingAs', 'action'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab reaches the card’s link or button; Enter or Space presses it.',
+      screenReader:
+        'The title, the details and the button’s words; a live badge is read as its label.',
+    },
   },
   {
     id: 'featured-link',
@@ -424,6 +625,298 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader: 'One link, read by its title, with the picture’s alt text.',
+    },
+  },
+  {
+    id: 'link-card',
+    component: 'LinkCard',
+    kind: 'link',
+    group: 'links',
+    client: false,
+    pack: 'core',
+    summary:
+      "One link that shows the site's preview picture, its icon or words",
+    settings: [
+      {
+        name: 'href',
+        label: 'Link',
+        type: 'link',
+        required: true,
+        main: true,
+        slow: true,
+        help: 'Its title, preview picture and icon can be filled in from the page.',
+      },
+      { name: 'title', label: 'Title', type: 'text', required: true },
+      { name: 'detail', label: 'Line under the title', type: 'text' },
+      {
+        name: 'look',
+        label: 'Show from the site',
+        type: 'choice',
+        options: ['preview', 'favicon', 'text'],
+        optionLabels: {
+          preview: 'Its preview picture',
+          favicon: 'Only its icon',
+          text: 'Only words',
+        },
+        default: 'preview',
+        help: 'With no preview picture, its icon shows.',
+        icon: 'eye',
+      },
+      {
+        name: 'image',
+        label: 'Preview picture',
+        type: 'picture',
+        help: 'Filled in from the link.',
+      },
+      {
+        name: 'imageAlt',
+        label: 'What the picture shows',
+        type: 'text',
+        default: '',
+        help: 'Leave empty when it only repeats the title.',
+      },
+      {
+        name: 'favicon',
+        label: 'Site icon',
+        type: 'picture',
+        help: 'Filled in from the link.',
+      },
+      {
+        name: 'tileStyle',
+        label: 'Style',
+        type: 'choice',
+        options: ['filled', 'outline', 'soft', 'plain'],
+        optionLabels: {
+          filled: 'Filled',
+          outline: 'Outline',
+          soft: 'Soft',
+          plain: 'Plain',
+        },
+        default: 'filled',
+      },
+      {
+        name: 'arrow',
+        label: 'Round arrow at the end',
+        type: 'toggle',
+        default: true,
+      },
+      ...LINK_BEHAVIOR_SETTINGS,
+    ],
+    appOnly: [],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches the card; Enter opens its link.',
+      screenReader:
+        'One link, read by its title and the line under it; its preview picture is read by its alt text or skipped.',
+    },
+  },
+  {
+    id: 'logo-tile',
+    component: 'LogoTile',
+    kind: 'tile',
+    group: 'links',
+    client: false,
+    pack: 'core',
+    summary: 'A square link with a big logo or picture and an arrow badge',
+    settings: [
+      {
+        name: 'href',
+        label: 'Link',
+        type: 'link',
+        required: true,
+        main: true,
+        slow: true,
+        help: 'Its picture and icon can be filled in from the page.',
+      },
+      { name: 'title', label: 'Title', type: 'text', required: true },
+      {
+        name: 'image',
+        label: 'Logo or picture',
+        type: 'picture',
+      },
+      {
+        name: 'imageAlt',
+        label: 'What the picture shows',
+        type: 'text',
+        default: '',
+        help: 'Leave empty when it only repeats the title.',
+      },
+      {
+        name: 'favicon',
+        label: 'Site icon',
+        type: 'picture',
+        help: 'Filled in from the link.',
+      },
+      {
+        name: 'look',
+        label: 'Show from the site',
+        type: 'choice',
+        options: ['preview', 'favicon', 'text'],
+        optionLabels: {
+          preview: 'Its preview picture',
+          favicon: 'Only its icon',
+          text: 'Only words',
+        },
+        help: 'Unset, the picture shows as a logo. Its preview picture fills the tile.',
+        icon: 'eye',
+      },
+      {
+        name: 'tileStyle',
+        label: 'Style',
+        type: 'choice',
+        options: ['filled', 'outline', 'soft', 'plain'],
+        optionLabels: {
+          filled: 'Filled',
+          outline: 'Outline',
+          soft: 'Soft',
+          plain: 'Plain',
+        },
+        default: 'filled',
+      },
+      {
+        name: 'tint',
+        label: 'Brand colour',
+        type: 'colour',
+        help: 'Washes the tile in this colour.',
+      },
+      ...LINK_BEHAVIOR_SETTINGS,
+    ],
+    appOnly: ['icon'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the tile; Enter opens its link.',
+      screenReader:
+        'One link, read by its title; the logo is read by its alt text or skipped when the title says it.',
+    },
+  },
+  {
+    id: 'link-chip',
+    component: 'LinkChip',
+    kind: 'chip',
+    group: 'links',
+    client: false,
+    pack: 'core',
+    summary: 'A small link tinted in its brand colour, four to a row',
+    settings: [
+      {
+        name: 'href',
+        label: 'Link',
+        type: 'link',
+        required: true,
+        main: true,
+        slow: true,
+        help: 'Its icon can be filled in from the page.',
+      },
+      {
+        name: 'title',
+        label: 'Title',
+        type: 'text',
+        required: true,
+        help: 'A word or two.',
+      },
+      { name: 'image', label: 'Small picture', type: 'picture' },
+      {
+        name: 'imageAlt',
+        label: 'What the picture shows',
+        type: 'text',
+        default: '',
+        help: 'Leave empty when it only repeats the title.',
+      },
+      {
+        name: 'favicon',
+        label: 'Site icon',
+        type: 'picture',
+        help: 'Filled in from the link.',
+      },
+      {
+        name: 'look',
+        label: 'Show from the site',
+        type: 'choice',
+        options: ['preview', 'favicon', 'text'],
+        optionLabels: {
+          preview: 'Its preview picture',
+          favicon: 'Only its icon',
+          text: 'Only words',
+        },
+        help: 'Unset, the small picture or icon shows.',
+        icon: 'eye',
+      },
+      {
+        name: 'tint',
+        label: 'Brand colour',
+        type: 'colour',
+        help: 'The accent colour when unset.',
+      },
+      ...LINK_BEHAVIOR_SETTINGS,
+    ],
+    appOnly: ['icon'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the chip; Enter opens its link.',
+      screenReader: 'One link, read by its words; its icon is skipped.',
+    },
+  },
+  {
+    id: 'app-badges',
+    component: 'AppBadges',
+    kind: 'link',
+    group: 'links',
+    client: false,
+    pack: 'core',
+    summary: 'Badges that link to an app in the App Store and Google Play',
+    settings: [
+      {
+        name: 'apps',
+        label: 'Stores',
+        type: 'list',
+        required: true,
+        itemLabel: 'Store',
+        max: 2,
+        fields: [
+          {
+            name: 'store',
+            label: 'Store',
+            type: 'choice',
+            required: true,
+            options: ['app-store', 'google-play'],
+            optionLabels: {
+              'app-store': 'App Store',
+              'google-play': 'Google Play',
+            },
+          },
+          {
+            name: 'href',
+            label: 'The app in the store',
+            type: 'link',
+            required: true,
+          },
+          {
+            name: 'badge',
+            label: 'The store’s badge picture',
+            type: 'picture',
+            help: 'Without one, the badge is drawn in the page’s colours.',
+          },
+          ...LINK_BEHAVIOR_SETTINGS,
+        ],
+      },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'APP_BADGE_LABELS',
+      },
+    ],
+    appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each badge; Enter opens its store page.',
+      screenReader:
+        'A labelled list of store links, each read as the store’s name.',
+    },
   },
   {
     id: 'pack-row',
@@ -436,6 +929,13 @@ export const BLOCKS = [
     settings: [
       { name: 'title', label: 'Title', type: 'text', required: true },
       { name: 'detail', label: 'Line under the title', type: 'longText' },
+      {
+        name: 'duration',
+        label: 'How long',
+        type: 'text',
+        help: 'For a service, as "4.5 h".',
+        icon: 'clock',
+      },
       {
         name: 'price',
         label: 'Price',
@@ -457,12 +957,17 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Buy',
       },
       ...SELL_SETTINGS,
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the buy button; Enter or Space presses it.',
+      screenReader:
+        'The product’s name, its price (and the old price) and the button; buying news is read out as it happens.',
+    },
   },
   {
     id: 'featured-pack',
@@ -475,6 +980,13 @@ export const BLOCKS = [
     settings: [
       { name: 'title', label: 'Title', type: 'text', required: true },
       { name: 'detail', label: 'What’s in it', type: 'longText' },
+      {
+        name: 'duration',
+        label: 'How long',
+        type: 'text',
+        help: 'For a service, as "4.5 h".',
+        icon: 'clock',
+      },
       {
         name: 'price',
         label: 'Price',
@@ -502,12 +1014,25 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'I’ll take it',
       },
       { name: 'ribbon', label: 'Ribbon', type: 'text', icon: 'tag' },
       ...SELL_SETTINGS,
+      {
+        name: 'href',
+        label: 'Checkout on another site',
+        type: 'link',
+        main: true,
+        help: 'For a product not sold through BuildBase.',
+      },
+      ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY, 'headingAs', 'action'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the buy button; Enter or Space presses it.',
+      screenReader:
+        'The product as a heading, what’s in it as a list, the price and the button; buying news is read out.',
+    },
   },
   {
     id: 'pack-grid',
@@ -559,7 +1084,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on each button',
         type: 'text',
-        default: 'Buy',
       },
       SAVE_LABEL_SETTING,
       {
@@ -570,6 +1094,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['renderBuy'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab moves from product to product; Enter or Space presses a buy button.',
+      screenReader: 'A list of products, each with its name, price and button.',
+    },
   },
   {
     id: 'credit-pack',
@@ -635,6 +1165,12 @@ export const BLOCKS = [
       ...SELL_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY, 'locale', 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the buy button; Enter or Space presses it.',
+      screenReader:
+        'The pack’s name, how many credits, the price and the button.',
+    },
   },
   {
     id: 'slot-picker',
@@ -686,6 +1222,13 @@ export const BLOCKS = [
       'onChange',
       'headingAs',
     ],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab moves between the day and time groups; arrow keys pick within one; Tab then reaches the book button.',
+      screenReader:
+        'Two labelled groups of choices (day, then time), each read with how many there are, then the button.',
+    },
   },
   {
     id: 'pack-checkout',
@@ -713,8 +1256,6 @@ export const BLOCKS = [
         name: 'consent',
         label: 'Consent line',
         type: 'longText',
-        default:
-          'I want to download now and understand I lose my 14-day right to cancel.',
         help: 'The buyer ticks it before buying.',
       },
       {
@@ -738,6 +1279,13 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...FORM_APP_ONLY],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab reaches the download consent box (Space ticks it), then the buy button.',
+      screenReader:
+        'The product, the price, the consent box with its words, and the button.',
+    },
   },
   {
     id: 'booking-card',
@@ -778,7 +1326,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Book a call',
       },
       {
         name: 'buttonVariant',
@@ -792,6 +1339,11 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY, 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the book button; Enter or Space presses it.',
+      screenReader: 'The session’s name, its length and price, and the button.',
+    },
   },
   {
     id: 'membership-card',
@@ -814,7 +1366,6 @@ export const BLOCKS = [
         name: 'period',
         label: 'Per',
         type: 'text',
-        default: 'month',
         help: 'Shown as "/ month".',
         icon: 'clock',
       },
@@ -839,7 +1390,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Join',
       },
       {
         name: 'featured',
@@ -860,6 +1410,12 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY, 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the join button; Enter or Space presses it.',
+      screenReader:
+        'The tier’s name, its price, what members get as a list, and the button.',
+    },
   },
   {
     id: 'lead-magnet',
@@ -884,7 +1440,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Send it to me',
       },
       {
         name: 'placeholder',
@@ -900,6 +1455,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...FORM_APP_ONLY, 'headingAs'],
+    privacy: SENDS_ON_SUBMIT,
+    accessibility: {
+      keyboard: 'Tab reaches the email box and the button; Enter sends.',
+      screenReader:
+        'The offer, the labelled email box, and the form’s result read out when it arrives.',
+    },
   },
   {
     id: 'tip-jar',
@@ -910,7 +1471,7 @@ export const BLOCKS = [
     pack: 'core',
     summary: 'Pick an amount and leave a tip',
     settings: [
-      { name: 'title', label: 'Title', type: 'text', default: 'Leave a tip' },
+      { name: 'title', label: 'Title', type: 'text' },
       { name: 'detail', label: 'Line under the title', type: 'longText' },
       {
         name: 'amounts',
@@ -947,7 +1508,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Tip',
       },
       {
         name: 'sell',
@@ -959,6 +1519,13 @@ export const BLOCKS = [
       { name: 'labels', label: 'Words', type: 'words', from: 'TIP_JAR_LABELS' },
     ],
     appOnly: [...FORM_APP_ONLY, 'icon'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Arrow keys pick an amount; Tab reaches the box for your own amount and the button.',
+      screenReader:
+        'A labelled group of amounts, the amount box, and the button.',
+    },
   },
   {
     id: 'discount-code',
@@ -985,6 +1552,12 @@ export const BLOCKS = [
       { name: 'labels', label: 'Words', type: 'words', from: 'COPY_LABELS' },
     ],
     appOnly: ['copy'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the copy button; Enter or Space copies the code.',
+      screenReader:
+        'The code and the button; “copied” or “couldn’t copy” is read out.',
+    },
   },
   {
     id: 'countdown',
@@ -1007,7 +1580,6 @@ export const BLOCKS = [
         name: 'doneLabel',
         label: 'When time is up',
         type: 'text',
-        default: 'It’s live',
       },
       {
         name: 'doneContent',
@@ -1023,6 +1595,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['now', 'onDone'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'A timer that isn’t read out every second; when it ends, the end words are read once.',
+    },
   },
   {
     id: 'testimonials',
@@ -1079,6 +1657,11 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press, besides any links in the quotes.',
+      screenReader: 'Each quote, who said it and a star rating read as words.',
+    },
   },
   {
     id: 'faq-list',
@@ -1116,6 +1699,13 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab reaches each question; Enter or Space opens or closes its answer.',
+      screenReader:
+        'Each question as a button that says whether it’s open, then its answer.',
+    },
   },
   {
     id: 'youtube-video',
@@ -1170,8 +1760,21 @@ export const BLOCKS = [
         type: 'text',
         help: 'Left empty: "Play video: {title}".',
       },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: [],
+    appOnly: ['consent'],
+    privacy: {
+      services: ['youtube'],
+      cookies: 'marketing',
+      reason:
+        'Plays the video from YouTube’s privacy-enhanced player; once it loads, YouTube sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the play (or Load) button; Enter or Space loads the video and moves focus into it.',
+      screenReader:
+        'A button named by the video’s title; YouTube’s own player once it loads.',
+    },
   },
   {
     id: 'reel-grid',
@@ -1204,6 +1807,11 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each reel that has a link; Enter opens it.',
+      screenReader: 'A list of reels, each link named by its label.',
+    },
   },
   {
     id: 'image-grid',
@@ -1251,6 +1859,11 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each picture that has a link.',
+      screenReader: 'Each picture’s alt text, and its caption.',
+    },
   },
   {
     id: 'newsletter-band',
@@ -1267,7 +1880,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Subscribe',
       },
       {
         name: 'placeholder',
@@ -1285,13 +1897,37 @@ export const BLOCKS = [
         icon: 'layout',
       },
       {
+        name: 'display',
+        label: 'Show it as',
+        type: 'choice',
+        options: ['band', 'tile'],
+        optionLabels: {
+          band: 'The form in the block',
+          tile: 'A small tile with a button',
+        },
+        default: 'band',
+        help: 'The tile’s button opens the form in a pop-up.',
+      },
+      {
         name: 'labels',
         label: 'Words',
         type: 'words',
         from: 'EMAIL_FORM_LABELS',
       },
+      {
+        name: 'tileLabels',
+        label: 'Words on the tile',
+        type: 'words',
+        from: 'NEWSLETTER_TILE_LABELS',
+      },
     ],
     appOnly: [...FORM_APP_ONLY],
+    privacy: SENDS_ON_SUBMIT,
+    accessibility: {
+      keyboard: 'Tab reaches the email box and the button; Enter sends.',
+      screenReader:
+        'The heading, the labelled email box, and the form’s result read out when it arrives.',
+    },
   },
   {
     id: 'creator-footer',
@@ -1317,17 +1953,21 @@ export const BLOCKS = [
         name: 'credit',
         label: 'Credit line',
         type: 'text',
-        default: 'Made with Levuche',
       },
       { name: 'creditHref', label: 'Credit link', type: 'link' },
       {
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Site policies',
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'A labelled navigation of policy links, then the credit line.',
+    },
   },
   {
     id: 'site-image',
@@ -1347,6 +1987,7 @@ export const BLOCKS = [
         help: 'Empty if it’s only decoration.',
       },
       { name: 'caption', label: 'Caption', type: 'text' },
+      CAPTION_STYLE_SETTING,
       { name: 'href', label: 'Link', type: 'link', main: true },
       {
         name: 'ratio',
@@ -1367,6 +2008,11 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the picture when it’s a link.',
+      screenReader: 'The picture’s alt text and its caption.',
+    },
   },
   {
     id: 'image-carousel',
@@ -1435,10 +2081,16 @@ export const BLOCKS = [
       },
       { name: 'showDots', label: 'Dots', type: 'toggle', default: true },
       {
+        name: 'counter',
+        label: 'Slide number',
+        type: 'toggle',
+        default: false,
+        help: 'A small "1/4" on the picture.',
+      },
+      {
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Pictures',
         help: 'When there’s no title.',
       },
       {
@@ -1449,6 +2101,165 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['index', 'onIndexChange'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Arrow keys move between slides; Tab reaches the previous, next, pause and dot buttons. Autoplay stops while focus is inside.',
+      screenReader:
+        'A carousel named by its title; each slide is “slide n of m”, and the slide shown is read when it changes by hand.',
+    },
+  },
+  {
+    id: 'tile-gallery',
+    component: 'TileGallery',
+    kind: 'gallery',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'Pictures and videos in tiles of mixed sizes, captions on them',
+    settings: [
+      {
+        name: 'items',
+        label: 'Tiles',
+        type: 'list',
+        required: true,
+        itemLabel: 'Tile',
+        fields: [
+          {
+            name: 'src',
+            label: 'Picture',
+            type: 'picture',
+            help: 'For a video, its cover. Left empty: its first frame.',
+          },
+          {
+            name: 'alt',
+            label: 'What it shows',
+            type: 'text',
+            required: true,
+            help: 'It also names the link or the play button.',
+          },
+          {
+            name: 'video',
+            label: 'Video',
+            type: 'link',
+            help: 'An uploaded mp4, mov or webm file. Makes this a video tile.',
+            icon: 'video',
+          },
+          ...VIDEO_PLAY_SETTINGS,
+          {
+            name: 'span',
+            label: 'Size',
+            type: 'choice',
+            options: GALLERY_SPANS,
+            optionLabels: GALLERY_SPAN_LABELS,
+            default: '1x1',
+            icon: 'size',
+          },
+          { name: 'caption', label: 'Caption', type: 'text' },
+          {
+            name: 'href',
+            label: 'Link',
+            type: 'link',
+            help: 'For a picture. A video plays in place.',
+          },
+          ...LINK_BEHAVIOR_SETTINGS,
+        ],
+      },
+      { name: 'title', label: 'Title', type: 'text' },
+      {
+        name: 'columns',
+        label: 'Columns',
+        type: 'choice',
+        options: [2, 3, 4],
+        default: 3,
+        help: 'On a tablet or computer. Two on a phone.',
+        icon: 'layout',
+      },
+      { ...CAPTION_STYLE_SETTING, default: 'chip' },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'VIDEO_LABELS',
+      },
+    ],
+    appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab reaches each tile that has a link, and each video’s play and pause buttons.',
+      screenReader:
+        'A list of tiles, each picture read by its alt text and its caption; a video’s buttons say what they do.',
+    },
+  },
+  {
+    id: 'video-tile',
+    component: 'VideoTile',
+    kind: 'media',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'An uploaded video, wide or tall, that can loop without sound',
+    settings: [
+      {
+        name: 'src',
+        label: 'Video',
+        type: 'link',
+        required: true,
+        main: true,
+        help: 'An uploaded mp4, mov or webm file.',
+        icon: 'video',
+      },
+      {
+        name: 'title',
+        label: 'What it is',
+        type: 'text',
+        required: true,
+        help: 'For screen readers, and the play button’s name.',
+      },
+      {
+        name: 'poster',
+        label: 'Cover picture',
+        type: 'picture',
+        help: 'Left empty: the video’s first frame.',
+      },
+      {
+        name: 'ratio',
+        label: 'Shape',
+        type: 'choice',
+        options: VIDEO_RATIOS,
+        optionLabels: {
+          video: 'Wide (16:9)',
+          tall: 'Tall (9:16)',
+          square: 'Square',
+          portrait: 'Portrait (4:5)',
+        },
+        default: 'video',
+      },
+      ...VIDEO_PLAY_SETTINGS,
+      { name: 'caption', label: 'Caption', type: 'text' },
+      CAPTION_STYLE_SETTING,
+      {
+        name: 'transcriptHref',
+        label: 'Transcript',
+        type: 'link',
+        help: 'A page with the video’s words.',
+      },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'VIDEO_TILE_LABELS',
+      },
+    ],
+    appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab reaches the play and pause buttons; Enter or Space presses them. A looping video stands still for visitors who ask for less motion.',
+      screenReader:
+        'The video is named by its title; its buttons say what they do.',
+    },
   },
   {
     id: 'before-after',
@@ -1512,6 +2323,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['position', 'onPositionChange'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the slider; arrow keys, Home and End move it.',
+      screenReader:
+        'A slider named by its label, read as how much of each picture shows, with both pictures’ alt text.',
+    },
   },
   {
     id: 'logo-strip',
@@ -1576,10 +2393,84 @@ export const BLOCKS = [
         name: 'label',
         label: 'Name for screen readers',
         type: 'text',
-        default: 'Brands',
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Nothing to press; a scrolling strip stops while hovered or focused, and stands still for visitors who ask for less motion.',
+      screenReader: 'A labelled list of logos, each read once by its alt text.',
+    },
+  },
+  {
+    id: 'text-strip',
+    component: 'TextStrip',
+    kind: 'band',
+    group: 'page',
+    client: true,
+    pack: 'growth',
+    summary: 'A band of words that scrolls across, with a pause button',
+    settings: [
+      {
+        name: 'items',
+        label: 'Words',
+        type: 'list',
+        of: 'text',
+        required: true,
+        itemLabel: 'Phrase',
+        min: 1,
+        help: 'Short phrases, as "New drop" or "Free shipping".',
+      },
+      {
+        name: 'separator',
+        label: 'Between phrases',
+        type: 'text',
+        default: '✦',
+        help: 'A mark or emoji. Left empty, none.',
+      },
+      {
+        name: 'speed',
+        label: 'One pass takes',
+        type: 'number',
+        min: MIN_MOTION_SECONDS,
+        max: 120,
+        step: 1,
+        unit: 'seconds',
+        default: 16,
+        icon: 'clock',
+      },
+      {
+        name: 'direction',
+        label: 'Moves towards',
+        type: 'choice',
+        options: ['start', 'end'],
+        optionLabels: {
+          start: 'Start of the line',
+          end: 'End of the line',
+        },
+        default: 'start',
+      },
+      {
+        name: 'label',
+        label: 'Name for screen readers',
+        type: 'text',
+        default: 'Highlights',
+      },
+      {
+        name: 'labels',
+        label: 'Words on the pause button',
+        type: 'words',
+        from: 'TEXT_STRIP_LABELS',
+      },
+    ],
+    appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Nothing to press; a scrolling strip stops while hovered or focused, and stands still for visitors who ask for less motion.',
+      screenReader: 'A labelled list of logos, each read once by its alt text.',
+    },
   },
   {
     id: 'contact-form',
@@ -1630,6 +2521,13 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...FORM_APP_ONLY, 'headingAs', 'children'],
+    privacy: SENDS_ON_SUBMIT,
+    accessibility: {
+      keyboard:
+        'Tab moves through name, email, message and the send button; Enter in a box sends.',
+      screenReader:
+        'Each box by its label and hint, errors on the boxes they’re about, and the result read out.',
+    },
   },
   {
     id: 'message-card',
@@ -1715,6 +2613,18 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['headingAs'],
+    privacy: {
+      services: [],
+      cookies: 'none',
+      reason:
+        'Opens your chat or email app with the message ready; loads nothing from other sites before you press it.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the message box (when it can be changed) and the button; Enter or Space opens your app.',
+      screenReader:
+        'The message, the labelled box, and a button named by where it opens.',
+    },
   },
   {
     id: 'save-contact',
@@ -1758,7 +2668,6 @@ export const BLOCKS = [
         name: 'buttonLabel',
         label: 'Words on the button',
         type: 'text',
-        default: 'Save contact',
       },
       {
         name: 'buttonVariant',
@@ -1775,6 +2684,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Tab reaches the save button; Enter downloads the contact card.',
+      screenReader: 'A link that downloads, named by its words.',
+    },
   },
   {
     id: 'stats-row',
@@ -1826,6 +2741,12 @@ export const BLOCKS = [
       { name: 'animate', label: 'Count up', type: 'toggle', default: true },
     ],
     appOnly: ['locale', 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'Each number and its label, read as the final number, never as it counts up.',
+    },
   },
   {
     id: 'timeline',
@@ -1867,6 +2788,11 @@ export const BLOCKS = [
       { name: 'title', label: 'Title', type: 'text' },
     ],
     appOnly: ['headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press, besides any links.',
+      screenReader: 'An ordered list of milestones, each with its date.',
+    },
   },
   {
     id: 'section-heading',
@@ -1888,6 +2814,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'The heading at its level, so it shows in the page’s list of headings, then its line of detail.',
+    },
   },
   {
     id: 'text-block',
@@ -1907,6 +2839,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press, besides any links.',
+      screenReader:
+        'Paragraphs, and lists as lists with their item count; bold and italic words read as words, links by their text.',
+    },
   },
   {
     id: 'quote-block',
@@ -1928,6 +2866,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'A quote, then who said it and what they do; the big quote mark and the picture are skipped, since the name is read.',
+    },
   },
   {
     id: 'spacer',
@@ -1957,6 +2901,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'A gap is skipped; a line is read as a separator between parts of the page.',
+    },
   },
   {
     id: 'map-card',
@@ -1994,6 +2944,25 @@ export const BLOCKS = [
       },
       { name: 'showMap', label: 'Show the map', type: 'toggle', default: true },
       {
+        name: 'mapStyle',
+        label: 'Map style',
+        type: 'choice',
+        options: ['standard', 'light', 'dark', 'satellite'],
+        optionLabels: {
+          standard: 'Standard',
+          light: 'Light',
+          dark: 'Dark',
+          satellite: 'Satellite',
+        },
+        default: 'standard',
+      },
+      {
+        name: 'mapCaption',
+        label: 'Line over the map',
+        type: 'text',
+        help: 'A short line on the map’s corner, as "Upstairs, blue door".',
+      },
+      {
         name: 'image',
         label: 'Picture of the place',
         type: 'picture',
@@ -2029,8 +2998,21 @@ export const BLOCKS = [
         type: 'words',
         from: 'MAP_CARD_LABELS',
       },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs', 'children'],
+    appOnly: ['headingAs', 'children', 'consent'],
+    privacy: {
+      services: ['openstreetmap', 'googlemaps'],
+      cookies: 'marketing',
+      reason:
+        'Loads the map when you press it, from OpenStreetMap, or Google Maps for the satellite style, which sees your IP address and may set cookies; directions open in your maps app or site.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the map (or Load) button, then directions; Enter loads the map and moves focus into it.',
+      screenReader:
+        'The place as a heading, the address, the opening hours as a labelled list, and the directions link.',
+    },
   },
   {
     id: 'qr-code',
@@ -2083,7 +3065,6 @@ export const BLOCKS = [
         name: 'downloadLabel',
         label: 'Words on it',
         type: 'text',
-        default: 'Save the QR code',
       },
       {
         name: 'fileName',
@@ -2101,6 +3082,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['encode', 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the download button; Enter downloads the code.',
+      screenReader:
+        'The code as a picture named by what it opens, and the address under it.',
+    },
   },
   {
     id: 'locked-link',
@@ -2176,6 +3163,18 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: ['unlock', 'rememberAs', 'onUnlock'],
+    privacy: {
+      services: [],
+      cookies: 'needed',
+      reason:
+        'Remembers in this tab that you unlocked the link, until the tab closes; loads nothing from other sites.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the button; Enter opens a dialog that keeps focus inside, Escape closes it and focus goes back.',
+      screenReader:
+        'A button that says it opens a dialog; the dialog is named by its title, and a wrong code is read out.',
+    },
   },
   {
     id: 'course-card',
@@ -2233,6 +3232,12 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [...SELL_APP_ONLY, 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches the buy button; Enter or Space presses it.',
+      screenReader:
+        'The course as a heading, its lessons, length and price, and the button.',
+    },
   },
   {
     id: 'pricing-table',
@@ -2344,6 +3349,13 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: ['renderBuy', 'period', 'onPeriodChange', 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard:
+        'Arrow keys switch monthly and yearly; Tab moves through each plan’s button.',
+      screenReader:
+        'A labelled monthly or yearly choice, then each plan with its price, what’s in it and its button.',
+    },
   },
   {
     id: 'top-picks',
@@ -2398,6 +3410,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'A list of products, each link named by its title, with affiliate links marked in words.',
+    },
   },
   {
     id: 'booking-embed',
@@ -2440,6 +3458,20 @@ export const BLOCKS = [
         icon: 'size',
       },
       {
+        name: 'duration',
+        label: 'How long',
+        type: 'text',
+        help: 'As "30 min".',
+        icon: 'clock',
+      },
+      {
+        name: 'timeZone',
+        label: 'Time zone',
+        type: 'text',
+        help: 'For the next free time, as "Asia/Kolkata".',
+        icon: 'clock',
+      },
+      {
         name: 'buttonVariant',
         label: 'Button style',
         type: 'choice',
@@ -2452,8 +3484,21 @@ export const BLOCKS = [
         type: 'words',
         from: 'BOOKING_EMBED_LABELS',
       },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs', 'onOpen'],
+    appOnly: ['headingAs', 'onOpen', 'nextFree', 'locale', 'consent'],
+    privacy: {
+      services: ['booking'],
+      cookies: 'marketing',
+      reason:
+        'Shows the creator’s booking site inside the page; that site sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the button; Enter opens the booking page in a dialog (Escape closes it), or Load shows it in the page and moves focus into it.',
+      screenReader:
+        'A button that says it opens a dialog; the booking page is named by its title, with a plain link to it as well.',
+    },
   },
   {
     id: 'latest-videos',
@@ -2503,10 +3548,15 @@ export const BLOCKS = [
         name: 'channelLabel',
         label: 'Its words',
         type: 'text',
-        default: 'See the channel',
       },
     ],
     appOnly: [...LIVE_APP_ONLY, 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'A list of videos, each link named by its title; “Loading” while there’s no data.',
+    },
   },
   {
     id: 'latest-posts',
@@ -2547,6 +3597,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...LIVE_APP_ONLY, 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'A list of posts, each link named by its title, with its date; “Loading” while there’s no data.',
+    },
   },
   {
     id: 'live-status',
@@ -2574,8 +3630,21 @@ export const BLOCKS = [
         type: 'words',
         from: 'LIVE_STATUS_LABELS',
       },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: [...LIVE_APP_ONLY, 'parents', 'locale', 'headingAs'],
+    appOnly: [...LIVE_APP_ONLY, 'parents', 'locale', 'headingAs', 'consent'],
+    privacy: {
+      services: ['twitch'],
+      cookies: 'marketing',
+      reason:
+        'Shows whether the channel is live from data this site fetched; the Twitch player loads only when you press it, and Twitch may set cookies then.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the player (or Load) button and the channel link; Enter loads the player and moves focus into it.',
+      screenReader:
+        'The channel as a heading, “live” or “offline” in words, the title and viewers, and the link.',
+    },
   },
   {
     id: 'event-list',
@@ -2638,6 +3707,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['loading', 'error', 'updatedAt', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each ticket link; Enter opens it.',
+      screenReader:
+        'A list of events, each with its date and place; each ticket link says which event it’s for.',
+    },
   },
   {
     id: 'review-summary',
@@ -2684,6 +3759,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...LIVE_APP_ONLY, 'locale', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'The rating read as words (“4.8 out of 5 stars”), the count, and each review.',
+    },
   },
   {
     id: 'now-playing',
@@ -2725,6 +3806,11 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader: 'What’s playing or being read, by title and who made it.',
+    },
   },
   {
     id: 'github-profile',
@@ -2749,6 +3835,12 @@ export const BLOCKS = [
       { name: 'labels', label: 'Words', type: 'words', from: 'GITHUB_LABELS' },
     ],
     appOnly: [...LIVE_APP_ONLY, 'locale', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'The name as a heading, the bio, and followers, repos and stars as labelled numbers.',
+    },
   },
   {
     id: 'contribution-graph',
@@ -2779,6 +3871,12 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...LIVE_APP_ONLY, 'locale', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'The year’s total and the streaks in words; the squares are hidden from screen readers.',
+    },
   },
   {
     id: 'repo-card',
@@ -2803,6 +3901,12 @@ export const BLOCKS = [
       { name: 'labels', label: 'Words', type: 'words', from: 'REPO_LABELS' },
     ],
     appOnly: [...LIVE_APP_ONLY, 'locale', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'The repository’s name as a link, its description, language, and stars and forks with their words.',
+    },
   },
   {
     id: 'repo-list',
@@ -2836,6 +3940,12 @@ export const BLOCKS = [
       { name: 'labels', label: 'Words', type: 'words', from: 'REPO_LABELS' },
     ],
     appOnly: [...LIVE_APP_ONLY, 'locale', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'A list of repositories, each with its stars and forks in words.',
+    },
   },
   {
     id: 'package-stats',
@@ -2860,6 +3970,12 @@ export const BLOCKS = [
       { name: 'labels', label: 'Words', type: 'words', from: 'PACKAGE_LABELS' },
     ],
     appOnly: [...LIVE_APP_ONLY, 'locale', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard: 'Tab reaches each link; Enter opens it.',
+      screenReader:
+        'The version and downloads as labelled numbers; the chart is a picture named by its label.',
+    },
   },
   {
     id: 'tech-stack',
@@ -2885,6 +4001,12 @@ export const BLOCKS = [
       { name: 'title', label: 'Title', type: 'text' },
     ],
     appOnly: ['headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Tab reaches each chip that has a link.',
+      screenReader:
+        'A list of tools, each by its name; the logos are decoration.',
+    },
   },
   {
     id: 'spotify-embed',
@@ -2926,8 +4048,199 @@ export const BLOCKS = [
         help: 'Shown until play is pressed.',
       },
       { name: 'labels', label: 'Words', type: 'words', from: 'EMBED_LABELS' },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs'],
+    appOnly: ['headingAs', 'consent'],
+    privacy: {
+      services: ['spotify'],
+      cookies: 'marketing',
+      reason:
+        'Plays from Spotify once you press play; Spotify then sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the play (or Load) button; Enter or Space loads the player and moves focus into it.',
+      screenReader:
+        'A button named by what’s playing; Spotify’s own player once it loads.',
+    },
+  },
+  {
+    id: 'soundcloud-embed',
+    component: 'SoundCloudEmbed',
+    kind: 'media',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'A SoundCloud track or playlist, in the page’s colour',
+    settings: [
+      {
+        name: 'url',
+        label: 'SoundCloud link',
+        type: 'link',
+        required: true,
+        main: true,
+        slow: true,
+        help: 'A track or a playlist.',
+        icon: 'music',
+      },
+      {
+        name: 'title',
+        label: 'What’s playing',
+        type: 'text',
+        required: true,
+        help: 'For screen readers, and the heading.',
+      },
+      {
+        name: 'showTitle',
+        label: 'Show the title',
+        type: 'toggle',
+        default: false,
+      },
+      { name: 'detail', label: 'Line under the title', type: 'longText' },
+      {
+        name: 'poster',
+        label: 'Cover picture',
+        type: 'picture',
+        help: 'Shown until play is pressed.',
+      },
+      {
+        name: 'player',
+        label: 'Player',
+        type: 'choice',
+        options: ['compact', 'visual'],
+        optionLabels: { compact: 'Compact', visual: 'Big artwork' },
+        default: 'compact',
+        help: 'It takes the colour of the page’s buttons.',
+        icon: 'layout',
+      },
+      { name: 'labels', label: 'Words', type: 'words', from: 'EMBED_LABELS' },
+      CONSENT_LABELS_SETTING,
+    ],
+    appOnly: ['headingAs', 'consent'],
+    privacy: {
+      services: ['soundcloud'],
+      cookies: 'marketing',
+      reason:
+        'Plays from SoundCloud once you press play; SoundCloud then sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the play (or Load) button; Enter or Space loads the player and moves focus into it.',
+      screenReader:
+        'A button named by what’s playing; SoundCloud’s own player once it loads.',
+    },
+  },
+  {
+    id: 'apple-music-embed',
+    component: 'AppleMusicEmbed',
+    kind: 'media',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'An Apple Music song, album or playlist',
+    settings: [
+      {
+        name: 'url',
+        label: 'Apple Music link',
+        type: 'link',
+        required: true,
+        main: true,
+        slow: true,
+        help: 'A song, an album or a playlist.',
+        icon: 'music',
+      },
+      {
+        name: 'title',
+        label: 'What’s playing',
+        type: 'text',
+        required: true,
+        help: 'For screen readers, and the heading.',
+      },
+      {
+        name: 'showTitle',
+        label: 'Show the title',
+        type: 'toggle',
+        default: false,
+      },
+      { name: 'detail', label: 'Line under the title', type: 'longText' },
+      {
+        name: 'poster',
+        label: 'Cover picture',
+        type: 'picture',
+        help: 'Shown until play is pressed.',
+      },
+      { name: 'labels', label: 'Words', type: 'words', from: 'EMBED_LABELS' },
+      CONSENT_LABELS_SETTING,
+    ],
+    appOnly: ['headingAs', 'consent'],
+    privacy: {
+      services: ['applemusic'],
+      cookies: 'marketing',
+      reason:
+        'Plays from Apple Music once you press play; Apple Music then sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the play (or Load) button; Enter or Space loads the player and moves focus into it.',
+      screenReader:
+        'A button named by what’s playing; Apple Music’s own player once it loads.',
+    },
+  },
+  {
+    id: 'deezer-embed',
+    component: 'DeezerEmbed',
+    kind: 'media',
+    group: 'media',
+    client: false,
+    pack: 'media',
+    summary: 'A Deezer track, album or playlist',
+    settings: [
+      {
+        name: 'url',
+        label: 'Deezer link',
+        type: 'link',
+        required: true,
+        main: true,
+        slow: true,
+        help: 'A track, an album or a playlist.',
+        icon: 'music',
+      },
+      {
+        name: 'title',
+        label: 'What’s playing',
+        type: 'text',
+        required: true,
+        help: 'For screen readers, and the heading.',
+      },
+      {
+        name: 'showTitle',
+        label: 'Show the title',
+        type: 'toggle',
+        default: false,
+      },
+      { name: 'detail', label: 'Line under the title', type: 'longText' },
+      {
+        name: 'poster',
+        label: 'Cover picture',
+        type: 'picture',
+        help: 'Shown until play is pressed.',
+      },
+      { name: 'labels', label: 'Words', type: 'words', from: 'EMBED_LABELS' },
+      CONSENT_LABELS_SETTING,
+    ],
+    appOnly: ['headingAs', 'consent'],
+    privacy: {
+      services: ['deezer'],
+      cookies: 'marketing',
+      reason:
+        'Plays from Deezer once you press play; Deezer then sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the play (or Load) button; Enter or Space loads the player and moves focus into it.',
+      screenReader:
+        'A button named by what’s playing; Deezer’s own player once it loads.',
+    },
   },
   {
     id: 'tiktok-video',
@@ -2968,8 +4281,21 @@ export const BLOCKS = [
         help: 'Shown until play is pressed.',
       },
       { name: 'labels', label: 'Words', type: 'words', from: 'EMBED_LABELS' },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs'],
+    appOnly: ['headingAs', 'consent'],
+    privacy: {
+      services: ['tiktok'],
+      cookies: 'marketing',
+      reason:
+        'Plays from TikTok once you press play; TikTok then sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the play (or Load) button; Enter or Space loads the video and moves focus into it.',
+      screenReader:
+        'A button named by the video’s title; TikTok’s own player once it loads.',
+    },
   },
   {
     id: 'instagram-post',
@@ -3011,8 +4337,21 @@ export const BLOCKS = [
         help: 'Shown until play is pressed.',
       },
       { name: 'labels', label: 'Words', type: 'words', from: 'EMBED_LABELS' },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs'],
+    appOnly: ['headingAs', 'consent'],
+    privacy: {
+      services: ['instagram'],
+      cookies: 'marketing',
+      reason:
+        'Shows the post from Instagram once you press play; Instagram then sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the play (or Load) button; Enter or Space loads the post and moves focus into it.',
+      screenReader:
+        'A button named by the post’s title; Instagram’s own post once it loads.',
+    },
   },
   {
     id: 'link-embed',
@@ -3061,8 +4400,31 @@ export const BLOCKS = [
         help: 'Left empty: all of them.',
       },
       { name: 'labels', label: 'Words', type: 'words', from: 'EMBED_LABELS' },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs'],
+    appOnly: ['headingAs', 'consent'],
+    privacy: {
+      services: [
+        'youtube',
+        'spotify',
+        'tiktok',
+        'instagram',
+        'vimeo',
+        'soundcloud',
+        'applemusic',
+        'deezer',
+        'loom',
+      ],
+      cookies: 'marketing',
+      reason:
+        'Plays from the service the link is on (such as YouTube or Spotify) once you press play; it then sees your IP address and may set cookies.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches the play (or Load) button, or the link when it can’t play; Enter loads it and moves focus into it.',
+      screenReader:
+        'A button named by the title, or a plain link when the service isn’t on the list.',
+    },
   },
   {
     id: 'audio-player',
@@ -3107,8 +4469,21 @@ export const BLOCKS = [
         type: 'words',
         from: 'AUDIO_BAR_LABELS',
       },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: ['headingAs'],
+    appOnly: ['headingAs', 'consent'],
+    privacy: {
+      services: ['audio-host'],
+      cookies: 'none',
+      reason:
+        'Downloads the audio only when you press play, from the site it’s on, which sees your IP address.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches play, then the position slider (arrow keys move it) and the transcript link.',
+      screenReader:
+        'A play button named by the track, the position as “time of total”, and the transcript link.',
+    },
   },
   {
     id: 'podcast-episodes',
@@ -3150,7 +4525,6 @@ export const BLOCKS = [
         name: 'allLabel',
         label: 'Its words',
         type: 'text',
-        default: 'All episodes',
       },
       {
         name: 'labels',
@@ -3158,8 +4532,21 @@ export const BLOCKS = [
         type: 'words',
         from: 'AUDIO_BAR_LABELS',
       },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: [...LIVE_APP_ONLY, 'headingAs'],
+    appOnly: [...LIVE_APP_ONLY, 'headingAs', 'consent'],
+    privacy: {
+      services: ['audio-host'],
+      cookies: 'none',
+      reason:
+        'Downloads an episode only when you press play, from the podcast’s host, which sees your IP address.',
+    },
+    accessibility: {
+      keyboard:
+        'Tab reaches each episode’s play button, its slider (arrow keys move it) and its links.',
+      screenReader:
+        'A list of episodes, each with a play button named by its title and its position as “time of total”.',
+    },
   },
   {
     id: 'social-card',
@@ -3310,6 +4697,189 @@ export const BLOCKS = [
       },
     ],
     appOnly: ['posts', 'icon', 'locale', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard:
+        'Tab reaches the follow button, then each post; Enter opens it.',
+      screenReader:
+        'The name as a heading with the tick in words, the handle and platform, the follower count, the button, and a labelled list of posts, each named by its alt text or number with its views in words.',
+    },
+  },
+  {
+    id: 'goal-tracker',
+    component: 'GoalTracker',
+    kind: 'card',
+    group: 'trust',
+    client: false,
+    pack: 'growth',
+    summary:
+      'A goal with a deadline, steps to tick off and a bar with the percentage',
+    settings: [
+      { name: 'title', label: 'Goal', type: 'text', required: true },
+      { name: 'detail', label: 'About it', type: 'longText' },
+      {
+        name: 'deadline',
+        label: 'Due',
+        type: 'dateTime',
+        help: 'Shows the date and the days left.',
+      },
+      {
+        name: 'items',
+        label: 'Steps',
+        type: 'list',
+        itemLabel: 'Step',
+        help: 'Ticked steps make the percentage, unless there’s a target.',
+        fields: [
+          { name: 'label', label: 'Step', type: 'text', required: true },
+          { name: 'done', label: 'Done', type: 'toggle', default: false },
+        ],
+      },
+      {
+        name: 'target',
+        label: 'Target',
+        type: 'number',
+        min: 0,
+        help: 'An amount to reach, as money raised or members. Set, it makes the percentage instead of the steps.',
+      },
+      {
+        name: 'current',
+        label: 'So far',
+        type: 'number',
+        min: 0,
+        help: 'How much of the target there is now.',
+      },
+      {
+        name: 'currency',
+        label: 'Currency',
+        type: 'text',
+        help: 'A three-letter code, as USD or INR, to write the amounts as money. Left empty, a plain count.',
+        icon: 'money',
+      },
+      {
+        name: 'bar',
+        label: 'Bar style',
+        type: 'choice',
+        options: PROGRESS_BAR_STYLES,
+        optionLabels: { smooth: 'Smooth', steps: 'In steps' },
+        default: 'smooth',
+      },
+      {
+        name: 'steps',
+        label: 'Steps in the bar',
+        type: 'number',
+        min: 2,
+        max: MAX_PROGRESS_STEPS,
+        step: 1,
+        default: 10,
+        help: 'For a bar in steps.',
+      },
+      {
+        name: 'showPercent',
+        label: 'Show the percentage',
+        type: 'toggle',
+        default: true,
+      },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'GOAL_TRACKER_LABELS',
+      },
+    ],
+    appOnly: ['locale', 'now', 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press; the steps and the bar are read in order.',
+      screenReader:
+        'The title as a heading, the deadline and days left, a labelled list of steps each read as done or not done yet, and a progress bar named by the title with its percentage.',
+    },
+  },
+  {
+    id: 'progress-list',
+    component: 'ProgressList',
+    kind: 'text',
+    group: 'trust',
+    client: false,
+    pack: 'growth',
+    summary: 'Bars for skills, ratings or languages, each with its number',
+    settings: [
+      {
+        name: 'items',
+        label: 'Bars',
+        type: 'list',
+        required: true,
+        itemLabel: 'Bar',
+        fields: [
+          { name: 'label', label: 'Name', type: 'text', required: true },
+          {
+            name: 'value',
+            label: 'Value',
+            type: 'number',
+            required: true,
+            min: 0,
+          },
+          {
+            name: 'max',
+            label: 'Out of',
+            type: 'number',
+            min: 0,
+            help: 'Left empty, the list’s own.',
+          },
+        ],
+      },
+      { name: 'title', label: 'Title', type: 'text' },
+      {
+        name: 'max',
+        label: 'Out of',
+        type: 'number',
+        min: 1,
+        default: 100,
+        help: 'What a full bar is, as 100 or 5.',
+      },
+      {
+        name: 'valueAs',
+        label: 'Number beside each bar',
+        type: 'choice',
+        options: PROGRESS_VALUE_STYLES,
+        optionLabels: {
+          percent: 'Percentage',
+          amount: 'Value out of the most',
+          none: 'None',
+        },
+        default: 'percent',
+      },
+      {
+        name: 'bar',
+        label: 'Bar style',
+        type: 'choice',
+        options: PROGRESS_BAR_STYLES,
+        optionLabels: { smooth: 'Smooth', steps: 'In steps' },
+        default: 'smooth',
+      },
+      {
+        name: 'steps',
+        label: 'Steps in each bar',
+        type: 'number',
+        min: 2,
+        max: MAX_PROGRESS_STEPS,
+        step: 1,
+        default: 10,
+        help: 'For bars in steps.',
+      },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'PROGRESS_LIST_LABELS',
+      },
+    ],
+    appOnly: ['locale', 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'A list of progress bars, each named by its label and read with its number.',
+    },
   },
   {
     id: 'event-card',
@@ -3388,6 +4958,13 @@ export const BLOCKS = [
       },
     ],
     appOnly: [...SELL_APP_ONLY, 'details', 'now', 'locale', 'headingAs'],
+    privacy: SERVER_FETCHED,
+    accessibility: {
+      keyboard:
+        'Tab reaches the ticket link and the Add to calendar button; Enter or Space opens its two calendar links.',
+      screenReader:
+        'The event as a heading, its date and time, and how far away it is; the ticket link and the calendar button say which event they are for.',
+    },
   },
 ] as const satisfies readonly BlockInfo[];
 
@@ -3426,4 +5003,14 @@ export function mainLinkSetting(id: string): LinkSetting | undefined {
     (field): field is LinkSetting =>
       field.type === 'link' && field.main === true
   );
+}
+
+/**
+ * Every outside service and kind of cookie a page's blocks may lead to, for
+ * its cookie notice and privacy page, from each block's `privacy` note. Pass
+ * a block as `{ id, services }` when you know which services it really
+ * loads, as the one a LinkEmbed link plays.
+ */
+export function pagePrivacy(blocks: readonly PageBlock[]): PagePrivacy {
+  return addUpPrivacy(blocks, (id) => blockInfo(id)?.privacy);
 }

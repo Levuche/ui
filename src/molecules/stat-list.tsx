@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '../system/cn';
+import { usePageLocale } from '../system/page-words';
 
 /** One figure in a StatList. */
 export type StatItem = {
@@ -14,13 +15,14 @@ export type StatItem = {
  */
 export function StatList({
   items,
-  locale,
+  locale: localeProp,
   className,
 }: {
   items: StatItem[];
   locale?: string;
   className?: string;
 }) {
+  const locale = usePageLocale(localeProp);
   const write = (value: number | string) =>
     typeof value === 'number'
       ? new Intl.NumberFormat(locale, { notation: 'compact' }).format(value)

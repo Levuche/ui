@@ -202,6 +202,15 @@ export function contrastRatio(foreground: string, background: string) {
   return contrast(over(fg, back), back);
 }
 
+/**
+ * A plain colour as #rrggbb, for a player that takes its colour as hex, or
+ * null when it isn't one. A see-through colour is read as if over white.
+ */
+export function colorHex(value: string): string | null {
+  const color = isSafeColor(value) ? parseColor(value) : null;
+  return color ? toHex(over(color, WHITE)) : null;
+}
+
 /* ---------- A block's own background ---------- */
 
 /** One way a block's background makes its words hard to read. */

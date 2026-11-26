@@ -2,15 +2,23 @@ import type { ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLink } from '../atoms/link';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
+import { TileCaption, UNDER_CAPTION } from '../molecules/tile-caption';
+import { isOverCaption, type CaptionStyle } from '../system/gallery';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { imageAttrs, toImageSource, type ImageSrc } from '../system/image';
+import { usePageWords } from '../system/page-words';
 
-/** One picture, with an optional caption, and a link if given. */
+/**
+ * One picture, with an optional caption, and a link if given. The caption
+ * sits under the picture, or over it on a frosted bar or a small label
+ * (`captionStyle`).
+ */
 export function SiteImage({
   src,
   alt,
   caption,
+  captionStyle = 'below',
   href,
   ratio = 'auto',
   fit = 'cover',
@@ -24,12 +32,22 @@ export function SiteImage({
     /** What the picture shows; it also names the link. Empty if decorative. */
     alt: string;
     caption?: ReactNode;
+    /** Where the caption sits: under the picture, or over it. */
+    captionStyle?: CaptionStyle;
     href?: string;
     ratio?: ThumbRatio;
     fit?: 'cover' | 'contain';
   }) {
+  // A caption over the picture shares its grid cell (see TileCaption).
+  const over = Boolean(caption) && isOverCaption(captionStyle);
   const picture = (
-    <Thumb src={src} alt={alt} ratio={ratio} fit={fit} className="w-full" />
+    <Thumb
+      src={src}
+      alt={alt}
+      ratio={ratio}
+      fit={fit}
+      className={cn('w-full', over && !href && UNDER_CAPTION)}
+    />
   );
   return (
     <Block
@@ -37,7 +55,7 @@ export function SiteImage({
       name="site-image"
       defaults={{ tone: 'plain' }}
       {...root}
-      className={cn('m-0', root.className)}
+      className={cn('m-0', over && 'grid grid-cols-1', root.className)}
     >
       {href ? (
         <SiteLink
@@ -46,7 +64,7 @@ export function SiteImage({
           sponsored={sponsored}
           nofollow={nofollow}
           action="image_click"
-          className="block"
+          className={cn('block', over && UNDER_CAPTION)}
         >
           {picture}
         </SiteLink>
@@ -54,7 +72,7 @@ export function SiteImage({
         picture
       )}
       {caption ? (
-        <figcaption className="text-site-text-2 text-sm">{caption}</figcaption>
+        <TileCaption captionStyle={captionStyle}>{caption}</TileCaption>
       ) : null}
     </Block>
   );
@@ -80,7 +98,7 @@ export function LogoStrip({
   speed = 30,
   logoHeight = 32,
   muted = true,
-  label = 'Brands',
+  label: labelProp,
   ...root
 }: BlockRootProps & {
   /** Above the logos, such as "As seen in". */
@@ -96,6 +114,8 @@ export function LogoStrip({
   /** The list's name for screen readers. */
   label?: string;
 }) {
+  const own = usePageWords('props');
+  const label = labelProp === undefined ? own.brands : labelProp;
   const item = (logo: Logo, i: number, hidden = false) => {
     const source = toImageSource(logo.src);
     // Logos are at most 160 px wide (max-w-40).

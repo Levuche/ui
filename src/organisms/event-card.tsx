@@ -8,7 +8,6 @@ import { Badge } from '../atoms/text';
 import { Thumb } from '../atoms/thumb';
 import {
   AddToCalendar,
-  CALENDAR_LABELS,
   type CalendarLabels,
 } from '../molecules/add-to-calendar';
 import type { HeadingTag } from '../molecules/item-head';
@@ -26,6 +25,8 @@ import type { LinkBehavior } from '../system/href';
 import { toImageSource, type ImageSrc } from '../system/image';
 import type { LiveProps } from '../system/live';
 import { useVisitorLocale } from '../system/locale';
+import { usePageWords } from '../system/page-words';
+import { WORDS_EN } from '../system/words/en';
 
 /** The words on the card. The "in 4 months" chip comes from the locale. */
 export type EventCardLabels = CalendarLabels & {
@@ -41,15 +42,7 @@ export type EventCardLabels = CalendarLabels & {
   untitled: string;
 };
 
-export const EVENT_CARD_LABELS: EventCardLabels = {
-  ...CALENDAR_LABELS,
-  tickets: 'Get tickets',
-  soldOut: 'Sold out',
-  live: 'Happening now',
-  ended: 'Ended',
-  loading: 'Loading the event',
-  untitled: 'Event',
-};
+export const EVENT_CARD_LABELS: EventCardLabels = WORDS_EN.eventCard;
 
 /** How much of the grid the card takes: a full row, or a full row twice as tall. */
 export const EVENT_CARD_TILES = ['2x1', '2x2'] as const;
@@ -171,7 +164,7 @@ export function EventCard({
     locale?: string;
     headingAs?: HeadingTag;
   }) {
-  const words = { ...EVENT_CARD_LABELS, ...labels };
+  const words = usePageWords('eventCard', labels);
   const found = details?.data ?? undefined;
   const event = {
     title: title?.trim() || found?.title?.trim() || '',

@@ -7,6 +7,8 @@ import {
 import { CalendarIcon, ChevronDownIcon, DownloadIcon } from '../atoms/icons';
 import { calendarLinks, type CalendarEvent } from '../system/calendar';
 import { cn } from '../system/cn';
+import { usePageWords } from '../system/page-words';
+import { WORDS_EN } from '../system/words/en';
 
 /** The words on the calendar button and its two choices. */
 export type CalendarLabels = {
@@ -15,11 +17,7 @@ export type CalendarLabels = {
   download: string;
 };
 
-export const CALENDAR_LABELS: CalendarLabels = {
-  addToCalendar: 'Add to calendar',
-  google: 'Google Calendar',
-  download: 'Other calendars (.ics)',
-};
+export const CALENDAR_LABELS: CalendarLabels = WORDS_EN.calendar;
 
 /**
  * "Add to calendar": a button that opens two choices under it, a Google
@@ -50,9 +48,9 @@ export function AddToCalendar({
   context?: string;
   className?: string;
 }) {
+  const words = usePageWords('calendar', labels);
   const links = calendarLinks(event);
   if (!links) return null;
-  const words = { ...CALENDAR_LABELS, ...labels };
   return (
     <details
       data-calendar=""

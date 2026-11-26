@@ -4,6 +4,11 @@ import { Thumb } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import { PlayFrame } from '../molecules/play-frame';
 import { columnSizes, type ImageSrc } from '../system/image';
+import {
+  consentNotice,
+  OUTSIDE_SERVICES,
+  type ConsentLabels,
+} from '../system/privacy';
 
 /** Reel thumbnails in a grid of three (9:14), each one a link if given. */
 export function ReelGrid({
@@ -88,7 +93,8 @@ export function youtubeId(input: string): string | null {
  * A YouTube video on the creator's page. It shows the video's picture and a
  * play button first, and loads YouTube (in its privacy-enhanced mode) only
  * when the visitor presses play, so the page stays fast and sets no YouTube
- * cookies until then.
+ * cookies until then. With `consent={false}` it also skips YouTube's picture
+ * and says what loading will share before the visitor presses Load.
  */
 export function YouTubeVideo({
   video,
@@ -97,6 +103,8 @@ export function YouTubeVideo({
   vertical = false,
   start,
   playLabel,
+  consent,
+  consentLabels,
   ...root
 }: BlockRootProps & {
   /** The video's address or id. */
@@ -111,6 +119,13 @@ export function YouTubeVideo({
   start?: number;
   /** The play button's name; defaults to "Play video: {title}". */
   playLabel?: string;
+  /**
+   * Whether the visitor agreed to YouTube, from the page's cookie notice.
+   * False shows a notice and a Load button first; leave it out on pages
+   * that don't ask.
+   */
+  consent?: boolean;
+  consentLabels?: Partial<ConsentLabels>;
 }) {
   const id = youtubeId(video);
   if (!id) return null;
@@ -122,11 +137,14 @@ export function YouTubeVideo({
         title={title}
         playLabel={playLabel ?? `Play video: ${title}`}
         poster={
-          poster === undefined
+          poster === undefined && consent !== false
             ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg`
             : poster
         }
         ratio={vertical ? 'vertical' : 'video'}
+        consent={consent}
+        notice={consentNotice(OUTSIDE_SERVICES.youtube.name, consentLabels)}
+        consentLabels={consentLabels}
       />
     </Block>
   );

@@ -1,8 +1,10 @@
 import {
   AppIcon,
+  TileGallery,
   BookingCard,
   Countdown,
   EventCard,
+  GoalTracker,
   DiscountCode,
   FaqList,
   FeaturedLink,
@@ -208,6 +210,17 @@ export function SamplePage({ words = SAMPLE_WORDS }: { words?: SampleWords }) {
           detail="10% off the reel pack"
           copy={() => Promise.resolve()}
         />
+        <GoalTracker
+          title="Film the spice series"
+          deadline={new Date(SAMPLE_NOW + 30 * 86_400_000).toISOString()}
+          now={SAMPLE_NOW}
+          bar="steps"
+          items={[
+            { label: 'Write the scripts', done: true },
+            { label: 'Film five episodes', done: true },
+            { label: 'Edit and post' },
+          ]}
+        />
       </SiteSection>
       <SiteSection title="Work with me">
         <BookingCard
@@ -249,6 +262,21 @@ export function SamplePage({ words = SAMPLE_WORDS }: { words?: SampleWords }) {
             { alt: 'Chai on a clay stove' },
             { alt: 'A spice market in Kochi' },
             { alt: 'Tea leaves drying in Assam' },
+          ]}
+        />
+      </SiteSection>
+      <SiteSection title="Gallery">
+        <TileGallery
+          captionStyle="bar"
+          items={[
+            { alt: 'Chai on a clay stove', span: '2x2', caption: 'Chai' },
+            { alt: 'A spice market in Kochi', span: '1x2' },
+            { alt: 'Tea leaves drying in Assam' },
+            {
+              alt: 'Hills above Darjeeling',
+              span: '2x1',
+              caption: 'Darjeeling',
+            },
           ]}
         />
       </SiteSection>

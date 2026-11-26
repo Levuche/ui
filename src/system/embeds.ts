@@ -5,14 +5,26 @@
  * the app's server can check a link before saving it.
  */
 
-/** The shape a player takes on the page. */
-export type EmbedShape = 'video' | 'vertical' | 'square' | 'audio' | 'tall';
+import { colorHex } from './contrast';
+
+/**
+ * The shape a player takes on the page: `audio` is a short bar, `track` a
+ * single song's player with its artwork, `tall` a list of songs.
+ */
+export type EmbedShape =
+  'video' | 'vertical' | 'square' | 'audio' | 'track' | 'tall';
 
 /** A player for a pasted link: where it loads from and its shape. */
 export type Embed = {
   service: EmbedService;
   src: string;
   shape: EmbedShape;
+  /**
+   * For a player that takes a colour: the name of the address's setting
+   * that the page's button colour goes in, as #rrggbb, when play is pressed
+   * (see tintedSrc).
+   */
+  tint?: string;
 };
 
 export const EMBED_SERVICES = [
@@ -23,6 +35,8 @@ export const EMBED_SERVICES = [
   'vimeo',
   'soundcloud',
   'loom',
+  'applemusic',
+  'deezer',
 ] as const;
 export type EmbedService = (typeof EMBED_SERVICES)[number];
 
@@ -127,8 +141,14 @@ export function vimeoEmbed(input: string): Embed | null {
   };
 }
 
-/** A SoundCloud track or playlist page. */
-export function soundcloudEmbed(input: string): Embed | null {
+/**
+ * A SoundCloud track or playlist page. `visual` shows the big artwork player
+ * in place of the compact one. The player takes the page's button colour.
+ */
+export function soundcloudEmbed(
+  input: string,
+  { visual = false }: { visual?: boolean } = {}
+): Embed | null {
   const url = parse(input);
   if (!url || hostOf(url) !== 'soundcloud.com') return null;
   const path = parts(url);
@@ -136,8 +156,75 @@ export function soundcloudEmbed(input: string): Embed | null {
   const page = `https://soundcloud.com/${path.join('/')}`;
   return {
     service: 'soundcloud',
-    src: `https://w.soundcloud.com/player/?url=${encodeURIComponent(page)}&visual=false`,
-    shape: path.includes('sets') ? 'tall' : 'audio',
+    src: `https://w.soundcloud.com/player/?url=${encodeURIComponent(page)}&visual=${visual}`,
+    shape: visual || path.includes('sets') ? 'tall' : 'track',
+    tint: 'color',
+  };
+}
+
+const APPLE_MUSIC_KINDS = new Set(['song', 'album', 'playlist']);
+const APPLE_MUSIC_IDS = /^\d{4,15}$/;
+
+/**
+ * An Apple Music song, album or playlist, as
+ * music.apple.com/us/album/name/123, with ?i=456 for one song of an album.
+ */
+export function appleMusicEmbed(input: string): Embed | null {
+  const url = parse(input);
+  if (!url || hostOf(url) !== 'music.apple.com') return null;
+  const [store, kind, ...rest] = parts(url);
+  if (
+    !store ||
+    !/^[a-z]{2}$/i.test(store) ||
+    !kind ||
+    !APPLE_MUSIC_KINDS.has(kind) ||
+    rest.length < 1 ||
+    rest.length > 2
+  )
+    return null;
+  const id = rest[rest.length - 1] ?? '';
+  const valid =
+    kind === 'playlist' ? /^pl\.[A-Za-z0-9-]{8,64}$/ : APPLE_MUSIC_IDS;
+  if (!valid.test(id)) return null;
+  // The name in the address is only for people; one in another script (or
+  // anything odd) is left out, and the player still finds the music by id.
+  const name = rest.length === 2 && /^[\w-]{1,120}$/.test(rest[0] ?? '');
+  const song = kind === 'album' ? url.searchParams.get('i') : null;
+  if (song !== null && !APPLE_MUSIC_IDS.test(song)) return null;
+  const path = [store.toLowerCase(), kind, ...(name ? [rest[0]] : []), id];
+  return {
+    service: 'applemusic',
+    src: `https://embed.music.apple.com/${path.join('/')}${song ? `?i=${song}` : ''}`,
+    shape: kind === 'song' || song ? 'track' : 'tall',
+  };
+}
+
+const DEEZER_KINDS = new Set(['track', 'album', 'playlist']);
+
+/**
+ * A Deezer track, album or playlist, as www.deezer.com/en/album/123. The
+ * player follows the visitor's light or dark setting.
+ */
+export function deezerEmbed(input: string): Embed | null {
+  const url = parse(input);
+  if (!url || hostOf(url) !== 'deezer.com') return null;
+  const path = parts(url);
+  // A language may come first, as /en/ or /pt-br/.
+  const [kind, id, ...extra] = /^[a-z]{2}(-[a-z]{2})?$/i.test(path[0] ?? '')
+    ? path.slice(1)
+    : path;
+  if (
+    !kind ||
+    !DEEZER_KINDS.has(kind) ||
+    !id ||
+    !/^\d{1,15}$/.test(id) ||
+    extra.length
+  )
+    return null;
+  return {
+    service: 'deezer',
+    src: `https://widget.deezer.com/widget/auto/${kind}/${id}`,
+    shape: kind === 'track' ? 'track' : 'tall',
   };
 }
 
@@ -176,7 +263,30 @@ const PARSERS = [
   vimeoEmbed,
   soundcloudEmbed,
   loomEmbed,
+  appleMusicEmbed,
+  deezerEmbed,
 ];
+
+/**
+ * A player's address with the page's colour put in, for a player that takes
+ * one (`tint` names its setting). The colour must be a plain colour, as
+ * isSafeColor lets through; anything else leaves the address as it was.
+ */
+export function tintedSrc(
+  src: string,
+  tint: string | undefined,
+  color: string | null | undefined
+): string {
+  const hex = tint && color ? colorHex(color) : null;
+  if (!tint || !hex) return src;
+  try {
+    const url = new URL(src);
+    url.searchParams.set(tint, hex);
+    return url.toString();
+  } catch {
+    return src;
+  }
+}
 
 /**
  * The player for a pasted link, or null when its service isn't on the list

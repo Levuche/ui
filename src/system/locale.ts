@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import { usePageLocale } from './page-words';
 
 /*
  * Numbers and dates written in the visitor's own way. The server doesn't
@@ -23,10 +24,12 @@ export function useHydrated() {
 }
 
 /**
- * The locale to format with: `locale` when it's given, otherwise
- * SERVER_LOCALE until the page has hydrated, then the visitor's own.
+ * The locale to format with: `locale` when it's given, else the page's
+ * language (SiteTheme.language), otherwise SERVER_LOCALE until the page has
+ * hydrated, then the visitor's own.
  */
 export function useVisitorLocale(locale?: string): string | undefined {
   const hydrated = useHydrated();
-  return locale ?? (hydrated ? undefined : SERVER_LOCALE);
+  const chosen = usePageLocale(locale);
+  return chosen ?? (hydrated ? undefined : SERVER_LOCALE);
 }
