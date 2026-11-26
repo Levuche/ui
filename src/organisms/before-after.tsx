@@ -8,6 +8,8 @@ import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import { useControllableState } from '../system/state';
 import type { ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 export type BeforeAfterLabels = {
   before: string;
@@ -18,12 +20,7 @@ export type BeforeAfterLabels = {
   value: string;
 };
 
-export const BEFORE_AFTER_LABELS: BeforeAfterLabels = {
-  before: 'Before',
-  after: 'After',
-  slider: 'Compare before and after',
-  value: '{before}% before, {after}% after',
-};
+export const BEFORE_AFTER_LABELS: BeforeAfterLabels = WORDS_EN.beforeAfter;
 
 type Picture = { src: ImageSrc | null | undefined; alt: string };
 
@@ -56,7 +53,7 @@ export function BeforeAfter({
   showLabels?: boolean;
   labels?: Partial<BeforeAfterLabels>;
 }) {
-  const words = { ...BEFORE_AFTER_LABELS, ...labels };
+  const words = usePageWords('beforeAfter', labels);
   const id = useId();
   const [value, setValue] = useControllableState({
     value: position,

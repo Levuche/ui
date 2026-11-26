@@ -71,12 +71,15 @@ export type PageLayouts = Partial<Record<GridScreen, GridLayout>>;
  * - profile: CreatorHeader, with SocialIcons under it
  * - link: SiteLinkButton, a LinkTile, SaveContact or LockedLink
  * - links: LinkList, TopPicks, PodcastEpisodes
+ * - tile: LogoTile, a square link tile; two sit side by side
+ * - chip: LinkChip, a small link; it can be a quarter of a phone's width
  * - card: ActionCard, FeaturedLink, FeaturedPack, PackRow, BookingCard, MembershipCard,
- *   LeadMagnet, TipJar, DiscountCode, Countdown, ContactForm, MessageCard,
+ *   LeadMagnet, TipJar, DiscountCode, Countdown, EventCard, ContactForm, MessageCard,
  *   MapCard, QrCode, CourseCard, BookingEmbed, GitHubProfile, RepoCard,
  *   PackageStats, AudioPlayer, LocalTime
  * - media: YouTubeVideo, SiteImage, ImageCarousel, BeforeAfter, SpotifyEmbed,
- *   TikTokVideo, InstagramPost, LinkEmbed
+ *   SoundCloudEmbed, AppleMusicEmbed, DeezerEmbed, TikTokVideo, InstagramPost,
+ *   LinkEmbed
  * - gallery: ImageGrid, ReelGrid, PackGrid, RepoList
  * - text: SiteText, Testimonials, FaqList, Timeline, TechStack, SectionHeading,
  *   TextBlock, Spacer
@@ -86,7 +89,16 @@ export type PageLayouts = Partial<Record<GridScreen, GridLayout>>;
  * Every block's kind is also in BLOCKS, in registry.ts.
  */
 export type BlockKind =
-  'profile' | 'link' | 'links' | 'card' | 'media' | 'gallery' | 'text' | 'band';
+  | 'profile'
+  | 'link'
+  | 'links'
+  | 'tile'
+  | 'chip'
+  | 'card'
+  | 'media'
+  | 'gallery'
+  | 'text'
+  | 'band';
 
 /** What a kind of block needs, in rem. */
 export type BlockSize = {
@@ -102,6 +114,8 @@ export const BLOCK_SIZES: Record<BlockKind, BlockSize> = {
   profile: { minWidth: 15, maxWidth: 32, minHeight: 9 },
   link: { minWidth: 10, minHeight: 3, maxHeight: 7, half: true },
   links: { minWidth: 15, minHeight: 7 },
+  tile: { minWidth: 7, maxWidth: 18, minHeight: 7, maxHeight: 18, half: true },
+  chip: { minWidth: 3.5, maxWidth: 11, minHeight: 3, maxHeight: 5, half: true },
   card: { minWidth: 15, minHeight: 7, half: true },
   media: { minWidth: 18, minHeight: 11 },
   gallery: { minWidth: 15, minHeight: 7 },

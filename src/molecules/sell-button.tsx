@@ -8,12 +8,12 @@ import {
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import {
-  SELL_LABELS,
   sellJson,
   type SellLabels,
   type SellRef,
   type SellState,
 } from '../system/sell';
+import { usePageWords } from '../system/page-words';
 
 /** What `renderBuy` gets, to draw the app's own buy button in its place. */
 export type BuyRender = {
@@ -70,7 +70,7 @@ export function SellButton({
     disabled?: boolean;
     children: ReactNode;
   }) {
-  const words = { ...SELL_LABELS, ...sellLabels };
+  const words = usePageWords('sell', sellLabels);
   const json = sellJson(sell);
   if (sell && json) {
     if (renderBuy) {

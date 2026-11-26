@@ -10,6 +10,8 @@ import { ChoiceChips } from '../molecules/choice-chips';
 import { FormNotice } from '../molecules/form-notice';
 import { SellField } from '../molecules/sell-button';
 import type { SellRef } from '../system/sell';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 /** The words a tip jar shows. */
 export type TipJarLabels = {
@@ -18,11 +20,7 @@ export type TipJarLabels = {
   error: ReactNode;
 };
 
-export const TIP_JAR_LABELS: TipJarLabels = {
-  other: 'Other amount',
-  sent: 'Thank you!',
-  error: 'The tip didn’t go through. Please try again.',
-};
+export const TIP_JAR_LABELS: TipJarLabels = WORDS_EN.tipJar;
 
 /**
  * A tip jar: preset amounts to pick, or any other amount. The form sends
@@ -31,14 +29,14 @@ export const TIP_JAR_LABELS: TipJarLabels = {
  * the form also sends it as `sell`; the app adds the amount in minor units.
  */
 export function TipJar({
-  title = 'Leave a tip',
+  title: titleProp,
   detail,
   icon,
   amounts = [3, 5, 10],
   defaultAmount,
   currency = '$',
   allowOther = true,
-  buttonLabel = 'Tip',
+  buttonLabel: buttonLabelProp,
   labels,
   status = 'idle',
   onSubmit,
@@ -66,7 +64,10 @@ export function TipJar({
   onSubmit?: FormEventHandler<HTMLFormElement>;
   action?: string | ((data: FormData) => void | Promise<void>);
 }) {
-  const words = { ...TIP_JAR_LABELS, ...labels };
+  const own = usePageWords('props');
+  const title = titleProp === undefined ? own.leaveTip : titleProp;
+  const buttonLabel = buttonLabelProp === undefined ? own.tip : buttonLabelProp;
+  const words = usePageWords('tipJar', labels);
   const id = useId();
   const [picked, setPicked] = useState<string>(
     String(defaultAmount ?? amounts[1] ?? amounts[0] ?? '')

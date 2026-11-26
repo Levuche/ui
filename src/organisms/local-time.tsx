@@ -4,9 +4,10 @@ import { Fragment, useEffect, useRef, useState, type RefObject } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { cn } from '../system/cn';
 import { useHydrated, useVisitorLocale } from '../system/locale';
+import { usePageWords } from '../system/page-words';
+import { WORDS_EN } from '../system/words/en';
 import {
   LOCAL_TIME_CITIES,
-  OFFSET_WORDS,
   describeOffset,
   formatLocalDate,
   isLocalTimeCity,
@@ -34,12 +35,7 @@ export type LocalTimeLabels = OffsetWords & {
   away: string;
 };
 
-export const LOCAL_TIME_LABELS: LocalTimeLabels = {
-  title: 'My local time',
-  open: 'Open now',
-  away: 'Away',
-  ...OFFSET_WORDS,
-};
+export const LOCAL_TIME_LABELS: LocalTimeLabels = WORDS_EN.localTime;
 
 /** How much of the grid the block takes, in half-row tiles. */
 export const LOCAL_TIME_TILES = ['2x1', '2x2'] as const;
@@ -173,7 +169,7 @@ export function LocalTime({
   /** The visitor's IANA time zone. Left out, the browser's, once it runs. */
   visitorTimeZone?: string;
 }) {
-  const words = { ...LOCAL_TIME_LABELS, ...labels };
+  const words = usePageWords('localTime', labels);
   const zone = localTimeZone(city, timeZone);
   const place =
     cityName?.trim() ||
