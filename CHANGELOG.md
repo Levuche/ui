@@ -8,6 +8,12 @@ change when it moves to that version.
 
 ### Added
 
+- Text blocks in a new `text` group, free in `core`: `SectionHeading` (a
+  heading a link can jump to, with a line of detail), `TextBlock` (bold,
+  italic, links, lists and emoji), `QuoteBlock` (a quote with who said it
+  and a small picture) and `Spacer` (a gap of whole grid rows, or a thin
+  line). What a creator types is never read as HTML (`parseRichText`,
+  `RichText`).
 - The page's language: `SiteTheme.language` and `<CreatorTheme words>`, so
   every block's own words, numbers and dates follow the page with no `labels`
   on any block. Ready word sets in English, Hindi, Spanish, German, French and
