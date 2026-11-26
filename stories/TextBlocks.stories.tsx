@@ -58,7 +58,7 @@ export const Text: Story = {
     ).toHaveAttribute('href', '#my-works');
     const youtube = canvas.getByRole('link', { name: 'YouTube channel' });
     await expect(youtube).toHaveAttribute('target', '_blank');
-    await expect(youtube).toHaveAttribute('rel', /noopener/);
+    await expect(youtube.getAttribute('rel')).toMatch(/noopener/);
     const [bullets, steps] = canvas.getAllByRole('list');
     await expect(bullets!.tagName).toBe('UL');
     await expect(steps!.tagName).toBe('OL');
