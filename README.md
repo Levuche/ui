@@ -270,11 +270,12 @@ export function BlockTracking({ children }: { children: React.ReactNode }) {
 - Event names follow BuildBase's rule: lowercase letters, digits and
   underscores, starting with a letter, 40 characters at most. The built-in
   names are `link_click`, `button_click` and `form_submit`; a block's own
-  `data-action` (`buy`, `tip`, `save_contact`, `qr_download`,
+  `data-action` (`buy`, `tip`, `save_contact`, `contact`, `qr_download`,
   `audio_play`, …) follows the same rule, and so must yours.
 - Send ids and labels only. Never send what a visitor typed, an email
   address, a name or anything else that identifies them: every tag
-  forbids it.
+  forbids it. A link marked `data-href-private` (a `MessageCard`'s button,
+  which carries the message) is reported without its query.
 - Each press is reported once: a submit button is reported by its form's
   submit, and a click inside a form (ticking its consent box, say) isn't
   the form's action.
@@ -611,25 +612,34 @@ through `SiteLink`, and one that isn't safe shows as plain words.
 
 ## What's in it
 
-| Group       | Blocks                                                                                                                                                                                                                                     |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `contrastIssues`, `fixContrast`, `Block`, `withBlockLook`, `BlockLook`                                                                                                      |
-| Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Ribbon`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                |
-| Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton` |
-| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                                                               |
-| Profile     | `CreatorHeader`, `SocialIcons`, `SaveContact`                                                                                                                                                                                              |
-| Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                                                     |
-| Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                   |
-| Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                       |
-| Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                                                             |
-| Text        | `SectionHeading`, `TextBlock`, `QuoteBlock`, `Spacer`, `RichText`                                                                                                                                                                          |
-| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `BeforeAfter`, `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                                                        |
-| Forms       | `NewsletterBand`, `ContactForm`                                                                                                                                                                                                            |
-| Feeds       | `LatestVideos`, `LatestPosts`, `LiveStatus`, `EventList`, `ReviewSummary`, `NowPlaying`                                                                                                                                                    |
-| Developer   | `GitHubProfile`, `ContributionGraph`, `RepoCard`, `RepoList`, `PackageStats`, `TechStack`                                                                                                                                                  |
+| Group       | Blocks                                                                                                                                                                                                                                                        |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `contrastIssues`, `fixContrast`, `Block`, `withBlockLook`, `BlockLook`                                                                                                                         |
+| Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Ribbon`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                                   |
+| Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton`, `MessageComposer` |
+| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                                                                                  |
+| Profile     | `CreatorHeader`, `SocialIcons`, `SaveContact`                                                                                                                                                                                                                 |
+| Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                                                                        |
+| Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                                      |
+| Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                                          |
+| Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                                                                                |
+| Text        | `SectionHeading`, `TextBlock`, `QuoteBlock`, `Spacer`, `RichText`                                                                                                                                                                                             |
+| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `BeforeAfter`, `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                                                                           |
+| Forms       | `NewsletterBand`, `ContactForm`, `MessageCard`                                                                                                                                                                                                                |
+| Feeds       | `LatestVideos`, `LatestPosts`, `LiveStatus`, `EventList`, `ReviewSummary`, `NowPlaying`                                                                                                                                                                       |
+| Developer   | `GitHubProfile`, `ContributionGraph`, `RepoCard`, `RepoList`, `PackageStats`, `TechStack`                                                                                                                                                                     |
 
 `BLOCKS` in the registry lists every block with its group, so this table
 is a summary; the registry is the full list.
+
+`MessageCard` opens a chat on WhatsApp, Telegram, a text, email or
+Messenger with a message ready to send (`channel`, `to`, `message`, and
+`subject` for email). `messageHref` builds the link on its own: phone
+numbers become digits only, usernames keep to each service's characters,
+an email address can't carry another address or header, and the message is
+URL-encoded. The number or address stays out of the page's HTML until the
+page runs (`hideFromSource={false}` to turn that off); `editable` lets the
+visitor change the message first.
 
 `BookingCard` and `MembershipCard` link to the page that takes the booking
 or the payment, or sell through BuildBase with `sell` (see below). `LeadMagnet`, `TipJar` and `NewsletterBand` are forms: give
