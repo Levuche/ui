@@ -8,9 +8,9 @@ import { expectNoA11yViolations } from './a11y';
  */
 
 const THEMES = {
-  light: { scheme: 'light', accent: 'rgb(194, 65, 12)' },
-  dark: { scheme: 'dark', accent: 'rgb(255, 138, 61)' },
-  custom: { scheme: 'light', accent: 'rgb(15, 118, 110)' },
+  light: { scheme: 'light', accent: 'rgb(194, 65, 12)', hex: '#c2410c' },
+  dark: { scheme: 'dark', accent: 'rgb(255, 138, 61)', hex: '#ff8a3d' },
+  custom: { scheme: 'light', accent: 'rgb(15, 118, 110)', hex: '#0f766e' },
 } as const;
 
 /** control: 44 px on a touch screen (the phone run), 40 px with a mouse. */
@@ -22,6 +22,10 @@ test.beforeEach(async ({ page }) => {
   // YouTube here so the tests never depend on it.
   await page.route(/youtube(-nocookie)?\.com|ytimg\.com/, (route) =>
     route.fulfill({ contentType: 'text/html', body: '<title>Video</title>' })
+  );
+  // The same for the music player.
+  await page.route(/soundcloud\.com/, (route) =>
+    route.fulfill({ contentType: 'text/html', body: '<title>Player</title>' })
   );
   const response = await page.goto('/');
   expect(response?.status(), 'the gallery should load').toBe(200);
@@ -83,6 +87,25 @@ for (const [id, expected] of Object.entries(THEMES)) {
         'src',
         /^https:\/\/www\.youtube-nocookie\.com\/embed\/M7lc1UVf-VE\?/
       );
+    });
+
+    test('music loads SoundCloud only after play, in the theme’s colour', async ({
+      page,
+    }) => {
+      const music = panel.getByTestId('music');
+      await expect(music.locator('iframe')).toHaveCount(0);
+      const play = music.getByRole('button', { name: 'Play: Chai at dawn' });
+      const box = await play.boundingBox();
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(await tapMin(page));
+      await play.click();
+      const frame = music.locator('iframe');
+      await expect(frame).toHaveAttribute('title', 'Chai at dawn');
+      const src = new URL((await frame.getAttribute('src')) ?? '');
+      expect(src.origin).toBe('https://w.soundcloud.com');
+      expect(src.searchParams.get('url')).toBe(
+        'https://soundcloud.com/desi-origins/chai-at-dawn'
+      );
+      expect(src.searchParams.get('color')).toBe(expected.hex);
     });
 
     test('checkout needs the consent box ticked', async () => {
@@ -248,6 +271,46 @@ for (const [id, expected] of Object.entries(THEMES)) {
       expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
         'ORIGINS10'
       );
+    });
+
+    test('goals and lists show how far along they are as progress bars', async () => {
+      const goals = panel.getByTestId('goals');
+      const series = goals.getByRole('progressbar', {
+        name: 'Film the spice series',
+      });
+      await expect(series).toHaveAttribute('aria-valuenow', '2');
+      await expect(series).toHaveAttribute('aria-valuemax', '4');
+      await expect(series).toHaveAttribute(
+        'aria-valuetext',
+        '2 of 4 done, 50%'
+      );
+      // Ten steps, half of them filled, in the theme's accent.
+      await expect(series.locator('span')).toHaveCount(10);
+      await expect(series.locator('[data-filled]')).toHaveCount(5);
+      await expect(series.locator('[data-filled]').first()).toHaveCSS(
+        'background-color',
+        expected.accent
+      );
+      await expect(goals.getByText('37 days left')).toBeVisible();
+      await expect(
+        goals.getByRole('list', { name: 'Steps' }).getByRole('listitem')
+      ).toHaveCount(4);
+
+      const camera = goals.getByRole('progressbar', {
+        name: 'Fund a new camera',
+      });
+      await expect(camera).toHaveAttribute(
+        'aria-valuetext',
+        '₹37,000 of ₹100,000, 37%'
+      );
+      await expect(camera.locator('span')).toHaveCSS(
+        'background-color',
+        expected.accent
+      );
+
+      await expect(
+        goals.getByRole('progressbar', { name: 'Marathi' })
+      ).toHaveAttribute('aria-valuetext', '4 of 5');
     });
 
     test('a locked link stays out of the page until the code is right', async ({

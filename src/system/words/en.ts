@@ -230,6 +230,27 @@ export const WORDS_EN = {
     soundOn: 'Play {title} with sound',
     transcript: 'Transcript',
   },
+  daysLeft: {
+    due: 'Due {date}',
+    days: '{n} days left',
+    oneDay: '1 day left',
+    ended: 'Ended',
+  },
+  goalTracker: {
+    due: 'Due {date}',
+    days: '{n} days left',
+    oneDay: '1 day left',
+    ended: 'Ended',
+    items: '{done} of {total} done',
+    amount: '{current} of {target}',
+    reached: 'Goal reached',
+    list: 'Steps',
+    done: 'Done',
+    notDone: 'Not done yet',
+  },
+  progressList: {
+    amount: '{value} of {max}',
+  },
   props: {
     /** CreatorHeader `verifiedLabel`. */
     verified: 'Verified',

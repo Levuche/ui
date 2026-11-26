@@ -16,6 +16,21 @@ change when it moves to that version.
   order so the editor can select them from the keyboard. Client blocks read
   it with `usePreviewMode()`; `inPreview` and `previewStop` say what it
   stops. `Editor/Preview mode` in Storybook presses every block in it.
+- `GoalTracker`: a goal with a title, a deadline chip with the days left,
+  steps the creator ticks off and a bar with the percentage, worked out from
+  the steps that are done or from `current` towards a `target`, written as
+  money with a `currency` code or as a count ("$370 of $1,000"). Says "Goal
+  reached" once it's done. `ProgressList`: bars for skills, ratings or
+  languages, each with its number as a percentage, a value out of its most
+  ("4 of 5") or none. Both in the trust group of the growth pack.
+- `ProgressBar`: a bar in the theme's accent, smooth or in 2 to 20 steps,
+  with `role="progressbar"` and its value for screen readers; it never moves
+  for visitors who ask for less motion. `DaysLeft`: a deadline as a chip
+  with the days left, which waits for the browser so the page hydrates
+  cleanly. The sums are plain functions: `progressOf` (held between 0 and
+  the target, rounding down so 100% means done), `filledSteps`,
+  `formatAmount`, `formatPercent`, `currencyCode`, `deadlineState` and
+  `formatDeadline`.
 - More hovers: `SiteTheme.hover` takes `tint` (the fill deepens), `zoom`
   (the picture grows a little, clipped to the card) and `glow` (a line and
   soft glow in the button colour), beside `lift` and `none`, and a block can
@@ -74,6 +89,30 @@ change when it moves to that version.
 - `ImageCarousel` takes `counter`, a small "1/4" on the picture.
 - `safeImageSource`: a picture, only when its address is one a page may
   load, for a picture that isn't an `<img>`, such as a video's cover.
+- Privacy and accessibility notes for each block: every `BLOCKS` entry has
+  `privacy` (the other sites it can load, from `OUTSIDE_SERVICES`, the most
+  cookies that may come with it, from `COOKIE_KINDS`, and a reason a visitor
+  can read) and `accessibility` (keyboard use and what a screen reader
+  hears), both listed on **Docs/Every block**. `pagePrivacy` adds up a
+  page's services and cookie kinds for its cookie notice and privacy page.
+- `consent` on every block that loads another site (`YouTubeVideo`,
+  `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `MapCard`,
+  `BookingEmbed`, `LiveStatus`, `AudioPlayer`, `PodcastEpisodes`): with
+  `false` the block says what loading will share and loads only after a
+  Load press (YouTube's own picture waits too), then moves focus into what
+  loaded. Words in `consentLabels` (`CONSENT_LABELS`); `ConsentCover` for a
+  block of your own. Storybook: `Blocks/Privacy`.
+- Music players for SoundCloud, Apple Music and Deezer, beside Spotify:
+  `SoundCloudEmbed` (a track or playlist, compact or with big artwork, in
+  the page's button colour), `AppleMusicEmbed` (a song, album or playlist)
+  and `DeezerEmbed` (a track, album or playlist), all in the media pack.
+  Like `SpotifyEmbed`, each loads the other site only when play is pressed
+  and shows the link as a plain tile when it can't play it. `LinkEmbed`
+  plays Apple Music and Deezer links too (`applemusic` and `deezer` in
+  `EMBED_SERVICES`), and its SoundCloud player is a little taller, so it
+  isn't cut off, and takes the page's colour. New: `appleMusicEmbed`,
+  `deezerEmbed`, `tintedSrc`, `colorHex`, the `track` player shape and
+  `PlayFrame`'s `tint`.
 - `SocialCard`: one social profile with the platform's mark, the picture,
   name, handle and verified tick, the follower count written short by
   locale (`shortCount`: 1.1K, 860K) and a button in the platform's own word
@@ -123,11 +162,15 @@ change when it moves to that version.
 
 ### Changed
 
+- `PlayFrame` (and every player and map built on it) moves focus into the
+  player once a visitor presses play, so keyboard users land in what loaded.
 - New options on blocks already in use, each off until set, so pages look
   as before: `CreatorHeader` `initialsFont="display"` sets the initials in
   the theme's display font (and `Avatar` `initialsFont`); `MapCard`
   `mapStyle` (`light`, `dark`, `satellite`) and `mapCaption`, a line over
-  the map's corner (`mapFrameUrl`); `NewsletterBand` `display="tile"`, a
+  the map's corner (`mapFrameUrl`; the satellite map loads from Google Maps,
+  `googlemaps` in `OUTSIDE_SERVICES`, and `mapService` names the site for
+  each style); `NewsletterBand` `display="tile"`, a
   small tile whose one button opens the form in a pop-up (`tileLabels`,
   `NEWSLETTER_TILE_LABELS`, and `DialogButton` for any such button);
   `BookingEmbed` `duration` and `nextFree` (with `timeZone`, `locale` and

@@ -11,6 +11,11 @@ import type { LinkBehavior } from '../system/href';
 import type { ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
 import { usePageWords } from '../system/page-words';
+import {
+  consentNotice,
+  OUTSIDE_SERVICES,
+  type ConsentLabels,
+} from '../system/privacy';
 
 /* ---------------------------------------------------------------- StatsRow */
 
@@ -188,6 +193,11 @@ export type MapStyle = 'standard' | 'light' | 'dark' | 'satellite';
  * the view from above from Google Maps, as OpenStreetMap has none. Neither
  * needs a key.
  */
+/** The site a map in this style loads from. */
+export function mapService(style?: MapStyle) {
+  return style === 'satellite' ? 'googlemaps' : 'openstreetmap';
+}
+
 export function mapFrameUrl(lat: number, lng: number, style?: MapStyle) {
   if (style === 'satellite') {
     return `https://maps.google.com/maps?q=${lat.toFixed(5)},${lng.toFixed(5)}&t=k&z=17&output=embed`;
@@ -238,6 +248,8 @@ export function MapCard({
   mapStyle = 'standard',
   mapCaption,
   labels,
+  consent,
+  consentLabels,
   buttonVariant,
   headingAs = 'h3',
   children,
@@ -259,6 +271,13 @@ export function MapCard({
   /** A short line laid over the map's corner, such as "Upstairs, blue door". */
   mapCaption?: ReactNode;
   labels?: Partial<MapCardLabels>;
+  /**
+   * Whether the visitor agreed to OpenStreetMap, from the page's cookie
+   * notice. False shows a notice and a Load button in place of the map's
+   * button; leave it out on pages that don't ask.
+   */
+  consent?: boolean;
+  consentLabels?: Partial<ConsentLabels>;
   buttonVariant?: SiteButtonVariant;
   headingAs?: HeadingTag;
   /** More, under the hours, such as a phone number. */
@@ -287,6 +306,12 @@ export function MapCard({
             action="map_load"
             allow=""
             frameClassName={MAP_STYLE_CLASSES[mapStyle]}
+            consent={consent}
+            notice={consentNotice(
+              OUTSIDE_SERVICES[mapService(mapStyle)].name,
+              consentLabels
+            )}
+            consentLabels={consentLabels}
           />
           {mapCaption ? (
             // Over the map's corner; taps go through to the map under it.

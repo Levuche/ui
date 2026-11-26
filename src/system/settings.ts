@@ -742,3 +742,16 @@ export const FORM_APP_ONLY = ['status', 'onSubmit', 'action'] as const;
 
 /** Props of a block whose data the app fetches (LiveProps). */
 export const LIVE_APP_ONLY = ['data', 'loading', 'error', 'updatedAt'] as const;
+
+/**
+ * The words a block that loads another site shows before a visitor agrees
+ * to it (see privacy.ts). The visitor's answer, `consent`, is app-only: the
+ * app reads it from the page's cookie notice.
+ */
+export const CONSENT_LABELS_SETTING = {
+  name: 'consentLabels',
+  label: 'Words before it loads',
+  type: 'words',
+  from: 'CONSENT_LABELS',
+  help: 'Shown to visitors who haven’t agreed to the other site yet.',
+} as const satisfies SettingField;

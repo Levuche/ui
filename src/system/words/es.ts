@@ -225,6 +225,27 @@ export const WORDS_ES: PageWords = {
     soundOn: 'Reproducir {title} con sonido',
     transcript: 'Transcripción',
   },
+  daysLeft: {
+    due: 'Vence el {date}',
+    days: 'Quedan {n} días',
+    oneDay: 'Queda 1 día',
+    ended: 'Terminado',
+  },
+  goalTracker: {
+    due: 'Vence el {date}',
+    days: 'Quedan {n} días',
+    oneDay: 'Queda 1 día',
+    ended: 'Terminado',
+    items: '{done} de {total} hechos',
+    amount: '{current} de {target}',
+    reached: 'Meta alcanzada',
+    list: 'Pasos',
+    done: 'Hecho',
+    notDone: 'Aún sin hacer',
+  },
+  progressList: {
+    amount: '{value} de {max}',
+  },
   props: {
     verified: 'Verificado',
     links: 'Enlaces',

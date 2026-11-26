@@ -284,6 +284,56 @@ const user = res.ok ? await res.json() : null;
 function that draws the data. Stories use fixed sample data, so tests never
 reach a service.
 
+### Privacy, consent and cookie notices
+
+Every registry entry has a `privacy` note: the other sites the block can
+load in a visitor's browser (`services`, from `OUTSIDE_SERVICES`), the most
+cookies that may come with it (`cookies`: `none`, `needed`, `preferences`,
+`statistics` or `marketing`) and a `reason` a visitor can read. Players,
+maps and booking pages load nothing until a press; feed and developer
+blocks show data your server fetched (see above).
+
+`pagePrivacy` adds up a page's blocks, for the cookie notice and the
+privacy page:
+
+```tsx
+import { pagePrivacy } from '@levuche/ui';
+
+const privacy = pagePrivacy([
+  'creator-header',
+  'youtube-video',
+  // The one service a pasted link plays, when you know it:
+  { id: 'link-embed', services: ['vimeo'] },
+]);
+privacy.services; // YouTube, then Vimeo, each with the blocks that load it
+privacy.cookies; // ['statistics', 'marketing']
+privacy.blocks; // each block that loads or sets anything, with its reason
+privacy.needsConsent; // true: ask before these load
+```
+
+Serve a feed's pictures (thumbnails, avatars, covers) from your own host,
+or pass the service, as `{ id: 'latest-videos', services: ['youtube'] }`,
+so the list stays true.
+
+Every block that loads another site takes `consent`. Leave it out on pages
+that don't ask. Pass `false` until the visitor says yes in the cookie
+notice: the block then shows a line on what loading will share and a Load
+button in place of the player, map or booking page, and loads it only on
+that press (YouTube's own picture waits too). Audio players show the line
+under the player; play is the press that loads it. The words are
+`consentLabels` (defaults in `CONSENT_LABELS`, `{service}` filled in);
+`ConsentCover` is the same cover for a block of your own.
+
+```tsx
+<YouTubeVideo video={url} title="How tea came to India" consent={agreed} />
+```
+
+Each entry also has an `accessibility` note: how the block is used with a
+keyboard and what a screen reader hears. **Docs/Every block** in Storybook
+lists both notes for every block. A test (`e2e/privacy.spec.ts`) fails when
+a block puts another site's frame or address on the page without listing
+the service, or lists one without taking `consent`.
+
 ### Tracking clicks and sign-ups with BuildBase
 
 Blocks load no analytics. `useBlockActions` reports every link, button and
@@ -813,22 +863,22 @@ through `SiteLink`, and one that isn't safe shows as plain words.
 
 ## What's in it
 
-| Group       | Blocks                                                                                                                                                                                                                                                        |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `contrastIssues`, `fixContrast`, `Block`, `withBlockLook`, `BlockLook`                                                                                                                         |
-| Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Ribbon`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                                   |
-| Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton`, `MessageComposer` |
-| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`, `TextStrip`                                                                                                                                                                                     |
-| Profile     | `CreatorHeader`, `SocialIcons`, `SocialCard`, `SaveContact`                                                                                                                                                                                                   |
-| Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`, `LinkCard`, `LogoTile`, `LinkChip`, `AppBadges`                                                                                                                                                       |
-| Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                                      |
-| Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                                          |
-| Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                                                                                |
-| Text        | `SectionHeading`, `TextBlock`, `QuoteBlock`, `Spacer`, `RichText`                                                                                                                                                                                             |
-| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `TileGallery`, `VideoTile`, `BeforeAfter`, `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                                               |
-| Forms       | `NewsletterBand`, `ContactForm`, `MessageCard`                                                                                                                                                                                                                |
-| Feeds       | `LatestVideos`, `LatestPosts`, `LiveStatus`, `EventList`, `ReviewSummary`, `NowPlaying`                                                                                                                                                                       |
-| Developer   | `GitHubProfile`, `ContributionGraph`, `RepoCard`, `RepoList`, `PackageStats`, `TechStack`                                                                                                                                                                     |
+| Group       | Blocks                                                                                                                                                                                                                                                                                    |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `contrastIssues`, `fixContrast`, `Block`, `withBlockLook`, `BlockLook`                                                                                                                                                     |
+| Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Ribbon`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, `ProgressBar`, icons                                                                                                                                |
+| Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `ConsentCover`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `DaysLeft`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton`, `MessageComposer` |
+| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`, `TextStrip`                                                                                                                                                                                                                 |
+| Profile     | `CreatorHeader`, `SocialIcons`, `SocialCard`, `SaveContact`                                                                                                                                                                                                                               |
+| Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`, `LinkCard`, `LogoTile`, `LinkChip`, `AppBadges`                                                                                                                                                                                   |
+| Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                                                                  |
+| Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                                                                      |
+| Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`, `GoalTracker`, `ProgressList`                                                                                                                                                                                             |
+| Text        | `SectionHeading`, `TextBlock`, `QuoteBlock`, `Spacer`, `RichText`                                                                                                                                                                                                                         |
+| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `TileGallery`, `VideoTile`, `BeforeAfter`, `SpotifyEmbed`, `SoundCloudEmbed`, `AppleMusicEmbed`, `DeezerEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                      |
+| Forms       | `NewsletterBand`, `ContactForm`, `MessageCard`                                                                                                                                                                                                                                            |
+| Feeds       | `LatestVideos`, `LatestPosts`, `LiveStatus`, `EventList`, `ReviewSummary`, `NowPlaying`                                                                                                                                                                                                   |
+| Developer   | `GitHubProfile`, `ContributionGraph`, `RepoCard`, `RepoList`, `PackageStats`, `TechStack`                                                                                                                                                                                                 |
 
 `BLOCKS` in the registry lists every block with its group, so this table
 is a summary; the registry is the full list.
