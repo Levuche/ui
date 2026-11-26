@@ -220,8 +220,8 @@ The React ideas it uses, and why:
   page reports every link, button and form as `{ action, block, label }`,
   with no tracking prop on each block.
 - **A registry**: `BLOCKS` lists every block once, with its `data-block` id,
-  its grid kind and its group, for the editor and for analytics. A test
-  checks each id is used only once.
+  its grid kind, its group and its settings, for the editor and for
+  analytics. A test checks each id is used only once.
 
 ### Data from other services
 
@@ -473,6 +473,56 @@ Each registry entry has a `pack`. `blocksInPack('media')` lists a pack's
 blocks and `isPaidPack(pack)` says whether the editor should ask for the
 unlock. Blocks that take payments stay in `core`, so every creator can sell.
 
+### Each block's settings
+
+Every registry entry describes what a creator can set on the block, so the
+page editor builds the block's settings panel from it instead of a form made
+by hand for each block. `settings` lists the block's own fields in panel
+order; `appOnly` lists the props the app fills in itself (callbacks, data it
+fetches, form status, `locale`, `headingAs`, `children`). The look every
+block shares is described once, as `LOOK_SETTINGS`, and goes on every panel.
+
+```tsx
+import { settingsPanel, mainLinkSetting, settingIcon } from '@levuche/ui';
+
+const panel = settingsPanel('tip-jar');
+// panel.settings: title, detail, amounts, currency... then panel.look
+mainLinkSetting('youtube-video'); // the `video` field: a pasted link goes here
+```
+
+Each field (`SettingField`) has a `name` (the prop it sets), a `label`, an
+optional `help` line, a `type` and a `default`, and may be:
+
+- `required`: the block needs it
+- `slow`: it makes a network call (a link that loads a preview, a channel
+  that loads a feed), so the editor waits until typing stops before it
+  reloads the block
+- `main` (links only): where a link pasted with the panel open goes; at
+  most one per block
+- `forApp`: not a prop of the block; the app reads it, as the channel or
+  feed to load the block's data from, or a code it checks on its server
+- `icon`: one of `SETTING_ICONS`, when the type's own (`settingIcon(field)`)
+  says less, as `person` for a name or `mail` for an email address
+
+The types are `text`, `longText`, `link`, `toggle`, `choice` (`options`, with
+`multiple` for a list of them), `number` (`min`, `max`, `step`, `unit`),
+`colour`, `dateTime`, `picture`, `list` (items made of `fields`, or plain
+values with `of`), `group` (a few fields kept together), `words` (the words a
+visitor sees, with defaults from the export named in `from`, as
+`TIP_JAR_LABELS`) and `product` (something to sell from the creator's
+BuildBase store). Choices reuse the package's own lists (`BLOCK_TONES`,
+`EMBED_SERVICES`...). `fitsSetting(field, value)` checks a value a creator
+typed, and `settingDefaults(fields)` gives a new block's starting values.
+
+`src/settings-check.ts` keeps the settings in step with the code: `npm run
+typecheck` fails, naming the block and prop, when a prop is in neither
+`settings` nor `appOnly`, a setting names a prop the block doesn't take, a
+field's type doesn't fit its prop, a choice's options aren't exactly the
+values the prop takes, or a prop the block needs isn't a required setting.
+`e2e/settings.spec.ts` checks the rest: unique names, options, defaults, at
+most one main link. `Editor/Settings panel` in Storybook previews any
+block's panel.
+
 ## Size presets
 
 Blocks use named sizes, never fixed pixels, so one change in `tokens.css`
@@ -721,8 +771,9 @@ a creator's own theme, and `Pages/Creator page` shows a whole page in each. The
 Cards menu shows it in each card style, and `Pages/Card styles` shows a whole
 page in each. The Direction menu shows it right to left. `Docs/Getting started`
 walks through installing and theming, and `Docs/Every block` lists every block
-with what it's for, its grid kind and whether it's free, read from the
-registry. `CHANGELOG.md` lists what changed in each release.
+with what it's for, its grid kind, whether it's free and how many settings
+it has, read from the registry. `Editor/Settings panel` previews the settings
+panel for any block. `CHANGELOG.md` lists what changed in each release.
 
 Each story is also a test. `npm run test:stories` opens every story in
 Chromium (Vitest with the Storybook plugin), runs its play function, which
@@ -747,8 +798,9 @@ variable, the same pair the website uses.
    `gap-block-gap` for spacing, and the size presets above (`min-h-control`
    or more for anything tapped). Put words in a `labels` prop, links through
    `SiteLink`, and add `'use client'` only if it has state.
-2. Add it to `BLOCKS` in `src/system/registry.ts` and export it from
-   `src/index.ts`.
+2. Add it to `BLOCKS` in `src/system/registry.ts`, with a `settings` entry
+   for each prop a creator sets and the rest in `appOnly` (`npm run
+typecheck` says what's missing), and export it from `src/index.ts`.
 3. Show it in `gallery/gallery.tsx`, inside a `Group`.
 4. Add `stories/<Block>.stories.tsx`, with a play function that does what a
    visitor would, and add it to the sample page in `stories/sample-page.tsx`.
