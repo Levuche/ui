@@ -306,7 +306,12 @@ export * from './atoms/icons';
 
 // Molecules
 export { SiteSection } from './molecules/section';
-export { ItemHead, type HeadingTag } from './molecules/item-head';
+export {
+  ItemHead,
+  subHeading,
+  type HeadingTag,
+  type SubHeadingTag,
+} from './molecules/item-head';
 export {
   LINK_TILE_LOOKS,
   LINK_TILE_VARIANTS,
@@ -315,8 +320,8 @@ export {
   type LinkTileStyle,
   type LinkTileVariant,
 } from './molecules/link-tile';
-export { Price, priceSaving } from './molecules/price';
-export { Rating } from './molecules/rating';
+export { Price, priceSaving, yearlySaving } from './molecules/price';
+export { Rating, starFills } from './molecules/rating';
 export { CheckList } from './molecules/check-list';
 export { FormNotice } from './molecules/form-notice';
 export {
@@ -619,6 +624,7 @@ export { Skeleton } from './atoms/skeleton';
 export {
   CONTRIBUTION_LABELS,
   ContributionGraph,
+  contributionCells,
   GITHUB_LABELS,
   GitHubProfile,
   PACKAGE_LABELS,

@@ -78,6 +78,8 @@ export const AgeCheck: Story = {
     await userEvent.click(open);
     const dialog = within(dialogOf(canvasElement));
     await expect(dialog.getByText('Are you 18 or older?')).toBeVisible();
+    // Empty until "No", so the answer is announced.
+    await expect(dialog.getByRole('status')).toBeEmptyDOMElement();
     await userEvent.click(dialog.getByRole('button', { name: 'No' }));
     await expect(dialog.getByRole('status')).toHaveTextContent(/18 and over/);
     const close = dialog.getByRole('button', { name: 'Close' });

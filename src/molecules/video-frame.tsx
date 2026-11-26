@@ -14,6 +14,7 @@ import { TileCaption, UNDER_CAPTION } from './tile-caption';
 import { WORDS_EN } from '../system/words/en';
 import { usePageWords } from '../system/page-words';
 import { usePreviewMode } from '../system/preview-mode';
+import { mediaWaits } from './media-notice';
 
 /** A file of captions, subtitles or descriptions for a video (WebVTT). */
 export type VideoTrack = {
@@ -71,7 +72,9 @@ type Mode = 'still' | 'loop' | 'watch';
  * With `loop`, it plays without sound, round and round, while it's on the
  * screen, with buttons to pause it and to play it with sound. It never moves
  * on its own for visitors who ask their device for less motion: they get the
- * cover and the play button. Sound never starts without a press.
+ * cover and the play button. Sound never starts without a press. With
+ * `consent={false}` a video on another site neither downloads nor loops
+ * until it's pressed.
  */
 export function VideoFrame({
   src,
@@ -83,6 +86,7 @@ export function VideoFrame({
   caption,
   captionStyle = 'below',
   labels,
+  consent,
   className,
 }: {
   /** The video file's address. */
@@ -104,6 +108,11 @@ export function VideoFrame({
   caption?: ReactNode;
   captionStyle?: CaptionStyle;
   labels?: Partial<VideoLabels>;
+  /**
+   * False when the visitor hasn't agreed to the site the video is on: then
+   * nothing downloads and nothing loops until they press play.
+   */
+  consent?: boolean;
   className?: string;
 }) {
   const words = usePageWords('video', labels);
@@ -115,6 +124,7 @@ export function VideoFrame({
   // Once the visitor watches it with sound, the loop never takes over again.
   const watching = useRef(false);
   const fill = (text: string) => text.replace('{title}', title);
+  const waits = mediaWaits(src, consent);
 
   // Loop without sound while on the screen, unless less motion is asked for,
   // the visitor paused it or it's in preview mode (the page editor), where
@@ -123,7 +133,7 @@ export function VideoFrame({
   useEffect(() => {
     const el = video.current;
     const box = frame.current;
-    if (!loop || preview || !el || !box || watching.current) return;
+    if (!loop || waits || preview || !el || !box || watching.current) return;
     if (paused) {
       el.pause();
       return;
@@ -166,7 +176,7 @@ export function VideoFrame({
       watcher?.disconnect();
       motion?.removeEventListener('change', update);
     };
-  }, [loop, paused, preview]);
+  }, [loop, paused, preview, waits]);
 
   if (!isSafeMediaSrc(src, 'video')) return null;
   const cover = safeImageSource(poster);
@@ -217,9 +227,9 @@ export function VideoFrame({
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <video
           ref={video}
-          src={cover ? src : firstFrame(src)}
+          src={cover || waits ? src : firstFrame(src)}
           poster={cover?.src}
-          preload={cover ? 'none' : 'metadata'}
+          preload={cover || waits ? 'none' : 'metadata'}
           loop={loop}
           playsInline
           controls={mode === 'watch'}

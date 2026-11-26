@@ -369,7 +369,7 @@ export const BLOCKS = [
     accessibility: {
       keyboard: 'Nothing to press.',
       screenReader:
-        'The name as a heading, then the tagline; the picture is described by its alt text and the tick by its own words.',
+        'The name as a heading, then the tagline; the picture is skipped, as the name beside it says who it is, and the tick is read by its own words.',
     },
   },
   {
@@ -667,7 +667,7 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: [],
-    privacy: LOADS_NOTHING,
+    privacy: SERVER_FETCHED,
     accessibility: {
       keyboard: 'Tab reaches each link; Enter opens it.',
       screenReader: 'One link, read by its title, with the picture’s alt text.',
@@ -828,7 +828,7 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: ['icon'],
-    privacy: LOADS_NOTHING,
+    privacy: SERVER_FETCHED,
     accessibility: {
       keyboard: 'Tab reaches the tile; Enter opens its link.',
       screenReader:
@@ -896,7 +896,7 @@ export const BLOCKS = [
       ...LINK_BEHAVIOR_SETTINGS,
     ],
     appOnly: ['icon'],
-    privacy: LOADS_NOTHING,
+    privacy: SERVER_FETCHED,
     accessibility: {
       keyboard: 'Tab reaches the chip; Enter opens its link.',
       screenReader: 'One link, read by its words; its icon is skipped.',
@@ -1073,7 +1073,7 @@ export const BLOCKS = [
     accessibility: {
       keyboard: 'Tab reaches the buy button; Enter or Space presses it.',
       screenReader:
-        'The product as a heading, what’s in it as a list, the price and the button; buying news is read out.',
+        'The product as a heading with its picture and line about it, how long it takes, the price and the button; buying news is read out.',
     },
   },
   {
@@ -1211,7 +1211,7 @@ export const BLOCKS = [
     accessibility: {
       keyboard: 'Tab reaches the buy button; Enter or Space presses it.',
       screenReader:
-        'The pack’s name, how many credits, the price and the button.',
+        'How many credits as a heading, any bonus, the price and the button; buying news is read out.',
     },
   },
   {
@@ -1326,7 +1326,7 @@ export const BLOCKS = [
       keyboard:
         'Tab reaches the download consent box (Space ticks it), then the buy button.',
       screenReader:
-        'The product, the price, the consent box with its words, and the button.',
+        'The consent box with its words, then the button, which says the price; buying news is read out.',
     },
   },
   {
@@ -1641,7 +1641,7 @@ export const BLOCKS = [
         from: 'COUNTDOWN_LABELS',
       },
     ],
-    appOnly: ['now', 'onDone'],
+    appOnly: ['now', 'onDone', 'headingAs'],
     privacy: LOADS_NOTHING,
     accessibility: {
       keyboard: 'Nothing to press.',
@@ -1717,7 +1717,7 @@ export const BLOCKS = [
     group: 'trust',
     client: false,
     pack: 'core',
-    summary: 'Questions that open one at a time',
+    summary: 'Questions that open to show their answer',
     settings: [
       {
         name: 'items',
@@ -1909,7 +1909,7 @@ export const BLOCKS = [
     privacy: LOADS_NOTHING,
     accessibility: {
       keyboard: 'Tab reaches each picture that has a link.',
-      screenReader: 'Each picture’s alt text, and its caption.',
+      screenReader: 'Each picture’s alt text.',
     },
   },
   {
@@ -1968,7 +1968,7 @@ export const BLOCKS = [
         from: 'NEWSLETTER_TILE_LABELS',
       },
     ],
-    appOnly: [...FORM_APP_ONLY],
+    appOnly: [...FORM_APP_ONLY, 'headingAs'],
     privacy: SENDS_ON_SUBMIT,
     accessibility: {
       keyboard: 'Tab reaches the email box and the button; Enter sends.',
@@ -2147,7 +2147,7 @@ export const BLOCKS = [
         from: 'CAROUSEL_LABELS',
       },
     ],
-    appOnly: ['index', 'onIndexChange'],
+    appOnly: ['index', 'onIndexChange', 'headingAs'],
     privacy: LOADS_NOTHING,
     accessibility: {
       keyboard:
@@ -2229,9 +2229,15 @@ export const BLOCKS = [
         type: 'words',
         from: 'VIDEO_LABELS',
       },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: [],
-    privacy: LOADS_NOTHING,
+    appOnly: ['headingAs', 'consent'],
+    privacy: {
+      services: ['video-host'],
+      cookies: 'none',
+      reason:
+        'Downloads the video only when you press play, or when it loops on screen, from the site it’s on, which sees your IP address.',
+    },
     accessibility: {
       keyboard:
         'Tab reaches each tile that has a link, and each video’s play and pause buttons.',
@@ -2298,9 +2304,15 @@ export const BLOCKS = [
         type: 'words',
         from: 'VIDEO_TILE_LABELS',
       },
+      CONSENT_LABELS_SETTING,
     ],
-    appOnly: [],
-    privacy: LOADS_NOTHING,
+    appOnly: ['consent'],
+    privacy: {
+      services: ['video-host'],
+      cookies: 'none',
+      reason:
+        'Downloads the video only when you press play, or when it loops on screen, from the site it’s on, which sees your IP address.',
+    },
     accessibility: {
       keyboard:
         'Tab reaches the play and pause buttons; Enter or Space presses them. A looping video stands still for visitors who ask for less motion.',
@@ -2448,7 +2460,7 @@ export const BLOCKS = [
         from: 'LOGO_STRIP_LABELS',
       },
     ],
-    appOnly: [],
+    appOnly: ['headingAs'],
     privacy: LOADS_NOTHING,
     accessibility: {
       keyboard:
@@ -2521,8 +2533,9 @@ export const BLOCKS = [
     privacy: LOADS_NOTHING,
     accessibility: {
       keyboard:
-        'Nothing to press; a scrolling strip stops while hovered or focused, and stands still for visitors who ask for less motion.',
-      screenReader: 'A labelled list of logos, each read once by its alt text.',
+        'Tab reaches the pause button; Enter or Space pauses or plays the strip. It also stops while hovered or off screen, and stands still for visitors who ask for less motion.',
+      screenReader:
+        'A labelled list of the phrases, each read once; the copies that make the loop are skipped. The pause button says what it does.',
     },
   },
   {
@@ -2577,9 +2590,9 @@ export const BLOCKS = [
     privacy: SENDS_ON_SUBMIT,
     accessibility: {
       keyboard:
-        'Tab moves through name, email, message and the send button; Enter in a box sends.',
+        'Tab moves through name, email, message and the send button; Enter in the name or email box sends, and in the message box starts a new line.',
       screenReader:
-        'Each box by its label and hint, errors on the boxes they’re about, and the result read out.',
+        'Each box by its label, which ones are required, and the result read out.',
     },
   },
   {
@@ -2674,7 +2687,7 @@ export const BLOCKS = [
     },
     accessibility: {
       keyboard:
-        'Tab reaches the message box (when it can be changed) and the button; Enter or Space opens your app.',
+        'Tab reaches the message box (when it can be changed) and the button; Enter opens your app.',
       screenReader:
         'The message, the labelled box, and a button named by where it opens.',
     },
@@ -2862,7 +2875,7 @@ export const BLOCKS = [
         name: 'id',
         label: 'Name for links',
         type: 'text',
-        help: 'A link to #this-name jumps here. Letters, numbers and hyphens.',
+        help: 'A link to #this-name jumps here. Kept as small letters, numbers and hyphens, so “My Works” becomes #my-works.',
         icon: 'link',
       },
       {
@@ -3936,9 +3949,10 @@ export const BLOCKS = [
     appOnly: ['loading', 'error', 'updatedAt', 'headingAs'],
     privacy: SERVER_FETCHED,
     accessibility: {
-      keyboard: 'Tab reaches each ticket link; Enter opens it.',
+      keyboard:
+        'Tab reaches each ticket link and Add to calendar button; Enter opens them.',
       screenReader:
-        'A list of events, each with its date and place; each ticket link says which event it’s for.',
+        'A list of events, each with its date and place; each ticket link and Add to calendar button says which event it’s for.',
     },
   },
   {
@@ -4033,7 +4047,7 @@ export const BLOCKS = [
       },
     ],
     appOnly: [],
-    privacy: SERVER_FETCHED,
+    privacy: LOADS_NOTHING,
     accessibility: {
       keyboard: 'Tab reaches each link; Enter opens it.',
       screenReader: 'What’s playing or being read, by title and who made it.',

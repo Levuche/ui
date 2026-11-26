@@ -4,6 +4,7 @@ import { WORDS_EN } from '../system/words/en';
 import { SiteLink } from '../atoms/link';
 import { LogoMarquee } from '../molecules/logo-marquee';
 import type { MotionToggleLabels } from '../molecules/motion-toggle';
+import type { HeadingTag } from '../molecules/item-head';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { TileCaption, UNDER_CAPTION } from '../molecules/tile-caption';
 import { isOverCaption, type CaptionStyle } from '../system/gallery';
@@ -110,6 +111,7 @@ export function LogoStrip({
   muted = true,
   label: labelProp,
   labels,
+  headingAs: Heading = 'h3',
   ...root
 }: BlockRootProps & {
   /** Above the logos, such as "As seen in". */
@@ -126,6 +128,8 @@ export function LogoStrip({
   label?: string;
   /** What the pause button of a scrolling strip says to screen readers. */
   labels?: Partial<LogoStripLabels>;
+  /** The title's level on the page. `p` when it's only for looks. */
+  headingAs?: HeadingTag;
 }) {
   const own = usePageWords('props');
   const label = labelProp === undefined ? own.brands : labelProp;
@@ -182,16 +186,18 @@ export function LogoStrip({
       {...root}
     >
       {title ? (
-        <p className="text-site-text-2 m-0 text-xs font-bold tracking-wide uppercase">
+        <Heading className="text-site-text-2 m-0 text-xs font-bold tracking-wide uppercase">
           {title}
-        </p>
+        </Heading>
       ) : null}
       {scrolling ? (
-        <LogoMarquee seconds={motionSeconds(speed, 30)} labels={labels}>
-          {logos.map((logo, i) => item(logo, i))}
-          {/* The second copy makes the loop seamless; screen readers skip it. */}
-          {logos.map((logo, i) => item(logo, i, true))}
-        </LogoMarquee>
+        <LogoMarquee
+          seconds={motionSeconds(speed, 30)}
+          labels={labels}
+          logos={logos.map((logo, i) => item(logo, i))}
+          // The copies make the loop seamless; screen readers skip them.
+          copies={logos.map((logo, i) => item(logo, i, true))}
+        />
       ) : (
         <ul className="m-0 flex list-none flex-wrap items-center justify-center gap-x-10 gap-y-4 p-0">
           {logos.map((logo, i) => item(logo, i))}

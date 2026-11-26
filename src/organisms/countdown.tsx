@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { WORDS_EN } from '../system/words/en';
 import { usePageWords } from '../system/page-words';
+import type { HeadingTag } from '../molecules/item-head';
 
 /** The names of the units, as the visitor reads them. */
 export type CountdownLabels = {
@@ -40,6 +41,7 @@ export function timeLeft(to: Date | string, now: number) {
 export function Countdown({
   to,
   title,
+  headingAs: Heading = 'h3',
   doneLabel: doneLabelProp,
   doneContent,
   labels,
@@ -50,6 +52,8 @@ export function Countdown({
 }: BlockRootProps & {
   to: Date | string;
   title?: ReactNode;
+  /** The title's level on the page. `p` when it's only for looks. */
+  headingAs?: HeadingTag;
   doneLabel?: ReactNode;
   /** Shown under `doneLabel` once time is up, such as a link to the stream. */
   doneContent?: ReactNode;
@@ -96,14 +100,17 @@ export function Countdown({
 
   return (
     <Block name="countdown" defaults={{ align: 'center' }} {...root}>
-      {title ? <p className="m-0 font-bold">{title}</p> : null}
+      {title ? <Heading className="m-0 font-bold">{title}</Heading> : null}
+      {/* In the page from the start, so the done words are read out when
+          they arrive rather than mounting with the region. */}
+      <p
+        role="status"
+        className="text-site-link m-0 text-xl font-bold empty:sr-only"
+      >
+        {done ? doneLabel : null}
+      </p>
       {done ? (
-        <>
-          <p role="status" className="text-site-link m-0 text-xl font-bold">
-            {doneLabel}
-          </p>
-          {doneContent}
-        </>
+        doneContent
       ) : (
         <p role="timer" className="m-0 flex justify-center gap-2">
           {parts.map((part) => (

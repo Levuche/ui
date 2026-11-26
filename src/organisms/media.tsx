@@ -5,6 +5,7 @@ import { cn } from '../system/cn';
 import { PlayFrame } from '../molecules/play-frame';
 import { columnSizes, type ImageSrc } from '../system/image';
 import { OUTSIDE_SERVICES, type ConsentLabels } from '../system/privacy';
+import { usePageWords } from '../system/page-words';
 
 /** Reel thumbnails in a grid of three (9:14), each one a link if given. */
 export function ReelGrid({
@@ -15,6 +16,7 @@ export function ReelGrid({
   reels: { image?: ImageSrc | null; label?: string; href?: string }[];
   columns?: 2 | 3 | 4;
 }) {
+  const own = usePageWords('props');
   return (
     <Block name="reel-grid" defaults={{ tone: 'plain' }} {...root}>
       <ul
@@ -40,7 +42,9 @@ export function ReelGrid({
                   href={reel.href}
                   newTab
                   action="open_reel"
-                  aria-label={reel.label ?? `Reel ${i + 1}`}
+                  aria-label={
+                    reel.label?.trim() || own.reel.replace('{n}', String(i + 1))
+                  }
                   className="block"
                 >
                   {tile}

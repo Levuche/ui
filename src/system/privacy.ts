@@ -112,6 +112,11 @@ export const OUTSIDE_SERVICES = {
     hosts: [],
     cookies: 'none',
   },
+  'video-host': {
+    name: 'the site the video is on',
+    hosts: [],
+    cookies: 'none',
+  },
 } as const satisfies Record<string, OutsideServiceInfo>;
 export type OutsideService = keyof typeof OUTSIDE_SERVICES;
 

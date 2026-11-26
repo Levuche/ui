@@ -58,8 +58,8 @@ export type BackgroundPosition = (typeof BACKGROUND_POSITIONS)[number];
 
 /**
  * A gradient through two or three of the theme's colours. `angle` is in
- * degrees (135, from the top left, if left out). `move` lets it drift slowly,
- * never for visitors who ask their device for less motion.
+ * degrees (135, from the top left, if left out). `move` lets it drift across
+ * once, in under five seconds, never for visitors who ask their device for less motion.
  */
 export type GradientBackground = {
   type: 'gradient';

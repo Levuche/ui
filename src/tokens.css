@@ -318,11 +318,30 @@
     0 0,
     12px 12px;
 }
-/* A gradient that drifts slowly; never for visitors who ask for less motion. */
+/*
+ * A gradient that drifts across once, in under five seconds, so it needs no
+ * pause button (WCAG 2.2.2); never for visitors who ask for less motion.
+ */
 @media (prefers-reduced-motion: no-preference) {
   [data-block][data-background='gradient'][data-background-move] {
     background-size: 200% 200%;
-    animation: levuche-drift 12s ease-in-out infinite alternate;
+    animation: levuche-drift 4.8s ease-in-out both;
+  }
+}
+/*
+ * A live dot that pulses and a picture's ping that spreads: each plays a
+ * few times, under five seconds in all, then rests (WCAG 2.2.2).
+ */
+@keyframes levuche-live-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+@keyframes levuche-live-ping {
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
   }
 }
 @keyframes levuche-drift {

@@ -6,6 +6,18 @@ import type { ImageSrc } from '../system/image';
 
 export type HeadingTag = 'h2' | 'h3' | 'h4' | 'p';
 
+/** The level of a heading inside a block, one below the block's title. */
+export type SubHeadingTag = 'h3' | 'h4' | 'h5' | 'p';
+
+/**
+ * The heading for each item under a block's title, such as each card in a
+ * list: one level below `tag`, or `p` when the title is only for looks.
+ * Every block with items uses this, so the page's outline has no gaps.
+ */
+export function subHeading(tag: HeadingTag | undefined): SubHeadingTag {
+  return tag === 'h2' ? 'h3' : tag === 'h3' ? 'h4' : tag === 'h4' ? 'h5' : 'p';
+}
+
 /**
  * The top of a card: an optional picture, a small line above the title, the
  * title and a line or two about it. `media="side"` puts a small square
@@ -30,7 +42,7 @@ export function ItemHead({
   imageAlt?: string;
   media?: 'side' | 'top';
   ratio?: ThumbRatio;
-  headingAs?: HeadingTag;
+  headingAs?: HeadingTag | SubHeadingTag;
   className?: string;
 }) {
   const picture =

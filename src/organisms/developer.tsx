@@ -5,11 +5,17 @@ import { SiteLinkButton } from '../atoms/button';
 import { CodeIcon, DownloadIcon, ForkIcon, StarIcon } from '../atoms/icons';
 import { SiteLink } from '../atoms/link';
 import { Skeleton } from '../atoms/skeleton';
-import { ItemHead, type HeadingTag } from '../molecules/item-head';
+import {
+  ItemHead,
+  subHeading,
+  type HeadingTag,
+  type SubHeadingTag,
+} from '../molecules/item-head';
 import { LiveData, SkeletonLines } from '../molecules/live-data';
 import { Sparkline } from '../molecules/sparkline';
 import { StatList } from '../molecules/stat-list';
 import { cn } from '../system/cn';
+import { imageAttrs } from '../system/image';
 import type { LiveProps } from '../system/live';
 import { isSafeColor } from '../system/theme';
 import { WORDS_EN } from '../system/words/en';
@@ -123,6 +129,10 @@ export function GitHubProfile({
 
 /** A year of contributions: 52 or 53 weeks of 7 days, oldest first. */
 export type ContributionData = {
+  /**
+   * Each week's counts, Sunday first. The first week may start later in
+   * the week and the last may end early, as GitHub gives them.
+   */
   weeks: number[][];
   total: number;
   currentStreak: number;
@@ -139,6 +149,19 @@ export type ContributionLabels = {
 };
 
 export const CONTRIBUTION_LABELS: ContributionLabels = WORDS_EN.contributions;
+
+/**
+ * The graph's weeks as seven cells each, so every day sits in its own row:
+ * a short first week gets empty cells (null) before its days, as it starts
+ * later in the week, and a short last week gets them after.
+ */
+export function contributionCells(weeks: number[][]): (number | null)[][] {
+  return weeks.map((week, w) => {
+    const days = week.slice(0, 7);
+    const gap: null[] = Array.from({ length: 7 - days.length }, () => null);
+    return w === 0 && weeks.length > 1 ? [...gap, ...days] : [...days, ...gap];
+  });
+}
 
 const LEVELS = [
   'bg-site-surface-2',
@@ -201,13 +224,14 @@ export function ContributionGraph({
               </p>
               <div className="overflow-x-auto" aria-hidden>
                 <div className="grid w-max grid-flow-col grid-rows-7 gap-[3px]">
-                  {year.weeks.flatMap((week, w) =>
+                  {contributionCells(year.weeks).flatMap((week, w) =>
                     week.map((count, d) => (
                       <span
                         key={`${w}-${d}`}
                         className={cn(
                           'size-2.5 rounded-[2px]',
-                          LEVELS[contributionLevel(count, max)]
+                          count !== null &&
+                            LEVELS[contributionLevel(count, max)]
                         )}
                       />
                     ))
@@ -257,7 +281,7 @@ function RepoBody({
   repo: RepoData;
   locale?: string;
   words: RepoLabels;
-  Heading: HeadingTag;
+  Heading: HeadingTag | SubHeadingTag;
 }) {
   const dot =
     repo.languageColor && isSafeColor(repo.languageColor)
@@ -363,7 +387,7 @@ export function RepoList({
   }) {
   const locale = usePageLocale(localeProp);
   const words = usePageWords('repo', labels);
-  const itemHeading: HeadingTag = headingAs === 'h2' ? 'h3' : 'h4';
+  const itemHeading = subHeading(headingAs);
   return (
     <Block name="repo-list" {...root}>
       {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
@@ -509,13 +533,13 @@ export function TechStack({
           const chip = (
             <>
               {typeof item.logo === 'string' ? (
-                <img
-                  src={item.logo}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  className="size-5 object-contain"
-                />
+                item.logo.trim() ? (
+                  <img
+                    {...imageAttrs({ src: item.logo.trim() }, '20px')}
+                    alt=""
+                    className="size-5 object-contain"
+                  />
+                ) : null
               ) : (
                 item.logo
               )}

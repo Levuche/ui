@@ -74,7 +74,8 @@ function EmbedBody({
   const words = usePageWords('embed', labels);
   return (
     <Block name={name} data-service={embed?.service} {...root}>
-      {showTitle ? (
+      {/* A plain link's tile shows its own title and detail. */}
+      {showTitle && embed ? (
         <ItemHead title={title} detail={detail} headingAs={headingAs} />
       ) : null}
       {embed ? (
@@ -102,6 +103,10 @@ function EmbedBody({
           {title}
         </LinkTile>
       )}
+      {/* Without the title above the player, its detail sits under it. */}
+      {embed && !showTitle && detail ? (
+        <p className="text-site-text-2 m-0 text-sm">{detail}</p>
+      ) : null}
     </Block>
   );
 }
