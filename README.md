@@ -25,7 +25,7 @@ Install a released version straight from GitHub (no npm account or token
 needed):
 
 ```bash
-npm install github:Levuche/ui#v0.1.0
+npm install github:Levuche/ui#v0.2.0
 ```
 
 The package ships TypeScript source. In a Next.js app:
@@ -78,6 +78,24 @@ const theme: SiteTheme = {
 The app provides `react`, `clsx`, `tailwind-merge` and Tailwind CSS v4
 (peer dependencies).
 
+### Colours a visitor can read
+
+`isSafeColor` only checks that a colour is a plain value. In the theme editor,
+`contrastIssues(theme)` says which of the creator's pairs are too faint to
+read by WCAG 2.2 AA (4.5:1 for text, 3:1 for buttons against the page): text
+and softer text on the page and on cards, links, button text on the accent,
+text on the band, and buttons against the page. Each issue has a `label` to
+show, its `ratio`, what it `needed`, the colour to `change` (the one the
+creator picked) and a `suggestion`: the nearest colour, same hue, that
+passes. `fixContrast(theme)` applies every suggestion, for a "Fix all"
+button, and `contrastRatio(a, b)` measures any two colours.
+
+```tsx
+contrastIssues({ colors: { accent: '#fbbf24', onAccent: '#ffffff' } });
+// [{ label: 'Button text on the accent colour', ratio: 1.66, needed: 4.5,
+//    change: 'onAccent', suggestion: '#545454', ... }, ...]
+```
+
 ## Theming
 
 Every block reads only `--site-*` CSS variables. `<CreatorTheme>` sets them:
@@ -92,6 +110,13 @@ Every block reads only `--site-*` CSS variables. `<CreatorTheme>` sets them:
 - `font`: a CSS font-family list (the app loads the font).
 - `displayFont`: a second font for a few words set apart, such as the
   header's `highlight`; it falls back to `font`.
+- `cards`: `flat` (the default), `outline` (a thin line), `raised` (a soft
+  shadow tinted with the accent) or `glass` (see-through and blurred over the
+  page's background). It restyles every card on the page; a block that picks
+  its own `shadow` keeps it. The page's background itself is set by the app.
+- `hover`: `lift` (the default) raises links and linked cards a little under
+  the pointer and presses them in on tap; `none` keeps them still. Neither
+  moves for visitors who ask for less motion.
 
 Buttons also take `variant` (`solid`, `outline`, `soft`, `text`) and `size`
 (`sm`, `md`, `lg`), so creators can pick them per block.
@@ -354,7 +379,7 @@ no keys, and the blocks stay Server Components.
 | Credits (`CreditPack`)                           | `{ creditPackageId }`                                         |
 | A coupon                                         | `couponCode` on an item, `promotionCode` on a plan or credits |
 
-Blocks with a button (`PackRow`, `FeaturedPack`, `PackGrid`, `CourseCard`,
+Blocks with a button (`ActionCard`, `PackRow`, `FeaturedPack`, `PackGrid`, `CourseCard`,
 `BookingCard`, `MembershipCard`, `PricingTable`, `CreditPack`,
 `SlotPicker`) write it on the button; form blocks (`PackCheckout`,
 `TipJar`, `LeadMagnet`) send it as a hidden `sell` field. Any action with
@@ -447,6 +472,50 @@ own buttons and fields can use `min-h-control` too, without defining it
 again. The widths are named `site` so an app's own `max-w-page` stays its
 own.
 
+### Pictures in the right size
+
+Every block that shows a picture takes a plain address or an `ImageSource`
+with the other sizes it comes in, so a phone downloads a small copy:
+
+```tsx
+<SiteImage
+  alt="Chai on a clay stove"
+  src={{
+    src: 'https://cdn.example.com/chai-800.jpg',
+    srcSet:
+      'https://cdn.example.com/chai-400.jpg 400w, https://cdn.example.com/chai-800.jpg 800w',
+    width: 800,
+    height: 600,
+  }}
+/>
+```
+
+- **Each block sets `sizes`** from its width on a phone and in the 576 px
+  column (`columnSizes(1 / 3)` for three to a row); pass `sizes` in the source
+  only for a page laid out differently, such as a grid page.
+- **Nothing jumps while pictures load:** a block's shape, or the picture's own
+  `width` and `height`, keeps its space.
+- **Pictures load when near the screen.** The header's picture loads at once,
+  as it's at the top; mark the first other picture with `priority: true`.
+- **Making the sizes is the page app's job.** BuildBase Assets stores a file
+  as it was uploaded, with no other sizes, and its uploads for an app's users
+  are only workspace and profile pictures, so creator media needs an image
+  service that resizes by address.
+
+### Right-to-left scripts and long text
+
+Blocks use start and end, not left and right, so `dir="rtl"` on the page, or
+on any element around the blocks, mirrors them for Arabic, Hebrew or Urdu:
+link icons sit on the right, the carousel's next slide is on the left (and the
+left arrow key moves to it), the before-and-after picture shows from the
+right, scrolling logos move right, and grid pages mirror their columns.
+
+Long names, titles and addresses wrap inside their block, even a word with no
+place to break, so nothing spills off a phone; prices stay on one line. In
+Storybook, the toolbar's Direction menu shows any story right to left, and
+**Pages/Right to left and long text** checks a page in Arabic and one with
+very long words on each screen.
+
 ## Grid pages
 
 `SiteGrid` lays a page out on a grid of 10 columns, with a separate
@@ -509,6 +578,14 @@ import { SiteGrid, type PageLayouts } from '@levuche/ui';
   each one inside the 10 columns and its size limits, moves a block down if it
   would cover another, and adds new blocks at the bottom. `SiteGrid` runs it
   on every layout it's given.
+- **Heights in an editor:** on the page a row grows to fit what's in it, but
+  a drag-and-drop editor's rows are fixed, so a tall block can look cut short
+  there and seem to run into the one below. Measure each block in the editor
+  (a `ResizeObserver` on each one, say), then pass the heights in px to
+  `fitHeights(layout, measured, blocks)` before showing or saving the layout.
+  Each block grows to the rows it needs, up to its kind's largest height,
+  never shrinks, keeps lining up with a card beside it, and pushes anything
+  under it down.
 - **Reading order:** screen readers and the Tab key follow the order of
   `blocks`, whatever the arrangement, so put the profile first.
 
@@ -520,12 +597,12 @@ that no block covers another and that the page never scrolls sideways.
 
 | Group       | Blocks                                                                                                                                                                                                                                     |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `Block`, `withBlockLook`, `BlockLook`                                                                                                                                       |
-| Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                          |
+| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `contrastIssues`, `fixContrast`, `Block`, `withBlockLook`, `BlockLook`                                                                                                      |
+| Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Ribbon`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                |
 | Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton` |
 | Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                                                               |
 | Profile     | `CreatorHeader`, `SocialIcons`, `SaveContact`                                                                                                                                                                                              |
-| Links       | `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                                                                   |
+| Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                                                     |
 | Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                   |
 | Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                       |
 | Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                                                             |
@@ -569,14 +646,20 @@ phone sizes, and check that each theme reaches every block, tap targets
 tab, the video loading only on play, the checkout's consent box, newsletter validation, no sideways
 scrolling, and accessibility with axe (WCAG 2.2 AA, no serious or critical
 problems). `e2e/theme.spec.ts` checks the YouTube address reader and that a
-theme only lets plain colours and fonts into CSS.
+theme only lets plain colours and fonts into CSS, and
+`e2e/contrast.spec.ts` checks the contrast warnings and their suggestions.
 
 ### Storybook
 
 Storybook (`stories/`, set up in `.storybook/`) has a story for each block
 and state, with its props as controls and docs built from them. The toolbar's
 Theme menu shows any story in the sample creator's light or dark scheme or in
-a creator's own theme, and `Pages/Creator page` shows a whole page in each.
+a creator's own theme, and `Pages/Creator page` shows a whole page in each. The
+Cards menu shows it in each card style, and `Pages/Card styles` shows a whole
+page in each. The Direction menu shows it right to left. `Docs/Getting started`
+walks through installing and theming, and `Docs/Every block` lists every block
+with what it's for, its grid kind and whether it's free, read from the
+registry. `CHANGELOG.md` lists what changed in each release.
 
 Each story is also a test. `npm run test:stories` opens every story in
 Chromium (Vitest with the Storybook plugin), runs its play function, which
@@ -619,7 +702,9 @@ The same flow as Levuche/website:
 3. Release: bump `version` in `package.json` in a pull request into `dev`,
    then open a pull request from `dev` into `main` and merge it with a merge
    commit. Tag that commit on `main` (`git tag v0.2.0 && git push origin
-v0.2.0`).
+v0.2.0`). The release pull request into `dev` also turns `CHANGELOG.md`'s
+   Unreleased section into the new version's, with anything an app must
+   change.
 4. Each app moves to the new version in its own pull request
    (`npm install github:Levuche/ui#v0.2.0`), where its own tests run.
 

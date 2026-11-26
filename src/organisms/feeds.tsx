@@ -11,6 +11,7 @@ import { PlayFrame } from '../molecules/play-frame';
 import { Rating } from '../molecules/rating';
 import { cn } from '../system/cn';
 import type { LiveProps } from '../system/live';
+import { columnSizes, type ImageSrc } from '../system/image';
 
 const subHeading = (tag: HeadingTag): HeadingTag =>
   tag === 'h2' ? 'h3' : tag === 'h3' ? 'h4' : 'p';
@@ -21,7 +22,7 @@ const subHeading = (tag: HeadingTag): HeadingTag =>
 export type VideoItem = {
   title: string;
   href: string;
-  thumbnail?: string | null;
+  thumbnail?: ImageSrc | null;
   /** As the visitor reads it, such as "3 days ago". */
   detail?: string;
 };
@@ -67,9 +68,15 @@ export function LatestVideos({
                     href={video.href}
                     newTab
                     action="video_click"
+                    data-lift=""
                     className="flex flex-col gap-2 no-underline"
                   >
-                    <Thumb src={video.thumbnail} alt="" ratio="video" />
+                    <Thumb
+                      src={video.thumbnail}
+                      alt=""
+                      ratio="video"
+                      sizes={columnSizes(1 / columns, 1)}
+                    />
                     <Item className="text-site-text m-0 text-sm font-semibold">
                       {video.title}
                     </Item>
@@ -110,7 +117,7 @@ export type PostItem = {
   date?: string;
   dateTime?: string;
   excerpt?: string;
-  image?: string | null;
+  image?: ImageSrc | null;
 };
 
 /** The newest posts from the creator's blog or any feed. */
@@ -147,6 +154,7 @@ export function LatestPosts({
                     src={post.image}
                     alt=""
                     ratio="square"
+                    sizes="64px"
                     className="w-16 flex-none"
                   />
                 ) : null}
@@ -535,7 +543,7 @@ export function NowPlaying({
   title: string;
   /** The artist, author or show. */
   by?: string;
-  image?: string | null;
+  image?: ImageSrc | null;
   href?: string;
   labels?: Partial<Record<NowPlayingKind, string>>;
 }) {
@@ -543,7 +551,13 @@ export function NowPlaying({
   const body = (
     <>
       {image !== undefined ? (
-        <Thumb src={image} alt="" ratio="square" className="w-14 flex-none" />
+        <Thumb
+          src={image}
+          alt=""
+          ratio="square"
+          sizes="56px"
+          className="w-14 flex-none"
+        />
       ) : null}
       <span className="flex min-w-0 flex-col">
         <span className="text-site-text-2 text-xs font-semibold tracking-wide uppercase">

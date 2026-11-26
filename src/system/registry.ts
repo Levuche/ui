@@ -86,6 +86,16 @@ export const BLOCKS = [
     summary: 'A column of links',
   },
   {
+    id: 'action-card',
+    component: 'ActionCard',
+    kind: 'card',
+    group: 'links',
+    client: false,
+    pack: 'core',
+    summary:
+      'A bold card for a main offer, with a bar that says what happens next',
+  },
+  {
     id: 'featured-link',
     component: 'FeaturedLink',
     kind: 'card',

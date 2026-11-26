@@ -6,6 +6,7 @@ import { SiteLink } from '../atoms/link';
 import { Thumb } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import { isSafeMediaSrc } from '../system/href';
+import type { ImageSrc } from '../system/image';
 
 export type AudioBarLabels = {
   /** {title} is filled in. */
@@ -56,7 +57,7 @@ export function AudioBar({
   title: string;
   /** Such as the artist, or the episode's date. */
   detail?: ReactNode;
-  image?: string | null;
+  image?: ImageSrc | null;
   /** A page with the words, for visitors who can't listen. */
   transcriptHref?: string;
   labels?: Partial<AudioBarLabels>;
@@ -95,7 +96,13 @@ export function AudioBar({
       )}
     >
       {image !== undefined ? (
-        <Thumb src={image} alt="" ratio="square" className="w-14 flex-none" />
+        <Thumb
+          src={image}
+          alt=""
+          ratio="square"
+          sizes="56px"
+          className="w-14 flex-none"
+        />
       ) : null}
       <button
         type="button"

@@ -13,6 +13,7 @@ import {
   type EmbedService,
 } from '../system/embeds';
 import { youtubeId } from './media';
+import type { ImageSrc } from '../system/image';
 
 /** What every player from another site may do inside its frame. */
 const SANDBOX =
@@ -34,7 +35,7 @@ type EmbedProps = BlockRootProps & {
   showTitle?: boolean;
   detail?: ReactNode;
   /** A picture shown until the visitor presses play. */
-  poster?: string | null;
+  poster?: ImageSrc | null;
   labels?: Partial<EmbedLabels>;
   headingAs?: HeadingTag;
 };

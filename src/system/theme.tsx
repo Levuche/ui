@@ -22,6 +22,28 @@ export type SiteCorners = 'square' | 'soft' | 'round';
 export type SiteButtonShape = 'square' | 'rounded' | 'pill';
 
 /**
+ * How cards look on the page: blocks in the surface and muted tones, and the
+ * shadow on filled blocks.
+ *
+ * - flat: filled, no line or shadow (the default)
+ * - outline: filled, with a thin line around
+ * - raised: a soft shadow tinted with the accent, on every filled block
+ * - glass: see-through and blurred over the page's background, with a thin line
+ *
+ * A block's own `shadow` prop replaces the line or shadow a card style adds.
+ */
+export const SITE_CARD_STYLES = ['flat', 'outline', 'raised', 'glass'] as const;
+export type SiteCardStyle = (typeof SITE_CARD_STYLES)[number];
+
+/**
+ * What links and linked cards do under the pointer. `lift` raises them a
+ * little on hover and presses them in on tap (the default); `none` keeps them
+ * still. Never moves for visitors who ask for less motion.
+ */
+export const SITE_HOVERS = ['lift', 'none'] as const;
+export type SiteHover = (typeof SITE_HOVERS)[number];
+
+/**
  * A creator's theme, as chosen in the page editor: light or dark, their own
  * colours, corner and button shapes, and font. Saved with the page and passed
  * to <CreatorTheme>.
@@ -38,6 +60,10 @@ export type SiteTheme = {
    * the header's tagline. Left out, they use `font`.
    */
   displayFont?: string;
+  /** How cards look; see SiteCardStyle. */
+  cards?: SiteCardStyle;
+  /** What links do under the pointer; see SiteHover. */
+  hover?: SiteHover;
 };
 
 const COLOR_VARS: Record<keyof SiteColors, string> = {
@@ -106,9 +132,22 @@ export function siteThemeStyle(theme: SiteTheme = {}): CSSProperties {
 }
 
 /**
+ * The data attributes for a theme's card style and hover, which tokens.css
+ * turns into styles. Unknown values are dropped, so the defaults apply.
+ */
+export function siteThemeAttributes(theme: SiteTheme = {}) {
+  const cards = SITE_CARD_STYLES.find((value) => value === theme.cards);
+  const hover = SITE_HOVERS.find((value) => value === theme.hover);
+  return {
+    ...(cards && cards !== 'flat' ? { 'data-cards': cards } : {}),
+    ...(hover && hover !== 'lift' ? { 'data-hover': hover } : {}),
+  };
+}
+
+/**
  * Applies a creator's theme to everything inside: the scheme (light or dark)
- * and any colours, shapes and font they chose. Every page block reads only
- * these --site-* variables.
+ * and any colours, shapes, card style, hover and font they chose. Every page
+ * block reads only these --site-* variables and data attributes.
  */
 export function CreatorTheme({
   theme,
@@ -126,6 +165,7 @@ export function CreatorTheme({
       data-site={scheme ?? theme?.scheme ?? 'light'}
       className={cn('bg-site-bg text-site-text', className)}
       style={{ ...siteThemeStyle(theme), ...style }}
+      {...siteThemeAttributes(theme)}
       {...props}
     />
   );

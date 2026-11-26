@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { youtubeId } from '../src/organisms/media';
-import { isSafeColor, siteThemeStyle } from '../src/system/theme';
+import {
+  isSafeColor,
+  siteThemeAttributes,
+  siteThemeStyle,
+  type SiteTheme,
+} from '../src/system/theme';
 
 /* Plain checks of the helpers the page editor relies on. No browser. */
 
@@ -54,4 +59,17 @@ test('a theme only puts plain colours, shapes and fonts into CSS', () => {
       string
     >
   ).toEqual({});
+});
+
+test('a theme writes only known card styles and hovers', () => {
+  expect(siteThemeAttributes({ cards: 'glass', hover: 'none' })).toEqual({
+    'data-cards': 'glass',
+    'data-hover': 'none',
+  });
+  // The defaults need no attribute.
+  expect(siteThemeAttributes({ cards: 'flat', hover: 'lift' })).toEqual({});
+  expect(siteThemeAttributes()).toEqual({});
+  // Anything else a saved theme holds is dropped.
+  const saved = { cards: 'url(x)', hover: '"><b>' } as unknown as SiteTheme;
+  expect(siteThemeAttributes(saved)).toEqual({});
 });

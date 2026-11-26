@@ -83,12 +83,17 @@ export function Price({
       )}
     >
       {was ? (
-        <s className="text-site-text-2 text-sm tabular-nums">
+        <s className="text-site-text-2 text-sm whitespace-nowrap tabular-nums">
           <span className="sr-only">Was </span>
           {was}
         </s>
       ) : null}
-      <span className={cn('font-bold tabular-nums', sizes[size] ?? sizes.md)}>
+      <span
+        className={cn(
+          'font-bold whitespace-nowrap tabular-nums',
+          sizes[size] ?? sizes.md
+        )}
+      >
         {value}
       </span>
       {period ? (

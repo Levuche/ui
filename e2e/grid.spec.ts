@@ -2,10 +2,13 @@ import { expect, test } from '@playwright/test';
 import {
   GRID_COLUMNS,
   defaultLayout,
+  fitHeights,
   fitLayout,
   layoutBottom,
   limitsFor,
   pageLayouts,
+  rowsFor,
+  stackLayout,
   type GridBlockSpec,
   type GridLayout,
 } from '../src/system/grid';
@@ -173,4 +176,73 @@ test('a page gets the default arrangement on screens with nothing saved', () => 
   expect(layouts.tablet).toEqual(defaultLayout(BLOCKS, 'tablet'));
   expect(byId(layouts.desktop).profile).toMatchObject({ x: 0, w: 3 });
   expect(byId(layouts.desktop).footer.x).toBe(0);
+});
+
+test('grows each block to the rows its content needs', () => {
+  const blocks: GridBlockSpec[] = [
+    { i: 'header', kind: 'profile' },
+    { i: 'video', kind: 'media' },
+    { i: 'links', kind: 'links' },
+  ];
+  const layout = stackLayout(blocks);
+  // At 16 px to the rem, a row and its gap are 64 px: 4 rows hold 240 px.
+  const fitted = byId(fitHeights(layout, { links: 400 }, blocks));
+  expect(fitted.links!.h).toBe(rowsFor(400 / 16));
+  expect(fitted.links!.h).toBeGreaterThan(byId(layout).links!.h);
+  // Unmeasured blocks keep their rows, and the given layout isn't changed.
+  expect(fitted.header).toEqual(byId(layout).header);
+  expect(byId(layout).links!.h).toBe(limitsFor('links', 'phone').minH);
+});
+
+test('only grows, and no further than the kind allows', () => {
+  const blocks: GridBlockSpec[] = [
+    { i: 'shop', kind: 'link' },
+    { i: 'about', kind: 'text' },
+  ];
+  const layout: GridLayout = [
+    { i: 'shop', x: 0, y: 0, w: 10, h: 1 },
+    { i: 'about', x: 0, y: 1, w: 10, h: 4 },
+  ];
+  const fitted = byId(fitHeights(layout, { shop: 2000, about: 10 }, blocks));
+  // A link button never takes more than its largest height.
+  expect(fitted.shop!.h).toBe(limitsFor('link', 'phone').maxH);
+  // A short measure never shrinks a block the creator made taller.
+  expect(fitted.about!.h).toBe(4);
+});
+
+test('moves blocks down out of the way, and keeps pairs lined up', () => {
+  const blocks: GridBlockSpec[] = [
+    { i: 'pack', kind: 'card' },
+    { i: 'booking', kind: 'card' },
+    { i: 'video', kind: 'media' },
+    { i: 'aside', kind: 'text' },
+  ];
+  const layout: GridLayout = [
+    { i: 'pack', x: 0, y: 0, w: 5, h: 2 },
+    { i: 'booking', x: 5, y: 0, w: 5, h: 2 },
+    { i: 'video', x: 0, y: 2, w: 10, h: 3 },
+    { i: 'aside', x: 0, y: 8, w: 10, h: 1 },
+  ];
+  const fitted = fitHeights(layout, { pack: 300 }, blocks);
+  const items = byId(fitted);
+  // The pack card needs 5 rows; the booking card beside it grows to match.
+  expect(items.pack!.h).toBe(5);
+  expect(items.booking!.h).toBe(5);
+  // The video moves to just under them; the block further down stays put.
+  expect(items.video!.y).toBe(5);
+  expect(items.aside!.y).toBe(8);
+  expect(overlapping(fitted)).toEqual([]);
+});
+
+test('fits the default arrangement on every screen without overlaps', () => {
+  for (const screen of ['phone', 'tablet', 'desktop'] as const) {
+    const layout = defaultLayout(BLOCKS, screen);
+    const measured = Object.fromEntries(BLOCKS.map(({ i }) => [i, 600]));
+    const fitted = fitHeights(layout, measured, BLOCKS);
+    expect(overlapping(fitted), screen).toEqual([]);
+    for (const item of fitted) {
+      const before = layout.find((other) => other.i === item.i)!;
+      expect(item.h, `${screen} ${item.i}`).toBeGreaterThanOrEqual(before.h);
+    }
+  }
 });

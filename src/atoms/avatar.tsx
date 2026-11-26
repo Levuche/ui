@@ -1,4 +1,5 @@
 import { cn } from '../system/cn';
+import { imageAttrs, toImageSource, type ImageSrc } from '../system/image';
 
 /** First letters of up to two words: "Desi Origins" becomes "DO". */
 export function initials(name: string) {
@@ -24,7 +25,7 @@ export function Avatar({
   className,
 }: {
   name: string;
-  src?: string | null;
+  src?: ImageSrc | null;
   /** Width and height in px. */
   size?: number;
   /** `rounded` follows the block's corners. */
@@ -46,15 +47,14 @@ export function Avatar({
     ring && 'outline-site-button outline-2 outline-offset-2',
     className
   );
-  if (src) {
+  const source = toImageSource(src);
+  if (source) {
     return (
       <img
-        src={src}
+        {...imageAttrs(source, `${size}px`)}
         alt={alt}
         width={size}
         height={size}
-        loading="lazy"
-        decoding="async"
         style={style}
         className={cn('object-cover', classes)}
       />

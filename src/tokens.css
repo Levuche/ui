@@ -254,6 +254,64 @@
     scale: 0.96;
   }
 }
+/*
+ * Card styles (SiteTheme.cards, written as data-cards by CreatorTheme). They
+ * restyle the page's cards (blocks in the surface and muted tones) and the
+ * shadow on filled blocks. A block that picks its own shadow (data-shadow)
+ * keeps it. Inset shadows draw the lines, so no block changes size.
+ */
+[data-site][data-cards='outline']
+  [data-block]:is([data-tone='surface'], [data-tone='muted']):not(
+    [data-shadow]
+  ) {
+  box-shadow: inset 0 0 0 1px var(--site-border);
+}
+[data-site][data-cards='raised']
+  [data-block]:is(
+    [data-tone='surface'],
+    [data-tone='muted'],
+    [data-tone='accent'],
+    [data-tone='band'],
+    [data-tone='notice']
+  ):not([data-shadow]) {
+  box-shadow:
+    0 1px 2px color-mix(in oklab, var(--site-accent) 14%, transparent),
+    0 10px 28px -10px color-mix(in oklab, var(--site-accent) 40%, transparent);
+}
+[data-site][data-cards='glass']
+  [data-block]:is([data-tone='surface'], [data-tone='muted']) {
+  background-color: color-mix(in oklab, var(--site-surface) 72%, transparent);
+  backdrop-filter: blur(12px) saturate(1.2);
+}
+[data-site][data-cards='glass']
+  [data-block]:is([data-tone='surface'], [data-tone='muted']):not(
+    [data-shadow]
+  ) {
+  box-shadow: inset 0 0 0 1px
+    color-mix(in oklab, var(--site-text) 12%, transparent);
+}
+/*
+ * Links and linked cards (data-lift) rise a little under the pointer and
+ * press in on tap, unless the theme says hover: none (data-hover) or the
+ * visitor asks for less motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  [data-lift] {
+    transition:
+      translate 0.15s ease-out,
+      scale 0.15s ease-out,
+      opacity 0.15s ease-out;
+  }
+  @media (hover: hover) {
+    [data-site]:not([data-hover='none']) [data-lift]:hover {
+      translate: 0 -2px;
+    }
+  }
+  [data-site]:not([data-hover='none']) [data-lift]:active {
+    translate: 0 0;
+    scale: 0.98;
+  }
+}
 @theme inline {
   --spacing-block: var(--block-pad);
   --spacing-block-gap: var(--block-gap);
@@ -266,9 +324,22 @@
   --color-site-field: var(--site-field, var(--site-bg));
   --color-site-on-field: var(--site-on-field, var(--site-text));
 }
-/* LogoStrip's scrolling row: the list is drawn twice and moves by half. */
+/*
+ * LogoStrip's scrolling row: the list is drawn twice and moves by half, to
+ * the left, or to the right in a right-to-left script (--marquee-to).
+ */
 @keyframes levuche-marquee {
   to {
-    translate: -50% 0;
+    translate: var(--marquee-to, -50%) 0;
+  }
+}
+/*
+ * Long names, titles and addresses wrap inside their block, even a word with
+ * no place to break, so nothing spills off a phone. In the base layer, so a
+ * block's own classes still win.
+ */
+@layer base {
+  [data-block] {
+    overflow-wrap: anywhere;
   }
 }

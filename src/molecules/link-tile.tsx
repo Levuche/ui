@@ -58,8 +58,9 @@ export function LinkTile({
     <SiteLink
       href={href}
       action={action}
+      data-lift=""
       className={cn(
-        'rounded-block flex min-h-14 items-center gap-3 p-3 font-semibold no-underline transition-opacity hover:opacity-90 motion-reduce:transition-none',
+        'rounded-block flex min-h-14 items-center gap-3 p-3 font-semibold no-underline hover:opacity-90',
         TILE_STYLES[tileStyle] ?? TILE_STYLES.filled,
         className
       )}
