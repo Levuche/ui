@@ -675,6 +675,30 @@ comment (`.github/workflows/storybook.yml`, `wrangler.jsonc`). The workflow
 needs the `CLOUDFLARE_API_TOKEN` secret and the `CLOUDFLARE_ACCOUNT_ID`
 variable, the same pair the website uses.
 
+### Screenshot checks
+
+CI's "Screenshot checks" job compares every story with a reference picture in
+`screenshots/__screenshots__`: in the light theme on a phone, a tablet and a
+desktop, and on a phone in the dark theme and a creator's own theme. Dates are
+fixed and nothing loads from other sites, so a picture only changes when the
+look does. When one differs, the job fails and Playwright's report shows the
+reference, the new picture and the difference.
+
+The references are made on CI's Linux runner, since fonts draw a little
+differently on every computer. When you change the look on purpose, or add a
+story:
+
+1. Push your branch.
+2. On GitHub, open Actions, then CI, then Run workflow. Pick your branch and
+   tick "Update the reference screenshots".
+3. The run makes every picture again, commits the changed ones to your branch
+   and starts the checks on that commit. Look at the pictures in the pull
+   request's Files tab before you merge.
+
+It never runs on dev or main. `npm run build-storybook` then
+`npm run test:screenshots` runs the same checks on your computer, but expect
+small differences from CI's pictures.
+
 ### Adding a block
 
 1. Build it in `src/organisms/` on `<Block name="your-block">`, taking
@@ -689,6 +713,7 @@ variable, the same pair the website uses.
 3. Show it in `gallery/gallery.tsx`, inside a `Group`.
 4. Add `stories/<Block>.stories.tsx`, with a play function that does what a
    visitor would, and add it to the sample page in `stories/sample-page.tsx`.
+   Then make its reference screenshots (see Screenshot checks above).
 5. Test what it does in `e2e/blocks.spec.ts`.
 
 ## Branches and releases
