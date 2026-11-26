@@ -18,7 +18,19 @@ change when it moves to that version.
   pause button. Nothing moves for visitors who ask for less motion, moving
   words are read to screen readers once, and both hold still off screen.
   Also `WordRing`, `MotionToggle`, `useOnScreen` and the plain helpers
-  `motionSeconds`, `stripRepeats` and `wordRingShape`.
+  `motionSeconds`, `stripRepeats` and `wordRingShape`. `effect` is in
+  `LOOK_SETTINGS`, and `TextStrip` and the word ring have their settings.
+- Each block describes its settings, so the page editor can build its panel:
+  every `BLOCKS` entry has `settings` (field name, label, help, type,
+  default, required, `slow` for fields that load over the network, `main`
+  for the link a paste goes to, `forApp` for what the app reads, an icon
+  hint) and `appOnly` (props the app fills in). `LOOK_SETTINGS` describes
+  the shared look once. New: `SettingField` and its types, `SETTING_TYPES`,
+  `SETTING_ICONS`, `settingsPanel`, `mainLinkSetting`, `settingIcon`,
+  `fitsSetting`, `settingDefaults`, and `PACK_CHECKOUT_LABELS` and
+  `LEAD_MAGNET_LABELS` (the defaults those blocks already used). The type
+  check fails when a block's settings and props disagree. Storybook:
+  `Editor/Settings panel`.
 - Block backgrounds: every block takes `background`, a gradient through two
   or three theme colours, a faint pattern (lines, rings, dots, grid, waves)
   or a picture under a dim layer of the block's own colour. Colours are
