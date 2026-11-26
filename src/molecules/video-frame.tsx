@@ -7,10 +7,10 @@ import { isSafeMediaSrc } from '../system/href';
 import { safeImageSource, type ImageSrc } from '../system/image';
 import {
   isOverCaption,
-  TileCaption,
-  UNDER_CAPTION,
   type CaptionStyle,
-} from './tile-caption';
+  type VideoRatio,
+} from '../system/gallery';
+import { TileCaption, UNDER_CAPTION } from './tile-caption';
 
 /** A file of captions, subtitles or descriptions for a video (WebVTT). */
 export type VideoTrack = {
@@ -40,9 +40,6 @@ export const VIDEO_LABELS: VideoLabels = {
   pause: 'Pause {title}',
   soundOn: 'Play {title} with sound',
 };
-
-/** The shapes a video can take. `tall` is a phone video (9:16). */
-export type VideoRatio = 'video' | 'tall' | 'square' | 'portrait';
 
 const RATIOS: Record<VideoRatio, string> = {
   video: 'aspect-video',

@@ -2,12 +2,8 @@ import type { ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLink } from '../atoms/link';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
-import {
-  isOverCaption,
-  TileCaption,
-  UNDER_CAPTION,
-  type CaptionStyle,
-} from '../molecules/tile-caption';
+import { TileCaption, UNDER_CAPTION } from '../molecules/tile-caption';
+import { isOverCaption, type CaptionStyle } from '../system/gallery';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { imageAttrs, toImageSource, type ImageSrc } from '../system/image';

@@ -114,7 +114,46 @@ export {
   type BlockPack,
   type BlockId,
   type BlockInfo,
+  mainLinkSetting,
+  settingsPanel,
 } from './system/registry';
+export {
+  BUTTON_VARIANT_LABELS,
+  BUTTON_VARIANT_OPTIONS,
+  COLOUR_SETTINGS,
+  FORM_APP_ONLY,
+  LINK_BEHAVIOR_SETTINGS,
+  LIST_VALUE_TYPES,
+  LIVE_APP_ONLY,
+  LOOK_SETTINGS,
+  RATIO_LABELS,
+  RATIO_OPTIONS,
+  SAVE_LABEL_SETTING,
+  SELL_APP_ONLY,
+  SELL_SETTINGS,
+  SETTING_ICONS,
+  SETTING_TYPES,
+  fitsSetting,
+  settingDefaults,
+  settingIcon,
+  type ChoiceSetting,
+  type ChoiceValue,
+  type ColourSetting,
+  type DateTimeSetting,
+  type GroupSetting,
+  type LinkSetting,
+  type ListSetting,
+  type ListValueType,
+  type NumberSetting,
+  type PictureSetting,
+  type ProductSetting,
+  type SettingField,
+  type SettingIcon,
+  type SettingType,
+  type TextSetting,
+  type ToggleSetting,
+  type WordsSetting,
+} from './system/settings';
 export {
   BLOCK_SIZES,
   GRID_BREAKPOINTS,
@@ -227,6 +266,7 @@ export {
   FeaturedPack,
   PackCheckout,
   PackGrid,
+  PACK_CHECKOUT_LABELS,
   PackRow,
   type CreditPackLabels,
   type PackCheckoutLabels,
@@ -260,6 +300,7 @@ export {
 export { ChoiceChips, type ChipOption } from './molecules/choice-chips';
 export {
   BookingCard,
+  LEAD_MAGNET_LABELS,
   LeadMagnet,
   MembershipCard,
   type LeadMagnetLabels,
@@ -276,11 +317,17 @@ export { FaqList, Testimonials } from './organisms/trust';
 export { ReelGrid, YouTubeVideo, youtubeId } from './organisms/media';
 export { ImageGrid } from './organisms/images';
 export { LogoStrip, SiteImage, type Logo } from './organisms/pictures';
-export { CAPTION_STYLES, type CaptionStyle } from './molecules/tile-caption';
+export {
+  CAPTION_STYLES,
+  GALLERY_SPANS,
+  VIDEO_RATIOS,
+  type CaptionStyle,
+  type GallerySpan,
+  type VideoRatio,
+} from './system/gallery';
 export {
   VIDEO_LABELS,
   type VideoLabels,
-  type VideoRatio,
   type VideoTrack,
 } from './molecules/video-frame';
 export {
@@ -288,12 +335,7 @@ export {
   VideoTile,
   type VideoTileLabels,
 } from './organisms/video';
-export {
-  BentoGallery,
-  GALLERY_SPANS,
-  type GalleryItem,
-  type GallerySpan,
-} from './organisms/bento';
+export { BentoGallery, type GalleryItem } from './organisms/bento';
 export {
   CAROUSEL_LABELS,
   ImageCarousel,

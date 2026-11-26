@@ -1,14 +1,13 @@
 import type { ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLink } from '../atoms/link';
-import type { CaptionStyle } from '../molecules/tile-caption';
 import {
   VIDEO_LABELS,
   VideoFrame,
   type VideoLabels,
-  type VideoRatio,
   type VideoTrack,
 } from '../molecules/video-frame';
+import type { CaptionStyle, VideoRatio } from '../system/gallery';
 import { isSafeMediaSrc } from '../system/href';
 import type { ImageSrc } from '../system/image';
 

@@ -1,18 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '../system/cn';
-
-/**
- * Where a picture's caption sits:
- *
- * - below: under the picture, in the quieter text colour
- * - bar: over the bottom of the picture, on a frosted strip of the card colour
- * - chip: a small dark label in the picture's bottom corner
- */
-export const CAPTION_STYLES = ['below', 'bar', 'chip'] as const;
-export type CaptionStyle = (typeof CAPTION_STYLES)[number];
-
-/** True for the styles drawn over the picture. */
-export const isOverCaption = (style: CaptionStyle) => style !== 'below';
+import type { CaptionStyle } from '../system/gallery';
 
 /**
  * Puts a picture in the same grid cell as a caption drawn over it. The

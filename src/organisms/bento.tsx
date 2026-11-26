@@ -2,12 +2,7 @@ import type { ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLink } from '../atoms/link';
 import { Thumb } from '../atoms/thumb';
-import {
-  TileCaption,
-  UNDER_CAPTION,
-  isOverCaption,
-  type CaptionStyle,
-} from '../molecules/tile-caption';
+import { TileCaption, UNDER_CAPTION } from '../molecules/tile-caption';
 import {
   VIDEO_LABELS,
   VideoFrame,
@@ -15,15 +10,13 @@ import {
   type VideoTrack,
 } from '../molecules/video-frame';
 import { cn } from '../system/cn';
+import {
+  isOverCaption,
+  type CaptionStyle,
+  type GallerySpan,
+} from '../system/gallery';
 import { isSafeMediaSrc, type LinkBehavior } from '../system/href';
 import { columnSizes, type ImageSrc } from '../system/image';
-
-/**
- * How much of the gallery a tile takes, as columns by rows: one cell, two
- * cells wide, two cells tall, or a big square of four.
- */
-export const GALLERY_SPANS = ['1x1', '2x1', '1x2', '2x2'] as const;
-export type GallerySpan = (typeof GALLERY_SPANS)[number];
 
 /** One tile in a BentoGallery: a picture, or a video the creator uploaded. */
 export type GalleryItem = LinkBehavior & {

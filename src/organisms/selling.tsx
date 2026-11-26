@@ -136,6 +136,10 @@ export type PackCheckoutLabels = {
   error: ReactNode;
 };
 
+export const PACK_CHECKOUT_LABELS: PackCheckoutLabels = {
+  error: 'The payment didn’t go through. Please try again.',
+};
+
 /**
  * Checkout for a digital pack: the consent to start the download now (the
  * buyer gives up the 14-day right to cancel) must be ticked before the buy
@@ -195,9 +199,7 @@ export function PackCheckout({
       </BuyButton>
       <FormNotice
         status={status}
-        error={
-          labels?.error ?? 'The payment didn’t go through. Please try again.'
-        }
+        error={labels?.error ?? PACK_CHECKOUT_LABELS.error}
       />
     </Block>
   );
