@@ -2400,13 +2400,20 @@ export const BLOCKS = [
         label: 'Name for screen readers',
         type: 'text',
       },
+      {
+        name: 'labels',
+        label: 'Words on the pause button',
+        type: 'words',
+        from: 'LOGO_STRIP_LABELS',
+      },
     ],
     appOnly: [],
     privacy: LOADS_NOTHING,
     accessibility: {
       keyboard:
-        'Nothing to press; a scrolling strip stops while hovered or focused, and stands still for visitors who ask for less motion.',
-      screenReader: 'A labelled list of logos, each read once by its alt text.',
+        'A scrolling strip has a pause button, the only thing to press besides linked logos; it also stops while hovered or focused, holds still off screen, and stands still for visitors who ask for less motion.',
+      screenReader:
+        'A labelled list of logos, each read once by its alt text; the pause button says whether it stops or moves them again.',
     },
   },
   {

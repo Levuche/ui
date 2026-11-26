@@ -275,6 +275,10 @@ export const WORDS_FR: PageWords = {
     hours: '{n} h',
     minutes: '{n} min',
   },
+  logoStrip: {
+    pause: 'Arrêter les logos qui défilent',
+    play: 'Faire défiler les logos à nouveau',
+  },
   props: {
     verified: 'Vérifié',
     links: 'Liens',

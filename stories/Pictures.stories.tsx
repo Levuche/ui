@@ -265,6 +265,51 @@ export const LogosScrolling: StoryObj<typeof LogoStrip> = {
   },
 };
 
+/** The scrolling row's own motion, or none when nothing moves. */
+const logoMotion = (root: HTMLElement) =>
+  root
+    .querySelector<HTMLElement>('[data-block="logo-strip"] ul')
+    ?.getAnimations()[0];
+
+/**
+ * Logos that keep moving have a pause button, as WCAG 2.2.2 asks; it stops
+ * them and moves them again. Nothing moves for visitors who ask for less
+ * motion, so they get no button.
+ */
+export const LogosPauseButton: StoryObj<typeof LogoStrip> = {
+  render: () => <LogoStrip title="As seen in" logos={LOGOS} mode="scroll" />,
+  play: async ({ canvas, canvasElement }) => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      await expect(canvas.queryByRole('button')).toBeNull();
+      return;
+    }
+    const pause = canvas.getByRole('button', {
+      name: 'Stop the moving logos',
+    });
+    await expectTapSize(pause, 'pause button');
+    await expect(logoMotion(canvasElement)?.playState).toBe('running');
+    await userEvent.click(pause);
+    await waitFor(() =>
+      expect(logoMotion(canvasElement)?.playState).toBe('paused')
+    );
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Move the logos again' })
+    );
+    await waitFor(() =>
+      expect(logoMotion(canvasElement)?.playState).toBe('running')
+    );
+  },
+};
+
+/** A still row has nothing to pause. */
+export const LogosStillHaveNoButton: StoryObj<typeof LogoStrip> = {
+  render: () => <LogoStrip title="As seen in" logos={LOGOS} />,
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.queryByRole('button')).toBeNull();
+    await expect(logoMotion(canvasElement)).toBeUndefined();
+  },
+};
+
 /*
  * In a right-to-left script the row starts at the right-hand edge and moves
  * to the right, by half its length each pass, so the second copy takes the
