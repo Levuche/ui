@@ -149,12 +149,35 @@ export {
   type BlockId,
   type BlockInfo,
   mainLinkSetting,
+  pagePrivacy,
   settingsPanel,
 } from './system/registry';
+export {
+  CONSENT_LABELS,
+  COOKIE_KINDS,
+  LOADS_NOTHING,
+  OUTSIDE_SERVICES,
+  OUTSIDE_SERVICE_IDS,
+  SERVER_FETCHED,
+  addUpPrivacy,
+  consentNotice,
+  moreCookies,
+  needsConsent,
+  siteName,
+  type BlockAccessibility,
+  type BlockPrivacy,
+  type ConsentLabels,
+  type CookieKind,
+  type OutsideService,
+  type OutsideServiceInfo,
+  type PageBlock,
+  type PagePrivacy,
+} from './system/privacy';
 export {
   BUTTON_VARIANT_LABELS,
   BUTTON_VARIANT_OPTIONS,
   COLOUR_SETTINGS,
+  CONSENT_LABELS_SETTING,
   FORM_APP_ONLY,
   LINK_BEHAVIOR_SETTINGS,
   LIST_VALUE_TYPES,
@@ -273,6 +296,7 @@ export {
   type CopyLabels,
 } from './molecules/copy-button';
 export { PlayFrame, type FrameRatio } from './molecules/play-frame';
+export { ConsentCover } from './molecules/consent-cover';
 export { Field } from './molecules/field';
 export {
   LIVE_DATA_LABELS,

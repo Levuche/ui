@@ -11,6 +11,11 @@ import type { LinkBehavior } from '../system/href';
 import type { ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
 import { usePageWords } from '../system/page-words';
+import {
+  consentNotice,
+  OUTSIDE_SERVICES,
+  type ConsentLabels,
+} from '../system/privacy';
 
 /* ---------------------------------------------------------------- StatsRow */
 
@@ -208,6 +213,8 @@ export function MapCard({
   directionsHref,
   showMap = true,
   labels,
+  consent,
+  consentLabels,
   buttonVariant,
   headingAs = 'h3',
   children,
@@ -225,6 +232,13 @@ export function MapCard({
   directionsHref?: string;
   showMap?: boolean;
   labels?: Partial<MapCardLabels>;
+  /**
+   * Whether the visitor agreed to OpenStreetMap, from the page's cookie
+   * notice. False shows a notice and a Load button in place of the map's
+   * button; leave it out on pages that don't ask.
+   */
+  consent?: boolean;
+  consentLabels?: Partial<ConsentLabels>;
   buttonVariant?: SiteButtonVariant;
   headingAs?: HeadingTag;
   /** More, under the hours, such as a phone number. */
@@ -251,6 +265,12 @@ export function MapCard({
           playIcon={<MapPinIcon size={28} />}
           action="map_load"
           allow=""
+          consent={consent}
+          notice={consentNotice(
+            OUTSIDE_SERVICES.openstreetmap.name,
+            consentLabels
+          )}
+          consentLabels={consentLabels}
         />
       ) : null}
       <ItemHead title={place} headingAs={headingAs} />

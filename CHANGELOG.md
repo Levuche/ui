@@ -74,6 +74,19 @@ change when it moves to that version.
 - `ImageCarousel` takes `counter`, a small "1/4" on the picture.
 - `safeImageSource`: a picture, only when its address is one a page may
   load, for a picture that isn't an `<img>`, such as a video's cover.
+- Privacy and accessibility notes for each block: every `BLOCKS` entry has
+  `privacy` (the other sites it can load, from `OUTSIDE_SERVICES`, the most
+  cookies that may come with it, from `COOKIE_KINDS`, and a reason a visitor
+  can read) and `accessibility` (keyboard use and what a screen reader
+  hears), both listed on **Docs/Every block**. `pagePrivacy` adds up a
+  page's services and cookie kinds for its cookie notice and privacy page.
+- `consent` on every block that loads another site (`YouTubeVideo`,
+  `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `MapCard`,
+  `BookingEmbed`, `LiveStatus`, `AudioPlayer`, `PodcastEpisodes`): with
+  `false` the block says what loading will share and loads only after a
+  Load press (YouTube's own picture waits too), then moves focus into what
+  loaded. Words in `consentLabels` (`CONSENT_LABELS`); `ConsentCover` for a
+  block of your own. Storybook: `Blocks/Privacy`.
 - `SocialCard`: one social profile with the platform's mark, the picture,
   name, handle and verified tick, the follower count written short by
   locale (`shortCount`: 1.1K, 860K) and a button in the platform's own word
@@ -120,6 +133,11 @@ change when it moves to that version.
   kind and whether it's free, read from the registry.
 - README and stories: tracking clicks and sign-ups, and sending forms, with
   BuildBase.
+
+### Changed
+
+- `PlayFrame` (and every player and map built on it) moves focus into the
+  player once a visitor presses play, so keyboard users land in what loaded.
 
 ### An app must change
 
