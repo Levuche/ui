@@ -78,7 +78,10 @@ export function Countdown({
   }, [fixedNow]);
   const now = fixedNow ?? ticked;
 
-  const done = now !== null && new Date(to).getTime() <= now;
+  // A date that can't be read shows dashes and never ends.
+  const end = new Date(to).getTime();
+  const valid = Number.isFinite(end);
+  const done = valid && now !== null && end <= now;
   useEffect(() => {
     if (done && fixedNow === undefined) onDone?.();
     // Only when it turns done.
@@ -86,7 +89,7 @@ export function Countdown({
   }, [done]);
 
   const parts = (
-    now === null
+    now === null || !valid
       ? UNITS.map((u) => ({ label: u.key as string, value: null }))
       : timeLeft(to, now)
   ).filter((part) => showSeconds || part.label !== 'seconds');

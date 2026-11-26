@@ -19,11 +19,7 @@ import { youtubeId } from './media';
 import type { ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
 import { usePageWords } from '../system/page-words';
-import {
-  consentNotice,
-  OUTSIDE_SERVICES,
-  type ConsentLabels,
-} from '../system/privacy';
+import { OUTSIDE_SERVICES, type ConsentLabels } from '../system/privacy';
 
 /** What every player from another site may do inside its frame. */
 const SANDBOX =
@@ -93,10 +89,7 @@ function EmbedBody({
           action={`play_${embed.service}`}
           tint={embed.tint}
           consent={consent}
-          notice={consentNotice(
-            OUTSIDE_SERVICES[embed.service].name,
-            consentLabels
-          )}
+          site={OUTSIDE_SERVICES[embed.service].name}
           consentLabels={consentLabels}
         />
       ) : (
@@ -183,7 +176,7 @@ export function InstagramPost(props: EmbedProps) {
 /**
  * Any link from a service on the list (YouTube, Spotify, TikTok, Instagram,
  * Vimeo, SoundCloud, Loom, Apple Music and Deezer) plays in place. Anything
- * else is shown as a link. `services` narrows the list.
+ * else is shown as a link. `services` narrows the list; empty allows all.
  */
 export function LinkEmbed({
   services,

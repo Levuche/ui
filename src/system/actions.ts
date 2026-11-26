@@ -33,6 +33,22 @@ export type BlockAction = {
 };
 
 /**
+ * The block an element is in. A block drawn inside another one, as a
+ * pricing table's plans are, reports as the outer block.
+ */
+function blockOf(element: Element): string | null {
+  let block = element.closest('[data-block]');
+  for (
+    let outer = block?.parentElement?.closest('[data-block]');
+    outer;
+    outer = outer.parentElement?.closest('[data-block]')
+  ) {
+    block = outer;
+  }
+  return block?.getAttribute('data-block') ?? null;
+}
+
+/**
  * Reads a click or submit event into a BlockAction, or null when it wasn't
  * on a link, a button or a form. A link, button or form can name its action
  * with data-action, such as data-action="buy". A form's action is reported
@@ -79,7 +95,7 @@ export function readBlockAction(event: Event): BlockAction | null {
   );
   return {
     action: named ?? fallback,
-    block: control.closest('[data-block]')?.getAttribute('data-block') ?? null,
+    block: blockOf(control),
     label,
     ...(control instanceof HTMLAnchorElement
       ? {

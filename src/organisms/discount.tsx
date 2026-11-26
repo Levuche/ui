@@ -1,8 +1,20 @@
 import type { ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { cn } from '../system/cn';
-import { CopyButton, type CopyLabels } from '../molecules/copy-button';
+import {
+  COPY_LABELS,
+  CopyButton,
+  type CopyLabels,
+} from '../molecules/copy-button';
 import { usePageWords } from '../system/page-words';
+import { WORDS_EN } from '../system/words/en';
+
+/** The words a discount code shows, which name the code rather than text. */
+export const DISCOUNT_CODE_LABELS: CopyLabels = {
+  ...COPY_LABELS,
+  copy: WORDS_EN.props.copyCode,
+  failedStatus: WORDS_EN.props.copyCodeFailed,
+};
 
 /**
  * A discount code the visitor copies with one tap. On the notice colour by

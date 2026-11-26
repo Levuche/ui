@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  useSyncExternalStore,
   useEffect,
   useId,
   useRef,
@@ -10,13 +11,9 @@ import {
 } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLinkButton } from '../atoms/button';
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  PauseIcon,
-  PlayIcon,
-} from '../atoms/icons';
+import { ChevronLeftIcon, ChevronRightIcon } from '../atoms/icons';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
+import { MotionToggle } from '../molecules/motion-toggle';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { useControllableState } from '../system/state';
@@ -54,6 +51,13 @@ const isRtl = (el: Element) => getComputedStyle(el).direction === 'rtl';
 const prefersLessMotion = () =>
   typeof matchMedia === 'function' &&
   matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const watchLessMotion = (change: () => void) => {
+  if (typeof matchMedia !== 'function') return () => {};
+  const query = matchMedia('(prefers-reduced-motion: reduce)');
+  query.addEventListener('change', change);
+  return () => query.removeEventListener('change', change);
+};
 
 /**
  * Pictures to swipe through, or step with the arrows and the arrow keys,
@@ -110,8 +114,27 @@ export function ImageCarousel({
   // Kept to the slides there are, so a slide always shows when slides are
   // taken away or the app passes an index past the end.
   const current = Math.min(Math.max(0, chosen), Math.max(0, total - 1));
-  const [playing, setPlaying] = useState(Boolean(autoplay));
+  // Seconds per slide: at least 2, as the editor allows; 0 for still.
+  const every =
+    typeof autoplay === 'number' && Number.isFinite(autoplay) && autoplay > 0
+      ? Math.max(2, autoplay)
+      : 0;
+  const [playing, setPlaying] = useState(every > 0);
+  // Autoplay turned on or off after the first render starts or stops it.
+  const [autoOn, setAutoOn] = useState(every > 0);
+  if (autoOn !== every > 0) {
+    setAutoOn(every > 0);
+    setPlaying(every > 0);
+  }
   const [held, setHeld] = useState(false);
+  // False on the server and while hydrating, then the browser's setting.
+  const lessMotion = useSyncExternalStore(
+    watchLessMotion,
+    prefersLessMotion,
+    () => false
+  );
+  // Moving on its own right now; while it is, the slide isn't read out.
+  const turning = every > 0 && playing && !held && !lessMotion && total > 1;
 
   const go = (next: number) => {
     if (total === 0) return;
@@ -149,13 +172,11 @@ export function ImageCarousel({
 
   // Move on its own, unless paused, held, or less motion is asked for.
   useEffect(() => {
-    if (!autoplay || !playing || held || total < 2 || prefersLessMotion()) {
-      return;
-    }
-    const timer = setTimeout(() => go(current + 1), autoplay * 1000);
+    if (!turning) return;
+    const timer = setTimeout(() => go(current + 1), every * 1000);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoplay, playing, held, current, total]);
+  }, [turning, every, current]);
 
   // A swipe moves the track; read the slide it settled on.
   const onScroll = () => {
@@ -203,7 +224,7 @@ export function ImageCarousel({
         <div
           ref={track}
           id={`${id}-track`}
-          aria-live={playing && autoplay ? 'off' : 'polite'}
+          aria-live={turning ? 'off' : 'polite'}
           // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           tabIndex={0}
           onScroll={onScroll}
@@ -284,17 +305,14 @@ export function ImageCarousel({
           </>
         ) : null}
       </div>
-      {total > 1 && (showDots || autoplay) ? (
+      {total > 1 && (showDots || every > 0) ? (
         <div className="flex items-center justify-center gap-1">
-          {autoplay ? (
-            <button
-              type="button"
-              aria-label={playing ? words.pause : words.play}
-              onClick={() => setPlaying(!playing)}
-              className="text-site-text size-control inline-flex cursor-pointer items-center justify-center rounded-full border-0 bg-transparent"
-            >
-              {playing ? <PauseIcon size={18} /> : <PlayIcon size={18} />}
-            </button>
+          {every > 0 ? (
+            <MotionToggle
+              playing={playing}
+              onToggle={() => setPlaying(!playing)}
+              labels={words}
+            />
           ) : null}
           {showDots
             ? slides.map((_, i) => (

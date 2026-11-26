@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import { Avatar } from '../atoms/avatar';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { ChevronDownIcon } from '../atoms/icons';
@@ -86,7 +86,9 @@ export function FaqList({
   /** The question open at first, by position. */
   defaultOpen?: number;
 }) {
-  const group = exclusive ? `faq-${root.id ?? 'list'}` : undefined;
+  // Its own name, so two lists on a page don't close each other's questions.
+  const id = useId();
+  const group = exclusive ? `faq-${root.id ?? id}` : undefined;
   return (
     <Block
       name="faq-list"

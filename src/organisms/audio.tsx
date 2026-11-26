@@ -29,6 +29,7 @@ function AudioNotice({
   consent,
   consentLabels,
 }: AudioConsent & { sources: string[] }) {
+  const consentWords = usePageWords('consent', consentLabels);
   if (consent !== false) return null;
   const sites = [
     ...new Set(sources.map(siteName).filter((s): s is string => !!s)),
@@ -36,7 +37,7 @@ function AudioNotice({
   if (!sites.length) return null;
   return (
     <p data-consent="pending" className="text-site-text-2 m-0 text-sm">
-      {consentNotice(sites.join(', '), consentLabels)}
+      {consentNotice(sites.join(', '), consentWords)}
     </p>
   );
 }
@@ -109,6 +110,7 @@ export function PodcastEpisodes({
   data,
   loading,
   error,
+  updatedAt,
   title,
   limit = 5,
   allHref,
@@ -134,7 +136,12 @@ export function PodcastEpisodes({
   return (
     <Block name="podcast-episodes" {...root}>
       {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
-      <LiveData data={data} loading={loading} error={error}>
+      <LiveData
+        data={data}
+        loading={loading}
+        error={error}
+        updatedAt={updatedAt}
+      >
         {(episodes) => (
           <>
             <ul className="m-0 flex list-none flex-col gap-2 p-0">

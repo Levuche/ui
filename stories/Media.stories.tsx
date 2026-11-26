@@ -22,7 +22,7 @@ export const Video: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     await expect(canvasElement.querySelector('iframe')).toBeNull();
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Play video: How tea came to India' })
+      canvas.getByRole('button', { name: 'Play: How tea came to India' })
     );
     await waitFor(() =>
       expect(canvasElement.querySelector('iframe')).not.toBeNull()

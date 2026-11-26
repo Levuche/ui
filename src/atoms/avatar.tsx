@@ -1,9 +1,12 @@
 import { cn } from '../system/cn';
 import { imageAttrs, toImageSource, type ImageSrc } from '../system/image';
 
-/** First letters of up to two words: "Desi Origins" becomes "DO". */
+/**
+ * First letters of up to two words: "Desi Origins" becomes "DO". Empty for
+ * a missing name, which saved settings can leave.
+ */
 export function initials(name: string) {
-  return name
+  return (typeof name === 'string' ? name : '')
     .trim()
     .split(/\s+/)
     .slice(0, 2)

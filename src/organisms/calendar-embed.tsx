@@ -1,6 +1,12 @@
 'use client';
 
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLinkButton } from '../atoms/button';
 import { CalendarIcon } from '../atoms/icons';
@@ -12,7 +18,6 @@ import { calendarEmbed, type CalendarView } from '../system/embeds';
 import { usePageLocale, usePageWords } from '../system/page-words';
 import { usePreviewMode } from '../system/preview-mode';
 import {
-  CONSENT_LABELS,
   consentNotice,
   OUTSIDE_SERVICES,
   type ConsentLabels,
@@ -83,12 +88,18 @@ export function CalendarEmbed({
   headingAs?: HeadingTag;
 }) {
   const words = usePageWords('calendarEmbed', labels);
+  const consentWords = usePageWords('consent', consentLabels);
   const language = usePageLocale(locale);
   const preview = usePreviewMode();
   const place = useRef<HTMLDivElement>(null);
   // Undefined until the block is drawn and its colour read.
   const [background, setBackground] = useState<string | null>();
   const [agreed, setAgreed] = useState(false);
+  const frameRef = useRef<HTMLIFrameElement>(null);
+  // After Load, focus moves into the calendar, as in the other frames.
+  useEffect(() => {
+    if (agreed) frameRef.current?.focus();
+  }, [agreed, background]);
   // The colour behind the calendar is known only once it's drawn, so the
   // frame waits for it rather than load twice.
   useLayoutEffect(() => {
@@ -123,6 +134,7 @@ export function CalendarEmbed({
     still
   ) : shown ? (
     <iframe
+      ref={frameRef}
       src={page.src}
       title={name}
       loading="lazy"
@@ -132,8 +144,8 @@ export function CalendarEmbed({
     />
   ) : (
     <ConsentCover
-      notice={consentNotice(OUTSIDE_SERVICES[page.service].name, consentLabels)}
-      load={{ ...CONSENT_LABELS, ...consentLabels }.load}
+      notice={consentNotice(OUTSIDE_SERVICES[page.service].name, consentWords)}
+      load={consentWords.load}
       title={name}
       action="calendar_load"
       onLoad={() => setAgreed(true)}

@@ -4,12 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { PlayIcon } from '../atoms/icons';
 import { cn } from '../system/cn';
 import { tintedSrc } from '../system/embeds';
-import {
-  CONSENT_LABELS,
-  consentNotice,
-  siteName,
-  type ConsentLabels,
-} from '../system/privacy';
+import { consentNotice, siteName, type ConsentLabels } from '../system/privacy';
 import { ConsentCover } from './consent-cover';
 import {
   columnSizes,
@@ -17,6 +12,7 @@ import {
   toImageSource,
   type ImageSrc,
 } from '../system/image';
+import { usePageWords } from '../system/page-words';
 import { usePreviewMode } from '../system/preview-mode';
 
 /** The shape of an embedded player. */
@@ -46,7 +42,7 @@ const COVER_RATIOS: Record<FrameRatio, string> = {
  * the button, for players that are only a few kilobytes.
  *
  * With `consent={false}` (the visitor hasn't agreed to the site yet) it shows
- * `notice`, a line on what loading will share, and a Load button instead;
+ * a line on what loading will share, and a Load button instead;
  * the press loads it.
  * In preview mode (the page editor) it never loads: the picture and button
  * stay as a still placeholder, and a press does nothing.
@@ -65,6 +61,7 @@ export function PlayFrame({
   tint,
   onPlay,
   consent,
+  site,
   notice,
   consentLabels,
   className,
@@ -75,7 +72,7 @@ export function PlayFrame({
   /** What's playing, for screen readers, such as "How tea came to India". */
   title: string;
   poster?: ImageSrc | null;
-  /** The play button's name; defaults to "Play: {title}". */
+  /** The play button's name; defaults to "Play: {title}" in the page's language. */
   playLabel?: string;
   ratio?: FrameRatio;
   allow?: string;
@@ -93,7 +90,9 @@ export function PlayFrame({
   onPlay?: () => void;
   /** False until the visitor agrees to the site; see above. */
   consent?: boolean;
-  /** What loading shares; defaults to consentNotice with the player's host. */
+  /** The site's name in the notice, such as "YouTube"; defaults to its host. */
+  site?: string;
+  /** What loading shares; defaults to the page's notice for `site`. */
   notice?: string;
   consentLabels?: Partial<ConsentLabels>;
   className?: string;
@@ -101,6 +100,8 @@ export function PlayFrame({
   frameClassName?: string;
 }) {
   const preview = usePreviewMode();
+  const consentWords = usePageWords('consent', consentLabels);
+  const embedWords = usePageWords('embed');
   const [playing, setPlaying] = useState(
     autoLoad && consent !== false && !preview
   );
@@ -149,11 +150,12 @@ export function PlayFrame({
     onPlay?.();
   };
   if (consent === false) {
-    const words = { ...CONSENT_LABELS, ...consentLabels };
     return (
       <ConsentCover
-        notice={notice ?? consentNotice(siteName(src) ?? src, consentLabels)}
-        load={words.load}
+        notice={
+          notice ?? consentNotice(site ?? siteName(src) ?? src, consentWords)
+        }
+        load={consentWords.load}
         title={title}
         action={action}
         onLoad={press}
@@ -176,7 +178,7 @@ export function PlayFrame({
       data-action={action}
       data-preview-placeholder={preview ? '' : undefined}
       onClick={press}
-      aria-label={playLabel ?? `Play: ${title}`}
+      aria-label={playLabel ?? embedWords.play.replace('{title}', title)}
       className={cn(frame, 'cursor-pointer border-0 p-0')}
     >
       {cover ? (

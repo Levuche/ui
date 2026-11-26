@@ -18,11 +18,7 @@ import type { LiveProps } from '../system/live';
 import { columnSizes, type ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
 import { usePageLocale, usePageWords } from '../system/page-words';
-import {
-  consentNotice,
-  OUTSIDE_SERVICES,
-  type ConsentLabels,
-} from '../system/privacy';
+import { OUTSIDE_SERVICES, type ConsentLabels } from '../system/privacy';
 
 const subHeading = (tag: HeadingTag): HeadingTag =>
   tag === 'h2' ? 'h3' : tag === 'h3' ? 'h4' : 'p';
@@ -43,6 +39,7 @@ export function LatestVideos({
   data,
   loading,
   error,
+  updatedAt,
   title,
   limit = 4,
   columns = 2,
@@ -66,7 +63,12 @@ export function LatestVideos({
   return (
     <Block name="latest-videos" {...root}>
       {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
-      <LiveData data={data} loading={loading} error={error}>
+      <LiveData
+        data={data}
+        loading={loading}
+        error={error}
+        updatedAt={updatedAt}
+      >
         {(videos) => (
           <>
             <ul
@@ -139,6 +141,7 @@ export function LatestPosts({
   data,
   loading,
   error,
+  updatedAt,
   title,
   limit = 3,
   showImages = true,
@@ -158,7 +161,12 @@ export function LatestPosts({
   return (
     <Block name="latest-posts" {...root}>
       {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
-      <LiveData data={data} loading={loading} error={error}>
+      <LiveData
+        data={data}
+        loading={loading}
+        error={error}
+        updatedAt={updatedAt}
+      >
         {(posts) => (
           <ul className="m-0 flex list-none flex-col gap-4 p-0">
             {posts.slice(0, limit).map((post) => (
@@ -242,6 +250,7 @@ export function LiveStatus({
   data,
   loading,
   error,
+  updatedAt,
   parents,
   labels,
   consent,
@@ -270,7 +279,12 @@ export function LiveStatus({
   const hosts = (parents ?? []).filter((h) => /^[a-z0-9.-]+$/i.test(h));
   return (
     <Block name="live-status" {...root}>
-      <LiveData data={data} loading={loading} error={error}>
+      <LiveData
+        data={data}
+        loading={loading}
+        error={error}
+        updatedAt={updatedAt}
+      >
         {(status) => {
           const twitch =
             status.live &&
@@ -321,10 +335,7 @@ export function LiveStatus({
                   playLabel={words.play.replace('{channel}', status.channel)}
                   action="play_live"
                   consent={consent}
-                  notice={consentNotice(
-                    OUTSIDE_SERVICES.twitch.name,
-                    consentLabels
-                  )}
+                  site={OUTSIDE_SERVICES.twitch.name}
                   consentLabels={consentLabels}
                 />
               ) : null}
@@ -384,6 +395,7 @@ export function EventList({
   data,
   loading,
   error,
+  updatedAt,
   title,
   calendar = true,
   labels,
@@ -402,7 +414,12 @@ export function EventList({
   return (
     <Block name="event-list" {...root}>
       {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
-      <LiveData data={data} loading={loading} error={error}>
+      <LiveData
+        data={data}
+        loading={loading}
+        error={error}
+        updatedAt={updatedAt}
+      >
         {(events) => (
           <ul className="m-0 flex list-none flex-col gap-3 p-0">
             {events.map((event, n) => (
@@ -506,6 +523,7 @@ export function ReviewSummary({
   data,
   loading,
   error,
+  updatedAt,
   title,
   attribution,
   limit = 3,
@@ -527,7 +545,12 @@ export function ReviewSummary({
   return (
     <Block name="review-summary" {...root}>
       {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
-      <LiveData data={data} loading={loading} error={error}>
+      <LiveData
+        data={data}
+        loading={loading}
+        error={error}
+        updatedAt={updatedAt}
+      >
         {(summary) => (
           <>
             <div className="flex flex-wrap items-center gap-2">

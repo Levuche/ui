@@ -35,10 +35,45 @@ change when it moves to that version.
   until set, so pages look as before. `nameColorIssue` warns when the colour
   is too faint on its block; `nameLook` gives the classes and style for any
   other heading.
+- Words for every line a visitor reads, in all six languages: `consent`
+  (the notice and the Load button before a site loads), `rating` (as
+  "4.8 out of 5 stars"), `courseCard.oneLesson`, `props.highlights`,
+  `props.qrFor` and `packCheckout.sent`. `DISCOUNT_CODE_LABELS` is exported.
+  `PlayFrame` takes `site`, the site's name, and words the notice itself.
+
+### Fixed
+
+- Bad settings no longer break a block: a `QrCode` with an unsafe picture,
+  an `Avatar` without a name, an `ActionCard` with no covers, a
+  `SlotPicker` with an unknown time zone, a `Countdown` to a date that
+  isn't one, `SaveContact` with an empty or odd name, and a `TipJar`
+  default amount that isn't one of its chips.
+- The `Carousel` turns at most every 2 seconds, stops for visitors who ask
+  for less motion, and is read out by screen readers only while it's still.
+  `LogoStrip` speed has the same floor as other moving blocks.
+- `updatedAt` reaches the live-data line on every feed and developer block.
+- A sold-out `EventCard` that sells through BuildBase shows the button's own
+  sold-out state; packs and cards decide on the same usable `sell`.
+- Focus moves to the frame after Load in `CalendarEmbed`, and to the link
+  after a `LockedLink` opens. A `FormNotice` stays in the page for screen
+  readers while it's empty.
+- `MapCard` directions need real coordinates; an empty link falls back.
+  `SocialCard` counts and post views use the page's language.
+- Every visitor-facing word, such as "Play video", "Highlights", the QR
+  name and star ratings, is in the page's language.
+- Tracking: `ContactForm` and `LockedLink` sends report as `contact` and
+  `lock_unlock`, and a block drawn inside another (a pricing table's plans)
+  reports as the outer block.
+- Registry: `BookingEmbed` height starts at 24 rem as the block does, a
+  `GoalTracker` target and a progress item's full mark start at 1, and a
+  `TipJar` amount at 1.
 
 ### An app must change
 
-Nothing.
+- A `renderBuy` function for `SellButton` gets `disabled` and should pass
+  it to its button.
+- `LinkEmbed` with an empty `services` list now allows every service, as
+  leaving it out does. Pass the services you want to allow.
 
 ## 0.3.0 (2026-11-26)
 

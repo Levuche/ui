@@ -290,8 +290,9 @@ export function tintedSrc(
 
 /**
  * The player for a pasted link, or null when its service isn't on the list
- * (show it as a link instead). `services` narrows the list. YouTube needs its
- * id parser passed in, to keep this file free of block code.
+ * (show it as a link instead). `services` narrows the list; an empty list
+ * allows all. YouTube needs its id parser passed in, to keep this file free
+ * of block code.
  */
 export function embedFor(
   input: string,
@@ -303,7 +304,9 @@ export function embedFor(
     youtubeId?: (input: string) => string | null;
   } = {}
 ): Embed | null {
-  const allowed = (s: EmbedService) => !services || services.includes(s);
+  // An empty list is what the editor saves when nothing is ticked: all.
+  const allowed = (s: EmbedService) =>
+    !services || services.length === 0 || services.includes(s);
   if (allowed('youtube') && youtubeId) {
     const yt = youtubeEmbed(input, parse(input) ? youtubeId(input) : null);
     if (yt) return yt;

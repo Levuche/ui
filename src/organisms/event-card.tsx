@@ -26,6 +26,7 @@ import { toImageSource, type ImageSrc } from '../system/image';
 import type { LiveProps } from '../system/live';
 import { useVisitorLocale } from '../system/locale';
 import { usePageWords } from '../system/page-words';
+import { sellJson } from '../system/sell';
 import { WORDS_EN } from '../system/words/en';
 
 /** The words on the card. The "in 4 months" chip comes from the locale. */
@@ -257,7 +258,7 @@ export function EventCard({
   const ownBackground = root.background !== undefined;
 
   let tickets: ReactNode = null;
-  if (soldOut && !sell) {
+  if (soldOut && !sellJson(sell)) {
     tickets = (
       <Badge tone="outline" className="self-center">
         {words.soldOut}
@@ -268,7 +269,8 @@ export function EventCard({
       <SellButton
         href={href}
         sell={sell}
-        sellState={sellState}
+        // The Sold out toggle closes the buy button too.
+        sellState={soldOut ? 'sold_out' : sellState}
         sellLabels={sellLabels}
         renderBuy={renderBuy}
         newTab={newTab}

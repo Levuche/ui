@@ -32,6 +32,7 @@ export const WORDS_HI: PageWords = {
     error: 'यह नहीं हो सका। कृपया फिर से कोशिश करें।',
   },
   packCheckout: {
+    sent: 'धन्यवाद! आपका भुगतान हो गया।',
     error: 'भुगतान नहीं हो सका। कृपया फिर से कोशिश करें।',
   },
   creditPack: {
@@ -110,6 +111,7 @@ export const WORDS_HI: PageWords = {
     close: 'बंद करें',
   },
   courseCard: {
+    oneLesson: '1 पाठ',
     lessons: '{n} पाठ',
     button: 'सीखना शुरू करें',
   },
@@ -155,6 +157,14 @@ export const WORDS_HI: PageWords = {
   },
   embed: {
     play: 'चलाएँ: {title}',
+  },
+  consent: {
+    notice:
+      'यह {service} से लोड होता है, जो आपका IP पता देखेगा और कुकीज़ सेट कर सकता है।',
+    load: 'लोड करें',
+  },
+  rating: {
+    stars: '{max} में से {n} स्टार',
   },
   liveStatus: {
     live: 'अभी लाइव',
@@ -288,6 +298,8 @@ export const WORDS_HI: PageWords = {
     close: 'बंद करें',
   },
   props: {
+    highlights: 'मुख्य बातें',
+    qrFor: '{address} के लिए QR कोड',
     verified: 'सत्यापित',
     links: 'लिंक',
     socialAccounts: 'सोशल अकाउंट',
