@@ -8,6 +8,12 @@ change when it moves to that version.
 
 ### Added
 
+- Text blocks in a new `text` group, free in `core`: `SectionHeading` (a
+  heading a link can jump to, with a line of detail), `TextBlock` (bold,
+  italic, links, lists and emoji), `QuoteBlock` (a quote with who said it
+  and a small picture) and `Spacer` (a gap of whole grid rows, or a thin
+  line). What a creator types is never read as HTML (`parseRichText`,
+  `RichText`).
 - Link tiles in new shapes. `LinkTile` takes `variant` (`row`, `icon`: a
   square tile with a big logo or picture and an arrow badge, `chip`: a small
   tile tinted in the link's brand colour, `tint`) and `look` (`preview`,
