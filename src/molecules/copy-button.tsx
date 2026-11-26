@@ -5,6 +5,7 @@ import { SiteButton, type ButtonLook } from '../atoms/button';
 import { CheckIcon, CopyIcon } from '../atoms/icons';
 import { WORDS_EN } from '../system/words/en';
 import { usePageWords } from '../system/page-words';
+import { usePreviewMode } from '../system/preview-mode';
 
 export type CopyLabels = {
   copy: string;
@@ -45,6 +46,7 @@ export function CopyButton({
 }) {
   const words = usePageWords('copy', labels);
   const [state, setState] = useState<'idle' | 'copied' | 'failed'>('idle');
+  const preview = usePreviewMode();
   return (
     <>
       <SiteButton
@@ -55,6 +57,8 @@ export function CopyButton({
           state === 'copied' ? <CheckIcon size={18} /> : <CopyIcon size={18} />
         }
         onClick={() => {
+          // The page editor selects the block; nothing is copied.
+          if (preview) return;
           // A copy function that throws counts as a failed copy too.
           Promise.resolve()
             .then(() => copy(text))

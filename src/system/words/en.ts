@@ -181,6 +181,31 @@ export const WORDS_EN = {
     reading: 'Reading',
     watching: 'Watching',
   },
+  textStrip: {
+    pause: 'Stop the moving words',
+    play: 'Move the words again',
+  },
+  wordRing: {
+    pause: 'Stop the turning words',
+    play: 'Turn the words again',
+  },
+  socialCard: {
+    follow: 'Follow',
+    subscribe: 'Subscribe',
+    connect: 'Connect',
+    addFriend: 'Add friend',
+    join: 'Join server',
+    message: 'Message',
+    followers: '{n} followers',
+    subscribers: '{n} subscribers',
+    members: '{n} members',
+    connections: '{n} connections',
+    views: '{n} views',
+    verified: 'Verified',
+    posts: 'Latest posts',
+    post: 'Post {n}',
+    on: '{name} on {platform}',
+  },
   props: {
     /** CreatorHeader `verifiedLabel`. */
     verified: 'Verified',

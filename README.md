@@ -339,6 +339,53 @@ export function BlockTracking({ children }: { children: React.ReactNode }) {
   Tracking & tags** in the BuildBase console.
 - Cookie consent isn't here: BuildBase's consent banner covers it.
 
+### Preview mode in the page editor
+
+The page editor ([Levuche/app#20](https://github.com/Levuche/app/issues/20))
+shows a creator's page with the same blocks, exactly as they look live. There
+a click should select a block, not open its link, send its form, start a
+checkout or load a player from another site. Wrap the canvas in
+`<PreviewMode>` once, and every block inside, including blocks added to the
+package later, behaves that way, with nothing to set on each block:
+
+```tsx
+'use client';
+import { PreviewMode, SitePage } from '@levuche/ui';
+
+<PreviewMode>
+  <SitePage>{/* the creator's blocks, as on the live page */}</SitePage>
+</PreviewMode>;
+```
+
+- **Links don't open and forms don't send.** A link, a download, a submit
+  button or a form inside is never followed or sent, and a form's own
+  `onSubmit` and React form actions don't run. Clicks still reach the page,
+  so the editor's own click handler can select the block.
+- **Nothing is tracked.** `useBlockActions` (and `readBlockAction`) report
+  nothing from inside a preview, so the editor adds no clicks to a creator's
+  numbers and never starts a checkout.
+- **Players stay still.** YouTube, Spotify and every other `PlayFrame`
+  player, the map, and a booking page show their picture or a placeholder,
+  marked `data-preview-placeholder`, and never load the other site, even
+  with `autoLoad`. Pop-ups (a booking page, a locked link) don't open, audio
+  doesn't play and the copy button copies nothing.
+- **Every block stays in the tab order.** Nothing is removed, hidden,
+  `inert` or given `tabindex="-1"`, so the editor can select blocks from the
+  keyboard. Enter on a link doesn't follow it.
+- **It doesn't change the layout.** It wraps the page in one element with
+  `display: contents` and `data-preview="on"`. `enabled={false}` turns it
+  off, also for one part inside a preview (`data-preview="off"`).
+
+Most blocks are Server Components, which can't read React context, so the
+rule isn't a prop on each block: `<PreviewMode>` stops what would leave the
+page where the browser hands it over, in the capture phase, whatever element
+did it (`previewStop(event)` says what it stops, and `inPreview(element)`
+whether an element is in a preview). Client blocks also read
+`usePreviewMode()` for what only they know, such as loading a player; an
+app's own client blocks and `renderBuy` buttons can do the same.
+`Editor/Preview mode` in Storybook presses every link, button and form of
+every block on the gallery and in the registry in preview mode.
+
 ### Sending forms to BuildBase Forms
 
 `NewsletterBand`, `LeadMagnet`, `ContactForm`, `PackCheckout` and `TipJar`
@@ -872,7 +919,10 @@ variable, the same pair the website uses.
    or more for anything tapped). Put words in a `labels` prop, with their
    English in a group of `src/system/words/en.ts` (and the same keys in every
    other language's file there), read with `usePageWords`; links through
-   `SiteLink`, and add `'use client'` only if it has state.
+   `SiteLink`, and add `'use client'` only if it has state. A client block
+   that loads another site, opens a pop-up or plays something checks
+   `usePreviewMode()` and doesn't, in the page editor (links and forms are
+   stopped for it).
 2. Add it to `BLOCKS` in `src/system/registry.ts`, with a `settings` entry
    for each prop a creator sets and the rest in `appOnly` (`npm run
 typecheck` says what's missing), and export it from `src/index.ts`.

@@ -170,6 +170,30 @@ test('blocks on a server-rendered page follow its language', () => {
   expect(html).not.toContain('Code kopieren');
 });
 
+test('the moving words and the social card follow the page language', () => {
+  const html = renderToString(
+    createElement(
+      ui.CreatorTheme,
+      { theme: { language: 'de' }, words: WORDS_DE },
+      createElement(ui.TextStrip, { items: ['Neu', 'Jetzt da'] }),
+      createElement(ui.CreatorHeader, {
+        name: 'Desi Origins',
+        wordRing: 'Chai • Stories',
+      }),
+      createElement(ui.SocialCard, {
+        platform: 'instagram',
+        handle: 'desiorigins',
+        followers: 1200,
+      })
+    )
+  );
+  expect(html).toContain(WORDS_DE.textStrip.pause);
+  expect(html).toContain(WORDS_DE.wordRing.pause);
+  expect(html).toContain(WORDS_DE.socialCard.follow);
+  expect(html).not.toContain(WORDS_EN.textStrip.pause);
+  expect(html).not.toContain(WORDS_EN.wordRing.pause);
+});
+
 test('a page without a language stays as it was', () => {
   const html = renderToString(
     createElement(
