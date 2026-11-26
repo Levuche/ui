@@ -74,7 +74,7 @@ export type PageLayouts = Partial<Record<GridScreen, GridLayout>>;
  * - tile: LogoTile, a square link tile; two sit side by side
  * - chip: LinkChip, a small link; it can be a quarter of a phone's width
  * - card: ActionCard, FeaturedLink, FeaturedPack, PackRow, BookingCard, MembershipCard,
- *   LeadMagnet, TipJar, DiscountCode, Countdown, ContactForm, MessageCard,
+ *   LeadMagnet, TipJar, DiscountCode, Countdown, EventCard, ContactForm, MessageCard,
  *   MapCard, QrCode, CourseCard, BookingEmbed, GitHubProfile, RepoCard,
  *   PackageStats, AudioPlayer
  * - media: YouTubeVideo, SiteImage, ImageCarousel, BeforeAfter, SpotifyEmbed,

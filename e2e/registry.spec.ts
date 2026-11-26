@@ -50,6 +50,7 @@ test('blocks that sell through BuildBase are free', () => {
     'tip-jar',
     'course-card',
     'pricing-table',
+    'event-card',
   ];
   for (const id of sellers) {
     expect(BLOCKS.find((block) => block.id === id)?.pack, id).toBe('core');

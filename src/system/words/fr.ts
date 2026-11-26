@@ -166,6 +166,9 @@ export const WORDS_FR: PageWords = {
     play: 'Regarder {channel} en direct',
   },
   eventList: {
+    addToCalendar: 'Ajouter au calendrier',
+    google: 'Google Agenda',
+    download: 'Autres agendas (.ics)',
     tickets: 'Billets',
     soldOut: 'Complet',
   },
@@ -245,6 +248,22 @@ export const WORDS_FR: PageWords = {
   },
   progressList: {
     amount: '{value} sur {max}',
+  },
+  calendar: {
+    addToCalendar: 'Ajouter au calendrier',
+    google: 'Google Agenda',
+    download: 'Autres agendas (.ics)',
+  },
+  eventCard: {
+    addToCalendar: 'Ajouter au calendrier',
+    google: 'Google Agenda',
+    download: 'Autres agendas (.ics)',
+    tickets: 'Prendre des billets',
+    soldOut: 'Complet',
+    live: 'En cours',
+    ended: 'Terminé',
+    loading: 'Chargement de l’événement',
+    untitled: 'Événement',
   },
   props: {
     verified: 'Vérifié',

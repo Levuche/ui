@@ -164,6 +164,9 @@ export const WORDS_HI: PageWords = {
     play: '{channel} को लाइव देखें',
   },
   eventList: {
+    addToCalendar: 'कैलेंडर में जोड़ें',
+    google: 'Google Calendar',
+    download: 'अन्य कैलेंडर (.ics)',
     tickets: 'टिकट',
     soldOut: 'बिक गया',
   },
@@ -243,6 +246,22 @@ export const WORDS_HI: PageWords = {
   },
   progressList: {
     amount: '{max} में से {value}',
+  },
+  calendar: {
+    addToCalendar: 'कैलेंडर में जोड़ें',
+    google: 'Google Calendar',
+    download: 'अन्य कैलेंडर (.ics)',
+  },
+  eventCard: {
+    addToCalendar: 'कैलेंडर में जोड़ें',
+    google: 'Google Calendar',
+    download: 'अन्य कैलेंडर (.ics)',
+    tickets: 'टिकट लें',
+    soldOut: 'बिक गया',
+    live: 'अभी चल रहा है',
+    ended: 'समाप्त',
+    loading: 'इवेंट लोड हो रहा है',
+    untitled: 'इवेंट',
   },
   props: {
     verified: 'सत्यापित',

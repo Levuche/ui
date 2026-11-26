@@ -93,6 +93,8 @@ test('each block’s English labels are the English word set', () => {
     ['embed', ui.EMBED_LABELS],
     ['liveStatus', ui.LIVE_STATUS_LABELS],
     ['eventList', ui.EVENT_LIST_LABELS],
+    ['calendar', ui.CALENDAR_LABELS],
+    ['eventCard', ui.EVENT_CARD_LABELS],
     ['reviewSummary', ui.REVIEW_SUMMARY_LABELS],
     ['nowPlaying', ui.NOW_PLAYING_LABELS],
   ];

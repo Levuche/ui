@@ -7,6 +7,7 @@ import {
   BookingCard,
   Countdown,
   DiscountCode,
+  EventCard,
   FaqList,
   FeaturedLink,
   GoalTracker,
@@ -359,13 +360,25 @@ export function Panel({
           <LockedLinkDemo />
         </Group>
 
-        <Group id={id} name="promo" title="Countdown and code">
+        <Group id={id} name="promo" title="Countdown, code and event">
           <Countdown
             title="The caption playbook drops in"
             to={new Date(NOW + 3 * 86_400_000 + 5 * 3_600_000)}
             now={NOW}
           />
           <DiscountCode code="ORIGINS10" detail="10% off the reel pack" />
+          <EventCard
+            title="Live cooking night"
+            start="2027-03-15T19:00"
+            end="2027-03-15T22:00"
+            timeZone="Asia/Kolkata"
+            venue="The Old Hall"
+            city="Pune"
+            href="https://example.com/tickets"
+            now={NOW}
+            locale="en-US"
+            headingAs="p"
+          />
         </Group>
 
         <Group id={id} name="goals" title="Goals and progress">

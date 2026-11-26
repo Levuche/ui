@@ -166,6 +166,9 @@ export const WORDS_ES: PageWords = {
     play: 'Ver a {channel} en directo',
   },
   eventList: {
+    addToCalendar: 'Añadir al calendario',
+    google: 'Google Calendar',
+    download: 'Otros calendarios (.ics)',
     tickets: 'Entradas',
     soldOut: 'Agotado',
   },
@@ -245,6 +248,22 @@ export const WORDS_ES: PageWords = {
   },
   progressList: {
     amount: '{value} de {max}',
+  },
+  calendar: {
+    addToCalendar: 'Añadir al calendario',
+    google: 'Google Calendar',
+    download: 'Otros calendarios (.ics)',
+  },
+  eventCard: {
+    addToCalendar: 'Añadir al calendario',
+    google: 'Google Calendar',
+    download: 'Otros calendarios (.ics)',
+    tickets: 'Conseguir entradas',
+    soldOut: 'Agotado',
+    live: 'En curso',
+    ended: 'Terminado',
+    loading: 'Cargando el evento',
+    untitled: 'Evento',
   },
   props: {
     verified: 'Verificado',

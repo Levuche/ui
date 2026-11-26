@@ -171,6 +171,9 @@ export const WORDS_EN = {
     play: 'Watch {channel} live',
   },
   eventList: {
+    addToCalendar: 'Add to calendar',
+    google: 'Google Calendar',
+    download: 'Other calendars (.ics)',
     tickets: 'Tickets',
     soldOut: 'Sold out',
   },
@@ -250,6 +253,22 @@ export const WORDS_EN = {
   },
   progressList: {
     amount: '{value} of {max}',
+  },
+  calendar: {
+    addToCalendar: 'Add to calendar',
+    google: 'Google Calendar',
+    download: 'Other calendars (.ics)',
+  },
+  eventCard: {
+    addToCalendar: 'Add to calendar',
+    google: 'Google Calendar',
+    download: 'Other calendars (.ics)',
+    tickets: 'Get tickets',
+    soldOut: 'Sold out',
+    live: 'Happening now',
+    ended: 'Ended',
+    loading: 'Loading the event',
+    untitled: 'Event',
   },
   props: {
     /** CreatorHeader `verifiedLabel`. */
