@@ -151,6 +151,8 @@ export type LookProps = {
   'data-block-size': BlockScale;
   'data-radius': BlockRadius;
   'data-motion'?: BlockMotion;
+  /** Set when the block picks its own shadow, which wins over the card style. */
+  'data-shadow'?: BlockShadow;
 };
 
 /**
@@ -198,5 +200,6 @@ export function lookProps(
     'data-block-size': size,
     'data-radius': radius,
     ...(motion && motion !== 'none' ? { 'data-motion': motion } : {}),
+    ...(shadow ? { 'data-shadow': shadow } : {}),
   };
 }

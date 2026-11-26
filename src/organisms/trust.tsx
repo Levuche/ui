@@ -4,6 +4,7 @@ import { Block, type BlockRootProps } from '../atoms/block';
 import { ChevronDownIcon } from '../atoms/icons';
 import { cn } from '../system/cn';
 import { Rating } from '../molecules/rating';
+import type { ImageSrc } from '../system/image';
 
 /** What buyers and fans say: a quote, who said it and an optional rating. */
 export function Testimonials({
@@ -17,7 +18,7 @@ export function Testimonials({
     name: string;
     /** As "Bought the reel pack". */
     detail?: string;
-    avatar?: string | null;
+    avatar?: ImageSrc | null;
     /** 1 to 5 stars. */
     rating?: number;
   }[];

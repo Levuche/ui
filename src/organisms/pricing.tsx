@@ -52,6 +52,8 @@ export type Plan = {
   /** Outlined in the button colour, with `featuredLabel`. */
   featured?: boolean;
   featuredLabel?: string;
+  /** A small tilted label over the plan's top corner, such as "Best value". */
+  ribbon?: string;
   buttonLabel?: string;
 };
 
@@ -99,10 +101,13 @@ export function PricingTable({
   nofollow,
   sellLabels,
   renderBuy,
+  saveLabel,
   ...root
 }: BlockRootProps &
   LinkBehavior &
   Pick<SellProps, 'sellLabels' | 'renderBuy'> & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
     plans: Plan[];
     title?: ReactNode;
     detail?: ReactNode;
@@ -149,6 +154,7 @@ export function PricingTable({
           const useYear = yearly && plan.yearlyPrice;
           return (
             <MembershipCard
+              saveLabel={saveLabel}
               key={plan.name}
               title={plan.name}
               price={useYear ? plan.yearlyPrice! : plan.price}
@@ -162,6 +168,7 @@ export function PricingTable({
               renderBuy={renderBuy}
               featured={plan.featured}
               featuredLabel={plan.featuredLabel}
+              ribbon={plan.ribbon}
               buttonLabel={plan.buttonLabel}
               headingAs={planHeading}
               tone={cardTone}

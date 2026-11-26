@@ -83,6 +83,12 @@ export const CheckIcon = (p: IconProps) => (
     <path d="M5 12l5 5 9-10" />
   </Svg>
 );
+/** Points the way the text reads; flip it in right-to-left text. */
+export const ArrowRightIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M5 12h14M13 6l6 6-6 6" />
+  </Svg>
+);
 export const ChevronDownIcon = (p: IconProps) => (
   <Svg {...p}>
     <path d="M7 10l5 5 5-5" />

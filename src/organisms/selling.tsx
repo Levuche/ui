@@ -7,7 +7,7 @@ import {
   type SiteButtonVariant,
 } from '../atoms/button';
 import { SiteLink } from '../atoms/link';
-import { Badge } from '../atoms/text';
+import { Badge, Ribbon } from '../atoms/text';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
@@ -21,6 +21,7 @@ import {
   type SellProps,
 } from '../molecules/sell-button';
 import type { SellRef, SellState } from '../system/sell';
+import { columnSizes, type ImageSrc } from '../system/image';
 
 /**
  * A pack in a list: thumbnail, title, what's in it, price. The row links to
@@ -41,29 +42,32 @@ export function PackRow({
   sellLabels,
   renderBuy,
   buttonLabel = 'Buy',
+  saveLabel,
   ...root
 }: BlockRootProps &
   LinkBehavior &
   SellProps & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
     /** The words on the buy button, with `sell`. */
     buttonLabel?: ReactNode;
     title: string;
     detail?: ReactNode;
     price: string;
     was?: string;
-    image?: string | null;
+    image?: ImageSrc | null;
     href?: string;
   }) {
   const body = (
     <>
-      <Thumb src={image} ratio="square" className="size-13" />
+      <Thumb src={image} ratio="square" sizes="52px" className="size-13" />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="font-semibold">{title}</span>
         {detail ? (
           <span className="text-site-text-2 text-sm">{detail}</span>
         ) : null}
       </span>
-      <Price value={price} was={was} />
+      <Price saveLabel={saveLabel} value={price} was={was} />
     </>
   );
   const row = 'text-site-text flex items-center gap-3 no-underline';
@@ -211,18 +215,24 @@ export function FeaturedPack({
   action,
   buttonLabel = 'I’ll take it',
   headingAs = 'h2',
+  ribbon,
   sell,
   sellState,
   sellLabels,
   renderBuy,
+  saveLabel,
   ...root
 }: BlockRootProps &
   SellProps & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
+    /** A small tilted label over the top corner, such as "Most popular". */
+    ribbon?: ReactNode;
     title: string;
     detail?: ReactNode;
     price: string;
     was?: string;
-    image?: string | null;
+    image?: ImageSrc | null;
     imageAlt?: string;
     ratio?: ThumbRatio;
     /**
@@ -234,7 +244,13 @@ export function FeaturedPack({
     headingAs?: HeadingTag;
   }) {
   return (
-    <Block as="article" name="featured-pack" {...root}>
+    <Block
+      as="article"
+      name="featured-pack"
+      {...root}
+      className={cn('relative', root.className)}
+    >
+      {ribbon ? <Ribbon>{ribbon}</Ribbon> : null}
       <ItemHead
         title={title}
         detail={detail}
@@ -245,7 +261,7 @@ export function FeaturedPack({
         headingAs={headingAs}
       />
       <div className="flex items-center justify-between gap-3">
-        <Price value={price} was={was} size="lg" />
+        <Price saveLabel={saveLabel} value={price} was={was} size="lg" />
         {action ??
           (sell ? (
             <SellButton
@@ -275,14 +291,17 @@ export function PackGrid({
   buttonLabel = 'Buy',
   sellLabels,
   renderBuy,
+  saveLabel,
   ...root
 }: BlockRootProps &
   Pick<SellProps, 'sellLabels' | 'renderBuy'> & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
     packs: (LinkBehavior & {
       title: string;
       price: string;
       was?: string;
-      image?: string | null;
+      image?: ImageSrc | null;
       href?: string;
       /** Sells the pack through BuildBase, with a buy button on the tile. */
       sell?: SellRef;
@@ -306,9 +325,18 @@ export function PackGrid({
           ({ title, price, was, image, href, sell, sellState, ...link }, i) => {
             const body = (
               <>
-                <Thumb src={image} className="h-15 w-full" />
+                <Thumb
+                  src={image}
+                  sizes={columnSizes(1 / columns, 1 / 2)}
+                  className="h-15 w-full"
+                />
                 <strong>{title}</strong>
-                <Price value={price} was={was} size="sm" />
+                <Price
+                  saveLabel={saveLabel}
+                  value={price}
+                  was={was}
+                  size="sm"
+                />
               </>
             );
             const tile =
@@ -389,9 +417,12 @@ export function CreditPack({
   labels,
   locale,
   headingAs: Heading = 'h3',
+  saveLabel,
   ...root
 }: BlockRootProps &
   SellProps & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
     credits: number;
     bonus?: number;
     /** As "₹499". */
@@ -440,7 +471,7 @@ export function CreditPack({
       ) : null}
       {detail ? <p className="text-site-text-2 m-0 text-sm">{detail}</p> : null}
       <p className="m-0">
-        <Price value={price} was={was} size="lg" />
+        <Price saveLabel={saveLabel} value={price} was={was} size="lg" />
       </p>
       {expires ? (
         <p className="text-site-text-2 m-0 text-sm">{expires}</p>

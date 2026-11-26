@@ -83,3 +83,52 @@ export const Social: StoryObj<typeof SocialIcons> = {
     ).not.toHaveAttribute('target');
   },
 };
+
+/** A plain picture in one colour with a word on it, for the stories. */
+const cover = (fill: string, word: string) =>
+  `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" fill="${fill}"/><text x="48" y="56" font-family="sans-serif" font-size="20" text-anchor="middle" fill="#fff">${word}</text></svg>`
+  )}`;
+
+/** Links with a small picture on one side and a round arrow on the other. */
+export const WithPicturesAndArrows: Story = {
+  args: {
+    links: [
+      {
+        label: 'Origins reel pack',
+        detail: '100 prompts and 12 templates',
+        href: 'https://example.com/pack',
+        image: cover('#9a3412', 'Reels'),
+        trailing: 'arrow',
+      },
+      {
+        label: 'Latest video',
+        detail: 'How tea came to India',
+        href: 'https://example.com/video',
+        image: cover('#0f766e', 'Tea'),
+        trailing: 'arrow',
+      },
+    ],
+  },
+  play: async ({ canvas }) => {
+    const link = canvas.getByRole('link', { name: /Origins reel pack/ });
+    await expectTapSize(link, 'Origins reel pack');
+    // The picture only repeats the words, and the arrow is decoration.
+    await expect(link.querySelector('img')).toHaveAttribute('alt', '');
+    await expect(link.querySelector('svg')).toHaveAttribute(
+      'aria-hidden',
+      'true'
+    );
+  },
+};
+
+/** Social icons on round chips with a thin line. */
+export const SocialChips: StoryObj<typeof SocialIcons> = {
+  render: () => <SocialIcons links={SAMPLE_SOCIALS} iconStyle="chip" />,
+  play: async ({ canvas }) => {
+    for (const link of canvas.getAllByRole('link')) {
+      await expectTapSize(link, link.getAttribute('aria-label') ?? 'icon');
+      await expect(getComputedStyle(link).borderTopWidth).toBe('1px');
+    }
+  },
+};

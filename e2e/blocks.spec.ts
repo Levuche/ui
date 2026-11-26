@@ -130,6 +130,24 @@ for (const [id, expected] of Object.entries(THEMES)) {
       ).toHaveAttribute('target', '_blank');
     });
 
+    test('a press anywhere on the action card follows its link', async ({
+      page,
+    }) => {
+      await page.route('https://example.com/**', (route) =>
+        route.fulfill({ contentType: 'text/html', body: '<title>Shop</title>' })
+      );
+      const card = panel
+        .getByTestId('social')
+        .locator('[data-block="action-card"]');
+      const link = card.getByRole('link', { name: 'Shop the presets' });
+      await expect(link).toHaveAttribute('href', 'https://example.com/presets');
+      await expect(link).toHaveAttribute('data-action', 'link_click');
+      // On the title, nowhere near the bar.
+      const opened = page.waitForEvent('popup');
+      await card.click({ position: { x: 12, y: 12 } });
+      expect((await opened).url()).toBe('https://example.com/presets');
+    });
+
     test('booking and membership link to their pages', async () => {
       const offers = panel.getByTestId('offers');
       await expect(

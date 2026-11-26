@@ -10,6 +10,7 @@ import { Price } from '../molecules/price';
 import { SellButton, type SellProps } from '../molecules/sell-button';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
+import type { ImageSrc } from '../system/image';
 
 /* -------------------------------------------------------------- CourseCard */
 
@@ -50,13 +51,16 @@ export function CourseCard({
   newTab,
   sponsored,
   nofollow,
+  saveLabel,
   ...root
 }: BlockRootProps &
   LinkBehavior &
   SellProps & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
     title: ReactNode;
     detail?: ReactNode;
-    image?: string | null;
+    image?: ImageSrc | null;
     imageAlt?: string;
     lessons?: number;
     /** As "3 h 20 min". */
@@ -99,7 +103,7 @@ export function CourseCard({
             </span>
           ) : null}
         </span>
-        <Price value={price} was={was} />
+        <Price saveLabel={saveLabel} value={price} was={was} />
       </div>
       <SellButton
         href={href}
@@ -125,7 +129,7 @@ export function CourseCard({
 export type TopPick = {
   name: ReactNode;
   href: string;
-  image?: string | null;
+  image?: ImageSrc | null;
   /** What the picture shows. Empty when the name says it. */
   imageAlt?: string;
   /** Why the creator likes it, in a line. */
@@ -198,6 +202,7 @@ export function TopPicks({
                   src={pick.image}
                   alt={pick.imageAlt ?? ''}
                   ratio="square"
+                  sizes="64px"
                   className="w-16 flex-none"
                 />
               ) : null}

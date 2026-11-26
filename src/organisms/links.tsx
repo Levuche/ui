@@ -5,14 +5,19 @@ import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { LinkTile, type LinkTileStyle } from '../molecules/link-tile';
+import type { ImageSrc } from '../system/image';
 
 /** One link in a list. */
 export type LinkItem = LinkBehavior & {
   label: string;
   href: string;
   icon?: ReactNode;
+  /** A small picture on the start side, in place of the icon. */
+  image?: string | null;
+  imageAlt?: string;
   detail?: ReactNode;
-  trailing?: ReactNode;
+  /** A price, or `arrow` for a round arrow. */
+  trailing?: ReactNode | 'arrow';
 };
 
 /**
@@ -88,7 +93,7 @@ export function FeaturedLink({
     href: string;
     title: string;
     detail?: ReactNode;
-    image?: string | null;
+    image?: ImageSrc | null;
     /** Leave empty when the picture only repeats the title. */
     imageAlt?: string;
     ratio?: ThumbRatio;
@@ -135,8 +140,11 @@ export function SocialIcons({
   /** `label` names each link for screen readers, as "Instagram". */
   links: (LinkBehavior & { label: string; href: string; icon: ReactNode })[];
   label?: string;
-  /** `filled` puts each icon on a round tile. */
-  iconStyle?: 'plain' | 'filled' | 'outline';
+  /**
+   * `filled` puts each icon on a round tile, `outline` in a ring, and `chip`
+   * on a round chip in the card colour with a thin line.
+   */
+  iconStyle?: 'plain' | 'filled' | 'outline' | 'chip';
 }) {
   return (
     <Block
@@ -159,7 +167,9 @@ export function SocialIcons({
                 'text-site-text size-control-md inline-flex items-center justify-center rounded-full',
                 iconStyle === 'plain' && 'hover:bg-site-surface-2',
                 iconStyle === 'filled' && 'bg-site-surface-2',
-                iconStyle === 'outline' && 'border-site-border border-2'
+                iconStyle === 'outline' && 'border-site-border border-2',
+                iconStyle === 'chip' &&
+                  'bg-site-surface border-site-border hover:bg-site-surface-2 border'
               )}
             >
               {icon}

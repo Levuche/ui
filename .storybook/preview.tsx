@@ -1,13 +1,14 @@
 import type { Preview } from '@storybook/react-vite';
-import { CreatorTheme } from '../src';
+import { CreatorTheme, type SiteCardStyle } from '../src';
 import { SCREENS } from '../stories/screens';
 import { THEMES, type ThemeName } from '../stories/themes';
 import './preview.css';
 
 const preview: Preview = {
   // Pick the creator theme from the toolbar; a story can fix one with
-  // `globals: { theme: 'dark' }`.
-  initialGlobals: { theme: 'light' },
+  // `globals: { theme: 'dark' }`. Direction does the same for right-to-left
+  // scripts, such as Arabic, Hebrew and Urdu.
+  initialGlobals: { theme: 'light', cards: 'flat', direction: 'ltr' },
   globalTypes: {
     theme: {
       description: 'Creator theme',
@@ -22,15 +23,46 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    cards: {
+      description: 'Card style',
+      toolbar: {
+        title: 'Cards',
+        icon: 'component',
+        items: [
+          { value: 'flat', title: 'Flat cards' },
+          { value: 'outline', title: 'Outlined cards' },
+          { value: 'raised', title: 'Raised cards' },
+          { value: 'glass', title: 'Glass cards' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+    direction: {
+      description: 'Which way the text runs',
+      toolbar: {
+        title: 'Direction',
+        icon: 'transfer',
+        items: [
+          { value: 'ltr', title: 'Left to right' },
+          { value: 'rtl', title: 'Right to left' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
   decorators: [
     (Story, context) => {
       const name = (context.globals.theme ?? 'light') as ThemeName;
       // Grid pages are wider than one column; they set `frame: 'wide'`.
       const wide = context.parameters.frame === 'wide';
+      const dir = context.globals.direction === 'rtl' ? 'rtl' : 'ltr';
       return (
         <CreatorTheme
-          theme={THEMES[name].theme}
+          dir={dir}
+          theme={{
+            ...THEMES[name].theme,
+            cards: (context.globals.cards ?? 'flat') as SiteCardStyle,
+          }}
           className="min-h-screen p-5"
           data-testid="story-theme"
         >

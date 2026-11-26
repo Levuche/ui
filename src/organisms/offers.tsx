@@ -2,7 +2,7 @@ import type { FormEventHandler, ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import type { SiteButtonVariant } from '../atoms/button';
 import { ClockIcon } from '../atoms/icons';
-import { Badge } from '../atoms/text';
+import { Badge, Ribbon } from '../atoms/text';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import type { FormStatus } from '../system/state';
@@ -15,6 +15,7 @@ import {
   SellField,
   type SellProps,
 } from '../molecules/sell-button';
+import type { ImageSrc } from '../system/image';
 
 /**
  * A call or session to book: what it is, how long, the price, and a link to
@@ -51,7 +52,7 @@ export function BookingCard({
     href?: string;
     buttonLabel?: string;
     buttonVariant?: SiteButtonVariant;
-    image?: string | null;
+    image?: ImageSrc | null;
     headingAs?: HeadingTag;
   }) {
   return (
@@ -102,14 +103,18 @@ export function MembershipCard({
   buttonLabel = 'Join',
   featured = false,
   featuredLabel,
+  ribbon,
   headingAs: Heading = 'h3',
   newTab,
   sponsored,
   nofollow,
+  saveLabel,
   ...root
 }: BlockRootProps &
   LinkBehavior &
   SellProps & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
     title: string;
     price: string;
     /** The price before a discount. */
@@ -124,6 +129,8 @@ export function MembershipCard({
     featured?: boolean;
     /** A pill on the featured tier, such as "Most popular". */
     featuredLabel?: string;
+    /** A small tilted label over the top corner, such as "Best value". */
+    ribbon?: ReactNode;
     headingAs?: HeadingTag;
   }) {
   return (
@@ -132,11 +139,12 @@ export function MembershipCard({
       name="membership-card"
       {...root}
       className={cn(
-        'border-2',
+        'relative border-2',
         featured ? 'border-site-button' : 'border-transparent',
         root.className
       )}
     >
+      {ribbon ? <Ribbon>{ribbon}</Ribbon> : null}
       <div className="flex items-center justify-between gap-2">
         <Heading className="text-block-title m-0 font-bold">{title}</Heading>
         {featured && featuredLabel ? (
@@ -144,7 +152,13 @@ export function MembershipCard({
         ) : null}
       </div>
       <p className="m-0">
-        <Price value={price} was={was} period={period} size="lg" />
+        <Price
+          saveLabel={saveLabel}
+          value={price}
+          was={was}
+          period={period}
+          size="lg"
+        />
       </p>
       <CheckList items={perks} />
       <SellButton
@@ -190,7 +204,7 @@ export function LeadMagnet({
 }: BlockRootProps & {
   title: string;
   detail?: ReactNode;
-  image?: string | null;
+  image?: ImageSrc | null;
   /** A free item to claim with the address. */
   sell?: SellProps['sell'];
   buttonLabel?: string;

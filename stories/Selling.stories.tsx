@@ -72,3 +72,28 @@ export const Grid: StoryObj<typeof PackGrid> = {
 export const Buy: StoryObj<typeof BuyButton> = {
   render: () => <BuyButton>Buy, $7</BuyButton>,
 };
+
+/** An old price shows what the visitor saves, in words a creator can change. */
+export const WhatYouSave: StoryObj<typeof FeaturedPack> = {
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <FeaturedPack
+        title="Origins reel pack"
+        detail="100 prompts, a guide and 12 templates"
+        price="$12"
+        was="$20"
+      />
+      <PackRow
+        title="Prompt starter kit"
+        detail="50 prompts"
+        price="₹1,499"
+        was="₹2,499"
+        saveLabel="{amount} off"
+      />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText('Save $8')).toBeVisible();
+    await expect(canvas.getByText('₹1,000 off')).toBeVisible();
+  },
+};
