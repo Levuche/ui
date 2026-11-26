@@ -67,6 +67,16 @@ export const OUTSIDE_SERVICES = {
     hosts: ['w.soundcloud.com'],
     cookies: 'marketing',
   },
+  applemusic: {
+    name: 'Apple Music',
+    hosts: ['embed.music.apple.com'],
+    cookies: 'marketing',
+  },
+  deezer: {
+    name: 'Deezer',
+    hosts: ['widget.deezer.com'],
+    cookies: 'marketing',
+  },
   loom: { name: 'Loom', hosts: ['www.loom.com'], cookies: 'statistics' },
   twitch: {
     name: 'Twitch',

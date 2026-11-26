@@ -87,6 +87,17 @@ change when it moves to that version.
   Load press (YouTube's own picture waits too), then moves focus into what
   loaded. Words in `consentLabels` (`CONSENT_LABELS`); `ConsentCover` for a
   block of your own. Storybook: `Blocks/Privacy`.
+- Music players for SoundCloud, Apple Music and Deezer, beside Spotify:
+  `SoundCloudEmbed` (a track or playlist, compact or with big artwork, in
+  the page's button colour), `AppleMusicEmbed` (a song, album or playlist)
+  and `DeezerEmbed` (a track, album or playlist), all in the media pack.
+  Like `SpotifyEmbed`, each loads the other site only when play is pressed
+  and shows the link as a plain tile when it can't play it. `LinkEmbed`
+  plays Apple Music and Deezer links too (`applemusic` and `deezer` in
+  `EMBED_SERVICES`), and its SoundCloud player is a little taller, so it
+  isn't cut off, and takes the page's colour. New: `appleMusicEmbed`,
+  `deezerEmbed`, `tintedSrc`, `colorHex`, the `track` player shape and
+  `PlayFrame`'s `tint`.
 - `SocialCard`: one social profile with the platform's mark, the picture,
   name, handle and verified tick, the follower count written short by
   locale (`shortCount`: 1.1K, 860K) and a button in the platform's own word

@@ -8,9 +8,9 @@ import { expectNoA11yViolations } from './a11y';
  */
 
 const THEMES = {
-  light: { scheme: 'light', accent: 'rgb(194, 65, 12)' },
-  dark: { scheme: 'dark', accent: 'rgb(255, 138, 61)' },
-  custom: { scheme: 'light', accent: 'rgb(15, 118, 110)' },
+  light: { scheme: 'light', accent: 'rgb(194, 65, 12)', hex: '#c2410c' },
+  dark: { scheme: 'dark', accent: 'rgb(255, 138, 61)', hex: '#ff8a3d' },
+  custom: { scheme: 'light', accent: 'rgb(15, 118, 110)', hex: '#0f766e' },
 } as const;
 
 /** control: 44 px on a touch screen (the phone run), 40 px with a mouse. */
@@ -22,6 +22,10 @@ test.beforeEach(async ({ page }) => {
   // YouTube here so the tests never depend on it.
   await page.route(/youtube(-nocookie)?\.com|ytimg\.com/, (route) =>
     route.fulfill({ contentType: 'text/html', body: '<title>Video</title>' })
+  );
+  // The same for the music player.
+  await page.route(/soundcloud\.com/, (route) =>
+    route.fulfill({ contentType: 'text/html', body: '<title>Player</title>' })
   );
   const response = await page.goto('/');
   expect(response?.status(), 'the gallery should load').toBe(200);
@@ -83,6 +87,25 @@ for (const [id, expected] of Object.entries(THEMES)) {
         'src',
         /^https:\/\/www\.youtube-nocookie\.com\/embed\/M7lc1UVf-VE\?/
       );
+    });
+
+    test('music loads SoundCloud only after play, in the theme’s colour', async ({
+      page,
+    }) => {
+      const music = panel.getByTestId('music');
+      await expect(music.locator('iframe')).toHaveCount(0);
+      const play = music.getByRole('button', { name: 'Play: Chai at dawn' });
+      const box = await play.boundingBox();
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(await tapMin(page));
+      await play.click();
+      const frame = music.locator('iframe');
+      await expect(frame).toHaveAttribute('title', 'Chai at dawn');
+      const src = new URL((await frame.getAttribute('src')) ?? '');
+      expect(src.origin).toBe('https://w.soundcloud.com');
+      expect(src.searchParams.get('url')).toBe(
+        'https://soundcloud.com/desi-origins/chai-at-dawn'
+      );
+      expect(src.searchParams.get('color')).toBe(expected.hex);
     });
 
     test('checkout needs the consent box ticked', async () => {

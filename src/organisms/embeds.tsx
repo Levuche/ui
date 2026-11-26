@@ -5,8 +5,11 @@ import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { LinkTile } from '../molecules/link-tile';
 import { PlayFrame } from '../molecules/play-frame';
 import {
+  appleMusicEmbed,
+  deezerEmbed,
   embedFor,
   instagramEmbed,
+  soundcloudEmbed,
   spotifyEmbed,
   tiktokEmbed,
   type Embed,
@@ -88,6 +91,7 @@ function EmbedBody({
           playIcon={<PlayIcon size={28} />}
           sandbox={SANDBOX}
           action={`play_${embed.service}`}
+          tint={embed.tint}
           consent={consent}
           notice={consentNotice(
             OUTSIDE_SERVICES[embed.service].name,
@@ -120,6 +124,44 @@ export function SpotifyEmbed(props: EmbedProps) {
   );
 }
 
+/** How a SoundCloud player looks: a slim bar, or big artwork. */
+export type SoundCloudPlayer = 'compact' | 'visual';
+
+/**
+ * A SoundCloud track or playlist, in the page's button colour. `player`
+ * picks the slim compact player (the default) or the one with big artwork.
+ */
+export function SoundCloudEmbed({
+  player = 'compact',
+  ...props
+}: EmbedProps & { player?: SoundCloudPlayer }) {
+  return (
+    <EmbedBody
+      name="soundcloud-embed"
+      embed={soundcloudEmbed(props.url, { visual: player === 'visual' })}
+      {...props}
+    />
+  );
+}
+
+/** An Apple Music song, album or playlist. */
+export function AppleMusicEmbed(props: EmbedProps) {
+  return (
+    <EmbedBody
+      name="apple-music-embed"
+      embed={appleMusicEmbed(props.url)}
+      {...props}
+    />
+  );
+}
+
+/** A Deezer track, album or playlist. */
+export function DeezerEmbed(props: EmbedProps) {
+  return (
+    <EmbedBody name="deezer-embed" embed={deezerEmbed(props.url)} {...props} />
+  );
+}
+
 /** One TikTok video, played in place. */
 export function TikTokVideo(props: EmbedProps) {
   return (
@@ -140,8 +182,8 @@ export function InstagramPost(props: EmbedProps) {
 
 /**
  * Any link from a service on the list (YouTube, Spotify, TikTok, Instagram,
- * Vimeo, SoundCloud and Loom) plays in place. Anything else is shown as a
- * link. `services` narrows the list.
+ * Vimeo, SoundCloud, Loom, Apple Music and Deezer) plays in place. Anything
+ * else is shown as a link. `services` narrows the list.
  */
 export function LinkEmbed({
   services,

@@ -29,6 +29,7 @@ export {
   SCHEME_COLORS,
   TEXT_CONTRAST,
   backgroundIssues,
+  colorHex,
   contrastIssues,
   contrastRatio,
   fixBackground,
@@ -566,24 +567,31 @@ export {
 } from './organisms/developer';
 export {
   EMBED_SERVICES,
+  appleMusicEmbed,
+  deezerEmbed,
   embedFor,
   instagramEmbed,
   loomEmbed,
   soundcloudEmbed,
   spotifyEmbed,
   tiktokEmbed,
+  tintedSrc,
   vimeoEmbed,
   type Embed,
   type EmbedService,
   type EmbedShape,
 } from './system/embeds';
 export {
+  AppleMusicEmbed,
+  DeezerEmbed,
   EMBED_LABELS,
   InstagramPost,
   LinkEmbed,
+  SoundCloudEmbed,
   SpotifyEmbed,
   TikTokVideo,
   type EmbedLabels,
+  type SoundCloudPlayer,
 } from './organisms/embeds';
 export {
   AudioPlayer,

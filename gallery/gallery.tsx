@@ -36,6 +36,7 @@ import {
   SiteLinkButton,
   SiteSection,
   SiteText,
+  SoundCloudEmbed,
   Spacer,
   TextBlock,
   TextStrip,
@@ -289,6 +290,13 @@ export function Panel({
             video="https://www.youtube.com/watch?v=M7lc1UVf-VE"
             title="How tea came to India"
             poster={null}
+          />
+        </Group>
+
+        <Group id={id} name="music" title="Music">
+          <SoundCloudEmbed
+            url="https://soundcloud.com/desi-origins/chai-at-dawn"
+            title="Chai at dawn"
           />
         </Group>
 

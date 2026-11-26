@@ -144,6 +144,8 @@ test('every pasted-link player loads from its listed hosts', () => {
     instagram: 'https://www.instagram.com/reel/C1a2B3c4D5e/',
     vimeo: 'https://vimeo.com/76979871',
     soundcloud: 'https://soundcloud.com/artist/track-name',
+    applemusic: 'https://music.apple.com/us/album/chai-at-dawn/1440857781',
+    deezer: 'https://www.deezer.com/album/302127',
     loom: 'https://www.loom.com/share/0123456789abcdef0123456789abcdef',
   };
   const linkEmbed = blockInfo('link-embed')?.privacy.services ?? [];
@@ -157,6 +159,9 @@ test('every pasted-link player loads from its listed hosts', () => {
   }
   for (const [id, service] of [
     ['spotify-embed', 'spotify'],
+    ['soundcloud-embed', 'soundcloud'],
+    ['apple-music-embed', 'applemusic'],
+    ['deezer-embed', 'deezer'],
     ['tiktok-video', 'tiktok'],
     ['instagram-post', 'instagram'],
     ['youtube-video', 'youtube'],

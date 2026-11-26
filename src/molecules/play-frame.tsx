@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { PlayIcon } from '../atoms/icons';
 import { cn } from '../system/cn';
+import { tintedSrc } from '../system/embeds';
 import {
   CONSENT_LABELS,
   consentNotice,
@@ -19,13 +20,15 @@ import {
 import { usePreviewMode } from '../system/preview-mode';
 
 /** The shape of an embedded player. */
-export type FrameRatio = 'video' | 'vertical' | 'square' | 'audio' | 'tall';
+export type FrameRatio =
+  'video' | 'vertical' | 'square' | 'audio' | 'track' | 'tall';
 
 const FRAME_RATIOS: Record<FrameRatio, string> = {
   video: 'aspect-video',
   vertical: 'mx-auto aspect-[9/16] max-w-90',
   square: 'aspect-square',
   audio: 'h-38',
+  track: 'h-44',
   tall: 'h-88',
 };
 
@@ -59,6 +62,7 @@ export function PlayFrame({
   playIcon,
   sandbox,
   action = 'play',
+  tint,
   onPlay,
   consent,
   notice,
@@ -80,6 +84,11 @@ export function PlayFrame({
   sandbox?: string;
   /** What the press is called in `onAction`. */
   action?: string;
+  /**
+   * For a player that takes a colour: the setting in `src` that gets the
+   * page's button colour, as #rrggbb, when play is pressed.
+   */
+  tint?: string;
   onPlay?: () => void;
   /** False until the visitor agrees to the site; see above. */
   consent?: boolean;
@@ -92,6 +101,9 @@ export function PlayFrame({
   const [playing, setPlaying] = useState(
     autoLoad && consent !== false && !preview
   );
+  // Read from the page when play is pressed, so the server and the first
+  // render agree and the player matches the theme around it.
+  const [color, setColor] = useState<string | null>(null);
   const [pressed, setPressed] = useState(false);
   const frameRef = useRef<HTMLIFrameElement>(null);
   // After a press, focus moves into what loaded, not back to the page.
@@ -109,7 +121,7 @@ export function PlayFrame({
       <div className={frame}>
         <iframe
           ref={frameRef}
-          src={src}
+          src={tintedSrc(src, tint, color)}
           sandbox={sandbox}
           title={title}
           allow={allow}
@@ -120,8 +132,15 @@ export function PlayFrame({
       </div>
     );
   }
-  const press = () => {
+  const press = (event?: { currentTarget: Element }) => {
     if (preview) return;
+    if (tint && event) {
+      setColor(
+        getComputedStyle(event.currentTarget)
+          .getPropertyValue('--site-button')
+          .trim() || null
+      );
+    }
     setPlaying(true);
     setPressed(true);
     onPlay?.();
