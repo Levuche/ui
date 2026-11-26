@@ -114,9 +114,16 @@ Every block reads only `--site-*` CSS variables. `<CreatorTheme>` sets them:
   shadow tinted with the accent) or `glass` (see-through and blurred over the
   page's background). It restyles every card on the page; a block that picks
   its own `shadow` keeps it. The page's background itself is set by the app.
-- `hover`: `lift` (the default) raises links and linked cards a little under
-  the pointer and presses them in on tap; `none` keeps them still. Neither
-  moves for visitors who ask for less motion.
+- `hover`: what links and linked cards do under the pointer, on tap and when
+  a keyboard reaches them. `lift` (the default) raises them a little and
+  presses them in on tap; `tint` deepens their fill; `zoom` grows the picture
+  inside a little, clipped to the card; `glow` draws a line and a soft glow in
+  the button colour inside the edge; `none` keeps them still. Nothing moves
+  for visitors who ask for less motion: colour changes stay, and `zoom`
+  tints instead. A block can pick its own with the `hover` look prop. Your
+  own linked card joins in with a `data-lift` attribute, and the page editor
+  can show a hover without the pointer with `data-hover-preview` (`press` for
+  the tap) on the card or anything around it.
 
 Buttons also take `variant` (`solid`, `outline`, `soft`, `text`) and `size`
 (`sm`, `md`, `lg`), so creators can pick them per block.
@@ -138,6 +145,7 @@ creator can change one block without touching the others:
 | `font`       | this block's own font                                                       |
 | `background` | a gradient, a faint pattern or a picture behind the words (see below)       |
 | `hideOn`     | screens to hide it on: `phone`, `tablet`, `desktop`                         |
+| `hover`      | its links' hover: `lift`, `tint`, `zoom`, `glow`, `none`                    |
 
 A tone swaps the colours inside the block, so text, links and buttons stay
 readable: in an `accent` block, solid buttons turn inside out. Text boxes keep
@@ -680,6 +688,22 @@ In Storybook, **Pages/Grid page** shows the sample page on each screen, and a
 creator's own desktop arrangement. Each story checks where the blocks landed,
 that no block covers another and that the page never scrolls sideways.
 
+### Headings, text and quotes
+
+`SectionHeading` starts a part of the page ("My works"), with a line of
+detail; give it an `id` and any link to `#that-id` jumps to it (`anchorId`
+cleans what a creator typed). `TextBlock` takes the creator's words in a
+small format: `**bold**`, `*italic*`, `[words](https://…)`, lines starting
+`- ` or `1. ` for lists, a blank line between paragraphs, and emoji as they
+are. `QuoteBlock` shows a quote with who said it and a small picture, and
+`Spacer` leaves a gap of whole grid rows (`rows`), or draws a thin `line`, so
+nobody needs an empty heading to make room. All four are in the free `core`
+pack.
+
+What a creator types is read into plain data (`parseRichText`) and drawn as
+React elements, never as HTML, so it can't add tags or run code; links go
+through `SiteLink`, and one that isn't safe shows as plain words.
+
 ## What's in it
 
 | Group       | Blocks                                                                                                                                                                                                                                                                    |
@@ -693,6 +717,7 @@ that no block covers another and that the page never scrolls sideways.
 | Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                                                  |
 | Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                                                      |
 | Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`, `GoalTracker`, `ProgressList`                                                                                                                                                                             |
+| Text        | `SectionHeading`, `TextBlock`, `QuoteBlock`, `Spacer`, `RichText`                                                                                                                                                                                                         |
 | Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `BeforeAfter`, `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                                                                                       |
 | Forms       | `NewsletterBand`, `ContactForm`, `MessageCard`                                                                                                                                                                                                                            |
 | Feeds       | `LatestVideos`, `LatestPosts`, `LiveStatus`, `EventList`, `ReviewSummary`, `NowPlaying`                                                                                                                                                                                   |
@@ -763,7 +788,8 @@ and state, with its props as controls and docs built from them. The toolbar's
 Theme menu shows any story in the sample creator's light or dark scheme or in
 a creator's own theme, and `Pages/Creator page` shows a whole page in each. The
 Cards menu shows it in each card style, and `Pages/Card styles` shows a whole
-page in each. The Direction menu shows it right to left. `Docs/Getting started`
+page in each. The Hover menu shows each hover, and `Pages/Hover` hovers,
+presses and focuses links in each. The Direction menu shows it right to left. `Docs/Getting started`
 walks through installing and theming, and `Docs/Every block` lists every block
 with what it's for, its grid kind, whether it's free and how many settings
 it has, read from the registry. `Editor/Settings panel` previews the settings
