@@ -5,6 +5,7 @@ import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { LinkTile, type LinkTileStyle } from '../molecules/link-tile';
+import type { ImageSrc } from '../system/image';
 
 /** One link in a list. */
 export type LinkItem = LinkBehavior & {
@@ -88,7 +89,7 @@ export function FeaturedLink({
     href: string;
     title: string;
     detail?: ReactNode;
-    image?: string | null;
+    image?: ImageSrc | null;
     /** Leave empty when the picture only repeats the title. */
     imageAlt?: string;
     ratio?: ThumbRatio;

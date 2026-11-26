@@ -3,6 +3,7 @@ import { SiteLink } from '../atoms/link';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
+import { columnSizes, type ImageSrc } from '../system/image';
 
 /** Pictures in a grid of two to four, each one a link if given. */
 export function ImageGrid({
@@ -13,7 +14,7 @@ export function ImageGrid({
 }: BlockRootProps & {
   /** `alt` describes the picture; it also names the link. */
   images: (LinkBehavior & {
-    src?: string | null;
+    src?: ImageSrc | null;
     alt: string;
     href?: string;
   })[];
@@ -31,7 +32,13 @@ export function ImageGrid({
       >
         {images.map(({ src, alt, href, ...link }, i) => {
           const picture = (
-            <Thumb src={src} alt={alt} ratio={ratio} className="w-full" />
+            <Thumb
+              src={src}
+              alt={alt}
+              ratio={ratio}
+              sizes={columnSizes(1 / columns, 1 / Math.min(columns, 3))}
+              className="w-full"
+            />
           );
           return (
             <li key={`${i}-${alt}`} className="m-0">
@@ -39,6 +46,7 @@ export function ImageGrid({
                 <SiteLink
                   href={href}
                   action="image_click"
+                  data-lift=""
                   className="block"
                   {...link}
                 >

@@ -3,6 +3,12 @@
 import { useState, type ReactNode } from 'react';
 import { PlayIcon } from '../atoms/icons';
 import { cn } from '../system/cn';
+import {
+  columnSizes,
+  imageAttrs,
+  toImageSource,
+  type ImageSrc,
+} from '../system/image';
 
 /** The shape of an embedded player. */
 export type FrameRatio = 'video' | 'vertical' | 'square' | 'audio' | 'tall';
@@ -39,7 +45,7 @@ export function PlayFrame({
   src: string;
   /** What's playing, for screen readers, such as "How tea came to India". */
   title: string;
-  poster?: string | null;
+  poster?: ImageSrc | null;
   /** The play button's name; defaults to "Play: {title}". */
   playLabel?: string;
   ratio?: FrameRatio;
@@ -59,6 +65,7 @@ export function PlayFrame({
     FRAME_RATIOS[ratio] ?? FRAME_RATIOS.video,
     className
   );
+  const cover = toImageSource(poster);
   if (playing) {
     return (
       <div className={frame}>
@@ -85,12 +92,10 @@ export function PlayFrame({
       aria-label={playLabel ?? `Play: ${title}`}
       className={cn(frame, 'cursor-pointer border-0 p-0')}
     >
-      {poster ? (
+      {cover ? (
         <img
-          src={poster}
+          {...imageAttrs(cover, columnSizes())}
           alt=""
-          loading="lazy"
-          decoding="async"
           className="absolute inset-0 size-full object-cover"
         />
       ) : null}

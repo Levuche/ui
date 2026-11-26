@@ -4,6 +4,7 @@ import { SiteLink } from '../atoms/link';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
+import { imageAttrs, toImageSource, type ImageSrc } from '../system/image';
 
 /** One picture, with an optional caption, and a link if given. */
 export function SiteImage({
@@ -19,7 +20,7 @@ export function SiteImage({
   ...root
 }: BlockRootProps &
   LinkBehavior & {
-    src: string | null | undefined;
+    src: ImageSrc | null | undefined;
     /** What the picture shows; it also names the link. Empty if decorative. */
     alt: string;
     caption?: ReactNode;
@@ -61,7 +62,7 @@ export function SiteImage({
 
 /** A brand's logo, for LogoStrip. */
 export type Logo = LinkBehavior & {
-  src: string | null | undefined;
+  src: ImageSrc | null | undefined;
   /** The brand's name. */
   alt: string;
   href?: string;
@@ -96,12 +97,12 @@ export function LogoStrip({
   label?: string;
 }) {
   const item = (logo: Logo, i: number, hidden = false) => {
-    const image = logo.src ? (
+    const source = toImageSource(logo.src);
+    // Logos are at most 160 px wide (max-w-40).
+    const image = source ? (
       <img
-        src={logo.src}
+        {...imageAttrs(source, '160px')}
         alt={hidden ? '' : logo.alt}
-        loading="lazy"
-        decoding="async"
         style={{ height: logoHeight }}
         className={cn(
           'w-auto max-w-40 object-contain',
@@ -155,7 +156,7 @@ export function LogoStrip({
       {scrolling ? (
         <div className="group w-full overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]">
           <ul
-            className="m-0 flex w-max list-none gap-10 p-0 pe-10 group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-safe:animate-[levuche-marquee_var(--marquee)_linear_infinite] motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center"
+            className="m-0 flex w-max list-none gap-10 p-0 pe-10 group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-safe:animate-[levuche-marquee_var(--marquee)_linear_infinite] motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center rtl:[--marquee-to:50%]"
             style={{ ['--marquee' as string]: `${Math.max(5, speed)}s` }}
           >
             {logos.map((logo, i) => item(logo, i))}

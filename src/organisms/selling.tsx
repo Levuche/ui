@@ -21,6 +21,7 @@ import {
   type SellProps,
 } from '../molecules/sell-button';
 import type { SellRef, SellState } from '../system/sell';
+import { columnSizes, type ImageSrc } from '../system/image';
 
 /**
  * A pack in a list: thumbnail, title, what's in it, price. The row links to
@@ -51,12 +52,12 @@ export function PackRow({
     detail?: ReactNode;
     price: string;
     was?: string;
-    image?: string | null;
+    image?: ImageSrc | null;
     href?: string;
   }) {
   const body = (
     <>
-      <Thumb src={image} ratio="square" className="size-13" />
+      <Thumb src={image} ratio="square" sizes="52px" className="size-13" />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="font-semibold">{title}</span>
         {detail ? (
@@ -225,7 +226,7 @@ export function FeaturedPack({
     detail?: ReactNode;
     price: string;
     was?: string;
-    image?: string | null;
+    image?: ImageSrc | null;
     imageAlt?: string;
     ratio?: ThumbRatio;
     /**
@@ -291,7 +292,7 @@ export function PackGrid({
       title: string;
       price: string;
       was?: string;
-      image?: string | null;
+      image?: ImageSrc | null;
       href?: string;
       /** Sells the pack through BuildBase, with a buy button on the tile. */
       sell?: SellRef;
@@ -315,7 +316,11 @@ export function PackGrid({
           ({ title, price, was, image, href, sell, sellState, ...link }, i) => {
             const body = (
               <>
-                <Thumb src={image} className="h-15 w-full" />
+                <Thumb
+                  src={image}
+                  sizes={columnSizes(1 / columns, 1 / 2)}
+                  className="h-15 w-full"
+                />
                 <strong>{title}</strong>
                 <Price value={price} was={was} size="sm" />
               </>
