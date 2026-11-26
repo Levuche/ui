@@ -17,6 +17,14 @@ const THEMES = {
 const tapMin = (page: Page) =>
   page.evaluate(() => (matchMedia('(pointer: coarse)').matches ? 44 : 40));
 
+/**
+ * The message a block's status line shows. The blocks keep an empty status
+ * line in the page so screen readers announce the first message, so a block
+ * can hold more than one; pick the one with the words.
+ */
+const said = (block: Locator, words: string) =>
+  block.getByRole('status').filter({ hasText: words });
+
 test.beforeEach(async ({ page }) => {
   // The video block must not reach YouTube until play is pressed; answer for
   // YouTube here so the tests never depend on it.
@@ -111,13 +119,14 @@ for (const [id, expected] of Object.entries(THEMES)) {
     test('checkout needs the consent box ticked', async () => {
       const selling = panel.getByTestId('selling');
       const buy = selling.getByRole('button', { name: 'I’ll take it, $12' });
+      const started = said(selling, 'Checkout started');
       await buy.click();
-      await expect(selling.getByRole('status')).toHaveCount(0);
+      await expect(started).toHaveCount(0);
       await selling
         .getByRole('checkbox', { name: /14-day right to cancel/ })
         .check();
       await buy.click();
-      await expect(selling.getByRole('status')).toHaveText('Checkout started');
+      await expect(started).toBeVisible();
     });
 
     test('newsletter checks the address before subscribing', async () => {
@@ -129,7 +138,7 @@ for (const [id, expected] of Object.entries(THEMES)) {
       await expect(email).toHaveJSProperty('validity.valid', false);
       await email.fill('reader@example.com');
       await subscribe.click();
-      await expect(band.getByRole('status')).toHaveText('Subscribed');
+      await expect(said(band, 'Subscribed')).toBeVisible();
     });
 
     test('link tiles are square, chips sit four to a row, badges name their store', async ({
@@ -239,12 +248,13 @@ for (const [id, expected] of Object.entries(THEMES)) {
       const offers = panel.getByTestId('offers');
       const email = offers.getByRole('textbox', { name: 'Email' });
       const send = offers.getByRole('button', { name: 'Send it to me' });
+      const sentNote = said(offers, 'Guide sent');
       await email.fill('nope');
       await send.click();
-      await expect(offers.getByRole('status')).toHaveCount(0);
+      await expect(sentNote).toHaveCount(0);
       await email.fill('reader@example.com');
       await send.click();
-      await expect(offers.getByRole('status')).toHaveText('Guide sent');
+      await expect(sentNote).toBeVisible();
     });
 
     test('the tip jar sends the amount picked or typed', async () => {
@@ -254,7 +264,7 @@ for (const [id, expected] of Object.entries(THEMES)) {
       await tips.getByRole('spinbutton', { name: 'Other amount' }).fill('25');
       await expect(tips.getByRole('radio', { name: '$10' })).not.toBeChecked();
       await tips.getByRole('button', { name: 'Tip $25' }).click();
-      await expect(tips.getByRole('status')).toHaveText('Tip of 25 started');
+      await expect(said(tips, 'Tip of 25 started')).toBeVisible();
     });
 
     test('the local time shows the creator’s time, day, city and offset', async () => {
