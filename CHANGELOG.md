@@ -8,6 +8,12 @@ change when it moves to that version.
 
 ### Added
 
+- Text blocks in a new `text` group, free in `core`: `SectionHeading` (a
+  heading a link can jump to, with a line of detail), `TextBlock` (bold,
+  italic, links, lists and emoji), `QuoteBlock` (a quote with who said it
+  and a small picture) and `Spacer` (a gap of whole grid rows, or a thin
+  line). What a creator types is never read as HTML (`parseRichText`,
+  `RichText`).
 - Ready-made looks (`SITE_LOOKS`: clean, soft, bold, night, paper and
   terminal), each a whole `SiteTheme` that passes the contrast checks, and
   `siteLook` to lay a creator's own changes over one. Storybook's toolbar has
