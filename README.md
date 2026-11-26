@@ -126,18 +126,19 @@ Buttons also take `variant` (`solid`, `outline`, `soft`, `text`) and `size`
 Every block also takes the same look props, on top of the page theme, so a
 creator can change one block without touching the others:
 
-| Prop     | Values                                                              |
-| -------- | ------------------------------------------------------------------- |
-| `tone`   | `surface`, `muted`, `accent`, `band`, `notice`, `outline`, `plain`  |
-| `size`   | `sm`, `md`, `lg`: padding, gaps and type together                   |
-| `radius` | `theme` (the page's corners), `none`, `sm`, `md`, `lg`, `full`      |
-| `align`  | `start`, `center`, `end`                                            |
-| `shadow` | `none`, `sm`, `md`, `lg`                                            |
-| `motion` | `none`, `fade`, `rise`, `scale` (off for visitors who ask for less) |
-| `effect` | `none`, `float`, `pulse`, `shimmer`, `tilt` (a small loop)          |
-| `colors` | this block's own colours, the same keys as the theme                |
-| `font`   | this block's own font                                               |
-| `hideOn` | screens to hide it on: `phone`, `tablet`, `desktop`                 |
+| Prop         | Values                                                                      |
+| ------------ | --------------------------------------------------------------------------- |
+| `tone`       | `surface`, `muted`, `inset`, `accent`, `band`, `notice`, `outline`, `plain` |
+| `size`       | `sm`, `md`, `lg`: padding, gaps and type together                           |
+| `radius`     | `theme` (the page's corners), `none`, `sm`, `md`, `lg`, `full`              |
+| `align`      | `start`, `center`, `end`                                                    |
+| `shadow`     | `none`, `sm`, `md`, `lg`                                                    |
+| `motion`     | `none`, `fade`, `rise`, `scale` (off for visitors who ask for less)         |
+| `effect`     | `none`, `float`, `pulse`, `shimmer`, `tilt` (a small loop)                  |
+| `colors`     | this block's own colours, the same keys as the theme                        |
+| `font`       | this block's own font                                                       |
+| `background` | a gradient, a faint pattern or a picture behind the words (see below)       |
+| `hideOn`     | screens to hide it on: `phone`, `tablet`, `desktop`                         |
 
 `effect` keeps a block moving a little once it's on the page: `float`,
 `pulse` and `shimmer` each play for under five seconds, so they need no pause
@@ -150,6 +151,41 @@ A tone swaps the colours inside the block, so text, links and buttons stay
 readable: in an `accent` block, solid buttons turn inside out. Text boxes keep
 the page's colours in any tone. Blocks also take an `id`, `className`,
 `style`, `ref` and `data-*` attributes.
+
+`inset` presses the block into the page: a shade off the page's colour with a
+soft shadow inside its top edge, beside cards that are raised.
+
+#### A block's own background
+
+`background` puts a gradient, a pattern or a picture behind a block's words,
+over any tone, corners and card style, and inside `withBlockLook` and
+`<Block>` too. Colours are the theme's, by name, so a background follows the
+creator's theme and dark mode; a creator never types CSS.
+
+```tsx
+// Two or three theme colours, at any angle. `move` drifts it slowly.
+<BookingCard background={{ type: 'gradient', stops: ['accent', 'band'], angle: 135 }} />
+
+// lines, rings, dots, grid or waves, in a theme colour, 12% strong (30% at most).
+<BookingCard background={{ type: 'pattern', pattern: 'rings', color: 'accent' }} />
+
+// A picture, cropped to fill, under a layer of the block's own colour:
+// `dim` is that layer's strength, 80% if left out and never under 50%.
+<BookingCard background={{ type: 'image', src: heroPicture, position: 'top', dim: 85 }} />
+```
+
+- **Words stay readable.** `backgroundIssues(look, theme)` checks the
+  block's text against every gradient colour, the pattern's lines and the
+  worst picture there could be, as `contrastIssues` does for a theme.
+  `fixBackground(look, theme)` returns the background with the smallest
+  change that passes (a stronger layer, or fainter lines). The defaults pass
+  in the sample theme, light and dark, for the quieter tones; on `accent` or
+  `band` a picture needs a stronger layer.
+- **Pictures are checked.** A picture takes a plain address or an
+  `ImageSource`; only https, http, same-site, `blob:` and `data:image/`
+  addresses are drawn (`cssImageUrl`). A background picture is decoration:
+  one that says something belongs in a picture block, with `alt` text.
+- **Nothing moves** for visitors who ask their device for less motion.
 
 Behaviour is set the same way. Links take `newTab` (`auto` opens other
 sites in a new tab), `sponsored` and `nofollow`, and an unsafe address

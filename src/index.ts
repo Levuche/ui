@@ -28,9 +28,12 @@ export {
   CONTROL_CONTRAST,
   SCHEME_COLORS,
   TEXT_CONTRAST,
+  backgroundIssues,
   contrastIssues,
   contrastRatio,
+  fixBackground,
   fixContrast,
+  type BackgroundIssue,
   type ContrastIssue,
 } from './system/contrast';
 export {
@@ -71,6 +74,31 @@ export {
   wordRingShape,
   type WordRingShape,
 } from './system/motion';
+export {
+  BACKGROUND_FILLS,
+  BACKGROUND_INKS,
+  BACKGROUND_PATTERNS,
+  BACKGROUND_POSITIONS,
+  BACKGROUND_TYPES,
+  DEFAULT_ANGLE,
+  DEFAULT_DIM,
+  DEFAULT_PATTERN_OPACITY,
+  MAX_PATTERN_OPACITY,
+  MIN_DIM,
+  backgroundProps,
+  cleanBackground,
+  type BackgroundFill,
+  type BackgroundInk,
+  type BackgroundPattern,
+  type BackgroundPosition,
+  type BackgroundProps,
+  type BackgroundType,
+  type BlockBackground,
+  type CleanBackground,
+  type GradientBackground,
+  type ImageBackground,
+  type PatternBackground,
+} from './system/background';
 export {
   isExternalHref,
   isSafeHref,
@@ -439,6 +467,7 @@ export {
 } from './organisms/feeds';
 export {
   columnSizes,
+  cssImageUrl,
   imageAttrs,
   toImageSource,
   type ImageSource,
