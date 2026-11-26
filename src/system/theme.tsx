@@ -36,11 +36,21 @@ export const SITE_CARD_STYLES = ['flat', 'outline', 'raised', 'glass'] as const;
 export type SiteCardStyle = (typeof SITE_CARD_STYLES)[number];
 
 /**
- * What links and linked cards do under the pointer. `lift` raises them a
- * little on hover and presses them in on tap (the default); `none` keeps them
- * still. Never moves for visitors who ask for less motion.
+ * What links and linked cards do under the pointer, on tap and when a
+ * keyboard reaches them:
+ *
+ * - lift: rise a little, and press in on tap (the default)
+ * - tint: the fill deepens a little
+ * - zoom: the picture inside grows a little, clipped to the card (a link with
+ *   no picture deepens its fill, as tint does)
+ * - glow: a line and a soft glow in the button colour, inside the edge
+ * - none: stay still
+ *
+ * Nothing moves for visitors who ask for less motion: colour changes stay,
+ * lift and the press stop, and zoom deepens the fill instead. A block can
+ * pick its own (BlockLook.hover).
  */
-export const SITE_HOVERS = ['lift', 'none'] as const;
+export const SITE_HOVERS = ['lift', 'tint', 'zoom', 'glow', 'none'] as const;
 export type SiteHover = (typeof SITE_HOVERS)[number];
 
 /**

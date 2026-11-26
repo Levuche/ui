@@ -47,7 +47,7 @@ export function ImageGrid({
                   href={href}
                   action="image_click"
                   data-lift=""
-                  className="block"
+                  className="rounded-block-inner block"
                   {...link}
                 >
                   {picture}
