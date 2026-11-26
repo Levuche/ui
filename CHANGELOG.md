@@ -17,6 +17,12 @@ change when it moves to that version.
   for visitors who ask for less motion. The featured link card and social
   icons now take the hover too, and `data-hover-preview` shows it without the
   pointer. Storybook's toolbar has a Hover menu, and `Pages/Hover` shows each.
+- Text blocks in a new `text` group, free in `core`: `SectionHeading` (a
+  heading a link can jump to, with a line of detail), `TextBlock` (bold,
+  italic, links, lists and emoji), `QuoteBlock` (a quote with who said it
+  and a small picture) and `Spacer` (a gap of whole grid rows, or a thin
+  line). What a creator types is never read as HTML (`parseRichText`,
+  `RichText`).
 - `SocialCard`: one social profile with the platform's mark, the picture,
   name, handle and verified tick, the follower count written short by
   locale (`shortCount`: 1.1K, 860K) and a button in the platform's own word
