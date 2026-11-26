@@ -226,7 +226,10 @@ export const Plans: Story = {
     </App>
   ),
   play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('radio', { name: 'Yearly' }));
+    // The saving comes from the prices: ₹2,999 against 12 × ₹299.
+    await userEvent.click(
+      canvas.getByRole('radio', { name: 'Yearly Save 16%' })
+    );
     await userEvent.click(canvas.getByRole('button', { name: 'Join' }));
     await expect((await lastAction(canvas)).sell).toEqual({
       planVersionId: 'member',
@@ -254,7 +257,7 @@ export const PlansBilledYearly: Story = {
     </App>
   ),
   play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('radio', { name: 'Yearly' }));
+    await userEvent.click(canvas.getByRole('radio', { name: /^Yearly/ }));
     await userEvent.click(canvas.getByRole('button', { name: 'Join' }));
     await expect((await lastAction(canvas)).sell).toEqual({
       planVersionId: 'member',
