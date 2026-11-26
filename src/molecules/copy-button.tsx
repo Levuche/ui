@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { SiteButton, type ButtonLook } from '../atoms/button';
 import { CheckIcon, CopyIcon } from '../atoms/icons';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 export type CopyLabels = {
   copy: string;
@@ -13,12 +15,7 @@ export type CopyLabels = {
   failedStatus: string;
 };
 
-export const COPY_LABELS: CopyLabels = {
-  copy: 'Copy',
-  copied: 'Copied',
-  copiedStatus: 'Copied {text}',
-  failedStatus: 'Couldn’t copy. It’s {text}.',
-};
+export const COPY_LABELS: CopyLabels = WORDS_EN.copy;
 
 // No clipboard on an http page or in an older browser: that's a failed copy,
 // so the visitor is told the text, rather than nothing happening.
@@ -46,7 +43,7 @@ export function CopyButton({
   action?: string;
   className?: string;
 }) {
-  const words = { ...COPY_LABELS, ...labels };
+  const words = usePageWords('copy', labels);
   const [state, setState] = useState<'idle' | 'copied' | 'failed'>('idle');
   return (
     <>

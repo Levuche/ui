@@ -6,6 +6,7 @@ import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { LinkTile, type LinkTileStyle } from '../molecules/link-tile';
 import type { ImageSrc } from '../system/image';
+import { usePageWords } from '../system/page-words';
 
 /** One link in a list. */
 export type LinkItem = LinkBehavior & {
@@ -27,7 +28,7 @@ export type LinkItem = LinkBehavior & {
  */
 export function LinkList({
   links,
-  label = 'Links',
+  label: labelProp,
   tileStyle = 'filled',
   tileAlign = 'start',
   columns = 1,
@@ -41,6 +42,8 @@ export function LinkList({
   /** Links to a row from a tablet up. */
   columns?: 1 | 2 | 3;
 }) {
+  const own = usePageWords('props');
+  const label = labelProp === undefined ? own.links : labelProp;
   return (
     <Block
       as="nav"
@@ -133,7 +136,7 @@ export function FeaturedLink({
 /** A row of icon links to the creator's social accounts. */
 export function SocialIcons({
   links,
-  label = 'Social accounts',
+  label: labelProp,
   iconStyle = 'plain',
   ...root
 }: BlockRootProps & {
@@ -146,6 +149,8 @@ export function SocialIcons({
    */
   iconStyle?: 'plain' | 'filled' | 'outline' | 'chip';
 }) {
+  const own = usePageWords('props');
+  const label = labelProp === undefined ? own.socialAccounts : labelProp;
   return (
     <Block
       as="nav"

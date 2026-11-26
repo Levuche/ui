@@ -7,6 +7,8 @@ import type { FormStatus } from '../system/state';
 import { Field } from '../molecules/field';
 import { FormNotice } from '../molecules/form-notice';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 export type ContactFormLabels = {
   name: string;
@@ -17,14 +19,7 @@ export type ContactFormLabels = {
   error: ReactNode;
 };
 
-export const CONTACT_FORM_LABELS: ContactFormLabels = {
-  name: 'Your name',
-  email: 'Your email',
-  message: 'Message',
-  button: 'Send',
-  sent: 'Thanks! I’ll get back to you soon.',
-  error: 'That didn’t go through. Please try again.',
-};
+export const CONTACT_FORM_LABELS: ContactFormLabels = WORDS_EN.contactForm;
 
 /**
  * Name, email and a message, posted to `action` (a URL or a React server
@@ -63,7 +58,7 @@ export function ContactForm({
   /** More fields, above the button. */
   children?: ReactNode;
 }) {
-  const words = { ...CONTACT_FORM_LABELS, ...labels };
+  const words = usePageWords('contactForm', labels);
   const sent = status === 'sent' && hideWhenSent;
   const busy = status === 'sending';
   return (
@@ -179,7 +174,7 @@ export function SaveContact({
   contact,
   title,
   detail,
-  buttonLabel = 'Save contact',
+  buttonLabel: buttonLabelProp,
   buttonVariant,
   fileName,
   headingAs = 'h3',
@@ -194,6 +189,9 @@ export function SaveContact({
   fileName?: string;
   headingAs?: HeadingTag;
 }) {
+  const own = usePageWords('props');
+  const buttonLabel =
+    buttonLabelProp === undefined ? own.saveContact : buttonLabelProp;
   const file = `${(fileName ?? contact.name).replace(/[\\/:*?"<>|]/g, '')}.vcf`;
   const href = `data:text/vcard;charset=utf-8,${encodeURIComponent(
     toVCard(contact)

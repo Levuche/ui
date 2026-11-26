@@ -8,6 +8,11 @@ change when it moves to that version.
 
 ### Added
 
+- The page's language: `SiteTheme.language` and `<CreatorTheme words>`, so
+  every block's own words, numbers and dates follow the page with no `labels`
+  on any block. Ready word sets in English, Hindi, Spanish, German, French and
+  Portuguese, each loaded on its own with `loadPageWords`; a block's own
+  `labels` and word props still win. Storybook's toolbar has a Language menu.
 - Ready-made looks (`SITE_LOOKS`: clean, soft, bold, night, paper and
   terminal), each a whole `SiteTheme` that passes the contrast checks, and
   `siteLook` to lay a creator's own changes over one. Storybook's toolbar has
