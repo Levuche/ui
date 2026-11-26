@@ -5,6 +5,7 @@ import { AudioBar, type AudioBarLabels } from '../molecules/audio-bar';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { LiveData } from '../molecules/live-data';
 import type { LiveProps } from '../system/live';
+import type { ImageSrc } from '../system/image';
 
 /** One track: play, pause, a bar to move through it, and the time. */
 export function AudioPlayer({
@@ -22,7 +23,7 @@ export function AudioPlayer({
   title: string;
   /** Such as the artist. */
   detail?: ReactNode;
-  image?: string | null;
+  image?: ImageSrc | null;
   /** A page with the words, for visitors who can't listen. */
   transcriptHref?: string;
   /** A heading above the player, such as "My new single". */
@@ -53,7 +54,7 @@ export type PodcastEpisode = {
   detail?: string;
   /** The episode's own page. */
   href?: string;
-  image?: string | null;
+  image?: ImageSrc | null;
   /** A page with the episode's words. */
   transcriptUrl?: string;
 };

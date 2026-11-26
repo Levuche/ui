@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Avatar } from '../atoms/avatar';
 import { Block, type BlockRootProps } from '../atoms/block';
+import { toImageSource, type ImageSrc } from '../system/image';
 
 /** The top of a creator's page: profile picture, name, tagline and more. */
 export function CreatorHeader({
@@ -18,7 +19,7 @@ export function CreatorHeader({
 }: BlockRootProps & {
   name: string;
   tagline?: ReactNode;
-  avatar?: string | null;
+  avatar?: ImageSrc | null;
   avatarSize?: number;
   avatarShape?: 'circle' | 'rounded' | 'square';
   avatarRing?: boolean;
@@ -31,6 +32,9 @@ export function CreatorHeader({
   /** Under the tagline, such as social icons or a button. */
   children?: ReactNode;
 }) {
+  // The header is at the top of the page, so its picture loads at once.
+  const source = toImageSource(avatar);
+  const picture = source ? { priority: true, ...source } : null;
   const words = (
     <>
       <Heading className="text-site-text text-block-title m-0 inline-flex items-center gap-1.5 font-bold">
@@ -53,7 +57,7 @@ export function CreatorHeader({
         <div className="flex items-center gap-3 text-start">
           <Avatar
             name={name}
-            src={avatar}
+            src={picture}
             size={avatarSize}
             shape={avatarShape}
             ring={avatarRing}
@@ -66,7 +70,7 @@ export function CreatorHeader({
         <div className="flex flex-col gap-2" style={{ alignItems: 'inherit' }}>
           <Avatar
             name={name}
-            src={avatar}
+            src={picture}
             size={avatarSize}
             shape={avatarShape}
             ring={avatarRing}

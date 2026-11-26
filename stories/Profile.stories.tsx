@@ -61,3 +61,15 @@ export const AvatarSizes: StoryObj<typeof Avatar> = {
     </div>
   ),
 };
+
+/** The header's picture is at the top of the page, so it loads at once. */
+export const HeaderWithPicture: Story = {
+  args: {
+    avatar:
+      'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3Crect width="1" height="1" fill="%23c2410c"/%3E%3C/svg%3E',
+  },
+  play: async ({ canvasElement }) => {
+    const image = canvasElement.querySelector('header img');
+    await expect(image).toHaveAttribute('loading', 'eager');
+  },
+};

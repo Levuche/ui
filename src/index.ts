@@ -376,3 +376,10 @@ export {
   type ReviewSummaryLabels,
   type VideoItem,
 } from './organisms/feeds';
+export {
+  columnSizes,
+  imageAttrs,
+  toImageSource,
+  type ImageSource,
+  type ImageSrc,
+} from './system/image';

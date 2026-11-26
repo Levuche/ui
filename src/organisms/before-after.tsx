@@ -7,6 +7,7 @@ import { Badge } from '../atoms/text';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import { useControllableState } from '../system/state';
+import type { ImageSrc } from '../system/image';
 
 export type BeforeAfterLabels = {
   before: string;
@@ -24,7 +25,7 @@ export const BEFORE_AFTER_LABELS: BeforeAfterLabels = {
   value: '{before}% before, {after}% after',
 };
 
-type Picture = { src: string | null | undefined; alt: string };
+type Picture = { src: ImageSrc | null | undefined; alt: string };
 
 /**
  * Two pictures, one over the other, with a handle to drag between them, as

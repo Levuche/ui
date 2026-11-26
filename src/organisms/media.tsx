@@ -3,6 +3,7 @@ import { SiteLink } from '../atoms/link';
 import { Thumb } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import { PlayFrame } from '../molecules/play-frame';
+import { columnSizes, type ImageSrc } from '../system/image';
 
 /** Reel thumbnails in a grid of three (9:14), each one a link if given. */
 export function ReelGrid({
@@ -10,7 +11,7 @@ export function ReelGrid({
   columns = 3,
   ...root
 }: BlockRootProps & {
-  reels: { image?: string | null; label?: string; href?: string }[];
+  reels: { image?: ImageSrc | null; label?: string; href?: string }[];
   columns?: 2 | 3 | 4;
 }) {
   return (
@@ -24,7 +25,12 @@ export function ReelGrid({
       >
         {reels.map((reel, i) => {
           const tile = (
-            <Thumb src={reel.image} ratio="reel" className="w-full" />
+            <Thumb
+              src={reel.image}
+              ratio="reel"
+              sizes={columnSizes(1 / columns, 1 / Math.min(columns, 3))}
+              className="w-full"
+            />
           );
           return (
             <li key={i} className="m-0">
@@ -98,7 +104,7 @@ export function YouTubeVideo({
   /** What the video is, for screen readers, such as "How tea came to India". */
   title: string;
   /** A picture to show before play; defaults to YouTube's own. */
-  poster?: string | null;
+  poster?: ImageSrc | null;
   /** True for a Short (9:16). */
   vertical?: boolean;
   /** Start this many seconds in. */

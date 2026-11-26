@@ -61,6 +61,43 @@ const SLIDES = [
   },
 ];
 
+/*
+ * A picture that comes in several sizes: the browser picks one for the
+ * screen, its space is kept from its own width and height while it loads,
+ * and it waits until it's near the screen.
+ */
+export const ImageInSizes: Story = {
+  args: {
+    src: {
+      src: picture('#9a3412', 'Chai 800'),
+      srcSet: `${picture('#9a3412', 'Chai 400')} 400w, ${picture('#9a3412', 'Chai 800')} 800w`,
+      width: 800,
+      height: 600,
+    },
+  },
+  play: async ({ canvas }) => {
+    const image = canvas.getByRole('img', { name: 'Chai on a clay stove' });
+    await expect(image).toHaveAttribute('srcset');
+    await expect(image).toHaveAttribute(
+      'sizes',
+      '(min-width: 768px) 576px, 100vw'
+    );
+    await expect(image).toHaveAttribute('loading', 'lazy');
+    const box = image.getBoundingClientRect();
+    await expect(Math.abs(box.height - (box.width * 3) / 4)).toBeLessThan(1);
+  },
+};
+
+/** The first picture on a page can load at once. */
+export const ImageAtTheTop: Story = {
+  args: { src: { src: picture('#9a3412', 'Chai'), priority: true } },
+  play: async ({ canvas }) => {
+    const image = canvas.getByRole('img', { name: 'Chai on a clay stove' });
+    await expect(image).toHaveAttribute('loading', 'eager');
+    await expect(image).toHaveAttribute('fetchpriority', 'high');
+  },
+};
+
 /** Arrows, dots and the arrow keys move between slides. */
 export const Carousel: StoryObj<typeof ImageCarousel> = {
   render: () => <ImageCarousel title="Where tea comes from" slides={SLIDES} />,
