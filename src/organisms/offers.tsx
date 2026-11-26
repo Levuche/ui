@@ -108,10 +108,13 @@ export function MembershipCard({
   newTab,
   sponsored,
   nofollow,
+  saveLabel,
   ...root
 }: BlockRootProps &
   LinkBehavior &
   SellProps & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
     title: string;
     price: string;
     /** The price before a discount. */
@@ -149,7 +152,13 @@ export function MembershipCard({
         ) : null}
       </div>
       <p className="m-0">
-        <Price value={price} was={was} period={period} size="lg" />
+        <Price
+          saveLabel={saveLabel}
+          value={price}
+          was={was}
+          period={period}
+          size="lg"
+        />
       </p>
       <CheckList items={perks} />
       <SellButton

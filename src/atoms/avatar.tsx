@@ -43,7 +43,8 @@ export function Avatar({
       : shape === 'rounded'
         ? 'rounded-block-inner'
         : 'rounded-none',
-    ring && 'ring-site-button ring-offset-site-surface ring-2 ring-offset-2',
+    // An outline leaves a see-through gap, so the ring works on any background.
+    ring && 'outline-site-button outline-2 outline-offset-2',
     className
   );
   const source = toImageSource(src);

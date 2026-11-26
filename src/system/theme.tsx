@@ -55,6 +55,11 @@ export type SiteTheme = {
   buttonShape?: SiteButtonShape;
   /** A CSS font-family list, such as "'Sora', sans-serif". */
   font?: string;
+  /**
+   * A second font for a few words set apart, such as the highlighted words of
+   * the header's tagline. Left out, they use `font`.
+   */
+  displayFont?: string;
   /** How cards look; see SiteCardStyle. */
   cards?: SiteCardStyle;
   /** What links do under the pointer; see SiteHover. */
@@ -119,6 +124,9 @@ export function siteThemeStyle(theme: SiteTheme = {}): CSSProperties {
   }
   if (theme.font && isSafeFont(theme.font)) {
     style['--site-font'] = theme.font;
+  }
+  if (theme.displayFont && isSafeFont(theme.displayFont)) {
+    style['--site-display-font'] = theme.displayFont;
   }
   return style as CSSProperties;
 }

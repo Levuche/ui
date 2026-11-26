@@ -108,6 +108,8 @@ Every block reads only `--site-*` CSS variables. `<CreatorTheme>` sets them:
 - `corners`: `square`, `soft` or `round` for cards and tiles.
 - `buttonShape`: `square`, `rounded` or `pill`.
 - `font`: a CSS font-family list (the app loads the font).
+- `displayFont`: a second font for a few words set apart, such as the
+  header's `highlight`; it falls back to `font`.
 - `cards`: `flat` (the default), `outline` (a thin line), `raised` (a soft
   shadow tinted with the accent) or `glass` (see-through and blurred over the
   page's background). It restyles every card on the page; a block that picks
