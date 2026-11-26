@@ -81,3 +81,33 @@ export function imageAttrs(
     decoding: 'async',
   };
 }
+
+/** Data images a CSS background may show. None of these can run code there. */
+const DATA_IMAGE = /^data:image\/(png|jpe?g|gif|webp|avif|svg\+xml)[;,]/i;
+
+/**
+ * A picture's address, made safe to put in CSS as url("..."), or null when
+ * it isn't one: only https and http addresses, links on the same site, and
+ * the editor's own local previews (blob: and data:image/). Characters that
+ * could end the url() early are percent-encoded; control characters and
+ * backslashes are refused.
+ */
+export function cssImageUrl(src: ImageSrc | null | undefined): string | null {
+  const address = toImageSource(src)?.src;
+  if (typeof address !== 'string') return null;
+  const value = address.trim();
+  // eslint-disable-next-line no-control-regex -- control characters are refused
+  if (!value || /[\u0000-\u001f\u007f\\<>]/.test(value)) return null;
+  const allowed =
+    /^https?:\/\//i.test(value) ||
+    /^(\/(?![/\\])|\.\/)/.test(value) ||
+    /^blob:https?:\/\//i.test(value) ||
+    DATA_IMAGE.test(value);
+  if (!allowed) return null;
+  const encoded = value.replace(
+    /["'()\s]/g,
+    (char) =>
+      `%${char.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')}`
+  );
+  return `url("${encoded}")`;
+}
