@@ -175,7 +175,14 @@ export * from './atoms/icons';
 // Molecules
 export { SiteSection } from './molecules/section';
 export { ItemHead, type HeadingTag } from './molecules/item-head';
-export { LinkTile, type LinkTileStyle } from './molecules/link-tile';
+export {
+  LINK_TILE_LOOKS,
+  LINK_TILE_VARIANTS,
+  LinkTile,
+  type LinkTileLook,
+  type LinkTileStyle,
+  type LinkTileVariant,
+} from './molecules/link-tile';
 export { Price, priceSaving } from './molecules/price';
 export { Rating } from './molecules/rating';
 export { CheckList } from './molecules/check-list';
@@ -220,6 +227,17 @@ export {
   SocialIcons,
   type LinkItem,
 } from './organisms/links';
+export {
+  APP_BADGE_LABELS,
+  APP_STORES,
+  AppBadges,
+  LinkCard,
+  LinkChip,
+  LogoTile,
+  type AppBadgeLabels,
+  type AppBadgeLink,
+  type AppStoreName,
+} from './organisms/link-tiles';
 export {
   BuyButton,
   CREDIT_PACK_LABELS,
