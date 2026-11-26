@@ -217,6 +217,27 @@ export const WORDS_HI: PageWords = {
     soundOn: '{title} आवाज़ के साथ चलाएँ',
     transcript: 'ट्रांसक्रिप्ट',
   },
+  daysLeft: {
+    due: 'अंतिम तिथि {date}',
+    days: '{n} दिन बाकी',
+    oneDay: '1 दिन बाकी',
+    ended: 'समाप्त',
+  },
+  goalTracker: {
+    due: 'अंतिम तिथि {date}',
+    days: '{n} दिन बाकी',
+    oneDay: '1 दिन बाकी',
+    ended: 'समाप्त',
+    items: '{total} में से {done} पूरे',
+    amount: '{target} में से {current}',
+    reached: 'लक्ष्य पूरा',
+    list: 'चरण',
+    done: 'पूरा',
+    notDone: 'अभी पूरा नहीं',
+  },
+  progressList: {
+    amount: '{max} में से {value}',
+  },
   props: {
     verified: 'सत्यापित',
     links: 'लिंक',

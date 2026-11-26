@@ -273,6 +273,46 @@ for (const [id, expected] of Object.entries(THEMES)) {
       );
     });
 
+    test('goals and lists show how far along they are as progress bars', async () => {
+      const goals = panel.getByTestId('goals');
+      const series = goals.getByRole('progressbar', {
+        name: 'Film the spice series',
+      });
+      await expect(series).toHaveAttribute('aria-valuenow', '2');
+      await expect(series).toHaveAttribute('aria-valuemax', '4');
+      await expect(series).toHaveAttribute(
+        'aria-valuetext',
+        '2 of 4 done, 50%'
+      );
+      // Ten steps, half of them filled, in the theme's accent.
+      await expect(series.locator('span')).toHaveCount(10);
+      await expect(series.locator('[data-filled]')).toHaveCount(5);
+      await expect(series.locator('[data-filled]').first()).toHaveCSS(
+        'background-color',
+        expected.accent
+      );
+      await expect(goals.getByText('37 days left')).toBeVisible();
+      await expect(
+        goals.getByRole('list', { name: 'Steps' }).getByRole('listitem')
+      ).toHaveCount(4);
+
+      const camera = goals.getByRole('progressbar', {
+        name: 'Fund a new camera',
+      });
+      await expect(camera).toHaveAttribute(
+        'aria-valuetext',
+        '₹37,000 of ₹100,000, 37%'
+      );
+      await expect(camera.locator('span')).toHaveCSS(
+        'background-color',
+        expected.accent
+      );
+
+      await expect(
+        goals.getByRole('progressbar', { name: 'Marathi' })
+      ).toHaveAttribute('aria-valuetext', '4 of 5');
+    });
+
     test('a locked link stays out of the page until the code is right', async ({
       page,
     }) => {

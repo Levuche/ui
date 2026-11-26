@@ -9,6 +9,7 @@ import {
   DiscountCode,
   FaqList,
   FeaturedLink,
+  GoalTracker,
   ImageGrid,
   MembershipCard,
   SocialCard,
@@ -27,6 +28,7 @@ import {
   LogoTile,
   PackGrid,
   PackRow,
+  ProgressList,
   QuoteBlock,
   ReelGrid,
   SectionHeading,
@@ -364,6 +366,37 @@ export function Panel({
             now={NOW}
           />
           <DiscountCode code="ORIGINS10" detail="10% off the reel pack" />
+        </Group>
+
+        <Group id={id} name="goals" title="Goals and progress">
+          <GoalTracker
+            title="Film the spice series"
+            deadline={new Date(NOW + 37 * 86_400_000).toISOString()}
+            now={NOW}
+            bar="steps"
+            items={[
+              { label: 'Write the scripts', done: true },
+              { label: 'Book the market shoots', done: true },
+              { label: 'Film five episodes' },
+              { label: 'Edit and post' },
+            ]}
+          />
+          <GoalTracker
+            title="Fund a new camera"
+            current={37000}
+            target={100000}
+            currency="INR"
+          />
+          <ProgressList
+            title="Languages"
+            max={5}
+            valueAs="amount"
+            items={[
+              { label: 'Hindi', value: 5 },
+              { label: 'Marathi', value: 4 },
+              { label: 'English', value: 4 },
+            ]}
+          />
         </Group>
 
         <Group id={id} name="photos" title="Photos">

@@ -2,6 +2,11 @@ import type { BlockKind } from './grid';
 import { BLOCK_TONES } from './look';
 import { EMBED_SERVICES } from './embeds';
 import { MESSAGE_CHANNELS } from './message';
+import {
+  MAX_PROGRESS_STEPS,
+  PROGRESS_BAR_STYLES,
+  PROGRESS_VALUE_STYLES,
+} from './progress';
 import { CAPTION_STYLES, GALLERY_SPANS, VIDEO_RATIOS } from './gallery';
 import { MIN_MOTION_SECONDS } from './motion';
 import { SOCIAL_ACTIONS, SOCIAL_PLATFORMS } from './social';
@@ -4596,6 +4601,182 @@ export const BLOCKS = [
         'Tab reaches the follow button, then each post; Enter opens it.',
       screenReader:
         'The name as a heading with the tick in words, the handle and platform, the follower count, the button, and a labelled list of posts, each named by its alt text or number with its views in words.',
+    },
+  },
+  {
+    id: 'goal-tracker',
+    component: 'GoalTracker',
+    kind: 'card',
+    group: 'trust',
+    client: false,
+    pack: 'growth',
+    summary:
+      'A goal with a deadline, steps to tick off and a bar with the percentage',
+    settings: [
+      { name: 'title', label: 'Goal', type: 'text', required: true },
+      { name: 'detail', label: 'About it', type: 'longText' },
+      {
+        name: 'deadline',
+        label: 'Due',
+        type: 'dateTime',
+        help: 'Shows the date and the days left.',
+      },
+      {
+        name: 'items',
+        label: 'Steps',
+        type: 'list',
+        itemLabel: 'Step',
+        help: 'Ticked steps make the percentage, unless there’s a target.',
+        fields: [
+          { name: 'label', label: 'Step', type: 'text', required: true },
+          { name: 'done', label: 'Done', type: 'toggle', default: false },
+        ],
+      },
+      {
+        name: 'target',
+        label: 'Target',
+        type: 'number',
+        min: 0,
+        help: 'An amount to reach, as money raised or members. Set, it makes the percentage instead of the steps.',
+      },
+      {
+        name: 'current',
+        label: 'So far',
+        type: 'number',
+        min: 0,
+        help: 'How much of the target there is now.',
+      },
+      {
+        name: 'currency',
+        label: 'Currency',
+        type: 'text',
+        help: 'A three-letter code, as USD or INR, to write the amounts as money. Left empty, a plain count.',
+        icon: 'money',
+      },
+      {
+        name: 'bar',
+        label: 'Bar style',
+        type: 'choice',
+        options: PROGRESS_BAR_STYLES,
+        optionLabels: { smooth: 'Smooth', steps: 'In steps' },
+        default: 'smooth',
+      },
+      {
+        name: 'steps',
+        label: 'Steps in the bar',
+        type: 'number',
+        min: 2,
+        max: MAX_PROGRESS_STEPS,
+        step: 1,
+        default: 10,
+        help: 'For a bar in steps.',
+      },
+      {
+        name: 'showPercent',
+        label: 'Show the percentage',
+        type: 'toggle',
+        default: true,
+      },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'GOAL_TRACKER_LABELS',
+      },
+    ],
+    appOnly: ['locale', 'now', 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press; the steps and the bar are read in order.',
+      screenReader:
+        'The title as a heading, the deadline and days left, a labelled list of steps each read as done or not done yet, and a progress bar named by the title with its percentage.',
+    },
+  },
+  {
+    id: 'progress-list',
+    component: 'ProgressList',
+    kind: 'text',
+    group: 'trust',
+    client: false,
+    pack: 'growth',
+    summary: 'Bars for skills, ratings or languages, each with its number',
+    settings: [
+      {
+        name: 'items',
+        label: 'Bars',
+        type: 'list',
+        required: true,
+        itemLabel: 'Bar',
+        fields: [
+          { name: 'label', label: 'Name', type: 'text', required: true },
+          {
+            name: 'value',
+            label: 'Value',
+            type: 'number',
+            required: true,
+            min: 0,
+          },
+          {
+            name: 'max',
+            label: 'Out of',
+            type: 'number',
+            min: 0,
+            help: 'Left empty, the list’s own.',
+          },
+        ],
+      },
+      { name: 'title', label: 'Title', type: 'text' },
+      {
+        name: 'max',
+        label: 'Out of',
+        type: 'number',
+        min: 1,
+        default: 100,
+        help: 'What a full bar is, as 100 or 5.',
+      },
+      {
+        name: 'valueAs',
+        label: 'Number beside each bar',
+        type: 'choice',
+        options: PROGRESS_VALUE_STYLES,
+        optionLabels: {
+          percent: 'Percentage',
+          amount: 'Value out of the most',
+          none: 'None',
+        },
+        default: 'percent',
+      },
+      {
+        name: 'bar',
+        label: 'Bar style',
+        type: 'choice',
+        options: PROGRESS_BAR_STYLES,
+        optionLabels: { smooth: 'Smooth', steps: 'In steps' },
+        default: 'smooth',
+      },
+      {
+        name: 'steps',
+        label: 'Steps in each bar',
+        type: 'number',
+        min: 2,
+        max: MAX_PROGRESS_STEPS,
+        step: 1,
+        default: 10,
+        help: 'For bars in steps.',
+      },
+      {
+        name: 'labels',
+        label: 'Words',
+        type: 'words',
+        from: 'PROGRESS_LIST_LABELS',
+      },
+    ],
+    appOnly: ['locale', 'headingAs'],
+    privacy: LOADS_NOTHING,
+    accessibility: {
+      keyboard: 'Nothing to press.',
+      screenReader:
+        'A list of progress bars, each named by its label and read with its number.',
     },
   },
 ] as const satisfies readonly BlockInfo[];

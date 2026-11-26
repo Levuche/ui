@@ -16,6 +16,21 @@ change when it moves to that version.
   order so the editor can select them from the keyboard. Client blocks read
   it with `usePreviewMode()`; `inPreview` and `previewStop` say what it
   stops. `Editor/Preview mode` in Storybook presses every block in it.
+- `GoalTracker`: a goal with a title, a deadline chip with the days left,
+  steps the creator ticks off and a bar with the percentage, worked out from
+  the steps that are done or from `current` towards a `target`, written as
+  money with a `currency` code or as a count ("$370 of $1,000"). Says "Goal
+  reached" once it's done. `ProgressList`: bars for skills, ratings or
+  languages, each with its number as a percentage, a value out of its most
+  ("4 of 5") or none. Both in the trust group of the growth pack.
+- `ProgressBar`: a bar in the theme's accent, smooth or in 2 to 20 steps,
+  with `role="progressbar"` and its value for screen readers; it never moves
+  for visitors who ask for less motion. `DaysLeft`: a deadline as a chip
+  with the days left, which waits for the browser so the page hydrates
+  cleanly. The sums are plain functions: `progressOf` (held between 0 and
+  the target, rounding down so 100% means done), `filledSteps`,
+  `formatAmount`, `formatPercent`, `currencyCode`, `deadlineState` and
+  `formatDeadline`.
 - More hovers: `SiteTheme.hover` takes `tint` (the fill deepens), `zoom`
   (the picture grows a little, clipped to the card) and `glow` (a line and
   soft glow in the button colour), beside `lift` and `none`, and a block can
