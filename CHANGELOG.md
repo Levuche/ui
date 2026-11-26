@@ -8,6 +8,17 @@ change when it moves to that version.
 
 ### Added
 
+- Each block describes its settings, so the page editor can build its panel:
+  every `BLOCKS` entry has `settings` (field name, label, help, type,
+  default, required, `slow` for fields that load over the network, `main`
+  for the link a paste goes to, `forApp` for what the app reads, an icon
+  hint) and `appOnly` (props the app fills in). `LOOK_SETTINGS` describes
+  the shared look once. New: `SettingField` and its types, `SETTING_TYPES`,
+  `SETTING_ICONS`, `settingsPanel`, `mainLinkSetting`, `settingIcon`,
+  `fitsSetting`, `settingDefaults`, and `PACK_CHECKOUT_LABELS` and
+  `LEAD_MAGNET_LABELS` (the defaults those blocks already used). The type
+  check fails when a block's settings and props disagree. Storybook:
+  `Editor/Settings panel`.
 - Ready-made looks (`SITE_LOOKS`: clean, soft, bold, night, paper and
   terminal), each a whole `SiteTheme` that passes the contrast checks, and
   `siteLook` to lay a creator's own changes over one. Storybook's toolbar has
