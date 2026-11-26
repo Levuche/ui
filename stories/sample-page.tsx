@@ -8,6 +8,7 @@ import {
   ImageGrid,
   LeadMagnet,
   MembershipCard,
+  MessageCard,
   SocialIcons,
   Testimonials,
   TipJar,
@@ -203,6 +204,14 @@ export function SamplePage({ words = SAMPLE_WORDS }: { words?: SampleWords }) {
           perks={['A bonus story every week', 'Early access to new packs']}
           href="https://example.com/join"
           featured
+        />
+        <MessageCard
+          channel="whatsapp"
+          name={words.name}
+          picture={null}
+          detail="Usually replies within an hour"
+          to="+91 98765 43210"
+          message="Hi! I’d like a quote for a custom print."
         />
       </SiteSection>
       <SiteSection title="Free">

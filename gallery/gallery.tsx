@@ -9,6 +9,7 @@ import {
   FeaturedLink,
   ImageGrid,
   MembershipCard,
+  MessageCard,
   SocialIcons,
   Testimonials,
   CameraIcon,
@@ -260,6 +261,18 @@ function Panel({
             headingAs="p"
           />
           <LeadMagnetDemo />
+        </Group>
+
+        <Group id={id} name="message" title="Message">
+          <MessageCard
+            channel="whatsapp"
+            name="Desi Origins"
+            picture={null}
+            detail="Usually replies within an hour"
+            to="+91 98765 43210"
+            message="Hi! I’d like a quote for a custom print."
+            headingAs="p"
+          />
         </Group>
 
         <Group id={id} name="tips" title="Tips">
