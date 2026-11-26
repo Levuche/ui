@@ -114,9 +114,16 @@ Every block reads only `--site-*` CSS variables. `<CreatorTheme>` sets them:
   shadow tinted with the accent) or `glass` (see-through and blurred over the
   page's background). It restyles every card on the page; a block that picks
   its own `shadow` keeps it. The page's background itself is set by the app.
-- `hover`: `lift` (the default) raises links and linked cards a little under
-  the pointer and presses them in on tap; `none` keeps them still. Neither
-  moves for visitors who ask for less motion.
+- `hover`: what links and linked cards do under the pointer, on tap and when
+  a keyboard reaches them. `lift` (the default) raises them a little and
+  presses them in on tap; `tint` deepens their fill; `zoom` grows the picture
+  inside a little, clipped to the card; `glow` draws a line and a soft glow in
+  the button colour inside the edge; `none` keeps them still. Nothing moves
+  for visitors who ask for less motion: colour changes stay, and `zoom`
+  tints instead. A block can pick its own with the `hover` look prop. Your
+  own linked card joins in with a `data-lift` attribute, and the page editor
+  can show a hover without the pointer with `data-hover-preview` (`press` for
+  the tap) on the card or anything around it.
 
 Buttons also take `variant` (`solid`, `outline`, `soft`, `text`) and `size`
 (`sm`, `md`, `lg`), so creators can pick them per block.
@@ -137,6 +144,7 @@ creator can change one block without touching the others:
 | `colors` | this block's own colours, the same keys as the theme                |
 | `font`   | this block's own font                                               |
 | `hideOn` | screens to hide it on: `phone`, `tablet`, `desktop`                 |
+| `hover`  | its links' hover: `lift`, `tint`, `zoom`, `glow`, `none`            |
 
 A tone swaps the colours inside the block, so text, links and buttons stay
 readable: in an `accent` block, solid buttons turn inside out. Text boxes keep
@@ -656,7 +664,8 @@ and state, with its props as controls and docs built from them. The toolbar's
 Theme menu shows any story in the sample creator's light or dark scheme or in
 a creator's own theme, and `Pages/Creator page` shows a whole page in each. The
 Cards menu shows it in each card style, and `Pages/Card styles` shows a whole
-page in each. The Direction menu shows it right to left. `Docs/Getting started`
+page in each. The Hover menu shows each hover, and `Pages/Hover` hovers,
+presses and focuses links in each. The Direction menu shows it right to left. `Docs/Getting started`
 walks through installing and theming, and `Docs/Every block` lists every block
 with what it's for, its grid kind and whether it's free, read from the
 registry. `CHANGELOG.md` lists what changed in each release.

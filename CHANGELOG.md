@@ -8,6 +8,14 @@ change when it moves to that version.
 
 ### Added
 
+- More hovers: `SiteTheme.hover` takes `tint` (the fill deepens), `zoom`
+  (the picture grows a little, clipped to the card) and `glow` (a line and
+  soft glow in the button colour), beside `lift` and `none`, and a block can
+  pick its own with the `hover` look prop. Each has a matching press on tap
+  and shows when a keyboard reaches the link, with a focus ring; nothing moves
+  for visitors who ask for less motion. The featured link card and social
+  icons now take the hover too, and `data-hover-preview` shows it without the
+  pointer. Storybook's toolbar has a Hover menu, and `Pages/Hover` shows each.
 - Ready-made looks (`SITE_LOOKS`: clean, soft, bold, night, paper and
   terminal), each a whole `SiteTheme` that passes the contrast checks, and
   `siteLook` to lay a creator's own changes over one. Storybook's toolbar has

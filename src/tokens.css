@@ -291,25 +291,164 @@
     color-mix(in oklab, var(--site-text) 12%, transparent);
 }
 /*
- * Links and linked cards (data-lift) rise a little under the pointer and
- * press in on tap, unless the theme says hover: none (data-hover) or the
- * visitor asks for less motion.
+ * Hover: what links and linked cards (data-lift) do under the pointer, on tap
+ * and when a keyboard reaches them. The page picks one (SiteTheme.hover,
+ * data-hover on the page) and a block can pick its own (BlockLook.hover,
+ * data-hover on the block). Each choice only sets these variables, so the
+ * nearest one wins and reaches every link inside:
+ *
+ *   lift  rises 2px, presses in on tap (the default)
+ *   tint  the fill deepens with a little of the text colour
+ *   zoom  the picture grows a little, clipped to the card; a link with no
+ *         picture deepens instead, as tint does
+ *   glow  a line and a soft glow in the button colour, inside the edge
+ *   none  stays still
+ *
+ * Movement (rise, zoom, press) is only for visitors who haven't asked for
+ * less motion. For those who have, colour changes stay and zoom tints.
  */
-@media (prefers-reduced-motion: no-preference) {
+[data-site],
+:is([data-site], [data-block])[data-hover] {
+  --block-hover-y: 0px;
+  --block-hover-press: 1;
+  --block-hover-tint: 0%;
+  --block-hover-bare: 0%;
+  --block-hover-zoom: 1;
+  --block-hover-line: 0px;
+  --block-hover-glow: 0%;
+}
+[data-site]:not([data-hover]),
+:is([data-site], [data-block])[data-hover='lift'] {
+  --block-hover-y: -2px;
+  --block-hover-press: 0.98;
+}
+:is([data-site], [data-block])[data-hover='tint'] {
+  --block-hover-tint: 8%;
+  --block-hover-bare: 8%;
+}
+:is([data-site], [data-block])[data-hover='zoom'] {
+  --block-hover-bare: 8%;
+  --block-hover-zoom: 1.06;
+  --block-hover-press: 0.98;
+}
+:is([data-site], [data-block])[data-hover='glow'] {
+  --block-hover-line: 2px;
+  --block-hover-glow: 40%;
+}
+@media (prefers-reduced-motion: reduce) {
+  :is([data-site], [data-block])[data-hover='zoom'] {
+    --block-hover-tint: 8%;
+  }
+}
+/*
+ * The colour change is a layer over the card (::after), so it works over any
+ * fill, picture or card style. A link with a picture (img) takes the tint;
+ * one without takes the "bare" tint. The card clips what grows inside it. In
+ * the base layer, so a block's own position or overflow class still wins.
+ */
+@layer base {
   [data-lift] {
+    position: relative;
+    overflow: clip;
+  }
+}
+[data-lift] {
+  --block-hover-fill: var(--block-hover-tint);
+}
+[data-lift]:not(:has(img)) {
+  --block-hover-fill: var(--block-hover-bare);
+}
+[data-lift]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow:
+    inset 0 0 0 var(--block-hover-line) var(--site-button),
+    inset 0 0 18px
+      color-mix(
+        in oklab,
+        var(--site-button) var(--block-hover-glow),
+        transparent
+      ),
+    inset 0 0 0 100vmax
+      color-mix(in oklab, currentColor var(--block-hover-fill), transparent);
+}
+/*
+ * The hover state: under a pointer that can hover, on tap, from a keyboard,
+ * or when the page editor previews it (data-hover-preview on the link or on
+ * anything around it, "press" for the tap).
+ */
+@media (hover: hover) {
+  [data-lift]:hover::after {
+    opacity: 1;
+  }
+}
+[data-lift]:is(
+    :active,
+    :focus-visible,
+    :has(:focus-visible),
+    [data-hover-preview],
+    [data-hover-preview] *
+  )::after {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-lift],
+  [data-lift] img {
     transition:
       translate 0.15s ease-out,
-      scale 0.15s ease-out,
+      scale 0.2s ease-out,
       opacity 0.15s ease-out;
   }
+  [data-lift]::after {
+    transition: opacity 0.15s ease-out;
+  }
   @media (hover: hover) {
-    [data-site]:not([data-hover='none']) [data-lift]:hover {
-      translate: 0 -2px;
+    [data-lift]:hover {
+      translate: 0 var(--block-hover-y);
+    }
+    [data-lift]:hover img {
+      scale: var(--block-hover-zoom);
     }
   }
-  [data-site]:not([data-hover='none']) [data-lift]:active {
+  [data-lift]:is(
+    :focus-visible,
+    :has(:focus-visible),
+    [data-hover-preview],
+    [data-hover-preview] *
+  ) {
+    translate: 0 var(--block-hover-y);
+  }
+  [data-lift]:is(
+      :focus-visible,
+      :has(:focus-visible),
+      [data-hover-preview],
+      [data-hover-preview] *
+    )
+    img {
+    scale: var(--block-hover-zoom);
+  }
+  [data-lift]:is(
+    :active,
+    [data-hover-preview='press'],
+    [data-hover-preview='press'] *
+  ) {
     translate: 0 0;
-    scale: 0.98;
+    scale: var(--block-hover-press);
+  }
+}
+/*
+ * A keyboard always shows where it is. A linked card draws the ring on
+ * itself, since the link inside may be clipped by the card. In the base
+ * layer, so an app's own focus style wins.
+ */
+@layer base {
+  [data-lift]:is(:focus-visible, :has(:focus-visible)) {
+    outline: 2px solid var(--site-page-text, currentColor);
+    outline-offset: 2px;
   }
 }
 @theme inline {
