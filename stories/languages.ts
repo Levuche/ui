@@ -1,4 +1,9 @@
-import { WORDS_EN, type PageLanguage, type PageWords } from '../src';
+import {
+  PAGE_LANGUAGE_LABELS,
+  WORDS_EN,
+  type PageLanguage,
+  type PageWords,
+} from '../src';
 import { WORDS_DE } from '../src/system/words/de';
 import { WORDS_ES } from '../src/system/words/es';
 import { WORDS_FR } from '../src/system/words/fr';
@@ -13,10 +18,10 @@ export const LANGUAGES: Record<
   PageLanguage,
   { title: string; words: PageWords }
 > = {
-  en: { title: 'English', words: WORDS_EN },
-  hi: { title: 'हिन्दी (Hindi)', words: WORDS_HI },
-  es: { title: 'Español (Spanish)', words: WORDS_ES },
-  de: { title: 'Deutsch (German)', words: WORDS_DE },
-  fr: { title: 'Français (French)', words: WORDS_FR },
-  pt: { title: 'Português (Portuguese)', words: WORDS_PT },
+  en: { title: PAGE_LANGUAGE_LABELS.en, words: WORDS_EN },
+  hi: { title: PAGE_LANGUAGE_LABELS.hi, words: WORDS_HI },
+  es: { title: PAGE_LANGUAGE_LABELS.es, words: WORDS_ES },
+  de: { title: PAGE_LANGUAGE_LABELS.de, words: WORDS_DE },
+  fr: { title: PAGE_LANGUAGE_LABELS.fr, words: WORDS_FR },
+  pt: { title: PAGE_LANGUAGE_LABELS.pt, words: WORDS_PT },
 };

@@ -7,7 +7,11 @@ import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import type { FormStatus } from '../system/state';
 import { CheckList } from '../molecules/check-list';
-import { EmailForm, type EmailFormLabels } from '../molecules/email-form';
+import {
+  EMAIL_FORM_LABELS,
+  EmailForm,
+  type EmailFormLabels,
+} from '../molecules/email-form';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { Price } from '../molecules/price';
 import {
@@ -17,6 +21,7 @@ import {
 } from '../molecules/sell-button';
 import type { ImageSrc } from '../system/image';
 import { usePageWords } from '../system/page-words';
+import { WORDS_EN } from '../system/words/en';
 
 /**
  * A call or session to book: what it is, how long, the price, and a link to
@@ -189,6 +194,13 @@ export function MembershipCard({
 
 /** The words a lead magnet shows. */
 export type LeadMagnetLabels = EmailFormLabels & { free: string };
+
+export const LEAD_MAGNET_LABELS: LeadMagnetLabels = {
+  ...EMAIL_FORM_LABELS,
+  button: WORDS_EN.props.sendIt,
+  sent: WORDS_EN.props.sentCheckInbox,
+  free: WORDS_EN.props.free,
+};
 
 /**
  * Something free in return for an email address, such as a guide: the

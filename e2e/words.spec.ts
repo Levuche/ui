@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
 import * as ui from '../src';
+import { PAGE_SETTINGS, settingDefaults } from '../src/system/settings';
 import {
   PAGE_LANGUAGES,
   loadPageWords,
@@ -179,4 +180,27 @@ test('a page without a language stays as it was', () => {
   );
   expect(html).not.toContain('lang=');
   expect(html).toContain('seconds');
+});
+
+test('the page editor offers every ready language, starting in English', () => {
+  const [language] = PAGE_SETTINGS;
+  expect(language.name).toBe('language');
+  expect([...language.options]).toEqual([...PAGE_LANGUAGES]);
+  for (const option of language.options) {
+    expect(language.optionLabels[option].length, option).toBeGreaterThan(0);
+  }
+  expect(settingDefaults(PAGE_SETTINGS)).toEqual({ language: 'en' });
+});
+
+test('word props have no English default, so a new block follows the page', () => {
+  const english = new Set(Object.values(WORDS_EN.props));
+  for (const block of ui.BLOCKS) {
+    for (const field of block.settings ?? []) {
+      if ('default' in field && typeof field.default === 'string') {
+        expect(english.has(field.default), `${block.id}.${field.name}`).toBe(
+          false
+        );
+      }
+    }
+  }
 });

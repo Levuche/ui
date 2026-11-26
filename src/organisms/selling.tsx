@@ -142,6 +142,8 @@ export type PackCheckoutLabels = {
   error: ReactNode;
 };
 
+export const PACK_CHECKOUT_LABELS: PackCheckoutLabels = WORDS_EN.packCheckout;
+
 /**
  * Checkout for a digital pack: the consent to start the download now (the
  * buyer gives up the 14-day right to cancel) must be ticked before the buy
