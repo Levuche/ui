@@ -86,6 +86,16 @@ export const WORDS_EN = {
     sent: 'Thanks! I’ll get back to you soon.',
     error: 'That didn’t go through. Please try again.',
   },
+  messageCard: {
+    whatsapp: 'Message on WhatsApp',
+    telegram: 'Message on Telegram',
+    sms: 'Send a text',
+    email: 'Send an email',
+    messenger: 'Message on Messenger',
+    preview: 'Ready message',
+    message: 'Your message',
+    hint: 'Change it if you like, then send.',
+  },
   mapCard: {
     showMap: 'Show {place} on a map',
     map: 'Map of {place}',

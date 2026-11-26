@@ -28,9 +28,12 @@ export {
   CONTROL_CONTRAST,
   SCHEME_COLORS,
   TEXT_CONTRAST,
+  backgroundIssues,
   contrastIssues,
   contrastRatio,
+  fixBackground,
   fixContrast,
+  type BackgroundIssue,
   type ContrastIssue,
 } from './system/contrast';
 export {
@@ -60,6 +63,31 @@ export {
   type BlockTone,
   type LookProps,
 } from './system/look';
+export {
+  BACKGROUND_FILLS,
+  BACKGROUND_INKS,
+  BACKGROUND_PATTERNS,
+  BACKGROUND_POSITIONS,
+  BACKGROUND_TYPES,
+  DEFAULT_ANGLE,
+  DEFAULT_DIM,
+  DEFAULT_PATTERN_OPACITY,
+  MAX_PATTERN_OPACITY,
+  MIN_DIM,
+  backgroundProps,
+  cleanBackground,
+  type BackgroundFill,
+  type BackgroundInk,
+  type BackgroundPattern,
+  type BackgroundPosition,
+  type BackgroundProps,
+  type BackgroundType,
+  type BlockBackground,
+  type CleanBackground,
+  type GradientBackground,
+  type ImageBackground,
+  type PatternBackground,
+} from './system/background';
 export {
   isExternalHref,
   isSafeHref,
@@ -191,6 +219,7 @@ export {
 export { SiteDialog } from './molecules/dialog';
 export { Segmented, type SegmentOption } from './molecules/segmented';
 export { CountUp, type NumberStyle } from './molecules/count-up';
+export { HiddenText, MessageComposer } from './molecules/message-composer';
 
 // Organisms: the blocks
 export { CreatorHeader } from './organisms/profile';
@@ -277,11 +306,32 @@ export { SiteGrid, type SiteGridBlock } from './templates/site-grid';
 export {
   CONTACT_FORM_LABELS,
   ContactForm,
+  MESSAGE_CARD_LABELS,
+  MessageCard,
   SaveContact,
   toVCard,
   type ContactCard,
   type ContactFormLabels,
+  type MessageCardLabels,
 } from './organisms/contact';
+export {
+  MESSAGE_CHANNELS,
+  MESSAGE_MAX_LENGTH,
+  SUBJECT_MAX_LENGTH,
+  cleanEmail,
+  cleanMessageTarget,
+  cleanMessageText,
+  cleanMessenger,
+  cleanPhone,
+  cleanTelegram,
+  hideText,
+  isMessageChannel,
+  messageHref,
+  messageTargetText,
+  revealText,
+  type MessageChannel,
+  type MessageLinkInput,
+} from './system/message';
 export {
   MAP_CARD_LABELS,
   MapCard,
@@ -402,6 +452,7 @@ export {
 } from './organisms/feeds';
 export {
   columnSizes,
+  cssImageUrl,
   imageAttrs,
   toImageSource,
   type ImageSource,

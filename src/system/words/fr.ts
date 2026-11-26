@@ -80,6 +80,16 @@ export const WORDS_FR: PageWords = {
     sent: 'Merci ! Je vous réponds bientôt.',
     error: 'Ça n’a pas marché. Veuillez réessayer.',
   },
+  messageCard: {
+    whatsapp: 'Écrire sur WhatsApp',
+    telegram: 'Écrire sur Telegram',
+    sms: 'Envoyer un SMS',
+    email: 'Envoyer un e-mail',
+    messenger: 'Écrire sur Messenger',
+    preview: 'Message prêt',
+    message: 'Votre message',
+    hint: 'Modifiez-le si vous voulez, puis envoyez-le.',
+  },
   mapCard: {
     showMap: 'Afficher {place} sur une carte',
     map: 'Carte de {place}',

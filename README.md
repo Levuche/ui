@@ -128,22 +128,58 @@ Buttons also take `variant` (`solid`, `outline`, `soft`, `text`) and `size`
 Every block also takes the same look props, on top of the page theme, so a
 creator can change one block without touching the others:
 
-| Prop     | Values                                                              |
-| -------- | ------------------------------------------------------------------- |
-| `tone`   | `surface`, `muted`, `accent`, `band`, `notice`, `outline`, `plain`  |
-| `size`   | `sm`, `md`, `lg`: padding, gaps and type together                   |
-| `radius` | `theme` (the page's corners), `none`, `sm`, `md`, `lg`, `full`      |
-| `align`  | `start`, `center`, `end`                                            |
-| `shadow` | `none`, `sm`, `md`, `lg`                                            |
-| `motion` | `none`, `fade`, `rise`, `scale` (off for visitors who ask for less) |
-| `colors` | this block's own colours, the same keys as the theme                |
-| `font`   | this block's own font                                               |
-| `hideOn` | screens to hide it on: `phone`, `tablet`, `desktop`                 |
+| Prop         | Values                                                                      |
+| ------------ | --------------------------------------------------------------------------- |
+| `tone`       | `surface`, `muted`, `inset`, `accent`, `band`, `notice`, `outline`, `plain` |
+| `size`       | `sm`, `md`, `lg`: padding, gaps and type together                           |
+| `radius`     | `theme` (the page's corners), `none`, `sm`, `md`, `lg`, `full`              |
+| `align`      | `start`, `center`, `end`                                                    |
+| `shadow`     | `none`, `sm`, `md`, `lg`                                                    |
+| `motion`     | `none`, `fade`, `rise`, `scale` (off for visitors who ask for less)         |
+| `colors`     | this block's own colours, the same keys as the theme                        |
+| `font`       | this block's own font                                                       |
+| `background` | a gradient, a faint pattern or a picture behind the words (see below)       |
+| `hideOn`     | screens to hide it on: `phone`, `tablet`, `desktop`                         |
 
 A tone swaps the colours inside the block, so text, links and buttons stay
 readable: in an `accent` block, solid buttons turn inside out. Text boxes keep
 the page's colours in any tone. Blocks also take an `id`, `className`,
 `style`, `ref` and `data-*` attributes.
+
+`inset` presses the block into the page: a shade off the page's colour with a
+soft shadow inside its top edge, beside cards that are raised.
+
+#### A block's own background
+
+`background` puts a gradient, a pattern or a picture behind a block's words,
+over any tone, corners and card style, and inside `withBlockLook` and
+`<Block>` too. Colours are the theme's, by name, so a background follows the
+creator's theme and dark mode; a creator never types CSS.
+
+```tsx
+// Two or three theme colours, at any angle. `move` drifts it slowly.
+<BookingCard background={{ type: 'gradient', stops: ['accent', 'band'], angle: 135 }} />
+
+// lines, rings, dots, grid or waves, in a theme colour, 12% strong (30% at most).
+<BookingCard background={{ type: 'pattern', pattern: 'rings', color: 'accent' }} />
+
+// A picture, cropped to fill, under a layer of the block's own colour:
+// `dim` is that layer's strength, 80% if left out and never under 50%.
+<BookingCard background={{ type: 'image', src: heroPicture, position: 'top', dim: 85 }} />
+```
+
+- **Words stay readable.** `backgroundIssues(look, theme)` checks the
+  block's text against every gradient colour, the pattern's lines and the
+  worst picture there could be, as `contrastIssues` does for a theme.
+  `fixBackground(look, theme)` returns the background with the smallest
+  change that passes (a stronger layer, or fainter lines). The defaults pass
+  in the sample theme, light and dark, for the quieter tones; on `accent` or
+  `band` a picture needs a stronger layer.
+- **Pictures are checked.** A picture takes a plain address or an
+  `ImageSource`; only https, http, same-site, `blob:` and `data:image/`
+  addresses are drawn (`cssImageUrl`). A background picture is decoration:
+  one that says something belongs in a picture block, with `alt` text.
+- **Nothing moves** for visitors who ask their device for less motion.
 
 Behaviour is set the same way. Links take `newTab` (`auto` opens other
 sites in a new tab), `sponsored` and `nofollow`, and an unsafe address
@@ -273,11 +309,12 @@ export function BlockTracking({ children }: { children: React.ReactNode }) {
 - Event names follow BuildBase's rule: lowercase letters, digits and
   underscores, starting with a letter, 40 characters at most. The built-in
   names are `link_click`, `button_click` and `form_submit`; a block's own
-  `data-action` (`buy`, `tip`, `save_contact`, `qr_download`,
+  `data-action` (`buy`, `tip`, `save_contact`, `contact`, `qr_download`,
   `audio_play`, …) follows the same rule, and so must yours.
 - Send ids and labels only. Never send what a visitor typed, an email
   address, a name or anything else that identifies them: every tag
-  forbids it.
+  forbids it. A link marked `data-href-private` (a `MessageCard`'s button,
+  which carries the message) is reported without its query.
 - Each press is reported once: a submit button is reported by its form's
   submit, and a click inside a form (ticking its consent box, say) isn't
   the form's action.
@@ -637,24 +674,33 @@ that no block covers another and that the page never scrolls sideways.
 
 ## What's in it
 
-| Group       | Blocks                                                                                                                                                                                                                                     |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `contrastIssues`, `fixContrast`, `Block`, `withBlockLook`, `BlockLook`                                                                                                      |
-| Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Ribbon`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                |
-| Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton` |
-| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                                                               |
-| Profile     | `CreatorHeader`, `SocialIcons`, `SaveContact`                                                                                                                                                                                              |
-| Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                                                     |
-| Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                   |
-| Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                       |
-| Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                                                             |
-| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `BeforeAfter`, `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                                                        |
-| Forms       | `NewsletterBand`, `ContactForm`                                                                                                                                                                                                            |
-| Feeds       | `LatestVideos`, `LatestPosts`, `LiveStatus`, `EventList`, `ReviewSummary`, `NowPlaying`                                                                                                                                                    |
-| Developer   | `GitHubProfile`, `ContributionGraph`, `RepoCard`, `RepoList`, `PackageStats`, `TechStack`                                                                                                                                                  |
+| Group       | Blocks                                                                                                                                                                                                                                                        |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Theme, look | `CreatorTheme`, `siteThemeStyle`, `isSafeColor`, `isSafeFont`, `contrastIssues`, `fixContrast`, `Block`, `withBlockLook`, `BlockLook`                                                                                                                         |
+| Atoms       | `SiteButton`, `SiteLinkButton`, `SiteLink`, `SiteHeading`, `SiteText`, `Badge`, `Ribbon`, `Thumb`, `Avatar`, `SiteInput`, `Skeleton`, icons                                                                                                                   |
+| Molecules   | `SiteSection`, `ItemHead`, `LinkTile`, `Price`, `Rating`, `CheckList`, `Field`, `EmailForm`, `CopyButton`, `PlayFrame`, `SiteDialog`, `Segmented`, `ChoiceChips`, `CountUp`, `StatList`, `Sparkline`, `LiveData`, `AudioBar`, `SellButton`, `MessageComposer` |
+| Page        | `SitePage`, `SiteGrid`, `CreatorFooter`, `MapCard`, `QrCode`                                                                                                                                                                                                  |
+| Profile     | `CreatorHeader`, `SocialIcons`, `SaveContact`                                                                                                                                                                                                                 |
+| Links       | `ActionCard`, `LinkList`, `FeaturedLink`, `LockedLink`                                                                                                                                                                                                        |
+| Selling     | `FeaturedPack`, `PackRow`, `PackGrid`, `BuyButton`, `PackCheckout`, `CourseCard`, `PricingTable`, `CreditPack`, `SlotPicker`, `TopPicks`                                                                                                                      |
+| Offers      | `BookingCard`, `BookingEmbed`, `MembershipCard`, `LeadMagnet`, `TipJar`, `DiscountCode`, `Countdown`                                                                                                                                                          |
+| Trust       | `Testimonials`, `FaqList`, `LogoStrip`, `StatsRow`, `Timeline`                                                                                                                                                                                                |
+| Media       | `YouTubeVideo`, `ReelGrid`, `ImageGrid`, `SiteImage`, `ImageCarousel`, `BeforeAfter`, `SpotifyEmbed`, `TikTokVideo`, `InstagramPost`, `LinkEmbed`, `AudioPlayer`, `PodcastEpisodes`                                                                           |
+| Forms       | `NewsletterBand`, `ContactForm`, `MessageCard`                                                                                                                                                                                                                |
+| Feeds       | `LatestVideos`, `LatestPosts`, `LiveStatus`, `EventList`, `ReviewSummary`, `NowPlaying`                                                                                                                                                                       |
+| Developer   | `GitHubProfile`, `ContributionGraph`, `RepoCard`, `RepoList`, `PackageStats`, `TechStack`                                                                                                                                                                     |
 
 `BLOCKS` in the registry lists every block with its group, so this table
 is a summary; the registry is the full list.
+
+`MessageCard` opens a chat on WhatsApp, Telegram, a text, email or
+Messenger with a message ready to send (`channel`, `to`, `message`, and
+`subject` for email). `messageHref` builds the link on its own: phone
+numbers become digits only, usernames keep to each service's characters,
+an email address can't carry another address or header, and the message is
+URL-encoded. The number or address stays out of the page's HTML until the
+page runs (`hideFromSource={false}` to turn that off); `editable` lets the
+visitor change the message first.
 
 `BookingCard` and `MembershipCard` link to the page that takes the booking
 or the payment, or sell through BuildBase with `sell` (see below). `LeadMagnet`, `TipJar` and `NewsletterBand` are forms: give

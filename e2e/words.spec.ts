@@ -71,6 +71,7 @@ test('each block’s English labels are the English word set', () => {
     ['carousel', ui.CAROUSEL_LABELS],
     ['beforeAfter', ui.BEFORE_AFTER_LABELS],
     ['contactForm', ui.CONTACT_FORM_LABELS],
+    ['messageCard', ui.MESSAGE_CARD_LABELS],
     ['mapCard', ui.MAP_CARD_LABELS],
     ['lockedLink', ui.LOCKED_LINK_LABELS],
     ['courseCard', ui.COURSE_CARD_LABELS],

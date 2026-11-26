@@ -79,6 +79,16 @@ export const WORDS_DE: PageWords = {
     sent: 'Danke! Ich melde mich bald.',
     error: 'Das hat nicht geklappt. Bitte versuch es noch einmal.',
   },
+  messageCard: {
+    whatsapp: 'Auf WhatsApp schreiben',
+    telegram: 'Auf Telegram schreiben',
+    sms: 'SMS senden',
+    email: 'E-Mail senden',
+    messenger: 'Auf Messenger schreiben',
+    preview: 'Fertige Nachricht',
+    message: 'Deine Nachricht',
+    hint: 'Ändere sie, wenn du willst, und sende sie dann.',
+  },
   mapCard: {
     showMap: '{place} auf der Karte zeigen',
     map: 'Karte von {place}',

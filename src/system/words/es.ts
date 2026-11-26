@@ -79,6 +79,16 @@ export const WORDS_ES: PageWords = {
     sent: '¡Gracias! Te responderé pronto.',
     error: 'No se pudo enviar. Inténtalo de nuevo.',
   },
+  messageCard: {
+    whatsapp: 'Escribir por WhatsApp',
+    telegram: 'Escribir por Telegram',
+    sms: 'Enviar un SMS',
+    email: 'Enviar un correo',
+    messenger: 'Escribir por Messenger',
+    preview: 'Mensaje listo',
+    message: 'Tu mensaje',
+    hint: 'Cámbialo si quieres y luego envíalo.',
+  },
   mapCard: {
     showMap: 'Mostrar {place} en un mapa',
     map: 'Mapa de {place}',

@@ -79,6 +79,16 @@ export const WORDS_HI: PageWords = {
     sent: 'धन्यवाद! आपको जल्द ही जवाब मिलेगा।',
     error: 'यह नहीं हो सका। कृपया फिर से कोशिश करें।',
   },
+  messageCard: {
+    whatsapp: 'WhatsApp पर मैसेज करें',
+    telegram: 'Telegram पर मैसेज करें',
+    sms: 'SMS भेजें',
+    email: 'ईमेल भेजें',
+    messenger: 'Messenger पर मैसेज करें',
+    preview: 'तैयार मैसेज',
+    message: 'आपका मैसेज',
+    hint: 'चाहें तो इसे बदलें, फिर भेजें।',
+  },
   mapCard: {
     showMap: '{place} को नक्शे पर दिखाएँ',
     map: '{place} का नक्शा',
