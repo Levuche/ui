@@ -5,13 +5,12 @@ import { cn } from '../system/cn';
 import { useOnScreen } from '../system/effects';
 import { motionSeconds, wordRingShape } from '../system/motion';
 import { MotionToggle, type MotionToggleLabels } from './motion-toggle';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 export type WordRingLabels = MotionToggleLabels;
 
-export const WORD_RING_LABELS: WordRingLabels = {
-  pause: 'Stop the turning words',
-  play: 'Turn the words again',
-};
+export const WORD_RING_LABELS: WordRingLabels = WORDS_EN.wordRing;
 
 /**
  * Words in a ring that turns slowly around a picture, as CreatorHeader's
@@ -40,7 +39,7 @@ export function WordRing({
   /** The picture. */
   children: ReactNode;
 }) {
-  const text = { ...WORD_RING_LABELS, ...labels };
+  const text = usePageWords('wordRing', labels);
   // useId's characters aren't all safe in a url(#id) reference.
   const pathId = `ring-${useId().replace(/[^\w-]/g, '')}`;
   const box = useRef<HTMLDivElement>(null);

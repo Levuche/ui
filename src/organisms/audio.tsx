@@ -6,6 +6,7 @@ import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { LiveData } from '../molecules/live-data';
 import type { LiveProps } from '../system/live';
 import type { ImageSrc } from '../system/image';
+import { usePageWords } from '../system/page-words';
 
 /** One track: play, pause, a bar to move through it, and the time. */
 export function AudioPlayer({
@@ -70,7 +71,7 @@ export function PodcastEpisodes({
   title,
   limit = 5,
   allHref,
-  allLabel = 'All episodes',
+  allLabel: allLabelProp,
   labels,
   headingAs = 'h2',
   ...root
@@ -84,6 +85,8 @@ export function PodcastEpisodes({
     labels?: Partial<AudioBarLabels>;
     headingAs?: HeadingTag;
   }) {
+  const own = usePageWords('props');
+  const allLabel = allLabelProp === undefined ? own.allEpisodes : allLabelProp;
   return (
     <Block name="podcast-episodes" {...root}>
       {title ? <ItemHead title={title} headingAs={headingAs} /> : null}

@@ -20,6 +20,8 @@ import { FormNotice } from '../molecules/form-notice';
 import { isSafeHref, type LinkBehavior } from '../system/href';
 import { usePreviewMode } from '../system/preview-mode';
 import type { FormStatus } from '../system/state';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 /**
  * What stands before the link: a `code` the visitor types, an `age` they
@@ -44,20 +46,7 @@ export type LockedLinkLabels = {
   close: string;
 };
 
-export const LOCKED_LINK_LABELS: LockedLinkLabels = {
-  code: 'Code',
-  unlock: 'Unlock',
-  wrongCode: 'That code didn’t work. Check it and try again.',
-  ageQuestion: 'Are you {age} or older?',
-  ageYes: 'Yes, continue',
-  ageNo: 'No',
-  ageDenied: 'Sorry, this link is only for people {age} and over.',
-  warningTitle: 'Before you open this',
-  continue: 'Continue',
-  cancel: 'Cancel',
-  open: 'Open the link',
-  close: 'Close',
-};
+export const LOCKED_LINK_LABELS: LockedLinkLabels = WORDS_EN.lockedLink;
 
 /**
  * Checks a code on the server and answers the link's address, or nothing
@@ -127,7 +116,7 @@ export function LockedLink({
     buttonVariant?: SiteButtonVariant;
     onUnlock?: () => void;
   }) {
-  const words = { ...LOCKED_LINK_LABELS, ...labels };
+  const words = usePageWords('lockedLink', labels);
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);

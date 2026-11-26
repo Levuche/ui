@@ -2,12 +2,13 @@ import type { ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLink } from '../atoms/link';
 import { cn } from '../system/cn';
+import { usePageWords } from '../system/page-words';
 
 /** The page footer: policy links and "Made with Levuche". */
 export function CreatorFooter({
   links,
-  label = 'Site policies',
-  credit = 'Made with Levuche',
+  label: labelProp,
+  credit: creditProp,
   creditHref,
   ...root
 }: BlockRootProps & {
@@ -19,6 +20,9 @@ export function CreatorFooter({
   /** Makes the credit a link. */
   creditHref?: string;
 }) {
+  const own = usePageWords('props');
+  const label = labelProp === undefined ? own.policies : labelProp;
+  const credit = creditProp === undefined ? own.madeWith : creditProp;
   return (
     <Block
       as="footer"

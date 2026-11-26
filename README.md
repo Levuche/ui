@@ -124,6 +124,8 @@ Every block reads only `--site-*` CSS variables. `<CreatorTheme>` sets them:
   own linked card joins in with a `data-lift` attribute, and the page editor
   can show a hover without the pointer with `data-hover-preview` (`press` for
   the tap) on the card or anything around it.
+- `language`: the page's language, as a tag such as `hi`, `es` or `pt-BR`.
+  See "The page's language" below.
 
 Buttons also take `variant` (`solid`, `outline`, `soft`, `text`) and `size`
 (`sm`, `md`, `lg`), so creators can pick them per block.
@@ -198,7 +200,8 @@ creator's theme and dark mode; a creator never types CSS.
 Behaviour is set the same way. Links take `newTab` (`auto` opens other
 sites in a new tab), `sponsored` and `nofollow`, and an unsafe address
 (`javascript:` and the like) shows its words without a link. Words a block
-shows take a `labels` prop, so a page can be in any language. Forms take
+shows take a `labels` prop, over the page's language (see "The page's
+language"). Forms take
 `status` (`idle`, `sending`, `sent`, `error`) from the app: the button spins
 while sending and the result is read out to screen readers.
 
@@ -652,6 +655,50 @@ with the other sizes it comes in, so a phone downloads a small copy:
   are only workspace and profile pictures, so creator media needs an image
   service that resizes by address.
 
+### The page's language
+
+A creator picks the page's language once, and every block's own words
+(buttons, countdown units, "Copied", "Sold out", form messages, screen-reader
+names) and its numbers and dates follow it, with no `labels` on any block.
+Ready word sets come in English, Hindi, Spanish, German, French and
+Portuguese (`PAGE_LANGUAGES`), each in its own file, so a page loads only its
+own:
+
+```tsx
+// app/page.tsx, a server component.
+import { CreatorTheme, loadPageWords } from '@levuche/ui';
+
+<CreatorTheme theme={theme} words={await loadPageWords(theme.language)}>
+  ...
+</CreatorTheme>;
+```
+
+- `theme.language` puts `lang` on the page, so screen readers read it in that
+  language, and blocks write numbers and dates in it. A block's own `locale`
+  wins; without either, they use the visitor's own.
+- `words` are the words blocks write themselves, grouped by block
+  (`PageWords`; `WORDS_EN` is the English set). `loadPageWords` picks the set
+  for a language ("pt-BR" uses Portuguese) and falls back to English. Pass
+  only some groups or words to change just those across the page.
+- A block's own `labels`, and word props such as a tip jar's `buttonLabel`,
+  always win over the page's words, word by word. For a block in a second
+  language, pass that language's group as its `labels`:
+  `labels={(await loadPageWords('es')).countdown}`.
+- A language tag a creator typed is checked (`safeLanguage`); one the browser
+  can't read is dropped.
+- The page editor offers it from `PAGE_SETTINGS`, the settings a creator sets
+  once for the page, as a choice of the ready languages with
+  `PAGE_LANGUAGE_LABELS`. Block settings for words a block writes itself
+  (a button's words, a screen-reader name) have no English `default`, so a
+  new block left as it is follows the page.
+
+Blocks read the page's words with `usePageWords(group, labels)` and its
+locale with `usePageLocale(locale)`. In the browser these come from React
+context; in React Server Components, which can't read context,
+`<CreatorTheme>` keeps them for the rest of the request, so a request renders
+one page language. In Storybook, the toolbar's Language menu shows any story
+in each language, and **Pages/Page language** checks them.
+
 ### Right-to-left scripts and long text
 
 Blocks use start and end, not left and right, so `dir="rtl"` on the page, or
@@ -841,7 +888,8 @@ Theme menu shows any story in the sample creator's light or dark scheme or in
 a creator's own theme, and `Pages/Creator page` shows a whole page in each. The
 Cards menu shows it in each card style, and `Pages/Card styles` shows a whole
 page in each. The Hover menu shows each hover, and `Pages/Hover` hovers,
-presses and focuses links in each. The Direction menu shows it right to left. `Docs/Getting started`
+presses and focuses links in each. The Direction menu shows it right to left, and the Language
+menu in each ready language. `Docs/Getting started`
 walks through installing and theming, and `Docs/Every block` lists every block
 with what it's for, its grid kind, whether it's free and how many settings
 it has, read from the registry. `Editor/Settings panel` previews the settings
@@ -868,7 +916,9 @@ variable, the same pair the website uses.
    before writing new markup, `--site-*` tokens only (no raw colours),
    `rounded-block` or `rounded-block-inner` for corners, `p-block` and
    `gap-block-gap` for spacing, and the size presets above (`min-h-control`
-   or more for anything tapped). Put words in a `labels` prop, links through
+   or more for anything tapped). Put words in a `labels` prop, with their
+   English in a group of `src/system/words/en.ts` (and the same keys in every
+   other language's file there), read with `usePageWords`; links through
    `SiteLink`, and add `'use client'` only if it has state. A client block
    that loads another site, opens a pop-up or plays something checks
    `usePreviewMode()` and doesn't, in the page editor (links and forms are

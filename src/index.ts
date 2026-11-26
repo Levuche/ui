@@ -110,6 +110,16 @@ export {
 export { useControllableState, type FormStatus } from './system/state';
 export { SERVER_LOCALE, useHydrated, useVisitorLocale } from './system/locale';
 export {
+  PAGE_LANGUAGES,
+  loadPageWords,
+  pageWordsLanguage,
+  safeLanguage,
+  type PageLanguage,
+  type PageWordsInput,
+} from './system/language';
+export { usePageLocale, usePageWords } from './system/page-words';
+export { WORDS_EN, type PageWords } from './system/words/en';
+export {
   readBlockAction,
   useBlockActions,
   type BlockAction,
@@ -150,6 +160,8 @@ export {
   LIST_VALUE_TYPES,
   LIVE_APP_ONLY,
   LOOK_SETTINGS,
+  PAGE_LANGUAGE_LABELS,
+  PAGE_SETTINGS,
   RATIO_LABELS,
   RATIO_OPTIONS,
   SAVE_LABEL_SETTING,

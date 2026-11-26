@@ -43,6 +43,11 @@ change when it moves to that version.
   Also `WordRing`, `MotionToggle`, `useOnScreen` and the plain helpers
   `motionSeconds`, `stripRepeats` and `wordRingShape`. `effect` is in
   `LOOK_SETTINGS`, and `TextStrip` and the word ring have their settings.
+- The page's language: `SiteTheme.language` and `<CreatorTheme words>`, so
+  every block's own words, numbers and dates follow the page with no `labels`
+  on any block. Ready word sets in English, Hindi, Spanish, German, French and
+  Portuguese, each loaded on its own with `loadPageWords`; a block's own
+  `labels` and word props still win. Storybook's toolbar has a Language menu.
 - `SocialCard`: one social profile with the platform's mark, the picture,
   name, handle and verified tick, the follower count written short by
   locale (`shortCount`: 1.1K, 860K) and a button in the platform's own word

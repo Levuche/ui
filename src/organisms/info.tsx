@@ -9,6 +9,8 @@ import { PlayFrame } from '../molecules/play-frame';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import type { ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 /* ---------------------------------------------------------------- StatsRow */
 
@@ -163,12 +165,7 @@ export type MapCardLabels = {
   hours: string;
 };
 
-export const MAP_CARD_LABELS: MapCardLabels = {
-  showMap: 'Show {place} on a map',
-  map: 'Map of {place}',
-  directions: 'Get directions',
-  hours: 'Opening hours',
-};
+export const MAP_CARD_LABELS: MapCardLabels = WORDS_EN.mapCard;
 
 /** A day or days and when the place is open, such as Mon–Fri, 10 am–7 pm. */
 export type OpeningHours = { days: ReactNode; time: ReactNode };
@@ -233,7 +230,7 @@ export function MapCard({
   /** More, under the hours, such as a phone number. */
   children?: ReactNode;
 }) {
-  const words = { ...MAP_CARD_LABELS, ...labels };
+  const words = usePageWords('mapCard', labels);
   const hasPin =
     lat != null && lng != null && Number.isFinite(lat) && Number.isFinite(lng);
   const directions =

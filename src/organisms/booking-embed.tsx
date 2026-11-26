@@ -11,6 +11,8 @@ import { CalendarIcon } from '../atoms/icons';
 import { SiteDialog } from '../molecules/dialog';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { isSafeHref } from '../system/href';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 import { usePreviewMode } from '../system/preview-mode';
 
 export type BookingEmbedLabels = {
@@ -22,12 +24,7 @@ export type BookingEmbedLabels = {
   close: string;
 };
 
-export const BOOKING_EMBED_LABELS: BookingEmbedLabels = {
-  button: 'Pick a time',
-  frame: 'Booking: {title}',
-  fallback: 'Open the booking page',
-  close: 'Close',
-};
+export const BOOKING_EMBED_LABELS: BookingEmbedLabels = WORDS_EN.bookingEmbed;
 
 /** Only https pages go in a frame. */
 const isEmbeddable = (src: string) =>
@@ -65,7 +62,7 @@ export function BookingEmbed({
   headingAs?: HeadingTag;
   onOpen?: () => void;
 }) {
-  const words = { ...BOOKING_EMBED_LABELS, ...labels };
+  const words = usePageWords('bookingEmbed', labels);
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
