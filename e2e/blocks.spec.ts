@@ -292,7 +292,8 @@ for (const [id, expected] of Object.entries(THEMES)) {
       await expect(ring).toHaveAttribute('aria-hidden', 'true');
       const turning = () =>
         ring.evaluate((el) => el.getAnimations()[0]?.playState);
-      await ring.scrollIntoViewIfNeeded();
+      // Scroll the still box, not the turning svg, which is never "stable".
+      await motion.locator('[data-word-ring]').scrollIntoViewIfNeeded();
       await expect.poll(turning).toBe('running');
       await motion
         .getByRole('button', { name: 'Stop the turning words' })
