@@ -5,7 +5,7 @@
  * the app's server can check a link before saving it.
  */
 
-import { colorHex } from './contrast';
+import { colorHex, contrastRatio, TEXT_CONTRAST } from './contrast';
 
 /**
  * The shape a player takes on the page: `audio` is a short bar, `track` a
@@ -290,8 +290,9 @@ export function tintedSrc(
 
 /**
  * The player for a pasted link, or null when its service isn't on the list
- * (show it as a link instead). `services` narrows the list. YouTube needs its
- * id parser passed in, to keep this file free of block code.
+ * (show it as a link instead). `services` narrows the list; an empty list
+ * allows all. YouTube needs its id parser passed in, to keep this file free
+ * of block code.
  */
 export function embedFor(
   input: string,
@@ -303,7 +304,9 @@ export function embedFor(
     youtubeId?: (input: string) => string | null;
   } = {}
 ): Embed | null {
-  const allowed = (s: EmbedService) => !services || services.includes(s);
+  // An empty list is what the editor saves when nothing is ticked: all.
+  const allowed = (s: EmbedService) =>
+    !services || services.length === 0 || services.includes(s);
   if (allowed('youtube') && youtubeId) {
     const yt = youtubeEmbed(input, parse(input) ? youtubeId(input) : null);
     if (yt) return yt;
@@ -313,4 +316,262 @@ export function embedFor(
     if (embed && allowed(embed.service)) return embed;
   }
   return null;
+}
+
+/* ---------- Calendars and tickets ---------- */
+
+/** The calendar services a public calendar can be shown from. */
+export const CALENDAR_SERVICES = ['googlecalendar', 'outlookcalendar'] as const;
+export type CalendarService = (typeof CALENDAR_SERVICES)[number];
+
+/** How a calendar lays out its events. Only Google's takes one. */
+export const CALENDAR_VIEWS = ['agenda', 'month', 'week'] as const;
+export type CalendarView = (typeof CALENDAR_VIEWS)[number];
+
+/** A public calendar: the page to show in a frame, and its service. */
+export type CalendarPage = { service: CalendarService; src: string };
+
+const GOOGLE_CALENDAR_ID =
+  /^[A-Za-z0-9._%+#-]{1,128}@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
+const GOOGLE_VIEWS: Record<CalendarView, string> = {
+  agenda: 'AGENDA',
+  month: 'MONTH',
+  week: 'WEEK',
+};
+
+/** A Google calendar id, plain or as the base64 a share link carries. */
+const googleCalendarId = (value: string | null): string | null => {
+  if (!value) return null;
+  const plain = value.trim();
+  if (GOOGLE_CALENDAR_ID.test(plain)) return plain;
+  if (!/^[A-Za-z0-9+/_-]{4,400}={0,2}$/.test(plain)) return null;
+  try {
+    const decoded = atob(plain.replace(/-/g, '+').replace(/_/g, '/'));
+    return GOOGLE_CALENDAR_ID.test(decoded) ? decoded : null;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * The calendar ids in a Google Calendar link: an embed link
+ * (calendar.google.com/calendar/embed?src=…, one or more), a share link
+ * (…/calendar/u/0?cid=…) or the public address in iCal form
+ * (…/calendar/ical/<id>/public/basic.ics). Empty when it's none of those.
+ */
+export function googleCalendarIds(input: string): string[] {
+  const url = parse(input);
+  if (!url || url.protocol !== 'https:') return [];
+  const host = url.hostname.toLowerCase();
+  const path = parts(url);
+  const onGoogle =
+    (host === 'calendar.google.com' && path[0] === 'calendar') ||
+    (host === 'www.google.com' && path[0] === 'calendar');
+  if (!onGoogle) return [];
+  if (path[1] === 'ical') {
+    if (path[3] !== 'public') return [];
+    let id: string;
+    try {
+      id = decodeURIComponent(path[2] ?? '');
+    } catch {
+      return [];
+    }
+    return GOOGLE_CALENDAR_ID.test(id) ? [id] : [];
+  }
+  const ids = [
+    ...url.searchParams.getAll('src'),
+    ...url.searchParams.getAll('cid'),
+  ]
+    .map(googleCalendarId)
+    .filter((id): id is string => id !== null);
+  return [...new Set(ids)].slice(0, 10);
+}
+
+/**
+ * Whether a colour can be a Google calendar's background: its own text is
+ * dark grey, so the colour must leave that readable (4.5:1).
+ */
+const googleBackground = (color: string | null | undefined) => {
+  const hex = color ? colorHex(color) : null;
+  if (!hex) return null;
+  const ratio = contrastRatio('#3c4043', hex);
+  return ratio !== null && ratio >= TEXT_CONTRAST ? hex : null;
+};
+
+/**
+ * A public Google calendar in a frame. `view` is agenda, month or week;
+ * `timeZone` (an IANA zone, checked by the caller) and `language` (as
+ * "de") set how times and words read; `background` is the page's colour,
+ * used only when the calendar's own dark text stays readable on it.
+ */
+export function googleCalendarEmbed(
+  input: string,
+  {
+    view = 'agenda',
+    timeZone,
+    language,
+    background,
+  }: {
+    view?: CalendarView;
+    timeZone?: string;
+    language?: string;
+    background?: string | null;
+  } = {}
+): CalendarPage | null {
+  const ids = googleCalendarIds(input);
+  if (!ids.length) return null;
+  const params = new URLSearchParams();
+  for (const id of ids) params.append('src', id);
+  params.set('mode', GOOGLE_VIEWS[view] ?? GOOGLE_VIEWS.agenda);
+  for (const shown of ['showTitle', 'showPrint', 'showTabs', 'showCalendars'])
+    params.set(shown, '0');
+  if (timeZone && /^[A-Za-z][A-Za-z0-9_+\-/]{0,63}$/.test(timeZone))
+    params.set('ctz', timeZone);
+  const hl = language?.trim().split(/[-_]/)[0]?.toLowerCase();
+  if (hl && /^[a-z]{2,3}$/.test(hl)) params.set('hl', hl);
+  const bg = googleBackground(background);
+  if (bg) params.set('bgcolor', bg);
+  return {
+    service: 'googlecalendar',
+    src: `https://calendar.google.com/calendar/embed?${params}`,
+  };
+}
+
+const OUTLOOK_HOSTS = new Set([
+  'outlook.office365.com',
+  'outlook.office.com',
+  'outlook.live.com',
+]);
+const OUTLOOK_FILES = new Set([
+  'calendar.html',
+  'index.html',
+  'calendar.ics',
+  'reachcalendar.ics',
+]);
+
+/**
+ * A published Outlook calendar, from the HTML or ICS link that Publish a
+ * calendar gives (…/owa/calendar/<id>/<key>/calendar.html). It's shown as
+ * Outlook lays it out: the link takes no colour or view.
+ */
+export function outlookCalendarEmbed(input: string): CalendarPage | null {
+  const url = parse(input);
+  if (!url || url.protocol !== 'https:') return null;
+  const host = url.hostname.toLowerCase();
+  if (!OUTLOOK_HOSTS.has(host)) return null;
+  const path = parts(url);
+  if (path.length !== 5) return null;
+  const [owa, calendar, id = '', key = '', file = ''] = path;
+  if (
+    owa?.toLowerCase() !== 'owa' ||
+    calendar?.toLowerCase() !== 'calendar' ||
+    !OUTLOOK_FILES.has(file.toLowerCase())
+  )
+    return null;
+  let owner: string;
+  try {
+    owner = decodeURIComponent(id);
+  } catch {
+    return null;
+  }
+  if (
+    !/^[A-Za-z0-9._%+-]{1,128}(@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,})?$/.test(
+      owner
+    ) ||
+    !/^[A-Za-z0-9_-]{16,128}$/.test(key)
+  )
+    return null;
+  return {
+    service: 'outlookcalendar',
+    src: `https://${host}/owa/calendar/${encodeURIComponent(owner).replace(/%40/g, '@')}/${key}/calendar.html`,
+  };
+}
+
+/**
+ * The calendar for a pasted link, Google's or Outlook's, or null when it's
+ * neither (show it as a link instead). The options are Google's only.
+ */
+export function calendarEmbed(
+  input: string,
+  options: Parameters<typeof googleCalendarEmbed>[1] = {}
+): CalendarPage | null {
+  return googleCalendarEmbed(input, options) ?? outlookCalendarEmbed(input);
+}
+
+/** The ticket services TicketEmbed knows. */
+export const TICKET_SERVICES = ['luma', 'eventbrite'] as const;
+export type TicketService = (typeof TICKET_SERVICES)[number];
+
+/**
+ * An event's tickets. `src` is the checkout to show in a frame, when the
+ * service has one a page can frame; `href` is the event's own page, for the
+ * button and the plain link under the frame.
+ */
+export type TicketPage =
+  | { service: 'luma'; src: string; href: string }
+  | { service: 'eventbrite'; src?: undefined; href: string };
+
+const LUMA_HOSTS = new Set(['luma.com', 'lu.ma']);
+const LUMA_EVENT = /^evt-[A-Za-z0-9]{6,40}$/;
+const LUMA_TICKET_TYPE = /^ttyp-[A-Za-z0-9]{6,40}$/;
+
+/**
+ * A Luma event's registration, from its embed code's address
+ * (luma.com/embed/event/evt-…/simple) or the event's id (evt-…) as the
+ * event's More tab shows it. A ticket type (?tt=ttyp-…) is kept. The
+ * public page's own short address carries no id, so it can't be framed.
+ */
+export function lumaTickets(
+  input: string
+): Extract<TicketPage, { service: 'luma' }> | null {
+  const text = input.trim();
+  let id: string | undefined;
+  let ticketType: string | null = null;
+  if (LUMA_EVENT.test(text)) id = text;
+  else {
+    const url = parse(text);
+    if (!url || url.protocol !== 'https:') return null;
+    if (!LUMA_HOSTS.has(hostOf(url))) return null;
+    const [embed, kind, evt] = parts(url);
+    if (embed !== 'embed' || kind !== 'event' || !evt || !LUMA_EVENT.test(evt))
+      return null;
+    id = evt;
+    ticketType = url.searchParams.get('tt');
+    if (ticketType !== null && !LUMA_TICKET_TYPE.test(ticketType)) return null;
+  }
+  return {
+    service: 'luma',
+    src: `https://luma.com/embed/event/${id}/simple${ticketType ? `?tt=${ticketType}` : ''}`,
+    href: `https://luma.com/event/${id}`,
+  };
+}
+
+const EVENTBRITE_HOST =
+  /^(www\.)?eventbrite\.(com|ca|ie|fr|de|es|it|nl|be|ch|at|pt|se|dk|fi|co\.uk|com\.au|co\.nz|com\.br|com\.mx|com\.ar|cl|co|com\.pe|sg|hk|in)$/;
+
+/**
+ * An Eventbrite event, from its page (eventbrite.com/e/name-tickets-123…).
+ * Eventbrite shows its checkout in a page only through its own script,
+ * which no block loads, so the tickets open on Eventbrite's page.
+ */
+export function eventbriteTickets(
+  input: string
+): Extract<TicketPage, { service: 'eventbrite' }> | null {
+  const url = parse(input);
+  if (!url || url.protocol !== 'https:') return null;
+  const host = url.hostname.toLowerCase();
+  if (!EVENTBRITE_HOST.test(host)) return null;
+  const [e, slug, ...rest] = parts(url);
+  const id = slug?.match(/(?:^|-)(\d{9,15})$/)?.[1];
+  if (e !== 'e' || !id || rest.length || !/^[\w-]{1,200}$/.test(slug ?? ''))
+    return null;
+  return {
+    service: 'eventbrite',
+    href: `https://${host}/e/${slug}`,
+  };
+}
+
+/** The tickets for a pasted link or id, or null for any other service. */
+export function ticketsFor(input: string): TicketPage | null {
+  return lumaTickets(input) ?? eventbriteTickets(input);
 }

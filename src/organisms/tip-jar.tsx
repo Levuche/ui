@@ -51,7 +51,10 @@ export function TipJar({
   /** Beside the title; a heart by default, `null` for none. */
   icon?: ReactNode;
   amounts?: number[];
-  /** The amount picked at first; the middle one by default. */
+  /**
+   * The amount picked at first; the middle one by default. One that isn't
+   * among `amounts` starts in the Other box, when it shows.
+   */
   defaultAmount?: number;
   /** Put before the amount, as "$" or "€". */
   currency?: string;
@@ -69,10 +72,27 @@ export function TipJar({
   const buttonLabel = buttonLabelProp === undefined ? own.tip : buttonLabelProp;
   const words = usePageWords('tipJar', labels);
   const id = useId();
+  // The first amount: `defaultAmount` when it's one of the chips, or typed
+  // in the Other box when it isn't and the box shows, so the form sends what
+  // the button says. Otherwise the middle chip.
+  const startOwn =
+    typeof defaultAmount === 'number' &&
+    Number.isInteger(defaultAmount) &&
+    defaultAmount > 0
+      ? defaultAmount
+      : undefined;
+  const startChip =
+    startOwn !== undefined && amounts.includes(startOwn)
+      ? startOwn
+      : amounts[Math.floor(amounts.length / 2)];
+  const startOther =
+    startOwn !== undefined && !amounts.includes(startOwn) && allowOther
+      ? String(startOwn)
+      : '';
   const [picked, setPicked] = useState<string>(
-    String(defaultAmount ?? amounts[1] ?? amounts[0] ?? '')
+    startChip === undefined ? '' : String(startChip)
   );
-  const [other, setOther] = useState('');
+  const [other, setOther] = useState(startOther);
   const amount = other || picked;
   return (
     <Block

@@ -32,6 +32,7 @@ export const WORDS_PT: PageWords = {
     error: 'Não deu certo. Tente de novo.',
   },
   packCheckout: {
+    sent: 'Obrigado! Seu pagamento foi concluído.',
     error: 'O pagamento não foi concluído. Tente de novo.',
   },
   creditPack: {
@@ -110,6 +111,7 @@ export const WORDS_PT: PageWords = {
     close: 'Fechar',
   },
   courseCard: {
+    oneLesson: '1 aula',
     lessons: '{n} aulas',
     button: 'Começar a aprender',
   },
@@ -156,6 +158,14 @@ export const WORDS_PT: PageWords = {
   },
   embed: {
     play: 'Tocar: {title}',
+  },
+  consent: {
+    notice:
+      'Isto é carregado de {service}, que verá seu endereço IP e pode salvar cookies.',
+    load: 'Carregar',
+  },
+  rating: {
+    stars: '{n} de {max} estrelas',
   },
   liveStatus: {
     live: 'Ao vivo agora',
@@ -274,7 +284,23 @@ export const WORDS_PT: PageWords = {
     hours: '{n} h',
     minutes: '{n} min',
   },
+  logoStrip: {
+    pause: 'Parar os logos em movimento',
+    play: 'Mover os logos de novo',
+  },
+  calendarEmbed: {
+    frame: 'Calendário: {title}',
+    fallback: 'Abrir o calendário',
+  },
+  ticketEmbed: {
+    button: 'Garantir ingressos',
+    frame: 'Ingressos: {title}',
+    fallback: 'Abrir a página de ingressos',
+    close: 'Fechar',
+  },
   props: {
+    highlights: 'Destaques',
+    qrFor: 'Código QR de {address}',
     verified: 'Verificado',
     links: 'Links',
     socialAccounts: 'Redes sociais',

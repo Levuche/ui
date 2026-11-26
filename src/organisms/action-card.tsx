@@ -8,6 +8,8 @@ import { SellButton, type SellProps } from '../molecules/sell-button';
 import type { HeadingTag } from '../molecules/item-head';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
+import { usePageWords } from '../system/page-words';
+import { sellJson } from '../system/sell';
 
 /**
  * What sits beside an action card's title:
@@ -35,6 +37,7 @@ const FAN = [
 ];
 
 function Media({ media }: { media: ActionCardMedia }) {
+  const live = usePageWords('liveStatus').live;
   if (media.type === 'picture') {
     return (
       <Thumb
@@ -46,7 +49,12 @@ function Media({ media }: { media: ActionCardMedia }) {
     );
   }
   if (media.type === 'covers') {
-    const covers = media.covers.slice(0, 3);
+    // Saved settings can leave the list out.
+    const covers = (Array.isArray(media.covers) ? media.covers : []).slice(
+      0,
+      3
+    );
+    if (covers.length === 0) return null;
     return (
       <span className="relative isolate block h-20 w-24 flex-none">
         {covers.map((cover, i) => (
@@ -70,7 +78,7 @@ function Media({ media }: { media: ActionCardMedia }) {
       {media.live ? (
         <span
           role="img"
-          aria-label={media.liveLabel ?? 'Live now'}
+          aria-label={media.liveLabel ?? live}
           className="bg-site-button ring-site-surface absolute end-0.5 bottom-0.5 size-4 rounded-full ring-3"
         >
           <span className="bg-site-button absolute inset-0 rounded-full motion-safe:animate-ping" />
@@ -123,6 +131,8 @@ export function ActionCard({
     /** The press's name in tracking. Defaults to buy with `sell`, else link_click. */
     action?: string;
   }) {
+  // A sell that can't check out falls back to the link, as SellButton does.
+  const selling = Boolean(sellJson(sell));
   return (
     <Block
       as="article"
@@ -145,14 +155,14 @@ export function ActionCard({
         sellState={sellState}
         sellLabels={sellLabels}
         renderBuy={renderBuy}
-        action={action ?? (sell ? 'buy' : 'link_click')}
+        action={action ?? (selling ? 'buy' : 'link_click')}
         newTab={newTab}
         sponsored={sponsored}
         nofollow={nofollow}
         // The bar's ::after covers the card, so a press anywhere on the card
         // is a press on it.
         className={
-          sell
+          selling
             ? "[&>button]:after:absolute [&>button]:after:inset-0 [&>button]:after:content-['']"
             : "after:absolute after:inset-0 after:content-['']"
         }

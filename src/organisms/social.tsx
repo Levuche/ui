@@ -23,7 +23,7 @@ import {
   type SocialPlatform,
 } from '../system/social';
 import { WORDS_EN } from '../system/words/en';
-import { usePageWords } from '../system/page-words';
+import { usePageLocale, usePageWords } from '../system/page-words';
 
 /** One of the creator's latest posts, as the app reads it from the platform. */
 export type SocialPost = {
@@ -170,16 +170,18 @@ export function SocialCard({
   postLimit?: 3 | 4;
   postRatio?: ThumbRatio;
   labels?: Partial<SocialCardLabels>;
-  /** For the counts. Left out, the server's and browser's agree (en-US). */
+  /** For the counts. Left out, the page's language. */
   locale?: string;
   headingAs?: HeadingTag;
 }) {
   const info = SOCIAL_PLATFORM_INFO[platform] ?? SOCIAL_PLATFORM_INFO.x;
   const words = usePageWords('socialCard', labels);
+  // The page's language when the block names none; both sides know it.
+  const shownLocale = usePageLocale(locale);
   const at = socialHandleText(platform, handle);
   const title = name?.trim() || at || info.name;
-  const link = href ?? socialProfileHref(platform, handle);
-  const count = shortCount(followers, locale);
+  const link = href?.trim() || socialProfileHref(platform, handle);
+  const count = shortCount(followers, shownLocale);
   const wide = tile === '2x1' || tile === '2x2';
   const brand = tint ? socialTint(platform, color) : null;
   const tintStyle = brand
@@ -304,7 +306,7 @@ export function SocialCard({
                 )}
               >
                 {items.slice(0, limit).map((post, i) => {
-                  const views = shortCount(post.views, locale);
+                  const views = shortCount(post.views, shownLocale);
                   return (
                     <li key={`${i}-${post.href}`} className="m-0">
                       <SiteLink

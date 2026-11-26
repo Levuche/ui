@@ -103,6 +103,73 @@ export const HighlightInADisplayFont: Story = {
   },
 };
 
+/** A colour as the browser resolves it inside `element`, as rgb(). */
+function resolved(element: Element, color: string) {
+  const probe = document.createElement('span');
+  probe.style.color = color;
+  element.append(probe);
+  const value = getComputedStyle(probe).color;
+  probe.remove();
+  return value;
+}
+
+/**
+ * The name set apart: in the accent colour, in capitals and black weight.
+ * Screen readers still hear it as typed.
+ */
+export const NameInItsOwnStyle: Story = {
+  args: {
+    nameSize: 'lg',
+    nameColor: 'accent',
+    nameCase: 'upper',
+    nameWeight: 'black',
+  },
+  play: async ({ canvas }) => {
+    const name = canvas.getByRole('heading', {
+      level: 1,
+      name: 'Desi Origins',
+    });
+    await expect(name).toHaveTextContent('Desi Origins');
+    const style = getComputedStyle(name);
+    await expect(style.textTransform).toBe('uppercase');
+    await expect(style.fontWeight).toBe('900');
+    await expect(style.color).toBe(resolved(name, 'var(--site-accent)'));
+    // The tagline keeps its own colour.
+    const tagline = canvas.getByText('How everyday things began');
+    await expect(getComputedStyle(tagline).color).not.toBe(style.color);
+  },
+};
+
+/** The same in the dark scheme, where the accent is lighter. */
+export const NameInItsOwnStyleDark: Story = {
+  ...NameInItsOwnStyle,
+  globals: { theme: 'dark' },
+};
+
+/** A colour of the creator's own for the name, and a lighter weight. */
+export const NameInAnOwnColour: Story = {
+  args: { nameColor: 'accent', nameTint: '#1d4ed8', nameWeight: 'medium' },
+  play: async ({ canvas }) => {
+    const name = canvas.getByRole('heading', { level: 1 });
+    const style = getComputedStyle(name);
+    await expect(style.color).toBe('rgb(29, 78, 216)');
+    await expect(style.fontWeight).toBe('500');
+    await expect(style.textTransform).toBe('none');
+  },
+};
+
+/** A colour that isn't a plain one is ignored, and the name keeps the text colour. */
+export const NameWithAnUnsafeColour: Story = {
+  args: { nameTint: 'url(https://example.com/a.png)' },
+  play: async ({ canvas }) => {
+    const name = canvas.getByRole('heading', { level: 1 });
+    await expect(name.getAttribute('style') ?? '').not.toContain('url');
+    await expect(getComputedStyle(name).color).toBe(
+      resolved(name, 'var(--site-text)')
+    );
+  },
+};
+
 /** The header's picture is at the top of the page, so it loads at once. */
 export const HeaderWithPicture: Story = {
   args: {

@@ -4,11 +4,7 @@ import { Thumb } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import { PlayFrame } from '../molecules/play-frame';
 import { columnSizes, type ImageSrc } from '../system/image';
-import {
-  consentNotice,
-  OUTSIDE_SERVICES,
-  type ConsentLabels,
-} from '../system/privacy';
+import { OUTSIDE_SERVICES, type ConsentLabels } from '../system/privacy';
 
 /** Reel thumbnails in a grid of three (9:14), each one a link if given. */
 export function ReelGrid({
@@ -117,7 +113,7 @@ export function YouTubeVideo({
   vertical?: boolean;
   /** Start this many seconds in. */
   start?: number;
-  /** The play button's name; defaults to "Play video: {title}". */
+  /** The play button's name; defaults to "Play: {title}" in the page’s language. */
   playLabel?: string;
   /**
    * Whether the visitor agreed to YouTube, from the page's cookie notice.
@@ -135,7 +131,7 @@ export function YouTubeVideo({
       <PlayFrame
         src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0${from}`}
         title={title}
-        playLabel={playLabel ?? `Play video: ${title}`}
+        playLabel={playLabel}
         poster={
           poster === undefined && consent !== false
             ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg`
@@ -143,7 +139,7 @@ export function YouTubeVideo({
         }
         ratio={vertical ? 'vertical' : 'video'}
         consent={consent}
-        notice={consentNotice(OUTSIDE_SERVICES.youtube.name, consentLabels)}
+        site={OUTSIDE_SERVICES.youtube.name}
         consentLabels={consentLabels}
       />
     </Block>

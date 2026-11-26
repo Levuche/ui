@@ -23,7 +23,7 @@ export function FormNotice({
     <p
       role="status"
       className={cn(
-        'm-0 text-sm empty:hidden',
+        'm-0 text-sm empty:sr-only',
         status === 'error' ? 'font-semibold' : 'text-site-text-2',
         className
       )}

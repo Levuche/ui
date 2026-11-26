@@ -34,9 +34,22 @@ export {
   contrastRatio,
   fixBackground,
   fixContrast,
+  nameColorIssue,
   type BackgroundIssue,
   type ContrastIssue,
+  type NameColorIssue,
 } from './system/contrast';
+export {
+  NAME_CASES,
+  NAME_COLORS,
+  NAME_WEIGHTS,
+  nameLook,
+  nameTint,
+  type NameCase,
+  type NameColor,
+  type NameLook,
+  type NameWeight,
+} from './system/name-style';
 export {
   SITE_LOOKS,
   SITE_LOOK_NAMES,
@@ -421,7 +434,7 @@ export {
   type LeadMagnetLabels,
 } from './organisms/offers';
 export { TIP_JAR_LABELS, TipJar, type TipJarLabels } from './organisms/tip-jar';
-export { DiscountCode } from './organisms/discount';
+export { DiscountCode, DISCOUNT_CODE_LABELS } from './organisms/discount';
 export {
   COUNTDOWN_LABELS,
   Countdown,
@@ -449,7 +462,13 @@ export {
 } from './system/rich-text';
 export { ReelGrid, YouTubeVideo, youtubeId } from './organisms/media';
 export { ImageGrid } from './organisms/images';
-export { LogoStrip, SiteImage, type Logo } from './organisms/pictures';
+export {
+  LOGO_STRIP_LABELS,
+  LogoStrip,
+  SiteImage,
+  type Logo,
+  type LogoStripLabels,
+} from './organisms/pictures';
 export {
   TEXT_STRIP_LABELS,
   TextStrip,
@@ -585,6 +604,16 @@ export {
   formatNextFree,
   type BookingEmbedLabels,
 } from './organisms/booking-embed';
+export {
+  CALENDAR_EMBED_LABELS,
+  CalendarEmbed,
+  type CalendarEmbedLabels,
+} from './organisms/calendar-embed';
+export {
+  TICKET_EMBED_LABELS,
+  TicketEmbed,
+  type TicketEmbedLabels,
+} from './organisms/ticket-embed';
 export { liveView, type LiveProps } from './system/live';
 export { Skeleton } from './atoms/skeleton';
 export {
@@ -610,20 +639,35 @@ export {
   type TechItem,
 } from './organisms/developer';
 export {
+  CALENDAR_SERVICES,
+  CALENDAR_VIEWS,
   EMBED_SERVICES,
+  TICKET_SERVICES,
   appleMusicEmbed,
+  calendarEmbed,
   deezerEmbed,
   embedFor,
+  eventbriteTickets,
+  googleCalendarEmbed,
+  googleCalendarIds,
   instagramEmbed,
   loomEmbed,
+  lumaTickets,
+  outlookCalendarEmbed,
   soundcloudEmbed,
   spotifyEmbed,
+  ticketsFor,
   tiktokEmbed,
   tintedSrc,
   vimeoEmbed,
+  type CalendarPage,
+  type CalendarService,
+  type CalendarView,
   type Embed,
   type EmbedService,
   type EmbedShape,
+  type TicketPage,
+  type TicketService,
 } from './system/embeds';
 export {
   AppleMusicEmbed,

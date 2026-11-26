@@ -5,6 +5,7 @@ import {
   type BlockBackground,
 } from './background';
 import type { BlockLook } from './look';
+import { nameTint, type NameLook } from './name-style';
 import { isSafeColor, type SiteColors, type SiteTheme } from './theme';
 
 /*
@@ -429,6 +430,49 @@ export function fixBackground(
 ): BlockBackground | undefined {
   const fix = backgroundIssues(look, theme).find((issue) => issue.suggestion);
   return fix?.suggestion ?? look.background;
+}
+
+/* ---------- A name in its own colour ---------- */
+
+/** A name or heading whose own colour is too faint on its block. */
+export type NameColorIssue = {
+  /** The contrast now, to two decimals. */
+  ratio: number;
+  /** What it needs: 4.5, as for any text. */
+  needed: number;
+  /** The theme's text colour passes there, so the editor can offer it. */
+  suggestion?: 'text';
+};
+
+/**
+ * Whether a name in its own colour (CreatorHeader `nameColor` or `nameTint`,
+ * SectionHeading `titleColor` or `titleTint`) can be read on its block, in
+ * the page's theme and the block's tone and colours, by WCAG 2.2 AA. Null
+ * when it can. It asks for 4.5:1 even for a large name, so the name stays
+ * readable at every size. The block's background is checked on its own, by
+ * backgroundIssues.
+ */
+export function nameColorIssue(
+  name: Pick<NameLook, 'color' | 'tint'>,
+  look: Pick<BlockLook, 'tone' | 'colors'> = {},
+  theme: SiteTheme = {}
+): NameColorIssue | null {
+  const block = blockPalette(theme, look);
+  const tint = nameTint(name.tint);
+  const own = tint ? parseColor(tint) : null;
+  // A colour isSafeColor lets through but this can't measure: no warning.
+  if (tint && !own) return null;
+  const key =
+    name.color === 'accent' || name.color === 'link' ? name.color : 'text';
+  const ink = own ? over(own, block.fill) : block.color(key);
+  const ratio = contrast(ink, block.fill);
+  if (ratio >= TEXT_CONTRAST) return null;
+  const text = contrast(block.color('text'), block.fill) >= TEXT_CONTRAST;
+  return {
+    ratio: Math.floor(ratio * 100) / 100,
+    needed: TEXT_CONTRAST,
+    ...(text ? { suggestion: 'text' as const } : {}),
+  };
 }
 
 /* ---------- Colour maths ---------- */

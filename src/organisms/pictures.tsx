@@ -1,6 +1,9 @@
 import type { ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
+import { WORDS_EN } from '../system/words/en';
 import { SiteLink } from '../atoms/link';
+import { LogoMarquee } from '../molecules/logo-marquee';
+import type { MotionToggleLabels } from '../molecules/motion-toggle';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { TileCaption, UNDER_CAPTION } from '../molecules/tile-caption';
 import { isOverCaption, type CaptionStyle } from '../system/gallery';
@@ -8,6 +11,7 @@ import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { imageAttrs, toImageSource, type ImageSrc } from '../system/image';
 import { usePageWords } from '../system/page-words';
+import { motionSeconds } from '../system/motion';
 
 /**
  * One picture, with an optional caption, and a link if given. The caption
@@ -86,19 +90,26 @@ export type Logo = LinkBehavior & {
   href?: string;
 };
 
+export type LogoStripLabels = MotionToggleLabels;
+
+/** What a scrolling LogoStrip's pause button says, in English. */
+export const LOGO_STRIP_LABELS: LogoStripLabels = WORDS_EN.logoStrip;
+
 /**
  * Brand logos in a row, as "As seen in" or "Worked with". `scroll` moves
- * them slowly across, pausing on hover or focus; visitors who ask for less
- * motion get a still, wrapped row instead.
+ * them slowly across, with a pause button (WCAG 2.2.2), pausing on hover or
+ * focus and while off screen; visitors who ask for less motion get a still,
+ * wrapped row instead.
  */
 export function LogoStrip({
   title,
   logos,
   mode = 'still',
-  speed = 30,
+  speed,
   logoHeight = 32,
   muted = true,
   label: labelProp,
+  labels,
   ...root
 }: BlockRootProps & {
   /** Above the logos, such as "As seen in". */
@@ -113,6 +124,8 @@ export function LogoStrip({
   muted?: boolean;
   /** The list's name for screen readers. */
   label?: string;
+  /** What the pause button of a scrolling strip says to screen readers. */
+  labels?: Partial<LogoStripLabels>;
 }) {
   const own = usePageWords('props');
   const label = labelProp === undefined ? own.brands : labelProp;
@@ -174,16 +187,11 @@ export function LogoStrip({
         </p>
       ) : null}
       {scrolling ? (
-        <div className="group w-full overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]">
-          <ul
-            className="m-0 flex w-max list-none gap-10 p-0 pe-10 group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-safe:animate-[levuche-marquee_var(--marquee)_linear_infinite] motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center rtl:[--marquee-to:50%]"
-            style={{ ['--marquee' as string]: `${Math.max(5, speed)}s` }}
-          >
-            {logos.map((logo, i) => item(logo, i))}
-            {/* The second copy makes the loop seamless; screen readers skip it. */}
-            {logos.map((logo, i) => item(logo, i, true))}
-          </ul>
-        </div>
+        <LogoMarquee seconds={motionSeconds(speed, 30)} labels={labels}>
+          {logos.map((logo, i) => item(logo, i))}
+          {/* The second copy makes the loop seamless; screen readers skip it. */}
+          {logos.map((logo, i) => item(logo, i, true))}
+        </LogoMarquee>
       ) : (
         <ul className="m-0 flex list-none flex-wrap items-center justify-center gap-x-10 gap-y-4 p-0">
           {logos.map((logo, i) => item(logo, i))}

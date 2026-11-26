@@ -6,6 +6,7 @@ import { ChoiceChips } from '../molecules/choice-chips';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { LiveData } from '../molecules/live-data';
 import { SellButton, type SellProps } from '../molecules/sell-button';
+import { isTimeZone } from '../system/calendar';
 import type { LiveProps } from '../system/live';
 import { useVisitorLocale } from '../system/locale';
 import type { ItemSell } from '../system/sell';
@@ -37,6 +38,7 @@ export function SlotPicker({
   data,
   loading,
   error,
+  updatedAt,
   sell,
   sellState,
   sellLabels,
@@ -76,21 +78,23 @@ export function SlotPicker({
   });
   const id = useId();
   const shownLocale = useVisitorLocale(locale);
+  // A zone that isn't one would make the dates throw; show UTC instead.
+  const zone = isTimeZone(timeZone) ? timeZone : 'UTC';
   const days = useMemo(() => {
     const dayKey = new Intl.DateTimeFormat('en-CA', {
-      timeZone,
+      timeZone: zone,
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
     });
     const dayName = new Intl.DateTimeFormat(shownLocale, {
-      timeZone,
+      timeZone: zone,
       weekday: 'short',
       day: 'numeric',
       month: 'short',
     });
     const timeName = new Intl.DateTimeFormat(shownLocale, {
-      timeZone,
+      timeZone: zone,
       hour: 'numeric',
       minute: '2-digit',
     });
@@ -111,7 +115,7 @@ export function SlotPicker({
       byDay.set(key, day);
     }
     return [...byDay.entries()].map(([key, day]) => ({ key, ...day }));
-  }, [data, timeZone, shownLocale]);
+  }, [data, zone, shownLocale]);
 
   const [dayKey, setDayKey] = useState('');
   const pickedDay =
@@ -125,7 +129,12 @@ export function SlotPicker({
       {title ? (
         <ItemHead title={title} detail={detail} headingAs={headingAs} />
       ) : null}
-      <LiveData data={data} loading={loading} error={error}>
+      <LiveData
+        data={data}
+        loading={loading}
+        error={error}
+        updatedAt={updatedAt}
+      >
         {() =>
           days.length === 0 ? (
             <p className="text-site-text-2 m-0 text-sm">{words.none}</p>
@@ -153,7 +162,7 @@ export function SlotPicker({
                 options={pickedDay?.times ?? []}
               />
               <p className="text-site-text-2 m-0 text-sm">
-                {words.zone.replace('{zone}', timeZone)}
+                {words.zone.replace('{zone}', zone)}
               </p>
               <SellButton
                 sell={

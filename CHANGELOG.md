@@ -4,6 +4,80 @@ What changed in each release of `@levuche/ui`, newest first. Each release
 pull request into `dev` adds its section here, with anything an app must
 change when it moves to that version.
 
+## 0.4.0 (2026-11-26)
+
+New calendar and ticket blocks, the creator's name in its own style, a pause
+button on the scrolling logo strip, and every block behaving the same way.
+
+### Changed
+
+- `LogoStrip` with `mode="scroll"` has a pause button, as `TextStrip` does
+  (WCAG 2.2.2 asks for one on anything that moves for more than five
+  seconds), and holds still while it's off screen. Its words are in the
+  page's language, or set with `labels` (`LOGO_STRIP_LABELS`). A still row
+  is unchanged.
+
+### Added
+
+- `CalendarEmbed`: a creator's public calendar from the link Google
+  Calendar or Outlook gives. Google's shows as a list, a month or a week,
+  in the page's language and time zone, on the block's background where
+  Google's dark text stays readable. `TicketEmbed`: an event's tickets, in
+  the page or a pop-up, from Luma's checkout; an Eventbrite event's button
+  opens its page on Eventbrite. Both load lazily in a sandbox with a plain
+  link under them, wait for consent with `consent={false}`, and show a still
+  placeholder in preview mode. The parsers (`calendarEmbed`,
+  `googleCalendarEmbed`, `outlookCalendarEmbed`, `ticketsFor`,
+  `lumaTickets`, `eventbriteTickets`) check the host exactly and keep only
+  the ids. Google Calendar, Outlook and Luma are new `OUTSIDE_SERVICES`.
+- The creator's name in its own style: `CreatorHeader` `nameColor` (`text`,
+  `accent` or `link`), `nameTint` (a colour of the creator's own, checked
+  with `isSafeColor`), `nameCase` (`upper` for capitals) and `nameWeight`
+  (`medium`, `semibold`, `bold` or `black`). `SectionHeading` takes the same
+  as `titleColor`, `titleTint`, `titleCase` and `titleWeight`. Each is off
+  until set, so pages look as before. `nameColorIssue` warns when the colour
+  is too faint on its block; `nameLook` gives the classes and style for any
+  other heading.
+- Words for every line a visitor reads, in all six languages: `consent`
+  (the notice and the Load button before a site loads), `rating` (as
+  "4.8 out of 5 stars"), `courseCard.oneLesson`, `props.highlights`,
+  `props.qrFor` and `packCheckout.sent`. `DISCOUNT_CODE_LABELS` is exported.
+  `PlayFrame` takes `site`, the site's name, and words the notice itself.
+
+### Fixed
+
+- Bad settings no longer break a block: a `QrCode` with an unsafe picture,
+  an `Avatar` without a name, an `ActionCard` with no covers, a
+  `SlotPicker` with an unknown time zone, a `Countdown` to a date that
+  isn't one, `SaveContact` with an empty or odd name, and a `TipJar`
+  default amount that isn't one of its chips.
+- The `Carousel` turns at most every 2 seconds, stops for visitors who ask
+  for less motion, and is read out by screen readers only while it's still.
+  `LogoStrip` speed has the same floor as other moving blocks.
+- `updatedAt` reaches the live-data line on every feed and developer block.
+- A sold-out `EventCard` that sells through BuildBase shows the button's own
+  sold-out state; packs and cards decide on the same usable `sell`.
+- Focus moves to the frame after Load in `CalendarEmbed`, and to the link
+  after a `LockedLink` opens. A `FormNotice` stays in the page for screen
+  readers while it's empty.
+- `MapCard` directions need real coordinates; an empty link falls back.
+  `SocialCard` counts and post views use the page's language.
+- Every visitor-facing word, such as "Play video", "Highlights", the QR
+  name and star ratings, is in the page's language.
+- Tracking: `ContactForm` and `LockedLink` sends report as `contact` and
+  `lock_unlock`, and a block drawn inside another (a pricing table's plans)
+  reports as the outer block.
+- Registry: `BookingEmbed` height starts at 24 rem as the block does, a
+  `GoalTracker` target and a progress item's full mark start at 1, and a
+  `TipJar` amount at 1.
+
+### An app must change
+
+- A `renderBuy` function for `SellButton` gets `disabled` and should pass
+  it to its button.
+- `LinkEmbed` with an empty `services` list now allows every service, as
+  leaving it out does. Pass the services you want to allow.
+
 ## 0.3.0 (2026-11-26)
 
 Everything the page editor in the app needs: each block describes its

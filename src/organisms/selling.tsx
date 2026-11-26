@@ -21,7 +21,7 @@ import {
   SellField,
   type SellProps,
 } from '../molecules/sell-button';
-import type { SellRef, SellState } from '../system/sell';
+import { sellJson, type SellRef, type SellState } from '../system/sell';
 import { columnSizes, type ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
 import { usePageLocale, usePageWords } from '../system/page-words';
@@ -87,7 +87,7 @@ export function PackRow({
   const row = 'text-site-text flex items-center gap-3 no-underline';
   return (
     <Block name="pack-row" {...root}>
-      {sell ? (
+      {sellJson(sell) ? (
         <div className="flex flex-wrap items-center gap-3">
           <div className={cn(row, 'min-w-48 flex-1')}>{body}</div>
           <SellButton
@@ -149,6 +149,8 @@ export function BuyButton({
 
 /** The words a checkout shows. */
 export type PackCheckoutLabels = {
+  /** Once the payment went through. */
+  sent: ReactNode;
   error: ReactNode;
 };
 
@@ -214,7 +216,7 @@ export function PackCheckout({
       >
         {buttonLabel ?? own.takeItFor.replace('{price}', price)}
       </BuyButton>
-      <FormNotice status={status} error={words.error} />
+      <FormNotice status={status} sent={words.sent} error={words.error} />
     </Block>
   );
 }
@@ -391,7 +393,7 @@ export function PackGrid({
               'bg-site-surface text-site-text rounded-block flex h-full flex-col gap-1.5 p-2.5 no-underline';
             return (
               <li key={`${i}-${title}`} className="m-0">
-                {sell ? (
+                {sellJson(sell) ? (
                   <div className={tile}>
                     {body}
                     <SellButton

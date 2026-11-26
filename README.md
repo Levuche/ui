@@ -19,13 +19,45 @@ code is free to use, change and ship in your own sites and apps, including
 commercial ones, but not to resell as a component library, kit or template,
 or to use for training AI models.
 
+## Start here
+
+For a developer, or an AI agent, picking this repository up cold:
+
+1. **Set up.** Node 22 (CI uses it). `npm ci`, then `npm run check` and
+   `npm run build`. Both must pass before any push.
+2. **Find the work.** Open issues are grouped by milestone: **R1 Launch**
+   first, then R2 Polish, R3 More pages and stats, R4 Selling and extras.
+   The plan behind them is Levuche/app#45. Check an issue's milestone
+   before starting it, and finish R1 before anything later.
+3. **Know the code.** `src/atoms`, `src/molecules` and `src/organisms` are
+   the blocks, smallest to largest; `src/templates` holds whole pages.
+   `src/system/registry.ts` describes every block's settings for the page
+   editor, and `src/settings-check.ts` fails the type check when a prop is
+   in neither `settings` nor `appOnly`. `src/system/words/` holds every word
+   a visitor reads, one file per language. `src/index.ts` is what apps
+   import. `gallery/` is the test page, `stories/` is Storybook, `e2e/` the
+   tests.
+4. **Test.** `npm run test:e2e` runs every test in Chromium. Without a
+   browser installed, `npx playwright test --project=desktop` still runs the
+   plain tests (settings, words, registry, parsers) and skips the rest;
+   CI runs them all. Run the full phone, tablet and desktop checks once per
+   release, not on every push.
+5. **Ship.** One branch and one pull request into `dev` per issue (see
+   "Branches and releases"), with a CHANGELOG line under Unreleased. Only a
+   maintainer approves, merges and pushes tags.
+
+Work in flight: the block review (#93, done in #95; the rest in #96), the
+0.4.0 release (#94, waits for a maintainer's go) and screenshot checks for
+every story (#12, paused to a later release; pull request #56 is for
+reference only and is never merged).
+
 ## Use it in a Levuche app
 
 Install a released version straight from GitHub (no npm account or token
 needed):
 
 ```bash
-npm install github:Levuche/ui#v0.3.0
+npm install github:Levuche/ui#v0.4.0
 ```
 
 The package ships TypeScript source. In a Next.js app:
@@ -289,9 +321,19 @@ reach a service.
 Every registry entry has a `privacy` note: the other sites the block can
 load in a visitor's browser (`services`, from `OUTSIDE_SERVICES`), the most
 cookies that may come with it (`cookies`: `none`, `needed`, `preferences`,
-`statistics` or `marketing`) and a `reason` a visitor can read. Players,
-maps and booking pages load nothing until a press; feed and developer
+`statistics` or `marketing`) and a `reason` a visitor can read. Players load only on a press, unless
+`autoLoad` is set for a small one. Maps, calendars and booking pages in the
+page load when they're shown. Pass `consent={false}` while the visitor
+hasn't agreed to that site in your cookie notice: every one of these then
+shows what loading would share and a Load button first. Feed and developer
 blocks show data your server fetched (see above).
+
+`CalendarEmbed` and `TicketEmbed` take only links they can check: a Google
+Calendar share, embed or iCal link or a published Outlook calendar, and a
+Luma event (its embed link or `evt-` id) or an Eventbrite event page. Check
+a pasted link with `calendarEmbed` or `ticketsFor` before saving it.
+Eventbrite's checkout needs its own script, which no block loads, so an
+Eventbrite event opens on Eventbrite.
 
 `pagePrivacy` adds up a page's blocks, for the cookie notice and the
 privacy page:
@@ -886,9 +928,20 @@ is a summary; the registry is the full list.
 `TextStrip` is a band of words that scrolls across (`items`, `speed` in
 seconds a pass, `direction` `start` or `end`, and a `separator`).
 `CreatorHeader` can turn a ring of words around the picture (`wordRing`,
-`wordRingSpeed`). Both have a pause button (WCAG 2.2.2), hold still while
-off screen, stand still for visitors who ask for less motion, and are read
-to screen readers once, in order.
+`wordRingSpeed`), and `LogoStrip` with `mode="scroll"` moves its logos
+across. All three have a pause button (WCAG 2.2.2), hold still while off
+screen, stand still for visitors who ask for less motion, and are read to
+screen readers once, in order.
+
+`CreatorHeader` can set the creator's name apart from the rest of the text:
+`nameColor` (`text`, `accent` or `link` from the theme), `nameTint` (a
+colour of their own, used only when `isSafeColor` passes), `nameCase`
+(`upper` for capitals) and `nameWeight` (`medium` to `black`).
+`SectionHeading` takes the same as `titleColor`, `titleTint`, `titleCase`
+and `titleWeight`. Capitals are only a style, so screen readers hear the
+words as typed. `nameColorIssue(name, look, theme)` says when the colour is
+too faint to read on its block, as `contrastIssues` does for a theme, and
+suggests the theme's text colour.
 
 `MessageCard` opens a chat on WhatsApp, Telegram, a text, email or
 Messenger with a message ready to send (`channel`, `to`, `message`, and
@@ -1019,7 +1072,14 @@ typecheck` says what's missing), and export it from `src/index.ts`.
 3. Show it in `gallery/gallery.tsx`, inside a `Group`.
 4. Add `stories/<Block>.stories.tsx`, with a play function that does what a
    visitor would, and add it to the sample page in `stories/sample-page.tsx`.
-5. Test what it does in `e2e/blocks.spec.ts`.
+5. Test what it does in `e2e/blocks.spec.ts`, and add its labels group to
+   the list in `e2e/words.spec.ts`, which checks that every language has
+   every word.
+6. Give its registry entry a `privacy` note (`LOADS_NOTHING`, or the sites
+   it loads in a visitor's browser) and its accessibility text, list it in
+   "What's in it" above, and add a CHANGELOG line under Unreleased.
+7. A press that matters for tracking names itself with `data-action` (on
+   the form for a send, not its button), so `useBlockActions` reports it.
 
 ## Branches and releases
 

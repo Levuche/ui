@@ -7,6 +7,8 @@
  * use them too.
  */
 
+import { WORDS_EN } from './words/en';
+
 /**
  * The kinds of cookie (or other storage in the browser) a block may lead to,
  * from least to most, as a cookie notice groups them:
@@ -93,6 +95,17 @@ export const OUTSIDE_SERVICES = {
     hosts: ['maps.google.com', 'www.google.com'],
     cookies: 'marketing',
   },
+  googlecalendar: {
+    name: 'Google Calendar',
+    hosts: ['calendar.google.com'],
+    cookies: 'marketing',
+  },
+  outlookcalendar: {
+    name: 'Outlook',
+    hosts: ['outlook.office365.com', 'outlook.office.com', 'outlook.live.com'],
+    cookies: 'marketing',
+  },
+  luma: { name: 'Luma', hosts: ['luma.com'], cookies: 'marketing' },
   booking: { name: 'the booking site', hosts: [], cookies: 'marketing' },
   'audio-host': {
     name: 'the site the audio is on',
@@ -164,11 +177,8 @@ export type ConsentLabels = {
   load: string;
 };
 
-export const CONSENT_LABELS: ConsentLabels = {
-  notice:
-    'This loads from {service}, which will see your IP address and may set cookies.',
-  load: 'Load',
-};
+/** The English words; a page in another language uses its own (`consent`). */
+export const CONSENT_LABELS: ConsentLabels = WORDS_EN.consent;
 
 /** The notice for one service or site, with its name filled in. */
 export function consentNotice(

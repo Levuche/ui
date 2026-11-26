@@ -39,6 +39,7 @@ export const WORDS_EN = {
     error: 'That didn’t go through. Please try again.',
   },
   packCheckout: {
+    sent: 'Thank you! Your payment went through.',
     error: 'The payment didn’t go through. Please try again.',
   },
   creditPack: {
@@ -117,6 +118,7 @@ export const WORDS_EN = {
     close: 'Close',
   },
   courseCard: {
+    oneLesson: '1 lesson',
     lessons: '{n} lessons',
     button: 'Start learning',
   },
@@ -162,6 +164,16 @@ export const WORDS_EN = {
   },
   embed: {
     play: 'Play: {title}',
+  },
+  /** Every block's notice before it loads another site. {service} is filled in. */
+  consent: {
+    notice:
+      'This loads from {service}, which will see your IP address and may set cookies.',
+    load: 'Load',
+  },
+  /** Stars, read out by screen readers. */
+  rating: {
+    stars: '{n} out of {max} stars',
   },
   liveStatus: {
     live: 'Live now',
@@ -280,7 +292,25 @@ export const WORDS_EN = {
     hours: '{n} h',
     minutes: '{n} min',
   },
+  logoStrip: {
+    pause: 'Stop the moving logos',
+    play: 'Move the logos again',
+  },
+  calendarEmbed: {
+    frame: 'Calendar: {title}',
+    fallback: 'Open the calendar',
+  },
+  ticketEmbed: {
+    button: 'Get tickets',
+    frame: 'Tickets: {title}',
+    fallback: 'Open the ticket page',
+    close: 'Close',
+  },
   props: {
+    /** TextStrip `label`. */
+    highlights: 'Highlights',
+    /** QrCode's picture name. */
+    qrFor: 'QR code for {address}',
     /** CreatorHeader `verifiedLabel`. */
     verified: 'Verified',
     /** LinkList `label`. */

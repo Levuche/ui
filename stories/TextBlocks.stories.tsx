@@ -123,6 +123,36 @@ export const Heading: StoryObj<typeof SectionHeading> = {
   },
 };
 
+/** A heading in the links colour and capitals, a little lighter than bold. */
+export const HeadingInItsOwnStyle: StoryObj<typeof SectionHeading> = {
+  render: () => (
+    <SectionHeading
+      title="My works"
+      titleColor="link"
+      titleCase="upper"
+      titleWeight="semibold"
+    />
+  ),
+  play: async ({ canvas }) => {
+    const heading = canvas.getByRole('heading', { level: 2, name: 'My works' });
+    const style = getComputedStyle(heading);
+    await expect(style.textTransform).toBe('uppercase');
+    await expect(style.fontWeight).toBe('600');
+    const probe = document.createElement('span');
+    probe.style.color = 'var(--site-link)';
+    heading.append(probe);
+    const link = getComputedStyle(probe).color;
+    probe.remove();
+    await expect(style.color).toBe(link);
+  },
+};
+
+/** The same in the dark scheme. */
+export const HeadingInItsOwnStyleDark: StoryObj<typeof SectionHeading> = {
+  ...HeadingInItsOwnStyle,
+  globals: { theme: 'dark' },
+};
+
 /** A quote, with who said it and a small picture (initials when there's none). */
 export const Quote: StoryObj<typeof QuoteBlock> = {
   render: () => (

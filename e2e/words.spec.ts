@@ -79,6 +79,8 @@ test('each block’s English labels are the English word set', () => {
     ['topPicks', ui.TOP_PICKS_LABELS],
     ['pricingTable', ui.PRICING_TABLE_LABELS],
     ['bookingEmbed', ui.BOOKING_EMBED_LABELS],
+    ['calendarEmbed', ui.CALENDAR_EMBED_LABELS],
+    ['ticketEmbed', ui.TICKET_EMBED_LABELS],
     ['newsletterTile', ui.NEWSLETTER_TILE_LABELS],
     ['video', ui.VIDEO_LABELS],
     ['videoTile', ui.VIDEO_TILE_LABELS],
@@ -96,8 +98,14 @@ test('each block’s English labels are the English word set', () => {
     ['calendar', ui.CALENDAR_LABELS],
     ['eventCard', ui.EVENT_CARD_LABELS],
     ['localTime', ui.LOCAL_TIME_LABELS],
+    ['logoStrip', ui.LOGO_STRIP_LABELS],
     ['reviewSummary', ui.REVIEW_SUMMARY_LABELS],
     ['nowPlaying', ui.NOW_PLAYING_LABELS],
+    ['packCheckout', ui.PACK_CHECKOUT_LABELS],
+    ['textStrip', ui.TEXT_STRIP_LABELS],
+    ['wordRing', ui.WORD_RING_LABELS],
+    ['socialCard', ui.SOCIAL_CARD_LABELS],
+    ['consent', ui.CONSENT_LABELS],
   ];
   for (const [group, labels] of blocks) {
     expect(labels, group).toEqual(WORDS_EN[group]);
@@ -194,14 +202,53 @@ test('the moving words and the social card follow the page language', () => {
         platform: 'instagram',
         handle: 'desiorigins',
         followers: 1200,
+      }),
+      createElement(ui.LogoStrip, {
+        mode: 'scroll',
+        logos: [
+          { src: '/a.svg', alt: 'A' },
+          { src: '/b.svg', alt: 'B' },
+        ],
       })
     )
   );
   expect(html).toContain(WORDS_DE.textStrip.pause);
+  expect(html).toContain(WORDS_DE.logoStrip.pause);
+  expect(html).not.toContain(WORDS_EN.logoStrip.pause);
   expect(html).toContain(WORDS_DE.wordRing.pause);
   expect(html).toContain(WORDS_DE.socialCard.follow);
   expect(html).not.toContain(WORDS_EN.textStrip.pause);
   expect(html).not.toContain(WORDS_EN.wordRing.pause);
+});
+
+test('consent notices, stars, the QR code and counts follow the page language', () => {
+  const html = renderToString(
+    createElement(
+      ui.CreatorTheme,
+      { theme: { language: 'de' }, words: WORDS_DE },
+      createElement(ui.LinkEmbed, {
+        url: 'https://vimeo.com/76979871',
+        title: 'Ein Film',
+        consent: false,
+      }),
+      createElement(ui.Testimonials, {
+        items: [{ quote: 'Toll', name: 'Asha', rating: 4.8 }],
+      }),
+      createElement(ui.QrCode, { value: 'https://levuche.com/asha' }),
+      createElement(ui.CourseCard, {
+        title: 'Chai',
+        lessons: 1,
+        price: '20 €',
+        href: '/kurs',
+      })
+    )
+  );
+  expect(html).toContain(WORDS_DE.consent.notice.replace('{service}', 'Vimeo'));
+  expect(html).toContain(`>${WORDS_DE.consent.load}<`);
+  expect(html).not.toContain(WORDS_EN.consent.notice.split('{')[0]);
+  expect(html).toContain('4,8 von 5 Sternen');
+  expect(html).toContain('QR-Code für levuche.com/asha');
+  expect(html).toContain(WORDS_DE.courseCard.oneLesson);
 });
 
 test('a page without a language stays as it was', () => {

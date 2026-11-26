@@ -32,6 +32,7 @@ export const WORDS_DE: PageWords = {
     error: 'Das hat nicht geklappt. Bitte versuch es noch einmal.',
   },
   packCheckout: {
+    sent: 'Danke! Deine Zahlung ist eingegangen.',
     error: 'Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.',
   },
   creditPack: {
@@ -111,6 +112,7 @@ export const WORDS_DE: PageWords = {
     close: 'Schließen',
   },
   courseCard: {
+    oneLesson: '1 Lektion',
     lessons: '{n} Lektionen',
     button: 'Jetzt lernen',
   },
@@ -157,6 +159,14 @@ export const WORDS_DE: PageWords = {
   },
   embed: {
     play: 'Abspielen: {title}',
+  },
+  consent: {
+    notice:
+      'Das wird von {service} geladen, das dabei deine IP-Adresse sieht und Cookies setzen kann.',
+    load: 'Laden',
+  },
+  rating: {
+    stars: '{n} von {max} Sternen',
   },
   liveStatus: {
     live: 'Jetzt live',
@@ -275,7 +285,23 @@ export const WORDS_DE: PageWords = {
     hours: '{n} Std.',
     minutes: '{n} Min.',
   },
+  logoStrip: {
+    pause: 'Laufende Logos anhalten',
+    play: 'Logos wieder laufen lassen',
+  },
+  calendarEmbed: {
+    frame: 'Kalender: {title}',
+    fallback: 'Kalender öffnen',
+  },
+  ticketEmbed: {
+    button: 'Tickets holen',
+    frame: 'Tickets: {title}',
+    fallback: 'Ticketseite öffnen',
+    close: 'Schließen',
+  },
   props: {
+    highlights: 'Highlights',
+    qrFor: 'QR-Code für {address}',
     verified: 'Verifiziert',
     links: 'Links',
     socialAccounts: 'Social-Media-Konten',
