@@ -1,5 +1,5 @@
 import type { Preview } from '@storybook/react-vite';
-import { CreatorTheme } from '../src';
+import { CreatorTheme, type SiteCardStyle } from '../src';
 import { SCREENS } from '../stories/screens';
 import { THEMES, type ThemeName } from '../stories/themes';
 import './preview.css';
@@ -8,7 +8,7 @@ const preview: Preview = {
   // Pick the creator theme from the toolbar; a story can fix one with
   // `globals: { theme: 'dark' }`. Direction does the same for right-to-left
   // scripts, such as Arabic, Hebrew and Urdu.
-  initialGlobals: { theme: 'light', direction: 'ltr' },
+  initialGlobals: { theme: 'light', cards: 'flat', direction: 'ltr' },
   globalTypes: {
     theme: {
       description: 'Creator theme',
@@ -19,6 +19,20 @@ const preview: Preview = {
           { value: 'light', title: 'Sample creator, light' },
           { value: 'dark', title: 'Sample creator, dark' },
           { value: 'custom', title: 'A creator’s own theme' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+    cards: {
+      description: 'Card style',
+      toolbar: {
+        title: 'Cards',
+        icon: 'component',
+        items: [
+          { value: 'flat', title: 'Flat cards' },
+          { value: 'outline', title: 'Outlined cards' },
+          { value: 'raised', title: 'Raised cards' },
+          { value: 'glass', title: 'Glass cards' },
         ],
         dynamicTitle: true,
       },
@@ -45,7 +59,10 @@ const preview: Preview = {
       return (
         <CreatorTheme
           dir={dir}
-          theme={THEMES[name].theme}
+          theme={{
+            ...THEMES[name].theme,
+            cards: (context.globals.cards ?? 'flat') as SiteCardStyle,
+          }}
           className="min-h-screen p-5"
           data-testid="story-theme"
         >

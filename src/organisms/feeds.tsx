@@ -68,6 +68,7 @@ export function LatestVideos({
                     href={video.href}
                     newTab
                     action="video_click"
+                    data-lift=""
                     className="flex flex-col gap-2 no-underline"
                   >
                     <Thumb
