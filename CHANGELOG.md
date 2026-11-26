@@ -4,10 +4,11 @@ What changed in each release of `@levuche/ui`, newest first. Each release
 pull request into `dev` adds its section here, with anything an app must
 change when it moves to that version.
 
-## Unreleased
+## 0.5.0 (2026-11-27)
 
 Every open item from the block review, and four blocks that had the same
-problem, so each rule now holds in every block.
+problem, so each rule now holds in every block, with tests that every
+block works with every setting and state.
 
 ### Changed
 
@@ -71,6 +72,13 @@ problem, so each rule now holds in every block.
 - `ContributionGraph` pads a short first week at the start and a short last
   week at the end, so days line up under their weekday.
 - `TechStack` logos load at their drawn size.
+
+### An app must change
+
+- An app that renders `LogoMarquee` itself passes `logos` and `copies`
+  (arrays of list items) in place of `children`. `LogoStrip` is unchanged.
+- An app with its own word lists adds the new keys: `localTimeCities`,
+  `props.reel` and `pricingTable.yearlySave`.
 
 ## 0.4.0 (2026-11-26)
 
