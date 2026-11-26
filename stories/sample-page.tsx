@@ -1,13 +1,18 @@
 import {
   AppIcon,
+  TileGallery,
   BookingCard,
   Countdown,
+  EventCard,
+  GoalTracker,
   DiscountCode,
   FaqList,
   FeaturedLink,
   ImageGrid,
   LeadMagnet,
   MembershipCard,
+  SocialCard,
+  MessageCard,
   SocialIcons,
   Testimonials,
   TipJar,
@@ -18,6 +23,7 @@ import {
   FeaturedPack,
   GlobeIcon,
   LinkList,
+  LocalTime,
   NewsletterBand,
   PackCheckout,
   PackRow,
@@ -110,24 +116,69 @@ export const SAMPLE_FAQ = [
   },
 ];
 
-/** A fixed clock for the sample page's countdown, so it never changes. */
+/** A fixed clock for the sample page's countdown and local time, so they never change. */
 const SAMPLE_NOW = Date.UTC(2026, 11, 1, 9, 0, 0);
 
-/** A whole creator page built from the blocks, as a creator might set it up. */
-export function SamplePage() {
+/** The words on the sample page a creator writes themselves. */
+export type SampleWords = {
+  name: string;
+  tagline: string;
+  button: string;
+  featured: string;
+  featuredDetail: string;
+  pack: string;
+  packDetail: string;
+  price: string;
+  links: typeof SAMPLE_LINKS;
+};
+
+export const SAMPLE_WORDS: SampleWords = {
+  name: 'Desi Origins',
+  tagline: 'How everyday things began',
+  button: 'Shop my presets',
+  featured: 'New: how tea came to India',
+  featuredDetail: '12 minutes, out now',
+  pack: 'Origins reel pack',
+  packDetail: '100 prompts, a guide and 12 templates',
+  price: '$12',
+  links: SAMPLE_LINKS,
+};
+
+/**
+ * A whole creator page built from the blocks, as a creator might set it up.
+ * Pass `words` to try other names, titles and prices, such as very long ones
+ * or another language.
+ */
+export function SamplePage({ words = SAMPLE_WORDS }: { words?: SampleWords }) {
   return (
     <SitePage as="main" id="top">
-      <CreatorHeader name="Desi Origins" tagline="How everyday things began" />
+      <CreatorHeader name={words.name} tagline={words.tagline} />
       <SocialIcons links={SAMPLE_SOCIALS} />
       <SiteLinkButton href="https://example.com/presets" fullWidth>
-        Shop my presets
+        {words.button}
       </SiteLinkButton>
       <FeaturedLink
         href="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-        title="New: how tea came to India"
-        detail="12 minutes, out now"
+        title={words.featured}
+        detail={words.featuredDetail}
       />
-      <LinkList label="Desi Origins links" links={SAMPLE_LINKS} />
+      <LinkList label={`${words.name} links`} links={words.links} />
+      <SocialCard
+        platform="instagram"
+        handle="desiorigins"
+        name={words.name}
+        followers={128000}
+        tile="2x1"
+      />
+      <LocalTime
+        city="mumbai"
+        cityName="Kochi"
+        now={SAMPLE_NOW}
+        live={false}
+        locale="en-US"
+        visitorTimeZone="Europe/London"
+        hours={{ from: '09:00', to: '18:00' }}
+      />
       <SiteSection title="Latest video">
         <YouTubeVideo
           video="https://www.youtube.com/watch?v=M7lc1UVf-VE"
@@ -137,14 +188,14 @@ export function SamplePage() {
       </SiteSection>
       <SiteSection title="Packs">
         <FeaturedPack
-          title="Origins reel pack"
-          detail="100 prompts, a guide and 12 templates"
-          price="$12"
+          title={words.pack}
+          detail={words.packDetail}
+          price={words.price}
           headingAs="h3"
         />
         <PackRow title="Prompt starter kit" detail="50 prompts" price="$7" />
         <PackCheckout
-          price="$12"
+          price={words.price}
           onSubmit={(event) => event.preventDefault()}
         />
       </SiteSection>
@@ -154,10 +205,31 @@ export function SamplePage() {
           to={new Date(SAMPLE_NOW + 3 * 86_400_000 + 5 * 3_600_000)}
           now={SAMPLE_NOW}
         />
+        <EventCard
+          title="Live cooking night"
+          start="2027-03-15T19:00"
+          end="2027-03-15T22:00"
+          timeZone="Asia/Kolkata"
+          venue="The Old Hall"
+          city="Pune"
+          href="https://example.com/tickets"
+          now={SAMPLE_NOW}
+        />
         <DiscountCode
           code="ORIGINS10"
           detail="10% off the reel pack"
           copy={() => Promise.resolve()}
+        />
+        <GoalTracker
+          title="Film the spice series"
+          deadline={new Date(SAMPLE_NOW + 30 * 86_400_000).toISOString()}
+          now={SAMPLE_NOW}
+          bar="steps"
+          items={[
+            { label: 'Write the scripts', done: true },
+            { label: 'Film five episodes', done: true },
+            { label: 'Edit and post' },
+          ]}
         />
       </SiteSection>
       <SiteSection title="Work with me">
@@ -174,6 +246,14 @@ export function SamplePage() {
           perks={['A bonus story every week', 'Early access to new packs']}
           href="https://example.com/join"
           featured
+        />
+        <MessageCard
+          channel="whatsapp"
+          name={words.name}
+          picture={null}
+          detail="Usually replies within an hour"
+          to="+91 98765 43210"
+          message="Hi! I’d like a quote for a custom print."
         />
       </SiteSection>
       <SiteSection title="Free">
@@ -192,6 +272,21 @@ export function SamplePage() {
             { alt: 'Chai on a clay stove' },
             { alt: 'A spice market in Kochi' },
             { alt: 'Tea leaves drying in Assam' },
+          ]}
+        />
+      </SiteSection>
+      <SiteSection title="Gallery">
+        <TileGallery
+          captionStyle="bar"
+          items={[
+            { alt: 'Chai on a clay stove', span: '2x2', caption: 'Chai' },
+            { alt: 'A spice market in Kochi', span: '1x2' },
+            { alt: 'Tea leaves drying in Assam' },
+            {
+              alt: 'Hills above Darjeeling',
+              span: '2x1',
+              caption: 'Darjeeling',
+            },
           ]}
         />
       </SiteSection>

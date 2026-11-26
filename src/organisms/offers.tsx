@@ -2,12 +2,16 @@ import type { FormEventHandler, ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import type { SiteButtonVariant } from '../atoms/button';
 import { ClockIcon } from '../atoms/icons';
-import { Badge } from '../atoms/text';
+import { Badge, Ribbon } from '../atoms/text';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import type { FormStatus } from '../system/state';
 import { CheckList } from '../molecules/check-list';
-import { EmailForm, type EmailFormLabels } from '../molecules/email-form';
+import {
+  EMAIL_FORM_LABELS,
+  EmailForm,
+  type EmailFormLabels,
+} from '../molecules/email-form';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { Price } from '../molecules/price';
 import {
@@ -15,6 +19,9 @@ import {
   SellField,
   type SellProps,
 } from '../molecules/sell-button';
+import type { ImageSrc } from '../system/image';
+import { usePageWords } from '../system/page-words';
+import { WORDS_EN } from '../system/words/en';
 
 /**
  * A call or session to book: what it is, how long, the price, and a link to
@@ -30,7 +37,7 @@ export function BookingCard({
   sellState,
   sellLabels,
   renderBuy,
-  buttonLabel = 'Book a call',
+  buttonLabel: buttonLabelProp,
   buttonVariant = 'solid',
   image,
   headingAs = 'h3',
@@ -51,9 +58,12 @@ export function BookingCard({
     href?: string;
     buttonLabel?: string;
     buttonVariant?: SiteButtonVariant;
-    image?: string | null;
+    image?: ImageSrc | null;
     headingAs?: HeadingTag;
   }) {
+  const own = usePageWords('props');
+  const buttonLabel =
+    buttonLabelProp === undefined ? own.bookCall : buttonLabelProp;
   return (
     <Block as="article" name="booking-card" {...root}>
       <ItemHead
@@ -92,24 +102,28 @@ export function MembershipCard({
   title,
   price,
   was,
-  period = 'month',
+  period: periodProp,
   perks,
   href,
   sell,
   sellState,
   sellLabels,
   renderBuy,
-  buttonLabel = 'Join',
+  buttonLabel: buttonLabelProp,
   featured = false,
   featuredLabel,
+  ribbon,
   headingAs: Heading = 'h3',
   newTab,
   sponsored,
   nofollow,
+  saveLabel,
   ...root
 }: BlockRootProps &
   LinkBehavior &
   SellProps & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
     title: string;
     price: string;
     /** The price before a discount. */
@@ -124,19 +138,26 @@ export function MembershipCard({
     featured?: boolean;
     /** A pill on the featured tier, such as "Most popular". */
     featuredLabel?: string;
+    /** A small tilted label over the top corner, such as "Best value". */
+    ribbon?: ReactNode;
     headingAs?: HeadingTag;
   }) {
+  const own = usePageWords('props');
+  const period = periodProp === undefined ? own.month : periodProp;
+  const buttonLabel =
+    buttonLabelProp === undefined ? own.join : buttonLabelProp;
   return (
     <Block
       as="article"
       name="membership-card"
       {...root}
       className={cn(
-        'border-2',
+        'relative border-2',
         featured ? 'border-site-button' : 'border-transparent',
         root.className
       )}
     >
+      {ribbon ? <Ribbon>{ribbon}</Ribbon> : null}
       <div className="flex items-center justify-between gap-2">
         <Heading className="text-block-title m-0 font-bold">{title}</Heading>
         {featured && featuredLabel ? (
@@ -144,7 +165,13 @@ export function MembershipCard({
         ) : null}
       </div>
       <p className="m-0">
-        <Price value={price} was={was} period={period} size="lg" />
+        <Price
+          saveLabel={saveLabel}
+          value={price}
+          was={was}
+          period={period}
+          size="lg"
+        />
       </p>
       <CheckList items={perks} />
       <SellButton
@@ -168,6 +195,13 @@ export function MembershipCard({
 /** The words a lead magnet shows. */
 export type LeadMagnetLabels = EmailFormLabels & { free: string };
 
+export const LEAD_MAGNET_LABELS: LeadMagnetLabels = {
+  ...EMAIL_FORM_LABELS,
+  button: WORDS_EN.props.sendIt,
+  sent: WORDS_EN.props.sentCheckInbox,
+  free: WORDS_EN.props.free,
+};
+
 /**
  * Something free in return for an email address, such as a guide: the
  * visitor types their address and the creator's app sends it. `status` is
@@ -178,7 +212,7 @@ export function LeadMagnet({
   title,
   detail,
   image,
-  buttonLabel = 'Send it to me',
+  buttonLabel: buttonLabelProp,
   placeholder,
   labels,
   status,
@@ -190,7 +224,7 @@ export function LeadMagnet({
 }: BlockRootProps & {
   title: string;
   detail?: ReactNode;
-  image?: string | null;
+  image?: ImageSrc | null;
   /** A free item to claim with the address. */
   sell?: SellProps['sell'];
   buttonLabel?: string;
@@ -201,7 +235,10 @@ export function LeadMagnet({
   action?: string | ((data: FormData) => void | Promise<void>);
   headingAs?: HeadingTag;
 }) {
-  const { free = 'Free', ...formLabels } = labels ?? {};
+  const own = usePageWords('props');
+  const buttonLabel =
+    buttonLabelProp === undefined ? own.sendIt : buttonLabelProp;
+  const { free = own.free, ...formLabels } = labels ?? {};
   return (
     <Block as="article" name="lead-magnet" {...root}>
       <ItemHead
@@ -219,7 +256,7 @@ export function LeadMagnet({
         onSubmit={onSubmit}
         labels={{
           button: buttonLabel,
-          sent: 'Sent! Check your inbox.',
+          sent: own.sentCheckInbox,
           ...(placeholder ? { placeholder } : {}),
           ...formLabels,
         }}

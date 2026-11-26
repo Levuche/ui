@@ -7,6 +7,9 @@ import { Badge } from '../atoms/text';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import { useControllableState } from '../system/state';
+import type { ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 export type BeforeAfterLabels = {
   before: string;
@@ -17,14 +20,9 @@ export type BeforeAfterLabels = {
   value: string;
 };
 
-export const BEFORE_AFTER_LABELS: BeforeAfterLabels = {
-  before: 'Before',
-  after: 'After',
-  slider: 'Compare before and after',
-  value: '{before}% before, {after}% after',
-};
+export const BEFORE_AFTER_LABELS: BeforeAfterLabels = WORDS_EN.beforeAfter;
 
-type Picture = { src: string | null | undefined; alt: string };
+type Picture = { src: ImageSrc | null | undefined; alt: string };
 
 /**
  * Two pictures, one over the other, with a handle to drag between them, as
@@ -55,7 +53,7 @@ export function BeforeAfter({
   showLabels?: boolean;
   labels?: Partial<BeforeAfterLabels>;
 }) {
-  const words = { ...BEFORE_AFTER_LABELS, ...labels };
+  const words = usePageWords('beforeAfter', labels);
   const id = useId();
   const [value, setValue] = useControllableState({
     value: position,
@@ -78,9 +76,11 @@ export function BeforeAfter({
           ratio={ratio}
           className="w-full rounded-none"
         />
+        {/* The before picture shows from the side the text starts on, so it
+            follows the slider in right-to-left scripts too. */}
         <div
-          className="absolute inset-0"
-          style={{ clipPath: `inset(0 ${100 - at}% 0 0)` }}
+          className="absolute inset-0 [clip-path:inset(0_calc(100%_-_var(--at))_0_0)] rtl:[clip-path:inset(0_0_0_calc(100%_-_var(--at)))]"
+          style={{ ['--at' as string]: `${at}%` }}
         >
           <Thumb
             src={before.src}
@@ -101,8 +101,8 @@ export function BeforeAfter({
         ) : null}
         <span
           aria-hidden
-          className="bg-site-bg pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2"
-          style={{ left: `${at}%` }}
+          className="bg-site-bg pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 rtl:translate-x-1/2"
+          style={{ insetInlineStart: `${at}%` }}
         >
           <span className="bg-site-button text-site-on-button absolute top-1/2 left-1/2 flex size-10 -translate-1/2 items-center justify-center rounded-full shadow-md">
             <ArrowsHorizontalIcon size={20} />

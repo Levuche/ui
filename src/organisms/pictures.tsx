@@ -2,14 +2,23 @@ import type { ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLink } from '../atoms/link';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
+import { TileCaption, UNDER_CAPTION } from '../molecules/tile-caption';
+import { isOverCaption, type CaptionStyle } from '../system/gallery';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
+import { imageAttrs, toImageSource, type ImageSrc } from '../system/image';
+import { usePageWords } from '../system/page-words';
 
-/** One picture, with an optional caption, and a link if given. */
+/**
+ * One picture, with an optional caption, and a link if given. The caption
+ * sits under the picture, or over it on a frosted bar or a small label
+ * (`captionStyle`).
+ */
 export function SiteImage({
   src,
   alt,
   caption,
+  captionStyle = 'below',
   href,
   ratio = 'auto',
   fit = 'cover',
@@ -19,16 +28,26 @@ export function SiteImage({
   ...root
 }: BlockRootProps &
   LinkBehavior & {
-    src: string | null | undefined;
+    src: ImageSrc | null | undefined;
     /** What the picture shows; it also names the link. Empty if decorative. */
     alt: string;
     caption?: ReactNode;
+    /** Where the caption sits: under the picture, or over it. */
+    captionStyle?: CaptionStyle;
     href?: string;
     ratio?: ThumbRatio;
     fit?: 'cover' | 'contain';
   }) {
+  // A caption over the picture shares its grid cell (see TileCaption).
+  const over = Boolean(caption) && isOverCaption(captionStyle);
   const picture = (
-    <Thumb src={src} alt={alt} ratio={ratio} fit={fit} className="w-full" />
+    <Thumb
+      src={src}
+      alt={alt}
+      ratio={ratio}
+      fit={fit}
+      className={cn('w-full', over && !href && UNDER_CAPTION)}
+    />
   );
   return (
     <Block
@@ -36,7 +55,7 @@ export function SiteImage({
       name="site-image"
       defaults={{ tone: 'plain' }}
       {...root}
-      className={cn('m-0', root.className)}
+      className={cn('m-0', over && 'grid grid-cols-1', root.className)}
     >
       {href ? (
         <SiteLink
@@ -45,7 +64,7 @@ export function SiteImage({
           sponsored={sponsored}
           nofollow={nofollow}
           action="image_click"
-          className="block"
+          className={cn('block', over && UNDER_CAPTION)}
         >
           {picture}
         </SiteLink>
@@ -53,7 +72,7 @@ export function SiteImage({
         picture
       )}
       {caption ? (
-        <figcaption className="text-site-text-2 text-sm">{caption}</figcaption>
+        <TileCaption captionStyle={captionStyle}>{caption}</TileCaption>
       ) : null}
     </Block>
   );
@@ -61,7 +80,7 @@ export function SiteImage({
 
 /** A brand's logo, for LogoStrip. */
 export type Logo = LinkBehavior & {
-  src: string | null | undefined;
+  src: ImageSrc | null | undefined;
   /** The brand's name. */
   alt: string;
   href?: string;
@@ -79,7 +98,7 @@ export function LogoStrip({
   speed = 30,
   logoHeight = 32,
   muted = true,
-  label = 'Brands',
+  label: labelProp,
   ...root
 }: BlockRootProps & {
   /** Above the logos, such as "As seen in". */
@@ -95,13 +114,15 @@ export function LogoStrip({
   /** The list's name for screen readers. */
   label?: string;
 }) {
+  const own = usePageWords('props');
+  const label = labelProp === undefined ? own.brands : labelProp;
   const item = (logo: Logo, i: number, hidden = false) => {
-    const image = logo.src ? (
+    const source = toImageSource(logo.src);
+    // Logos are at most 160 px wide (max-w-40).
+    const image = source ? (
       <img
-        src={logo.src}
+        {...imageAttrs(source, '160px')}
         alt={hidden ? '' : logo.alt}
-        loading="lazy"
-        decoding="async"
         style={{ height: logoHeight }}
         className={cn(
           'w-auto max-w-40 object-contain',
@@ -155,7 +176,7 @@ export function LogoStrip({
       {scrolling ? (
         <div className="group w-full overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]">
           <ul
-            className="m-0 flex w-max list-none gap-10 p-0 pe-10 group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-safe:animate-[levuche-marquee_var(--marquee)_linear_infinite] motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center"
+            className="m-0 flex w-max list-none gap-10 p-0 pe-10 group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-safe:animate-[levuche-marquee_var(--marquee)_linear_infinite] motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center rtl:[--marquee-to:50%]"
             style={{ ['--marquee' as string]: `${Math.max(5, speed)}s` }}
           >
             {logos.map((logo, i) => item(logo, i))}

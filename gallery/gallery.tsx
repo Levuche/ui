@@ -1,13 +1,20 @@
 import type { ReactNode } from 'react';
 import {
+  ActionCard,
+  AppBadges,
   AppIcon,
+  TileGallery,
   BookingCard,
   Countdown,
   DiscountCode,
+  EventCard,
   FaqList,
   FeaturedLink,
+  GoalTracker,
   ImageGrid,
   MembershipCard,
+  SocialCard,
+  MessageCard,
   SocialIcons,
   Testimonials,
   CameraIcon,
@@ -17,16 +24,26 @@ import {
   EmailIcon,
   FeaturedPack,
   GlobeIcon,
+  LinkChip,
   LinkList,
+  LocalTime,
+  LogoTile,
   PackGrid,
   PackRow,
+  ProgressList,
+  QuoteBlock,
   ReelGrid,
+  SectionHeading,
   ShareIcon,
   SiteButton,
   SiteDivider,
   SiteLinkButton,
   SiteSection,
   SiteText,
+  SoundCloudEmbed,
+  Spacer,
+  TextBlock,
+  TextStrip,
   VideoIcon,
   YouTubeVideo,
   type SiteTheme,
@@ -39,7 +56,7 @@ import {
   TipJarDemo,
 } from './demos';
 
-/** A fixed clock for the countdown, so the gallery never changes. */
+/** A fixed clock for the countdown and local time, so the gallery never changes. */
 const NOW = Date.UTC(2026, 11, 1, 9, 0, 0);
 
 const THEMES: { id: string; title: string; theme: SiteTheme }[] = [
@@ -96,7 +113,7 @@ export function Gallery() {
   );
 }
 
-function Panel({
+export function Panel({
   id,
   title,
   theme,
@@ -169,6 +186,46 @@ function Panel({
             title="New: how tea came to India"
             detail="12 minutes, out now"
           />
+          <ActionCard
+            href="https://example.com/presets"
+            title="Story presets"
+            detail="Twelve looks for your reels, ready to drop in"
+            buttonLabel="Shop the presets"
+            ribbon="New"
+            media={{
+              type: 'covers',
+              covers: [{ src: null }, { src: null }, { src: null }],
+            }}
+          />
+          <SocialCard
+            platform="youtube"
+            handle="desiorigins"
+            name="Desi Origins"
+            followers={86400}
+            verified
+            icon={<VideoIcon size={22} />}
+            headingAs="p"
+          />
+        </Group>
+
+        <Group id={id} name="time" title="Local time">
+          <LocalTime
+            city="mumbai"
+            cityName="Kochi"
+            now={NOW}
+            live={false}
+            locale="en-US"
+            visitorTimeZone="Europe/London"
+            hours={{ from: '09:00', to: '18:00' }}
+          />
+          <LocalTime
+            city="london"
+            tile="2x2"
+            clock={24}
+            locale="en-GB"
+            visitorTimeZone="Asia/Kolkata"
+            data-testid="live-time"
+          />
         </Group>
 
         <Group id={id} name="links" title="Links">
@@ -205,11 +262,65 @@ function Panel({
           />
         </Group>
 
+        <Group id={id} name="link-tiles" title="Link tiles">
+          <div className="grid grid-cols-2 gap-3">
+            <LogoTile
+              href="https://www.youtube.com/@example"
+              title="YouTube"
+              icon={<VideoIcon />}
+            />
+            <LogoTile
+              href="https://example.com/app"
+              title="Get the app"
+              icon={<AppIcon />}
+              tint="#0f766e"
+            />
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            <LinkChip
+              href="https://www.instagram.com/example"
+              title="Instagram"
+              icon={<CameraIcon size={20} />}
+            />
+            <LinkChip
+              href="https://example.com/blog"
+              title="Blog"
+              icon={<GlobeIcon size={20} />}
+            />
+            <LinkChip
+              href="https://example.com/shop"
+              title="Shop"
+              icon={<ShareIcon size={20} />}
+            />
+            <LinkChip
+              href="mailto:hello@example.com"
+              title="Email"
+              icon={<EmailIcon size={20} />}
+            />
+          </div>
+          <AppBadges
+            apps={[
+              { store: 'app-store', href: 'https://apps.apple.com/app/id0' },
+              {
+                store: 'google-play',
+                href: 'https://play.google.com/store/apps/details?id=com.example',
+              },
+            ]}
+          />
+        </Group>
+
         <Group id={id} name="video" title="Video">
           <YouTubeVideo
             video="https://www.youtube.com/watch?v=M7lc1UVf-VE"
             title="How tea came to India"
             poster={null}
+          />
+        </Group>
+
+        <Group id={id} name="music" title="Music">
+          <SoundCloudEmbed
+            url="https://soundcloud.com/desi-origins/chai-at-dawn"
+            title="Chai at dawn"
           />
         </Group>
 
@@ -250,6 +361,18 @@ function Panel({
           <LeadMagnetDemo />
         </Group>
 
+        <Group id={id} name="message" title="Message">
+          <MessageCard
+            channel="whatsapp"
+            name="Desi Origins"
+            picture={null}
+            detail="Usually replies within an hour"
+            to="+91 98765 43210"
+            message="Hi! I’d like a quote for a custom print."
+            headingAs="p"
+          />
+        </Group>
+
         <Group id={id} name="tips" title="Tips">
           <TipJarDemo />
         </Group>
@@ -258,13 +381,56 @@ function Panel({
           <LockedLinkDemo />
         </Group>
 
-        <Group id={id} name="promo" title="Countdown and code">
+        <Group id={id} name="promo" title="Countdown, code and event">
           <Countdown
             title="The caption playbook drops in"
             to={new Date(NOW + 3 * 86_400_000 + 5 * 3_600_000)}
             now={NOW}
           />
           <DiscountCode code="ORIGINS10" detail="10% off the reel pack" />
+          <EventCard
+            title="Live cooking night"
+            start="2027-03-15T19:00"
+            end="2027-03-15T22:00"
+            timeZone="Asia/Kolkata"
+            venue="The Old Hall"
+            city="Pune"
+            href="https://example.com/tickets"
+            now={NOW}
+            locale="en-US"
+            headingAs="p"
+          />
+        </Group>
+
+        <Group id={id} name="goals" title="Goals and progress">
+          <GoalTracker
+            title="Film the spice series"
+            deadline={new Date(NOW + 37 * 86_400_000).toISOString()}
+            now={NOW}
+            bar="steps"
+            items={[
+              { label: 'Write the scripts', done: true },
+              { label: 'Book the market shoots', done: true },
+              { label: 'Film five episodes' },
+              { label: 'Edit and post' },
+            ]}
+          />
+          <GoalTracker
+            title="Fund a new camera"
+            current={37000}
+            target={100000}
+            currency="INR"
+          />
+          <ProgressList
+            title="Languages"
+            max={5}
+            valueAs="amount"
+            items={[
+              { label: 'Hindi', value: 5 },
+              { label: 'Marathi', value: 4 },
+              { label: 'English', value: 4 },
+            ]}
+          />
         </Group>
 
         <Group id={id} name="photos" title="Photos">
@@ -273,6 +439,22 @@ function Panel({
               { alt: 'Chai on a clay stove', href: 'https://example.com/chai' },
               { alt: 'A spice market in Kochi' },
               { alt: 'Tea leaves drying in Assam' },
+            ]}
+          />
+        </Group>
+
+        <Group id={id} name="gallery" title="Gallery">
+          <TileGallery
+            items={[
+              {
+                alt: 'Chai on a clay stove',
+                span: '2x2',
+                caption: 'Morning chai',
+                href: 'https://example.com/chai',
+              },
+              { alt: 'A spice market in Kochi', span: '1x2', caption: 'Kochi' },
+              { alt: 'Tea leaves drying in Assam', span: '2x1' },
+              { alt: 'Hills above Darjeeling' },
             ]}
           />
         </Group>
@@ -295,6 +477,38 @@ function Panel({
                 answer: '100 prompts, a guide and 12 templates.',
               },
             ]}
+          />
+        </Group>
+
+        <Group id={id} name="text" title="Headings, text and quotes">
+          <SectionHeading
+            id={`${id}-works`}
+            title="My works"
+            detail="Every story, newest first"
+            headingAs="p"
+          />
+          <TextBlock
+            text={
+              'Stories about **everyday things**, in *under a minute* 🍵\n- New every Friday\n- [Watch on YouTube](https://www.youtube.com/@example)'
+            }
+          />
+          <Spacer line />
+          <QuoteBlock
+            quote="The best minute of my day."
+            name="Meera K."
+            avatar={null}
+          />
+        </Group>
+
+        <Group id={id} name="motion" title="Moving words">
+          <CreatorHeader
+            name="Desi Origins"
+            headingAs="p"
+            wordRing="Chai • Stories • Since 2019"
+          />
+          <TextStrip
+            label="Shop news"
+            items={['New drop', 'Free shipping', 'Made in Pune']}
           />
         </Group>
 

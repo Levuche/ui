@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import {
   EventList,
   LatestPosts,
@@ -11,6 +11,7 @@ import {
   type PostItem,
   type VideoItem,
 } from '../src';
+import { expectTapSize } from './expect-tap-size';
 import { onScreen } from './screens';
 
 /* Fixed sample data: the stories never call a feed or a service. */
@@ -63,7 +64,9 @@ const POSTS: PostItem[] = [
 const EVENTS: EventItem[] = [
   {
     date: 'Sat 6 Dec',
-    dateTime: '2026-12-06',
+    dateTime: '2026-12-06T19:00',
+    end: '2026-12-06T22:00',
+    timeZone: 'Asia/Kolkata',
     title: 'Live cooking night',
     venue: 'The Hall',
     city: 'Pune',
@@ -174,13 +177,36 @@ export const Offline: StoryObj<typeof LiveStatus> = {
 export const Events: StoryObj<typeof EventList> = {
   globals: onScreen('desktop'),
   render: () => <EventList title="Coming up" data={EVENTS} />,
-  play: async ({ canvas }) => {
+  play: async ({ canvas, canvasElement }) => {
     await expect(
       canvas.getByRole('link', {
         name: 'Tickets: Live cooking night, Sat 6 Dec',
       })
     ).toHaveAttribute('data-action', 'event_tickets');
     await expect(canvas.getByText('Sold out')).toBeVisible();
+    // Each row has "Add to calendar", named for its event.
+    const opens = canvasElement.querySelectorAll('summary');
+    await expect(opens).toHaveLength(2);
+    await expect(opens[0]).toHaveTextContent(
+      'Add to calendar: Live cooking night, Sat 6 Dec'
+    );
+    await expectTapSize(opens[0], 'Add to calendar');
+    await userEvent.click(opens[0]);
+    const first = within(opens[0].parentElement!);
+    const google = first.getByRole('link', { name: 'Google Calendar' });
+    await expect(
+      new URL(google.getAttribute('href')!).searchParams.get('dates')
+    ).toBe('20261206T133000Z/20261206T163000Z');
+    const file = first.getByRole('link', { name: 'Other calendars (.ics)' });
+    await expect(file).toHaveAttribute('download', 'live-cooking-night.ics');
+  },
+};
+
+/** Without the calendar button. */
+export const EventsWithoutCalendar: StoryObj<typeof EventList> = {
+  render: () => <EventList title="Coming up" data={EVENTS} calendar={false} />,
+  play: async ({ canvasElement }) => {
+    await expect(canvasElement.querySelector('summary')).toBeNull();
   },
 };
 

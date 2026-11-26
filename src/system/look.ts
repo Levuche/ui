@@ -1,6 +1,17 @@
 import type { CSSProperties } from 'react';
+import {
+  backgroundProps,
+  type BackgroundPattern,
+  type BackgroundType,
+  type BlockBackground,
+} from './background';
 import { cn } from './cn';
-import { siteThemeStyle, type SiteColors } from './theme';
+import {
+  SITE_HOVERS,
+  siteThemeStyle,
+  type SiteColors,
+  type SiteHover,
+} from './theme';
 
 /*
  * The look every block shares. A creator picks these per block in the page
@@ -21,6 +32,7 @@ import { siteThemeStyle, type SiteColors } from './theme';
  *
  * - surface: the theme's card colour (the default)
  * - muted: a quieter card, a shade off the page colour
+ * - inset: pressed into the page, a shade off its colour with a soft inner shadow
  * - accent: the theme's accent colour, with buttons turned inside out
  * - band: the theme's band colour, as the newsletter band uses
  * - notice: the warm notice colour, as for codes and alerts
@@ -30,6 +42,7 @@ import { siteThemeStyle, type SiteColors } from './theme';
 export const BLOCK_TONES = [
   'surface',
   'muted',
+  'inset',
   'accent',
   'band',
   'notice',
@@ -59,6 +72,28 @@ export type BlockShadow = (typeof BLOCK_SHADOWS)[number];
 export const BLOCK_MOTIONS = ['none', 'fade', 'rise', 'scale'] as const;
 export type BlockMotion = (typeof BLOCK_MOTIONS)[number];
 
+/**
+ * A small loop the block keeps doing once it's on the page:
+ *
+ * - float: drifts gently up and down
+ * - pulse: swells a little and settles
+ * - shimmer: a soft sheen sweeps across it
+ * - tilt: leans a little towards the pointer (needs useBlockEffects)
+ *
+ * Float, pulse and shimmer play for under five seconds, so they need no pause
+ * button (WCAG 2.2.2), and hold still while the block is off screen when the
+ * page uses useBlockEffects. None of them flashes, and all of them are off
+ * for visitors who ask their device for less motion.
+ */
+export const BLOCK_EFFECTS = [
+  'none',
+  'float',
+  'pulse',
+  'shimmer',
+  'tilt',
+] as const;
+export type BlockEffect = (typeof BLOCK_EFFECTS)[number];
+
 /** The screens a block can be hidden on, when it's not on a grid page. */
 export const BLOCK_SCREENS = ['phone', 'tablet', 'desktop'] as const;
 export type BlockScreen = (typeof BLOCK_SCREENS)[number];
@@ -71,12 +106,24 @@ export type BlockLook = {
   align?: BlockAlign;
   shadow?: BlockShadow;
   motion?: BlockMotion;
+  /** A small loop the block keeps doing; see BlockEffect. */
+  effect?: BlockEffect;
   /** This block's own colours, over the page theme's. Same keys as a theme. */
   colors?: SiteColors;
   /** This block's own font, as a CSS font-family list. */
   font?: string;
+  /**
+   * A gradient, a faint pattern or a picture behind the block's words, drawn
+   * from the theme's colours (see background.ts). Over any tone.
+   */
+  background?: BlockBackground;
   /** Hide the block on these screens. Grid pages place blocks per screen instead. */
   hideOn?: BlockScreen[];
+  /**
+   * What this block's links and linked cards do under the pointer, over the
+   * page theme's `hover` (see SiteHover).
+   */
+  hover?: SiteHover;
 };
 
 const LOOK_KEYS = [
@@ -86,9 +133,12 @@ const LOOK_KEYS = [
   'align',
   'shadow',
   'motion',
+  'effect',
   'colors',
   'font',
+  'background',
   'hideOn',
+  'hover',
 ] as const satisfies readonly (keyof BlockLook)[];
 
 /**
@@ -116,6 +166,8 @@ const TONE_CLASSES: Record<BlockTone, string> = {
   surface: 'bg-site-surface text-site-text p-block',
   muted:
     'bg-[color-mix(in_oklab,var(--site-text)_6%,var(--site-bg))] text-site-text p-block',
+  inset:
+    'bg-[color-mix(in_oklab,var(--site-text)_8%,var(--site-bg))] text-site-text p-block',
   accent: 'bg-site-surface text-site-text p-block',
   band: 'bg-site-surface text-site-text p-block',
   notice: 'bg-site-surface text-site-text p-block',
@@ -151,6 +203,15 @@ export type LookProps = {
   'data-block-size': BlockScale;
   'data-radius': BlockRadius;
   'data-motion'?: BlockMotion;
+  'data-effect'?: BlockEffect;
+  /** Set when the block picks its own shadow, which wins over the card style. */
+  'data-shadow'?: BlockShadow;
+  /** Set when the block has its own background (see background.ts). */
+  'data-background'?: BackgroundType;
+  'data-pattern'?: BackgroundPattern;
+  'data-background-move'?: 'true';
+  /** Set when the block picks its own hover, which wins over the theme's. */
+  'data-hover'?: SiteHover;
 };
 
 /**
@@ -159,7 +220,8 @@ export type LookProps = {
  * how one creator setting restyles any block the same way.
  *
  * Values a creator typed are checked: an unknown tone or size falls back to
- * the default, and colours and fonts go through the theme's safety checks.
+ * the default, colours and fonts go through the theme's safety checks, and a
+ * background keeps only known colour names and a checked picture address.
  *
  * @param name The block's id from the registry (see registry.ts), written as
  *   data-block so tests, analytics and the editor can find it.
@@ -177,8 +239,13 @@ export function lookProps(
   const align = oneOf(BLOCK_ALIGNS, look.align) ?? defaults.align;
   const shadow = oneOf(BLOCK_SHADOWS, look.shadow) ?? defaults.shadow;
   const motion = oneOf(BLOCK_MOTIONS, look.motion) ?? defaults.motion;
+  const effect = oneOf(BLOCK_EFFECTS, look.effect) ?? defaults.effect;
+  const hover = oneOf(SITE_HOVERS, look.hover) ?? defaults.hover;
   const hideOn = (look.hideOn ?? defaults.hideOn ?? []).filter((screen) =>
     BLOCK_SCREENS.includes(screen)
+  );
+  const { style: backgroundStyle, ...background } = backgroundProps(
+    look.background ?? defaults.background
   );
   return {
     className: cn(
@@ -189,14 +256,21 @@ export function lookProps(
       hideOn.map((screen) => HIDE_CLASSES[screen]),
       className
     ),
-    style: siteThemeStyle({
-      colors: look.colors ?? defaults.colors,
-      font: look.font ?? defaults.font,
-    }),
+    style: {
+      ...siteThemeStyle({
+        colors: look.colors ?? defaults.colors,
+        font: look.font ?? defaults.font,
+      }),
+      ...backgroundStyle,
+    } as CSSProperties,
     'data-block': name,
     'data-tone': tone,
     'data-block-size': size,
     'data-radius': radius,
     ...(motion && motion !== 'none' ? { 'data-motion': motion } : {}),
+    ...(effect && effect !== 'none' ? { 'data-effect': effect } : {}),
+    ...(shadow ? { 'data-shadow': shadow } : {}),
+    ...background,
+    ...(hover ? { 'data-hover': hover } : {}),
   };
 }

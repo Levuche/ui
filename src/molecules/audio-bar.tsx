@@ -6,6 +6,10 @@ import { SiteLink } from '../atoms/link';
 import { Thumb } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import { isSafeMediaSrc } from '../system/href';
+import type { ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
+import { usePreviewMode } from '../system/preview-mode';
 
 export type AudioBarLabels = {
   /** {title} is filled in. */
@@ -18,13 +22,7 @@ export type AudioBarLabels = {
   transcript: string;
 };
 
-export const AUDIO_BAR_LABELS: AudioBarLabels = {
-  play: 'Play {title}',
-  pause: 'Pause {title}',
-  seek: 'Position',
-  position: '{time} of {total}',
-  transcript: 'Transcript',
-};
+export const AUDIO_BAR_LABELS: AudioBarLabels = WORDS_EN.audioBar;
 
 /** Seconds as "4:05" or "1:02:03". */
 export function clock(seconds: number) {
@@ -56,23 +54,25 @@ export function AudioBar({
   title: string;
   /** Such as the artist, or the episode's date. */
   detail?: ReactNode;
-  image?: string | null;
+  image?: ImageSrc | null;
   /** A page with the words, for visitors who can't listen. */
   transcriptHref?: string;
   labels?: Partial<AudioBarLabels>;
   onPlay?: () => void;
   className?: string;
 }) {
-  const words = { ...AUDIO_BAR_LABELS, ...labels };
+  const words = usePageWords('audioBar', labels);
   const audio = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState(0);
   const [total, setTotal] = useState(0);
+  const preview = usePreviewMode();
   if (!isSafeMediaSrc(src)) return null;
 
   const toggle = () => {
     const el = audio.current;
-    if (!el) return;
+    // The page editor selects the block; nothing downloads or plays.
+    if (!el || preview) return;
     if (el.paused) {
       document.querySelectorAll('audio').forEach((other) => {
         if (other !== el) other.pause();
@@ -95,7 +95,13 @@ export function AudioBar({
       )}
     >
       {image !== undefined ? (
-        <Thumb src={image} alt="" ratio="square" className="w-14 flex-none" />
+        <Thumb
+          src={image}
+          alt=""
+          ratio="square"
+          sizes="56px"
+          className="w-14 flex-none"
+        />
       ) : null}
       <button
         type="button"

@@ -20,10 +20,13 @@ import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { useControllableState } from '../system/state';
+import type { ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 /** One slide in an ImageCarousel. */
 export type CarouselSlide = {
-  src: string | null | undefined;
+  src: ImageSrc | null | undefined;
   /** What the picture shows. */
   alt: string;
   caption?: ReactNode;
@@ -40,16 +43,13 @@ export type CarouselLabels = {
   play: string;
 };
 
-export const CAROUSEL_LABELS: CarouselLabels = {
-  previous: 'Previous slide',
-  next: 'Next slide',
-  slide: 'Slide {n} of {total}',
-  pause: 'Pause slides',
-  play: 'Play slides',
-};
+export const CAROUSEL_LABELS: CarouselLabels = WORDS_EN.carousel;
 
 const fill = (text: string, n: number, total: number) =>
   text.replace('{n}', String(n)).replace('{total}', String(total));
+
+/** Whether the element lays out right to left, as for Arabic or Hebrew. */
+const isRtl = (el: Element) => getComputedStyle(el).direction === 'rtl';
 
 const prefersLessMotion = () =>
   typeof matchMedia === 'function' &&
@@ -74,8 +74,9 @@ export function ImageCarousel({
   autoplay,
   loop = true,
   showDots = true,
+  counter = false,
   labels,
-  label = 'Pictures',
+  label: labelProp,
   ...root
 }: BlockRootProps & {
   slides: CarouselSlide[];
@@ -89,11 +90,15 @@ export function ImageCarousel({
   /** Next from the last slide goes back to the first. */
   loop?: boolean;
   showDots?: boolean;
+  /** A small "1/4" on the picture, for the slide shown and how many there are. */
+  counter?: boolean;
   labels?: Partial<CarouselLabels>;
   /** The carousel's name for screen readers, when there's no title. */
   label?: string;
 }) {
-  const words = { ...CAROUSEL_LABELS, ...labels };
+  const own = usePageWords('props');
+  const label = labelProp === undefined ? own.pictures : labelProp;
+  const words = usePageWords('carousel', labels);
   const id = useId();
   const track = useRef<HTMLDivElement>(null);
   const total = slides.length;
@@ -126,11 +131,12 @@ export function ImageCarousel({
     clearTimeout(settle.current);
   };
 
-  // Show the current slide when it changes, from a button or the app.
+  // Show the current slide when it changes, from a button or the app. In a
+  // right-to-left script the track scrolls the other way, from 0 down.
   useEffect(() => {
     const el = track.current;
     if (!el) return;
-    const left = current * el.clientWidth;
+    const left = current * el.clientWidth * (isRtl(el) ? -1 : 1);
     if (Math.abs(el.scrollLeft - left) > 2) {
       moving.current = left;
       clearTimeout(settle.current);
@@ -159,15 +165,17 @@ export function ImageCarousel({
       if (Math.abs(el.scrollLeft - moving.current) <= 2) release();
       return;
     }
-    const shown = Math.round(el.scrollLeft / el.clientWidth);
+    const shown = Math.round(Math.abs(el.scrollLeft) / el.clientWidth);
     if (shown !== current && shown >= 0 && shown < total) setCurrent(shown);
   };
 
   // Arrow keys anywhere in the carousel, except in the slide's own button.
   const onKeyDown = (event: KeyboardEvent) => {
     if ((event.target as HTMLElement).closest('a')) return;
-    if (event.key === 'ArrowRight') go(current + 1);
-    else if (event.key === 'ArrowLeft') go(current - 1);
+    // The next slide is on the left in a right-to-left script.
+    const back = track.current && isRtl(track.current) ? 1 : -1;
+    if (event.key === 'ArrowRight') go(current - back);
+    else if (event.key === 'ArrowLeft') go(current + back);
     else return;
     event.preventDefault();
   };
@@ -239,6 +247,16 @@ export function ImageCarousel({
             </div>
           ))}
         </div>
+        {counter && total > 1 ? (
+          // Screen readers already hear "Slide 1 of 4" from the slide itself.
+          <span
+            aria-hidden
+            data-carousel-counter=""
+            className="bg-site-text text-site-surface rounded-block-inner pointer-events-none absolute end-2 top-2 px-2 py-1 text-xs font-semibold tabular-nums"
+          >
+            {current + 1}/{total}
+          </span>
+        ) : null}
         {total > 1 ? (
           <>
             <button
@@ -250,7 +268,7 @@ export function ImageCarousel({
               onClick={() => go(current - 1)}
               className={cn(arrow, 'start-2')}
             >
-              <ChevronLeftIcon size={20} />
+              <ChevronLeftIcon size={20} className="rtl:-scale-x-100" />
             </button>
             <button
               type="button"
@@ -261,7 +279,7 @@ export function ImageCarousel({
               onClick={() => go(current + 1)}
               className={cn(arrow, 'end-2')}
             >
-              <ChevronRightIcon size={20} />
+              <ChevronRightIcon size={20} className="rtl:-scale-x-100" />
             </button>
           </>
         ) : null}

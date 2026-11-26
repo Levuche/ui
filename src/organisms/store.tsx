@@ -10,6 +10,9 @@ import { Price } from '../molecules/price';
 import { SellButton, type SellProps } from '../molecules/sell-button';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
+import type { ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 /* -------------------------------------------------------------- CourseCard */
 
@@ -19,10 +22,7 @@ export type CourseCardLabels = {
   button: string;
 };
 
-export const COURSE_CARD_LABELS: CourseCardLabels = {
-  lessons: '{n} lessons',
-  button: 'Start learning',
-};
+export const COURSE_CARD_LABELS: CourseCardLabels = WORDS_EN.courseCard;
 
 /**
  * A course: its picture, title, how many lessons, how long, the price and a
@@ -50,13 +50,16 @@ export function CourseCard({
   newTab,
   sponsored,
   nofollow,
+  saveLabel,
   ...root
 }: BlockRootProps &
   LinkBehavior &
   SellProps & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
     title: ReactNode;
     detail?: ReactNode;
-    image?: string | null;
+    image?: ImageSrc | null;
     imageAlt?: string;
     lessons?: number;
     /** As "3 h 20 min". */
@@ -71,7 +74,7 @@ export function CourseCard({
     buttonVariant?: SiteButtonVariant;
     headingAs?: HeadingTag;
   }) {
-  const words = { ...COURSE_CARD_LABELS, ...labels };
+  const words = usePageWords('courseCard', labels);
   return (
     <Block as="article" name="course-card" {...root}>
       <ItemHead
@@ -99,7 +102,7 @@ export function CourseCard({
             </span>
           ) : null}
         </span>
-        <Price value={price} was={was} />
+        <Price saveLabel={saveLabel} value={price} was={was} />
       </div>
       <SellButton
         href={href}
@@ -125,7 +128,7 @@ export function CourseCard({
 export type TopPick = {
   name: ReactNode;
   href: string;
-  image?: string | null;
+  image?: ImageSrc | null;
   /** What the picture shows. Empty when the name says it. */
   imageAlt?: string;
   /** Why the creator likes it, in a line. */
@@ -141,10 +144,7 @@ export type TopPicksLabels = {
   disclosure: ReactNode;
 };
 
-export const TOP_PICKS_LABELS: TopPicksLabels = {
-  affiliate: 'Affiliate',
-  disclosure: 'I may earn a commission from links marked Affiliate.',
-};
+export const TOP_PICKS_LABELS: TopPicksLabels = WORDS_EN.topPicks;
 
 const PICK_COLUMNS = {
   1: '',
@@ -173,7 +173,7 @@ export function TopPicks({
   newTab?: boolean;
   headingAs?: HeadingTag;
 }) {
-  const words = { ...TOP_PICKS_LABELS, ...labels };
+  const words = usePageWords('topPicks', labels);
   const anyAffiliate = picks.some((pick) => pick.affiliate);
   return (
     <Block name="top-picks" {...root}>
@@ -198,6 +198,7 @@ export function TopPicks({
                   src={pick.image}
                   alt={pick.imageAlt ?? ''}
                   ratio="square"
+                  sizes="64px"
                   className="w-16 flex-none"
                 />
               ) : null}

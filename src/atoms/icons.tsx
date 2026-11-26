@@ -72,6 +72,18 @@ export const EmailIcon = (p: IconProps) => (
     <path d="M3 7l9 6 9-6" />
   </Svg>
 );
+export const ChatIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 5h16v11H9l-5 4z" />
+    <path d="M8 9.5h8M8 12.5h5" />
+  </Svg>
+);
+export const SendIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M21 3L3 10.5l7 2.5 2.5 7z" />
+    <path d="M10 13l11-10" />
+  </Svg>
+);
 export const LockIcon = (p: IconProps) => (
   <Svg {...p}>
     <rect x="5" y="11" width="14" height="10" rx="2" />
@@ -81,6 +93,12 @@ export const LockIcon = (p: IconProps) => (
 export const CheckIcon = (p: IconProps) => (
   <Svg {...p}>
     <path d="M5 12l5 5 9-10" />
+  </Svg>
+);
+/** Points the way the text reads; flip it in right-to-left text. */
+export const ArrowRightIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M5 12h14M13 6l6 6-6 6" />
   </Svg>
 );
 export const ChevronDownIcon = (p: IconProps) => (
@@ -101,6 +119,18 @@ export const ChevronRightIcon = (p: IconProps) => (
 export const PauseIcon = (p: IconProps) => (
   <Svg {...p}>
     <path d="M9 5v14M15 5v14" />
+  </Svg>
+);
+export const SoundOnIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 9v6h4l5 4V5L8 9H4z" />
+    <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" />
+  </Svg>
+);
+export const SoundOffIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 9v6h4l5 4V5L8 9H4z" />
+    <path d="M17 9.5l5 5M22 9.5l-5 5" />
   </Svg>
 );
 export const ArrowsHorizontalIcon = (p: IconProps) => (

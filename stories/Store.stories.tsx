@@ -185,6 +185,35 @@ export const Booking: StoryObj<typeof BookingEmbed> = {
   },
 };
 
+/**
+ * The closed card says how long a booking is and when the next free time
+ * is, which the app passes in, before the visitor opens the booking page.
+ */
+export const BookingWithNextFreeTime: StoryObj<typeof BookingEmbed> = {
+  render: () => (
+    <BookingEmbed
+      title="A recipe call"
+      src="https://example.com/book"
+      duration="30 min"
+      nextFree="2026-12-03T04:30:00Z"
+      timeZone="Asia/Kolkata"
+      locale="en-IN"
+    />
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.getByText('30 min')).toBeVisible();
+    // Screen readers hear what the length is.
+    await expect(canvas.getByText('30 min').textContent).toContain('Length');
+    const time = canvasElement.querySelector('time');
+    await expect(time).toHaveAttribute('dateTime', '2026-12-03T04:30:00Z');
+    // 04:30 UTC is 10:00 in India.
+    await expect(time?.textContent).toMatch(/10:00/);
+    await expect(time?.textContent).toMatch(/3 Dec/);
+    await expect(canvas.getByText(/Next free:/)).toBeVisible();
+    await expect(canvasElement.querySelector('iframe')).toBeNull();
+  },
+};
+
 /** The same booking page shown in the page, with a plain link under it. */
 export const BookingInline: StoryObj<typeof BookingEmbed> = {
   render: () => (

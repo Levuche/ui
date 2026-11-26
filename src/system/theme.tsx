@@ -1,5 +1,8 @@
 import type { CSSProperties, HTMLAttributes } from 'react';
 import { cn } from './cn';
+import { safeLanguage, type PageWordsInput } from './language';
+import { PageProvider, type PageSettings } from './page-context';
+import { rememberPage } from './page-words';
 
 /** The colours a creator can set. Each is optional; the scheme fills gaps. */
 export type SiteColors = Partial<{
@@ -22,6 +25,38 @@ export type SiteCorners = 'square' | 'soft' | 'round';
 export type SiteButtonShape = 'square' | 'rounded' | 'pill';
 
 /**
+ * How cards look on the page: blocks in the surface and muted tones, and the
+ * shadow on filled blocks.
+ *
+ * - flat: filled, no line or shadow (the default)
+ * - outline: filled, with a thin line around
+ * - raised: a soft shadow tinted with the accent, on every filled block
+ * - glass: see-through and blurred over the page's background, with a thin line
+ *
+ * A block's own `shadow` prop replaces the line or shadow a card style adds.
+ */
+export const SITE_CARD_STYLES = ['flat', 'outline', 'raised', 'glass'] as const;
+export type SiteCardStyle = (typeof SITE_CARD_STYLES)[number];
+
+/**
+ * What links and linked cards do under the pointer, on tap and when a
+ * keyboard reaches them:
+ *
+ * - lift: rise a little, and press in on tap (the default)
+ * - tint: the fill deepens a little
+ * - zoom: the picture inside grows a little, clipped to the card (a link with
+ *   no picture deepens its fill, as tint does)
+ * - glow: a line and a soft glow in the button colour, inside the edge
+ * - none: stay still
+ *
+ * Nothing moves for visitors who ask for less motion: colour changes stay,
+ * lift and the press stop, and zoom deepens the fill instead. A block can
+ * pick its own (BlockLook.hover).
+ */
+export const SITE_HOVERS = ['lift', 'tint', 'zoom', 'glow', 'none'] as const;
+export type SiteHover = (typeof SITE_HOVERS)[number];
+
+/**
  * A creator's theme, as chosen in the page editor: light or dark, their own
  * colours, corner and button shapes, and font. Saved with the page and passed
  * to <CreatorTheme>.
@@ -33,6 +68,21 @@ export type SiteTheme = {
   buttonShape?: SiteButtonShape;
   /** A CSS font-family list, such as "'Sora', sans-serif". */
   font?: string;
+  /**
+   * A second font for a few words set apart, such as the highlighted words of
+   * the header's tagline. Left out, they use `font`.
+   */
+  displayFont?: string;
+  /** How cards look; see SiteCardStyle. */
+  cards?: SiteCardStyle;
+  /** What links do under the pointer; see SiteHover. */
+  hover?: SiteHover;
+  /**
+   * The page's language, as a tag such as "hi", "es" or "pt-BR". Blocks write
+   * numbers and dates in it, and screen readers read the page in it. The
+   * words blocks write themselves come from <CreatorTheme words>.
+   */
+  language?: string;
 };
 
 const COLOR_VARS: Record<keyof SiteColors, string> = {
@@ -94,31 +144,67 @@ export function siteThemeStyle(theme: SiteTheme = {}): CSSProperties {
   if (theme.font && isSafeFont(theme.font)) {
     style['--site-font'] = theme.font;
   }
+  if (theme.displayFont && isSafeFont(theme.displayFont)) {
+    style['--site-display-font'] = theme.displayFont;
+  }
   return style as CSSProperties;
 }
 
 /**
+ * The data attributes for a theme's card style and hover, which tokens.css
+ * turns into styles. Unknown values are dropped, so the defaults apply.
+ */
+export function siteThemeAttributes(theme: SiteTheme = {}) {
+  const cards = SITE_CARD_STYLES.find((value) => value === theme.cards);
+  const hover = SITE_HOVERS.find((value) => value === theme.hover);
+  return {
+    ...(cards && cards !== 'flat' ? { 'data-cards': cards } : {}),
+    ...(hover && hover !== 'lift' ? { 'data-hover': hover } : {}),
+  };
+}
+
+/**
  * Applies a creator's theme to everything inside: the scheme (light or dark)
- * and any colours, shapes and font they chose. Every page block reads only
- * these --site-* variables.
+ * and any colours, shapes, card style, hover and font they chose. Every page
+ * block reads only these --site-* variables and data attributes.
+ *
+ * With `theme.language` or `words`, it also gives every block inside the
+ * page's language and words, so no block needs its own `labels`:
+ *
+ *   <CreatorTheme theme={theme} words={await loadPageWords(theme.language)}>
  */
 export function CreatorTheme({
   theme,
   scheme,
+  words,
   className,
   style,
+  children,
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
   theme?: SiteTheme;
   /** Shorthand for theme.scheme. */
   scheme?: 'light' | 'dark';
+  /**
+   * The words blocks write themselves, from loadPageWords or a WORDS_* set,
+   * or only some of them. A block's own `labels` win over these.
+   */
+  words?: PageWordsInput;
 }) {
+  const language = safeLanguage(theme?.language);
+  const page: PageSettings | null =
+    language || words ? { language, words } : null;
+  if (page) rememberPage(page);
   return (
     <div
       data-site={scheme ?? theme?.scheme ?? 'light'}
       className={cn('bg-site-bg text-site-text', className)}
       style={{ ...siteThemeStyle(theme), ...style }}
+      lang={language}
+      {...siteThemeAttributes(theme)}
       {...props}
-    />
+    >
+      {page ? <PageProvider value={page}>{children}</PageProvider> : children}
+    </div>
   );
 }

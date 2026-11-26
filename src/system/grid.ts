@@ -71,21 +71,34 @@ export type PageLayouts = Partial<Record<GridScreen, GridLayout>>;
  * - profile: CreatorHeader, with SocialIcons under it
  * - link: SiteLinkButton, a LinkTile, SaveContact or LockedLink
  * - links: LinkList, TopPicks, PodcastEpisodes
- * - card: FeaturedLink, FeaturedPack, PackRow, BookingCard, MembershipCard,
- *   LeadMagnet, TipJar, DiscountCode, Countdown, ContactForm, MapCard, QrCode,
- *   CourseCard, BookingEmbed, GitHubProfile, RepoCard, PackageStats,
- *   AudioPlayer
+ * - tile: LogoTile, a square link tile; two sit side by side
+ * - chip: LinkChip, a small link; it can be a quarter of a phone's width
+ * - card: ActionCard, FeaturedLink, FeaturedPack, PackRow, BookingCard, MembershipCard,
+ *   LeadMagnet, TipJar, DiscountCode, Countdown, EventCard, ContactForm, MessageCard,
+ *   MapCard, QrCode, CourseCard, BookingEmbed, GitHubProfile, RepoCard,
+ *   PackageStats, AudioPlayer, LocalTime
  * - media: YouTubeVideo, SiteImage, ImageCarousel, BeforeAfter, SpotifyEmbed,
- *   TikTokVideo, InstagramPost, LinkEmbed
+ *   SoundCloudEmbed, AppleMusicEmbed, DeezerEmbed, TikTokVideo, InstagramPost,
+ *   LinkEmbed
  * - gallery: ImageGrid, ReelGrid, PackGrid, RepoList
- * - text: SiteText, Testimonials, FaqList, Timeline, TechStack
+ * - text: SiteText, Testimonials, FaqList, Timeline, TechStack, SectionHeading,
+ *   TextBlock, Spacer
  * - band: NewsletterBand, PackCheckout, CreatorFooter, LogoStrip, StatsRow,
- *   PricingTable, ContributionGraph
+ *   PricingTable, ContributionGraph, QuoteBlock
  *
  * Every block's kind is also in BLOCKS, in registry.ts.
  */
 export type BlockKind =
-  'profile' | 'link' | 'links' | 'card' | 'media' | 'gallery' | 'text' | 'band';
+  | 'profile'
+  | 'link'
+  | 'links'
+  | 'tile'
+  | 'chip'
+  | 'card'
+  | 'media'
+  | 'gallery'
+  | 'text'
+  | 'band';
 
 /** What a kind of block needs, in rem. */
 export type BlockSize = {
@@ -101,6 +114,8 @@ export const BLOCK_SIZES: Record<BlockKind, BlockSize> = {
   profile: { minWidth: 15, maxWidth: 32, minHeight: 9 },
   link: { minWidth: 10, minHeight: 3, maxHeight: 7, half: true },
   links: { minWidth: 15, minHeight: 7 },
+  tile: { minWidth: 7, maxWidth: 18, minHeight: 7, maxHeight: 18, half: true },
+  chip: { minWidth: 3.5, maxWidth: 11, minHeight: 3, maxHeight: 5, half: true },
   card: { minWidth: 15, minHeight: 7, half: true },
   media: { minWidth: 18, minHeight: 11 },
   gallery: { minWidth: 15, minHeight: 7 },
@@ -329,6 +344,70 @@ export function fitLayout(
     row += startRows(block);
   }
   return placed;
+}
+
+/**
+ * Grows each block to the rows its content needs, so an editor shows the
+ * page as visitors will see it. On the page a row grows to fit what's in it;
+ * an editor's rows are fixed, so a tall block looks cut short there and seems
+ * to run into the one below.
+ *
+ * `measured` is each block's height in px, as the editor measured it (with a
+ * ResizeObserver, say), and `rem` is the editor's root font size in px. A
+ * block only ever grows, up to its kind's largest height; one with no
+ * measure keeps its rows. Two blocks that shared a row (a pair of cards)
+ * grow together, so they still line up, and anything a block grows into
+ * moves down. Returns a new layout; the one given isn't changed.
+ */
+export function fitHeights(
+  layout: GridLayout,
+  measured: Readonly<Record<string, number>>,
+  blocks: GridBlockSpec[],
+  rem = 16
+): GridLayout {
+  const kinds = new Map(blocks.map((block) => [block.i, block.kind]));
+  const grown = layout.map((item) => {
+    const height = measured[item.i];
+    const kind = kinds.get(item.i);
+    if (!kind || height === undefined || !Number.isFinite(height) || rem <= 0) {
+      return { ...item };
+    }
+    const { maxH } = limitsFor(kind, 'phone');
+    const needs = rowsFor(Math.max(0, height) / rem);
+    return { ...item, h: Math.max(item.h, Math.min(needs, maxH)) };
+  });
+
+  // A pair side by side on one row keeps lining up: both take the taller.
+  const heights = grown.map((item) => item.h);
+  layout.forEach((item, index) => {
+    layout.forEach((other, at) => {
+      const touching =
+        other.x + other.w === item.x || item.x + item.w === other.x;
+      if (
+        at !== index &&
+        touching &&
+        other.y === item.y &&
+        other.h === item.h
+      ) {
+        grown[index]!.h = Math.max(grown[index]!.h, heights[at]!);
+      }
+    });
+  });
+
+  // From the top down, anything a grown block now covers moves below it.
+  const order = grown
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => a.item.y - b.item.y || a.item.x - b.item.x);
+  const placed: GridItem[] = [];
+  for (const { item } of order) {
+    let clash = placed.find((other) => overlaps(item, other));
+    while (clash) {
+      item.y = clash.y + clash.h;
+      clash = placed.find((other) => overlaps(item, other));
+    }
+    placed.push(item);
+  }
+  return grown;
 }
 
 /** A page's arrangement on every screen: saved ones made safe, missing ones made. */

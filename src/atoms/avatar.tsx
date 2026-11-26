@@ -1,4 +1,5 @@
 import { cn } from '../system/cn';
+import { imageAttrs, toImageSource, type ImageSrc } from '../system/image';
 
 /** First letters of up to two words: "Desi Origins" becomes "DO". */
 export function initials(name: string) {
@@ -20,17 +21,20 @@ export function Avatar({
   size = 48,
   shape = 'circle',
   ring = false,
+  initialsFont = 'body',
   alt = '',
   className,
 }: {
   name: string;
-  src?: string | null;
+  src?: ImageSrc | null;
   /** Width and height in px. */
   size?: number;
   /** `rounded` follows the block's corners. */
   shape?: 'circle' | 'rounded' | 'square';
   /** A ring in the button colour around it. */
   ring?: boolean;
+  /** The initials' font: the page's own, or the theme's display font. */
+  initialsFont?: 'body' | 'display';
   alt?: string;
   className?: string;
 }) {
@@ -42,18 +46,18 @@ export function Avatar({
       : shape === 'rounded'
         ? 'rounded-block-inner'
         : 'rounded-none',
-    ring && 'ring-site-button ring-offset-site-surface ring-2 ring-offset-2',
+    // An outline leaves a see-through gap, so the ring works on any background.
+    ring && 'outline-site-button outline-2 outline-offset-2',
     className
   );
-  if (src) {
+  const source = toImageSource(src);
+  if (source) {
     return (
       <img
-        src={src}
+        {...imageAttrs(source, `${size}px`)}
         alt={alt}
         width={size}
         height={size}
-        loading="lazy"
-        decoding="async"
         style={style}
         className={cn('object-cover', classes)}
       />
@@ -65,6 +69,8 @@ export function Avatar({
       style={style}
       className={cn(
         'bg-site-button text-site-on-button inline-flex items-center justify-center font-bold',
+        initialsFont === 'display' &&
+          'font-[family-name:var(--site-display-font,var(--site-font))]',
         classes
       )}
     >

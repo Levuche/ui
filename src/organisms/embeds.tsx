@@ -5,14 +5,25 @@ import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { LinkTile } from '../molecules/link-tile';
 import { PlayFrame } from '../molecules/play-frame';
 import {
+  appleMusicEmbed,
+  deezerEmbed,
   embedFor,
   instagramEmbed,
+  soundcloudEmbed,
   spotifyEmbed,
   tiktokEmbed,
   type Embed,
   type EmbedService,
 } from '../system/embeds';
 import { youtubeId } from './media';
+import type { ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
+import {
+  consentNotice,
+  OUTSIDE_SERVICES,
+  type ConsentLabels,
+} from '../system/privacy';
 
 /** What every player from another site may do inside its frame. */
 const SANDBOX =
@@ -23,7 +34,7 @@ export type EmbedLabels = {
   play: string;
 };
 
-export const EMBED_LABELS: EmbedLabels = { play: 'Play: {title}' };
+export const EMBED_LABELS: EmbedLabels = WORDS_EN.embed;
 
 type EmbedProps = BlockRootProps & {
   /** The link the creator pasted. */
@@ -34,8 +45,15 @@ type EmbedProps = BlockRootProps & {
   showTitle?: boolean;
   detail?: ReactNode;
   /** A picture shown until the visitor presses play. */
-  poster?: string | null;
+  poster?: ImageSrc | null;
   labels?: Partial<EmbedLabels>;
+  /**
+   * Whether the visitor agreed to the service, from the page's cookie
+   * notice. False shows a notice and a Load button first; leave it out on
+   * pages that don't ask.
+   */
+  consent?: boolean;
+  consentLabels?: Partial<ConsentLabels>;
   headingAs?: HeadingTag;
 };
 
@@ -52,10 +70,12 @@ function EmbedBody({
   detail,
   poster,
   labels,
+  consent,
+  consentLabels,
   headingAs = 'h3',
   ...root
 }: EmbedProps & { name: string; embed: Embed | null }) {
-  const words = { ...EMBED_LABELS, ...labels };
+  const words = usePageWords('embed', labels);
   return (
     <Block name={name} data-service={embed?.service} {...root}>
       {showTitle ? (
@@ -71,6 +91,13 @@ function EmbedBody({
           playIcon={<PlayIcon size={28} />}
           sandbox={SANDBOX}
           action={`play_${embed.service}`}
+          tint={embed.tint}
+          consent={consent}
+          notice={consentNotice(
+            OUTSIDE_SERVICES[embed.service].name,
+            consentLabels
+          )}
+          consentLabels={consentLabels}
         />
       ) : (
         <LinkTile
@@ -97,6 +124,44 @@ export function SpotifyEmbed(props: EmbedProps) {
   );
 }
 
+/** How a SoundCloud player looks: a slim bar, or big artwork. */
+export type SoundCloudPlayer = 'compact' | 'visual';
+
+/**
+ * A SoundCloud track or playlist, in the page's button colour. `player`
+ * picks the slim compact player (the default) or the one with big artwork.
+ */
+export function SoundCloudEmbed({
+  player = 'compact',
+  ...props
+}: EmbedProps & { player?: SoundCloudPlayer }) {
+  return (
+    <EmbedBody
+      name="soundcloud-embed"
+      embed={soundcloudEmbed(props.url, { visual: player === 'visual' })}
+      {...props}
+    />
+  );
+}
+
+/** An Apple Music song, album or playlist. */
+export function AppleMusicEmbed(props: EmbedProps) {
+  return (
+    <EmbedBody
+      name="apple-music-embed"
+      embed={appleMusicEmbed(props.url)}
+      {...props}
+    />
+  );
+}
+
+/** A Deezer track, album or playlist. */
+export function DeezerEmbed(props: EmbedProps) {
+  return (
+    <EmbedBody name="deezer-embed" embed={deezerEmbed(props.url)} {...props} />
+  );
+}
+
 /** One TikTok video, played in place. */
 export function TikTokVideo(props: EmbedProps) {
   return (
@@ -117,8 +182,8 @@ export function InstagramPost(props: EmbedProps) {
 
 /**
  * Any link from a service on the list (YouTube, Spotify, TikTok, Instagram,
- * Vimeo, SoundCloud and Loom) plays in place. Anything else is shown as a
- * link. `services` narrows the list.
+ * Vimeo, SoundCloud, Loom, Apple Music and Deezer) plays in place. Anything
+ * else is shown as a link. `services` narrows the list.
  */
 export function LinkEmbed({
   services,

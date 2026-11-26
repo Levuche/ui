@@ -1,13 +1,32 @@
 import type { Preview } from '@storybook/react-vite';
-import { CreatorTheme } from '../src';
+import {
+  CreatorTheme,
+  PAGE_LANGUAGES,
+  SITE_LOOKS,
+  SITE_LOOK_NAMES,
+  siteLook,
+  type SiteCardStyle,
+  type SiteHover,
+} from '../src';
+import { LANGUAGES } from '../stories/languages';
 import { SCREENS } from '../stories/screens';
 import { THEMES, type ThemeName } from '../stories/themes';
 import './preview.css';
 
 const preview: Preview = {
   // Pick the creator theme from the toolbar; a story can fix one with
-  // `globals: { theme: 'dark' }`.
-  initialGlobals: { theme: 'light' },
+  // `globals: { theme: 'dark' }`. Direction does the same for right-to-left
+  // scripts, such as Arabic, Hebrew and Urdu. A ready-made look replaces the
+  // theme, card style and hover with its own. Language sets the page's language, so
+  // every block's own words and numbers follow it.
+  initialGlobals: {
+    theme: 'light',
+    cards: 'flat',
+    hover: 'lift',
+    look: 'none',
+    direction: 'ltr',
+    language: 'en',
+  },
   globalTypes: {
     theme: {
       description: 'Creator theme',
@@ -22,15 +41,100 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    cards: {
+      description: 'Card style',
+      toolbar: {
+        title: 'Cards',
+        icon: 'component',
+        items: [
+          { value: 'flat', title: 'Flat cards' },
+          { value: 'outline', title: 'Outlined cards' },
+          { value: 'raised', title: 'Raised cards' },
+          { value: 'glass', title: 'Glass cards' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+    hover: {
+      description: 'What links do under the pointer',
+      toolbar: {
+        title: 'Hover',
+        icon: 'pointerhand',
+        items: [
+          { value: 'lift', title: 'Hover: lift' },
+          { value: 'tint', title: 'Hover: tint' },
+          { value: 'zoom', title: 'Hover: zoom' },
+          { value: 'glow', title: 'Hover: glow' },
+          { value: 'none', title: 'Hover: none' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+    look: {
+      description: 'Ready-made look',
+      toolbar: {
+        title: 'Look',
+        icon: 'mirror',
+        items: [
+          { value: 'none', title: 'No ready-made look' },
+          ...SITE_LOOK_NAMES.map((value) => ({
+            value,
+            title: `Look: ${SITE_LOOKS[value].title}`,
+          })),
+        ],
+        dynamicTitle: true,
+      },
+    },
+    direction: {
+      description: 'Which way the text runs',
+      toolbar: {
+        title: 'Direction',
+        icon: 'transfer',
+        items: [
+          { value: 'ltr', title: 'Left to right' },
+          { value: 'rtl', title: 'Right to left' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+    language: {
+      description: 'The page’s language',
+      toolbar: {
+        title: 'Language',
+        icon: 'globe',
+        items: PAGE_LANGUAGES.map((value) => ({
+          value,
+          title: LANGUAGES[value].title,
+        })),
+        dynamicTitle: true,
+      },
+    },
   },
   decorators: [
     (Story, context) => {
       const name = (context.globals.theme ?? 'light') as ThemeName;
       // Grid pages are wider than one column; they set `frame: 'wide'`.
       const wide = context.parameters.frame === 'wide';
+      const dir = context.globals.direction === 'rtl' ? 'rtl' : 'ltr';
+      const look = SITE_LOOK_NAMES.find((n) => n === context.globals.look);
+      // English is the blocks' own default, so it needs nothing set.
+      const language = PAGE_LANGUAGES.find(
+        (value) => value !== 'en' && value === context.globals.language
+      );
       return (
         <CreatorTheme
-          theme={THEMES[name].theme}
+          dir={dir}
+          theme={{
+            ...(look
+              ? siteLook(look)
+              : {
+                  ...THEMES[name].theme,
+                  cards: (context.globals.cards ?? 'flat') as SiteCardStyle,
+                  hover: (context.globals.hover ?? 'lift') as SiteHover,
+                }),
+            language,
+          }}
+          words={language ? LANGUAGES[language].words : undefined}
           className="min-h-screen p-5"
           data-testid="story-theme"
         >

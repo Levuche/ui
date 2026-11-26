@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Eyebrow } from '../atoms/text';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
+import type { ImageSrc } from '../system/image';
 
 export type HeadingTag = 'h2' | 'h3' | 'h4' | 'p';
 
@@ -25,7 +26,7 @@ export function ItemHead({
   detail?: ReactNode;
   eyebrow?: ReactNode;
   /** undefined: no picture; null: a plain tile where it would be. */
-  image?: string | null;
+  image?: ImageSrc | null;
   imageAlt?: string;
   media?: 'side' | 'top';
   ratio?: ThumbRatio;
@@ -38,6 +39,7 @@ export function ItemHead({
         src={image}
         alt={imageAlt}
         ratio={ratio ?? (media === 'top' ? 'auto' : 'square')}
+        sizes={media === 'top' ? undefined : '52px'}
         className={media === 'top' ? 'h-28 w-full' : 'size-13'}
       />
     ) : null;

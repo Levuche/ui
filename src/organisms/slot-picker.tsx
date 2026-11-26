@@ -10,6 +10,8 @@ import type { LiveProps } from '../system/live';
 import { useVisitorLocale } from '../system/locale';
 import type { ItemSell } from '../system/sell';
 import { useControllableState } from '../system/state';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 export type SlotPickerLabels = {
   day: string;
@@ -23,14 +25,7 @@ export type SlotPickerLabels = {
   none: ReactNode;
 };
 
-export const SLOT_PICKER_LABELS: SlotPickerLabels = {
-  day: 'Day',
-  time: 'Time',
-  zone: 'Times are in {zone}.',
-  pick: 'Pick a time',
-  book: 'Book {time}',
-  none: 'No free times right now. Please check back soon.',
-};
+export const SLOT_PICKER_LABELS: SlotPickerLabels = WORDS_EN.slotPicker;
 
 /**
  * Free times for a booking, from the app (BuildBase's booking calendar), as
@@ -73,7 +68,7 @@ export function SlotPicker({
     labels?: Partial<SlotPickerLabels>;
     headingAs?: HeadingTag;
   }) {
-  const words = { ...SLOT_PICKER_LABELS, ...labels };
+  const words = usePageWords('slotPicker', labels);
   const [picked, setPicked] = useControllableState({
     value,
     defaultValue,

@@ -145,7 +145,12 @@
   --site-page-link: var(--site-link);
   --site-page-border: var(--site-border);
 }
-[data-site] [data-block]:is([data-tone='surface'], [data-tone='muted']) {
+[data-site]
+  [data-block]:is(
+    [data-tone='surface'],
+    [data-tone='muted'],
+    [data-tone='inset']
+  ) {
   --site-surface: var(--site-page-surface);
   --site-surface-2: var(--site-page-surface-2);
   --site-text: var(--site-page-text);
@@ -225,6 +230,109 @@
   --site-button: var(--site-on-notice);
   --site-on-button: var(--site-notice);
 }
+/*
+ * The inset tone: pressed into the page, a shade off the page's colour with a
+ * soft shadow inside its top edge. A block's own shadow replaces it.
+ */
+[data-block][data-tone='inset']:not([data-shadow]) {
+  box-shadow:
+    inset 0 2px 6px color-mix(in oklab, var(--site-text) 14%, transparent),
+    inset 0 0 0 1px color-mix(in oklab, var(--site-text) 6%, transparent);
+}
+/*
+ * A block's own background (see src/system/background.ts): a gradient, a
+ * pattern or a picture, over the tone's fill. --block-fill is that fill, the
+ * colour a picture is dimmed with so the tone's text stays readable on it.
+ */
+[data-block] {
+  --block-fill: var(--site-surface);
+}
+[data-block][data-tone='muted'] {
+  --block-fill: color-mix(in oklab, var(--site-text) 6%, var(--site-bg));
+}
+[data-block][data-tone='inset'] {
+  --block-fill: color-mix(in oklab, var(--site-text) 8%, var(--site-bg));
+}
+[data-block]:is([data-tone='outline'], [data-tone='plain']) {
+  --block-fill: var(--site-bg);
+}
+/* A plain block gets its padding back, so words don't touch the edge. */
+[data-block][data-tone='plain'][data-background] {
+  padding: var(--block-pad);
+}
+[data-block][data-background='gradient'] {
+  background-image: var(--block-gradient);
+}
+[data-block][data-background='image'] {
+  background-image:
+    linear-gradient(
+      color-mix(in oklab, var(--block-fill) var(--block-dim), transparent),
+      color-mix(in oklab, var(--block-fill) var(--block-dim), transparent)
+    ),
+    var(--block-picture);
+  background-size: cover;
+  background-position: var(--block-picture-position, center);
+  background-repeat: no-repeat;
+}
+/* Patterns: thin lines in --block-ink, a theme colour at a low strength. */
+[data-block][data-pattern='lines'] {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--block-ink) 0 1px,
+    transparent 1px 10px
+  );
+}
+[data-block][data-pattern='rings'] {
+  background-image: repeating-radial-gradient(
+    circle at 100% 0%,
+    var(--block-ink) 0 1px,
+    transparent 1px 14px
+  );
+}
+[data-block][data-pattern='dots'] {
+  background-image: radial-gradient(var(--block-ink) 1.5px, transparent 1.75px);
+  background-size: 16px 16px;
+}
+[data-block][data-pattern='grid'] {
+  background-image:
+    linear-gradient(var(--block-ink) 1px, transparent 1px),
+    linear-gradient(90deg, var(--block-ink) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+[data-block][data-pattern='waves'] {
+  background-image:
+    radial-gradient(
+      circle at 50% 100%,
+      transparent 7px,
+      var(--block-ink) 7px 8px,
+      transparent 8px
+    ),
+    radial-gradient(
+      circle at 50% 0%,
+      transparent 7px,
+      var(--block-ink) 7px 8px,
+      transparent 8px
+    );
+  background-size: 24px 12px;
+  background-position:
+    0 0,
+    12px 12px;
+}
+/* A gradient that drifts slowly; never for visitors who ask for less motion. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-block][data-background='gradient'][data-background-move] {
+    background-size: 200% 200%;
+    animation: levuche-drift 12s ease-in-out infinite alternate;
+  }
+}
+@keyframes levuche-drift {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 100% 50%;
+  }
+}
 /* How a block appears; never for visitors who ask for less motion. */
 @media (prefers-reduced-motion: no-preference) {
   [data-motion='fade'] {
@@ -254,6 +362,203 @@
     scale: 0.96;
   }
 }
+/*
+ * Card styles (SiteTheme.cards, written as data-cards by CreatorTheme). They
+ * restyle the page's cards (blocks in the surface and muted tones) and the
+ * shadow on filled blocks. A block that picks its own shadow (data-shadow)
+ * keeps it. Inset shadows draw the lines, so no block changes size.
+ */
+[data-site][data-cards='outline']
+  [data-block]:is([data-tone='surface'], [data-tone='muted']):not(
+    [data-shadow]
+  ) {
+  box-shadow: inset 0 0 0 1px var(--site-border);
+}
+[data-site][data-cards='raised']
+  [data-block]:is(
+    [data-tone='surface'],
+    [data-tone='muted'],
+    [data-tone='accent'],
+    [data-tone='band'],
+    [data-tone='notice']
+  ):not([data-shadow]) {
+  box-shadow:
+    0 1px 2px color-mix(in oklab, var(--site-accent) 14%, transparent),
+    0 10px 28px -10px color-mix(in oklab, var(--site-accent) 40%, transparent);
+}
+[data-site][data-cards='glass']
+  [data-block]:is([data-tone='surface'], [data-tone='muted']) {
+  background-color: color-mix(in oklab, var(--site-surface) 72%, transparent);
+  backdrop-filter: blur(12px) saturate(1.2);
+}
+[data-site][data-cards='glass']
+  [data-block]:is([data-tone='surface'], [data-tone='muted']):not(
+    [data-shadow]
+  ) {
+  box-shadow: inset 0 0 0 1px
+    color-mix(in oklab, var(--site-text) 12%, transparent);
+}
+/*
+ * Hover: what links and linked cards (data-lift) do under the pointer, on tap
+ * and when a keyboard reaches them. The page picks one (SiteTheme.hover,
+ * data-hover on the page) and a block can pick its own (BlockLook.hover,
+ * data-hover on the block). Each choice only sets these variables, so the
+ * nearest one wins and reaches every link inside:
+ *
+ *   lift  rises 2px, presses in on tap (the default)
+ *   tint  the fill deepens with a little of the text colour
+ *   zoom  the picture grows a little, clipped to the card; a link with no
+ *         picture deepens instead, as tint does
+ *   glow  a line and a soft glow in the button colour, inside the edge
+ *   none  stays still
+ *
+ * Movement (rise, zoom, press) is only for visitors who haven't asked for
+ * less motion. For those who have, colour changes stay and zoom tints.
+ */
+[data-site],
+:is([data-site], [data-block])[data-hover] {
+  --block-hover-y: 0px;
+  --block-hover-press: 1;
+  --block-hover-tint: 0%;
+  --block-hover-bare: 0%;
+  --block-hover-zoom: 1;
+  --block-hover-line: 0px;
+  --block-hover-glow: 0%;
+}
+[data-site]:not([data-hover]),
+:is([data-site], [data-block])[data-hover='lift'] {
+  --block-hover-y: -2px;
+  --block-hover-press: 0.98;
+}
+:is([data-site], [data-block])[data-hover='tint'] {
+  --block-hover-tint: 8%;
+  --block-hover-bare: 8%;
+}
+:is([data-site], [data-block])[data-hover='zoom'] {
+  --block-hover-bare: 8%;
+  --block-hover-zoom: 1.06;
+  --block-hover-press: 0.98;
+}
+:is([data-site], [data-block])[data-hover='glow'] {
+  --block-hover-line: 2px;
+  --block-hover-glow: 40%;
+}
+@media (prefers-reduced-motion: reduce) {
+  :is([data-site], [data-block])[data-hover='zoom'] {
+    --block-hover-tint: 8%;
+  }
+}
+/*
+ * The colour change is a layer over the card (::after), so it works over any
+ * fill, picture or card style. A link with a picture (img) takes the tint;
+ * one without takes the "bare" tint. The card clips what grows inside it. In
+ * the base layer, so a block's own position or overflow class still wins.
+ */
+@layer base {
+  [data-lift] {
+    position: relative;
+    overflow: clip;
+  }
+}
+[data-lift] {
+  --block-hover-fill: var(--block-hover-tint);
+}
+[data-lift]:not(:has(img)) {
+  --block-hover-fill: var(--block-hover-bare);
+}
+[data-lift]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow:
+    inset 0 0 0 var(--block-hover-line) var(--site-button),
+    inset 0 0 18px
+      color-mix(
+        in oklab,
+        var(--site-button) var(--block-hover-glow),
+        transparent
+      ),
+    inset 0 0 0 100vmax
+      color-mix(in oklab, currentColor var(--block-hover-fill), transparent);
+}
+/*
+ * The hover state: under a pointer that can hover, on tap, from a keyboard,
+ * or when the page editor previews it (data-hover-preview on the link or on
+ * anything around it, "press" for the tap).
+ */
+@media (hover: hover) {
+  [data-lift]:hover::after {
+    opacity: 1;
+  }
+}
+[data-lift]:is(
+    :active,
+    :focus-visible,
+    :has(:focus-visible),
+    [data-hover-preview],
+    [data-hover-preview] *
+  )::after {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-lift],
+  [data-lift] img {
+    transition:
+      translate 0.15s ease-out,
+      scale 0.2s ease-out,
+      opacity 0.15s ease-out;
+  }
+  [data-lift]::after {
+    transition: opacity 0.15s ease-out;
+  }
+  @media (hover: hover) {
+    [data-lift]:hover {
+      translate: 0 var(--block-hover-y);
+    }
+    [data-lift]:hover img {
+      scale: var(--block-hover-zoom);
+    }
+  }
+  [data-lift]:is(
+    :focus-visible,
+    :has(:focus-visible),
+    [data-hover-preview],
+    [data-hover-preview] *
+  ) {
+    translate: 0 var(--block-hover-y);
+  }
+  [data-lift]:is(
+      :focus-visible,
+      :has(:focus-visible),
+      [data-hover-preview],
+      [data-hover-preview] *
+    )
+    img {
+    scale: var(--block-hover-zoom);
+  }
+  [data-lift]:is(
+    :active,
+    [data-hover-preview='press'],
+    [data-hover-preview='press'] *
+  ) {
+    translate: 0 0;
+    scale: var(--block-hover-press);
+  }
+}
+/*
+ * A keyboard always shows where it is. A linked card draws the ring on
+ * itself, since the link inside may be clipped by the card. In the base
+ * layer, so an app's own focus style wins.
+ */
+@layer base {
+  [data-lift]:is(:focus-visible, :has(:focus-visible)) {
+    outline: 2px solid var(--site-page-text, currentColor);
+    outline-offset: 2px;
+  }
+}
 @theme inline {
   --spacing-block: var(--block-pad);
   --spacing-block-gap: var(--block-gap);
@@ -266,9 +571,107 @@
   --color-site-field: var(--site-field, var(--site-bg));
   --color-site-on-field: var(--site-on-field, var(--site-text));
 }
-/* LogoStrip's scrolling row: the list is drawn twice and moves by half. */
+/*
+ * LogoStrip's scrolling row: the list is drawn twice and moves by half, to
+ * the left, or to the right in a right-to-left script (--marquee-to).
+ */
 @keyframes levuche-marquee {
   to {
-    translate: -50% 0;
+    translate: var(--marquee-to, -50%) 0;
+  }
+}
+/*
+ * Small loops (BlockLook.effect, written as data-effect). Float, pulse and
+ * shimmer play for under five seconds, so WCAG 2.2.2 asks for no pause
+ * button, and hold still while useBlockEffects marks the block off screen
+ * (data-offscreen). They use transform and background-position, so they run
+ * alongside how the block appears (translate, scale and opacity). Tilt leans
+ * towards the pointer by --tilt-x and --tilt-y, which useBlockEffects sets.
+ * Nothing flashes, and nothing moves for visitors who ask for less motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  [data-effect] {
+    --levuche-effect: none;
+  }
+  [data-effect='float'] {
+    --levuche-effect: levuche-float 2.4s ease-in-out 2;
+    animation: var(--levuche-effect);
+  }
+  [data-effect='pulse'] {
+    --levuche-effect: levuche-pulse 1.6s ease-in-out 3;
+    animation: var(--levuche-effect);
+  }
+  [data-effect='shimmer'] {
+    --levuche-effect: levuche-shimmer 2.4s ease-in-out 2;
+    animation: var(--levuche-effect);
+    background-image: linear-gradient(
+      100deg,
+      transparent 40%,
+      color-mix(in oklab, var(--site-text) 9%, transparent) 50%,
+      transparent 60%
+    );
+    background-size: 250% 100%;
+    background-repeat: no-repeat;
+  }
+  [data-motion='fade'][data-effect] {
+    animation:
+      levuche-fade 0.5s ease-out both,
+      var(--levuche-effect);
+  }
+  [data-motion='rise'][data-effect] {
+    animation:
+      levuche-rise 0.5s ease-out both,
+      var(--levuche-effect);
+  }
+  [data-motion='scale'][data-effect] {
+    animation:
+      levuche-scale 0.4s ease-out both,
+      var(--levuche-effect);
+  }
+  [data-effect][data-offscreen] {
+    animation-play-state: paused;
+  }
+  [data-effect='tilt'] {
+    transition: transform 0.3s ease-out;
+  }
+  @media (hover: hover) {
+    [data-effect='tilt']:hover {
+      transform: perspective(60rem) rotateX(var(--tilt-y, 0deg))
+        rotateY(var(--tilt-x, 0deg));
+    }
+  }
+}
+@keyframes levuche-float {
+  50% {
+    transform: translateY(-0.375rem);
+  }
+}
+@keyframes levuche-pulse {
+  50% {
+    transform: scale(1.025);
+  }
+}
+@keyframes levuche-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+/* A ring of words turning around the profile picture (WordRing). */
+@keyframes levuche-turn {
+  to {
+    rotate: 1turn;
+  }
+}
+/*
+ * Long names, titles and addresses wrap inside their block, even a word with
+ * no place to break, so nothing spills off a phone. In the base layer, so a
+ * block's own classes still win.
+ */
+@layer base {
+  [data-block] {
+    overflow-wrap: anywhere;
   }
 }

@@ -10,6 +10,8 @@ import { useControllableState } from '../system/state';
 import type { SellProps } from '../molecules/sell-button';
 import type { SellRef, SellState } from '../system/sell';
 import { MembershipCard } from './offers';
+import { WORDS_EN } from '../system/words/en';
+import { usePageWords } from '../system/page-words';
 
 /**
  * What a plan checks out for its yearly price: `yearlySell`, or the monthly
@@ -52,6 +54,8 @@ export type Plan = {
   /** Outlined in the button colour, with `featuredLabel`. */
   featured?: boolean;
   featuredLabel?: string;
+  /** A small tilted label over the plan's top corner, such as "Best value". */
+  ribbon?: string;
   buttonLabel?: string;
 };
 
@@ -65,13 +69,7 @@ export type PricingTableLabels = {
   year: string;
 };
 
-export const PRICING_TABLE_LABELS: PricingTableLabels = {
-  billing: 'Billing',
-  monthly: 'Monthly',
-  yearly: 'Yearly',
-  month: 'month',
-  year: 'year',
-};
+export const PRICING_TABLE_LABELS: PricingTableLabels = WORDS_EN.pricingTable;
 
 const PLAN_COLUMNS = {
   2: '@xl:grid-cols-2',
@@ -99,10 +97,13 @@ export function PricingTable({
   nofollow,
   sellLabels,
   renderBuy,
+  saveLabel,
   ...root
 }: BlockRootProps &
   LinkBehavior &
   Pick<SellProps, 'sellLabels' | 'renderBuy'> & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
     plans: Plan[];
     title?: ReactNode;
     detail?: ReactNode;
@@ -114,7 +115,7 @@ export function PricingTable({
     cardTone?: BlockRootProps['tone'];
     headingAs?: HeadingTag;
   }) {
-  const words = { ...PRICING_TABLE_LABELS, ...labels };
+  const words = usePageWords('pricingTable', labels);
   const name = useId();
   const [shown, setShown] = useControllableState({
     value: period,
@@ -149,6 +150,7 @@ export function PricingTable({
           const useYear = yearly && plan.yearlyPrice;
           return (
             <MembershipCard
+              saveLabel={saveLabel}
               key={plan.name}
               title={plan.name}
               price={useYear ? plan.yearlyPrice! : plan.price}
@@ -162,6 +164,7 @@ export function PricingTable({
               renderBuy={renderBuy}
               featured={plan.featured}
               featuredLabel={plan.featuredLabel}
+              ribbon={plan.ribbon}
               buttonLabel={plan.buttonLabel}
               headingAs={planHeading}
               tone={cardTone}

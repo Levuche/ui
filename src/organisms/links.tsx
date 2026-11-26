@@ -4,28 +4,49 @@ import { SiteLink } from '../atoms/link';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
-import { LinkTile, type LinkTileStyle } from '../molecules/link-tile';
+import {
+  LinkTile,
+  type LinkTileLook,
+  type LinkTileStyle,
+  type LinkTileVariant,
+} from '../molecules/link-tile';
+import type { ImageSrc } from '../system/image';
+import { usePageWords } from '../system/page-words';
 
 /** One link in a list. */
 export type LinkItem = LinkBehavior & {
   label: string;
   href: string;
   icon?: ReactNode;
+  /** A small picture on the start side, in place of the icon. */
+  image?: ImageSrc | null;
+  imageAlt?: string;
+  /** The site's small icon, for the list's `look` favicon or preview. */
+  favicon?: ImageSrc | null;
+  /** The link's brand colour, as "#ff0000", for chips and square tiles. */
+  tint?: string;
   detail?: ReactNode;
-  trailing?: ReactNode;
+  /** A price, or `arrow` for a round arrow. */
+  trailing?: ReactNode | 'arrow';
 };
 
 /**
  * A column of links, as on a link-in-bio page. On a tablet and desktop it
  * can show two or three to a row. Sits on the page by default (tone plain);
  * each link is a tile in `tileStyle`.
+ *
+ * `variant` icon shows square logo tiles, two to a row (three from a tablet
+ * with `columns` 3); `variant` chip shows small tinted chips, four to a row.
+ * `look` picks what every link shows of its site (see LinkTileLook).
  */
 export function LinkList({
   links,
-  label = 'Links',
+  label: labelProp,
   tileStyle = 'filled',
   tileAlign = 'start',
   columns = 1,
+  variant = 'row',
+  look,
   ...root
 }: BlockRootProps & {
   links: LinkItem[];
@@ -33,9 +54,13 @@ export function LinkList({
   label?: string;
   tileStyle?: LinkTileStyle;
   tileAlign?: 'start' | 'center';
-  /** Links to a row from a tablet up. */
+  /** Links to a row from a tablet up. Rows and square tiles. */
   columns?: 1 | 2 | 3;
+  variant?: LinkTileVariant;
+  look?: LinkTileLook;
 }) {
+  const own = usePageWords('props');
+  const label = labelProp === undefined ? own.links : labelProp;
   return (
     <Block
       as="nav"
@@ -45,18 +70,27 @@ export function LinkList({
       {...root}
     >
       <ul
+        data-variant={variant}
         className={cn(
           'm-0 grid list-none gap-2.5 p-0',
-          columns === 2 && 'md:grid-cols-2',
-          columns === 3 && 'md:grid-cols-3'
+          variant === 'chip'
+            ? 'grid-cols-4 gap-2'
+            : variant === 'icon'
+              ? cn('grid-cols-2', columns === 3 && 'md:grid-cols-3')
+              : cn(
+                  columns === 2 && 'md:grid-cols-2',
+                  columns === 3 && 'md:grid-cols-3'
+                )
         )}
       >
         {links.map(({ label: text, href, ...link }, i) => (
-          <li key={`${i}-${href}`} className="m-0">
+          <li key={`${i}-${href}`} className="m-0 min-w-0">
             <LinkTile
               href={href}
               tileStyle={tileStyle}
               align={tileAlign}
+              variant={variant}
+              look={look}
               {...link}
             >
               {text}
@@ -88,7 +122,7 @@ export function FeaturedLink({
     href: string;
     title: string;
     detail?: ReactNode;
-    image?: string | null;
+    image?: ImageSrc | null;
     /** Leave empty when the picture only repeats the title. */
     imageAlt?: string;
     ratio?: ThumbRatio;
@@ -97,6 +131,7 @@ export function FeaturedLink({
     <Block
       name="featured-link"
       defaults={{ tone: 'surface' }}
+      data-lift=""
       {...root}
       className={cn('overflow-hidden p-0', root.className)}
     >
@@ -128,16 +163,21 @@ export function FeaturedLink({
 /** A row of icon links to the creator's social accounts. */
 export function SocialIcons({
   links,
-  label = 'Social accounts',
+  label: labelProp,
   iconStyle = 'plain',
   ...root
 }: BlockRootProps & {
   /** `label` names each link for screen readers, as "Instagram". */
   links: (LinkBehavior & { label: string; href: string; icon: ReactNode })[];
   label?: string;
-  /** `filled` puts each icon on a round tile. */
-  iconStyle?: 'plain' | 'filled' | 'outline';
+  /**
+   * `filled` puts each icon on a round tile, `outline` in a ring, and `chip`
+   * on a round chip in the card colour with a thin line.
+   */
+  iconStyle?: 'plain' | 'filled' | 'outline' | 'chip';
 }) {
+  const own = usePageWords('props');
+  const label = labelProp === undefined ? own.socialAccounts : labelProp;
   return (
     <Block
       as="nav"
@@ -154,12 +194,15 @@ export function SocialIcons({
               aria-label={name}
               title={name}
               action="social_click"
+              data-lift=""
               {...link}
               className={cn(
                 'text-site-text size-control-md inline-flex items-center justify-center rounded-full',
                 iconStyle === 'plain' && 'hover:bg-site-surface-2',
                 iconStyle === 'filled' && 'bg-site-surface-2',
-                iconStyle === 'outline' && 'border-site-border border-2'
+                iconStyle === 'outline' && 'border-site-border border-2',
+                iconStyle === 'chip' &&
+                  'bg-site-surface border-site-border hover:bg-site-surface-2 border'
               )}
             >
               {icon}

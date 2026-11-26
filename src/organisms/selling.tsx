@@ -6,8 +6,9 @@ import {
   type SiteButtonSize,
   type SiteButtonVariant,
 } from '../atoms/button';
+import { ClockIcon } from '../atoms/icons';
 import { SiteLink } from '../atoms/link';
-import { Badge } from '../atoms/text';
+import { Badge, Ribbon } from '../atoms/text';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
@@ -21,6 +22,9 @@ import {
   type SellProps,
 } from '../molecules/sell-button';
 import type { SellRef, SellState } from '../system/sell';
+import { columnSizes, type ImageSrc } from '../system/image';
+import { WORDS_EN } from '../system/words/en';
+import { usePageLocale, usePageWords } from '../system/page-words';
 
 /**
  * A pack in a list: thumbnail, title, what's in it, price. The row links to
@@ -40,30 +44,44 @@ export function PackRow({
   sellState,
   sellLabels,
   renderBuy,
-  buttonLabel = 'Buy',
+  buttonLabel: buttonLabelProp,
+  saveLabel,
+  duration,
   ...root
 }: BlockRootProps &
   LinkBehavior &
   SellProps & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
     /** The words on the buy button, with `sell`. */
     buttonLabel?: ReactNode;
     title: string;
     detail?: ReactNode;
+    /** How long a service takes, as "4.5 h", shown with a clock. */
+    duration?: ReactNode;
     price: string;
     was?: string;
-    image?: string | null;
+    image?: ImageSrc | null;
     href?: string;
   }) {
+  const own = usePageWords('props');
+  const buttonLabel = buttonLabelProp === undefined ? own.buy : buttonLabelProp;
   const body = (
     <>
-      <Thumb src={image} ratio="square" className="size-13" />
+      <Thumb src={image} ratio="square" sizes="52px" className="size-13" />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="font-semibold">{title}</span>
         {detail ? (
           <span className="text-site-text-2 text-sm">{detail}</span>
         ) : null}
+        {duration ? (
+          <span className="text-site-text-2 inline-flex items-center gap-1.5 text-sm">
+            <ClockIcon size={14} className="flex-none" />
+            {duration}
+          </span>
+        ) : null}
       </span>
-      <Price value={price} was={was} />
+      <Price saveLabel={saveLabel} value={price} was={was} />
     </>
   );
   const row = 'text-site-text flex items-center gap-3 no-underline';
@@ -105,7 +123,7 @@ export function PackRow({
 export function BuyButton({
   variant = 'solid',
   size = 'lg',
-  children = 'I’ll take it',
+  children: childrenProp,
   type = 'button',
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -113,6 +131,8 @@ export function BuyButton({
   size?: SiteButtonSize;
   loading?: boolean;
 }) {
+  const own = usePageWords('props');
+  const children = childrenProp === undefined ? own.takeIt : childrenProp;
   return (
     <SiteButton
       type={type}
@@ -132,6 +152,8 @@ export type PackCheckoutLabels = {
   error: ReactNode;
 };
 
+export const PACK_CHECKOUT_LABELS: PackCheckoutLabels = WORDS_EN.packCheckout;
+
 /**
  * Checkout for a digital pack: the consent to start the download now (the
  * buyer gives up the 14-day right to cancel) must be ticked before the buy
@@ -139,7 +161,7 @@ export type PackCheckoutLabels = {
  */
 export function PackCheckout({
   price,
-  consent = 'I want to download now and understand I lose my 14-day right to cancel.',
+  consent: consentProp,
   buttonLabel,
   buttonVariant,
   labels,
@@ -161,6 +183,9 @@ export function PackCheckout({
   onSubmit?: FormEventHandler<HTMLFormElement>;
   action?: string | ((data: FormData) => void | Promise<void>);
 }) {
+  const own = usePageWords('props');
+  const consent = consentProp === undefined ? own.consent : consentProp;
+  const words = usePageWords('packCheckout', labels);
   return (
     <Block
       as="form"
@@ -187,54 +212,81 @@ export function PackCheckout({
         variant={buttonVariant}
         loading={status === 'sending'}
       >
-        {buttonLabel ?? <>I’ll take it, {price}</>}
+        {buttonLabel ?? own.takeItFor.replace('{price}', price)}
       </BuyButton>
-      <FormNotice
-        status={status}
-        error={
-          labels?.error ?? 'The payment didn’t go through. Please try again.'
-        }
-      />
+      <FormNotice status={status} error={words.error} />
     </Block>
   );
 }
 
-/** The featured pack: big picture, title, what's in it, price and buy. */
+/**
+ * The featured pack: big picture, title, what's in it, price and buy. With
+ * `sell` the button checks out through BuildBase; with `href` it links to a
+ * checkout on another site.
+ */
 export function FeaturedPack({
   title,
   detail,
+  duration,
   price,
   was,
   image,
   imageAlt = '',
   ratio,
   action,
-  buttonLabel = 'I’ll take it',
+  buttonLabel: buttonLabelProp,
   headingAs = 'h2',
+  ribbon,
   sell,
   sellState,
   sellLabels,
   renderBuy,
+  saveLabel,
+  href,
+  newTab,
+  sponsored,
+  nofollow,
   ...root
 }: BlockRootProps &
+  LinkBehavior &
   SellProps & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
+    /** A small tilted label over the top corner, such as "Most popular". */
+    ribbon?: ReactNode;
     title: string;
     detail?: ReactNode;
+    /** How long a service takes, as "4.5 h", shown with a clock. */
+    duration?: ReactNode;
     price: string;
     was?: string;
-    image?: string | null;
+    image?: ImageSrc | null;
     imageAlt?: string;
     ratio?: ThumbRatio;
     /**
-     * The buy control. Defaults to a buy button for `sell`, or else a pill with
-     * `buttonLabel` that does nothing.
+     * The buy control. Defaults to a buy button for `sell`, a link to `href`,
+     * or else a pill with `buttonLabel` that does nothing.
      */
     action?: ReactNode;
+    /**
+     * A checkout on another site, for a product not sold through BuildBase.
+     * Not used with `sell`.
+     */
+    href?: string;
     buttonLabel?: ReactNode;
     headingAs?: HeadingTag;
   }) {
+  const own = usePageWords('props');
+  const buttonLabel =
+    buttonLabelProp === undefined ? own.takeIt : buttonLabelProp;
   return (
-    <Block as="article" name="featured-pack" {...root}>
+    <Block
+      as="article"
+      name="featured-pack"
+      {...root}
+      className={cn('relative', root.className)}
+    >
+      {ribbon ? <Ribbon>{ribbon}</Ribbon> : null}
       <ItemHead
         title={title}
         detail={detail}
@@ -244,15 +296,25 @@ export function FeaturedPack({
         media="top"
         headingAs={headingAs}
       />
+      {duration ? (
+        <p className="text-site-text-2 m-0 inline-flex items-center gap-1.5 text-sm">
+          <ClockIcon size={16} className="flex-none" />
+          {duration}
+        </p>
+      ) : null}
       <div className="flex items-center justify-between gap-3">
-        <Price value={price} was={was} size="lg" />
+        <Price saveLabel={saveLabel} value={price} was={was} size="lg" />
         {action ??
-          (sell ? (
+          (sell || href ? (
             <SellButton
               sell={sell}
               sellState={sellState}
               sellLabels={sellLabels}
               renderBuy={renderBuy}
+              href={href}
+              newTab={newTab}
+              sponsored={sponsored}
+              nofollow={nofollow}
               size="sm"
               fullWidth={false}
             >
@@ -272,17 +334,20 @@ export function FeaturedPack({
 export function PackGrid({
   packs,
   columns = 2,
-  buttonLabel = 'Buy',
+  buttonLabel: buttonLabelProp,
   sellLabels,
   renderBuy,
+  saveLabel,
   ...root
 }: BlockRootProps &
   Pick<SellProps, 'sellLabels' | 'renderBuy'> & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
     packs: (LinkBehavior & {
       title: string;
       price: string;
       was?: string;
-      image?: string | null;
+      image?: ImageSrc | null;
       href?: string;
       /** Sells the pack through BuildBase, with a buy button on the tile. */
       sell?: SellRef;
@@ -293,6 +358,8 @@ export function PackGrid({
     /** Packs to a row from a tablet up; two on a phone. */
     columns?: 2 | 3 | 4;
   }) {
+  const own = usePageWords('props');
+  const buttonLabel = buttonLabelProp === undefined ? own.buy : buttonLabelProp;
   return (
     <Block name="pack-grid" defaults={{ tone: 'plain' }} {...root}>
       <ul
@@ -306,9 +373,18 @@ export function PackGrid({
           ({ title, price, was, image, href, sell, sellState, ...link }, i) => {
             const body = (
               <>
-                <Thumb src={image} className="h-15 w-full" />
+                <Thumb
+                  src={image}
+                  sizes={columnSizes(1 / columns, 1 / 2)}
+                  className="h-15 w-full"
+                />
                 <strong>{title}</strong>
-                <Price value={price} was={was} size="sm" />
+                <Price
+                  saveLabel={saveLabel}
+                  value={price}
+                  was={was}
+                  size="sm"
+                />
               </>
             );
             const tile =
@@ -361,11 +437,7 @@ export type CreditPackLabels = {
   button: string;
 };
 
-export const CREDIT_PACK_LABELS: CreditPackLabels = {
-  credits: '{n} credits',
-  bonus: '+{n} bonus',
-  button: 'Buy credits',
-};
+export const CREDIT_PACK_LABELS: CreditPackLabels = WORDS_EN.creditPack;
 
 /**
  * A pack of credits: how many, any bonus, the price, how long they last and
@@ -387,11 +459,14 @@ export function CreditPack({
   featured = false,
   featuredLabel,
   labels,
-  locale,
+  locale: localeProp,
   headingAs: Heading = 'h3',
+  saveLabel,
   ...root
 }: BlockRootProps &
   SellProps & {
+    /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
+    saveLabel?: string | null;
     credits: number;
     bonus?: number;
     /** As "₹499". */
@@ -408,7 +483,8 @@ export function CreditPack({
     locale?: string;
     headingAs?: HeadingTag;
   }) {
-  const words = { ...CREDIT_PACK_LABELS, ...labels };
+  const locale = usePageLocale(localeProp);
+  const words = usePageWords('creditPack', labels);
   const count = new Intl.NumberFormat(locale);
   return (
     <Block
@@ -440,7 +516,7 @@ export function CreditPack({
       ) : null}
       {detail ? <p className="text-site-text-2 m-0 text-sm">{detail}</p> : null}
       <p className="m-0">
-        <Price value={price} was={was} size="lg" />
+        <Price saveLabel={saveLabel} value={price} was={was} size="lg" />
       </p>
       {expires ? (
         <p className="text-site-text-2 m-0 text-sm">{expires}</p>

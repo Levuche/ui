@@ -37,6 +37,7 @@ test('every block is in one pack, and every pack has blocks', () => {
 
 test('blocks that sell through BuildBase are free', () => {
   const sellers = [
+    'action-card',
     'pack-row',
     'featured-pack',
     'pack-grid',
@@ -49,6 +50,7 @@ test('blocks that sell through BuildBase are free', () => {
     'tip-jar',
     'course-card',
     'pricing-table',
+    'event-card',
   ];
   for (const id of sellers) {
     expect(BLOCKS.find((block) => block.id === id)?.pack, id).toBe('core');

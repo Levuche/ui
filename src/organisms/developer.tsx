@@ -12,6 +12,8 @@ import { StatList } from '../molecules/stat-list';
 import { cn } from '../system/cn';
 import type { LiveProps } from '../system/live';
 import { isSafeColor } from '../system/theme';
+import { WORDS_EN } from '../system/words/en';
+import { usePageLocale, usePageWords } from '../system/page-words';
 
 const compact = (n: number, locale?: string) =>
   new Intl.NumberFormat(locale, { notation: 'compact' }).format(n);
@@ -38,12 +40,7 @@ export type GitHubLabels = {
   button: string;
 };
 
-export const GITHUB_LABELS: GitHubLabels = {
-  followers: 'Followers',
-  repos: 'Repos',
-  stars: 'Stars',
-  button: 'Follow on GitHub',
-};
+export const GITHUB_LABELS: GitHubLabels = WORDS_EN.github;
 
 /** A developer's GitHub: picture, name, bio, followers, repos and stars. */
 export function GitHubProfile({
@@ -51,7 +48,7 @@ export function GitHubProfile({
   loading,
   error,
   labels,
-  locale,
+  locale: localeProp,
   headingAs = 'h3',
   ...root
 }: BlockRootProps &
@@ -60,7 +57,8 @@ export function GitHubProfile({
     locale?: string;
     headingAs?: HeadingTag;
   }) {
-  const words = { ...GITHUB_LABELS, ...labels };
+  const locale = usePageLocale(localeProp);
+  const words = usePageWords('github', labels);
   const Heading = headingAs;
   return (
     <Block name="github-profile" {...root}>
@@ -138,12 +136,7 @@ export type ContributionLabels = {
   days: string;
 };
 
-export const CONTRIBUTION_LABELS: ContributionLabels = {
-  total: '{n} contributions in the last year',
-  current: 'Current streak',
-  longest: 'Longest streak',
-  days: '{n} days',
-};
+export const CONTRIBUTION_LABELS: ContributionLabels = WORDS_EN.contributions;
 
 const LEVELS = [
   'bg-site-surface-2',
@@ -170,7 +163,7 @@ export function ContributionGraph({
   error,
   title,
   labels,
-  locale,
+  locale: localeProp,
   headingAs = 'h3',
   ...root
 }: BlockRootProps &
@@ -180,7 +173,8 @@ export function ContributionGraph({
     locale?: string;
     headingAs?: HeadingTag;
   }) {
-  const words = { ...CONTRIBUTION_LABELS, ...labels };
+  const locale = usePageLocale(localeProp);
+  const words = usePageWords('contributions', labels);
   const days = (n: number) => words.days.replace('{n}', compact(n, locale));
   return (
     <Block name="contribution-graph" {...root}>
@@ -248,7 +242,7 @@ export type RepoData = {
 
 export type RepoLabels = { stars: string; forks: string };
 
-export const REPO_LABELS: RepoLabels = { stars: 'stars', forks: 'forks' };
+export const REPO_LABELS: RepoLabels = WORDS_EN.repo;
 
 function RepoBody({
   repo,
@@ -310,7 +304,7 @@ export function RepoCard({
   loading,
   error,
   labels,
-  locale,
+  locale: localeProp,
   headingAs = 'h3',
   ...root
 }: BlockRootProps &
@@ -319,7 +313,8 @@ export function RepoCard({
     locale?: string;
     headingAs?: HeadingTag;
   }) {
-  const words = { ...REPO_LABELS, ...labels };
+  const locale = usePageLocale(localeProp);
+  const words = usePageWords('repo', labels);
   return (
     <Block as="article" name="repo-card" {...root}>
       <LiveData data={data} loading={loading} error={error}>
@@ -344,7 +339,7 @@ export function RepoList({
   title,
   columns = 2,
   labels,
-  locale,
+  locale: localeProp,
   headingAs = 'h2',
   ...root
 }: BlockRootProps &
@@ -355,7 +350,8 @@ export function RepoList({
     locale?: string;
     headingAs?: HeadingTag;
   }) {
-  const words = { ...REPO_LABELS, ...labels };
+  const locale = usePageLocale(localeProp);
+  const words = usePageWords('repo', labels);
   const itemHeading: HeadingTag = headingAs === 'h2' ? 'h3' : 'h4';
   return (
     <Block name="repo-list" {...root}>
@@ -407,11 +403,7 @@ export type PackageLabels = {
   chart: string;
 };
 
-export const PACKAGE_LABELS: PackageLabels = {
-  version: 'Version',
-  weekly: 'Weekly downloads',
-  chart: 'Downloads per week over the last {n} weeks',
-};
+export const PACKAGE_LABELS: PackageLabels = WORDS_EN.package;
 
 /** A package's version, weekly downloads and a small chart of them. */
 export function PackageStats({
@@ -419,7 +411,7 @@ export function PackageStats({
   loading,
   error,
   labels,
-  locale,
+  locale: localeProp,
   headingAs = 'h3',
   ...root
 }: BlockRootProps &
@@ -428,7 +420,8 @@ export function PackageStats({
     locale?: string;
     headingAs?: HeadingTag;
   }) {
-  const words = { ...PACKAGE_LABELS, ...labels };
+  const locale = usePageLocale(localeProp);
+  const words = usePageWords('package', labels);
   const Heading = headingAs;
   return (
     <Block name="package-stats" {...root}>

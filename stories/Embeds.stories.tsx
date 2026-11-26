@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fireEvent, userEvent } from 'storybook/test';
 import {
+  AppleMusicEmbed,
   AudioPlayer,
+  DeezerEmbed,
   InstagramPost,
   LinkEmbed,
   PodcastEpisodes,
+  SoundCloudEmbed,
   SpotifyEmbed,
   TikTokVideo,
 } from '../src';
@@ -44,6 +47,118 @@ export const NotSpotify: Story = {
     await expect(
       canvas.getByRole('link', { name: /Chai at dawn/ })
     ).toHaveAttribute('href', 'https://example.com/chai');
+  },
+};
+
+/** The height of a block's player, in pixels. */
+const playerHeight = (canvasElement: HTMLElement, name: RegExp) =>
+  [...canvasElement.querySelectorAll('button')]
+    .find((button) => name.test(button.getAttribute('aria-label') ?? ''))
+    ?.getBoundingClientRect().height ?? 0;
+
+/**
+ * A SoundCloud track in the slim player. When play is pressed it takes the
+ * colour of the page's buttons.
+ */
+export const SoundCloud: StoryObj<typeof SoundCloudEmbed> = {
+  render: () => (
+    <SoundCloudEmbed
+      url="https://soundcloud.com/desi-origins/chai-at-dawn"
+      title="Chai at dawn"
+      showTitle
+      detail="Asha Menon"
+    />
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvasElement.querySelector('iframe')).toBeNull();
+    const play = canvas.getByRole('button', { name: 'Play: Chai at dawn' });
+    await expect(play).toHaveAttribute('data-action', 'play_soundcloud');
+    await expectTapSize(play, 'Play');
+    await expect(
+      canvasElement.querySelector('[data-block="soundcloud-embed"]')
+    ).toHaveAttribute('data-service', 'soundcloud');
+    await expect(
+      canvas.getByRole('heading', { name: 'Chai at dawn' })
+    ).toBeVisible();
+  },
+};
+
+/** The player with big artwork, on a phone: taller than the slim one. */
+export const SoundCloudArtwork: StoryObj<typeof SoundCloudEmbed> = {
+  globals: onScreen('phone'),
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <SoundCloudEmbed
+        url="https://soundcloud.com/desi-origins/chai-at-dawn"
+        title="Chai at dawn"
+        player="visual"
+      />
+      <SoundCloudEmbed
+        url="https://soundcloud.com/desi-origins/monsoon"
+        title="Monsoon"
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const big = playerHeight(canvasElement, /Chai at dawn/);
+    const slim = playerHeight(canvasElement, /Monsoon/);
+    await expect(slim).toBeGreaterThanOrEqual(44);
+    await expect(big).toBeGreaterThan(slim);
+  },
+};
+
+/** An Apple Music album, then one song of it. */
+export const AppleMusic: StoryObj<typeof AppleMusicEmbed> = {
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <AppleMusicEmbed
+        url="https://music.apple.com/us/album/monsoon-songs/1440857781"
+        title="Monsoon songs"
+      />
+      <AppleMusicEmbed
+        url="https://music.apple.com/us/album/monsoon-songs/1440857781?i=1440857786"
+        title="Chai at dawn"
+      />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvasElement.querySelector('iframe')).toBeNull();
+    await expect(
+      canvas.getByRole('button', { name: 'Play: Monsoon songs' })
+    ).toHaveAttribute('data-action', 'play_applemusic');
+    await expect(playerHeight(canvasElement, /Monsoon songs/)).toBeGreaterThan(
+      playerHeight(canvasElement, /Chai at dawn/)
+    );
+  },
+};
+
+/** A Deezer playlist, with the creator's own words on the button, on a tablet. */
+export const Deezer: StoryObj<typeof DeezerEmbed> = {
+  globals: onScreen('tablet'),
+  render: () => (
+    <DeezerEmbed
+      url="https://www.deezer.com/en/playlist/908622995"
+      title="Morning chai"
+      labels={{ play: 'Listen: {title}' }}
+    />
+  ),
+  play: async ({ canvas }) => {
+    const play = canvas.getByRole('button', { name: 'Listen: Morning chai' });
+    await expect(play).toHaveAttribute('data-action', 'play_deezer');
+    await expectTapSize(play, 'Play');
+  },
+};
+
+/** A music link the block can't play shows as a plain link. */
+export const NotMusic: StoryObj<typeof DeezerEmbed> = {
+  render: () => (
+    <DeezerEmbed url="https://example.com/playlist" title="Morning chai" />
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    await expect(
+      canvas.getByRole('link', { name: /Morning chai/ })
+    ).toHaveAttribute('href', 'https://example.com/playlist');
+    await expect(canvasElement.querySelector('button')).toBeNull();
   },
 };
 
