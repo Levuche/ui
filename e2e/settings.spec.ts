@@ -9,6 +9,7 @@ import {
 import { BLOCK_EFFECTS, BLOCK_TONES, splitLook } from '../src/system/look';
 import { MIN_MOTION_SECONDS } from '../src/system/motion';
 import { EMBED_SERVICES } from '../src/system/embeds';
+import { SITE_HOVERS } from '../src/system/theme';
 import {
   LIST_VALUE_TYPES,
   LOOK_SETTINGS,
@@ -119,6 +120,10 @@ test('choice fields have options, each once, and labels only for them', () => {
 test('choices reuse the package’s own lists', () => {
   const tone = LOOK_SETTINGS.find((field) => field.name === 'tone');
   expect(tone?.type === 'choice' && tone.options).toBe(BLOCK_TONES);
+  // The block's hover has no default: left unset, it follows the page's.
+  const hover = LOOK_SETTINGS.find((field) => field.name === 'hover');
+  expect(hover?.type === 'choice' && hover.options).toBe(SITE_HOVERS);
+  expect(hover).not.toHaveProperty('default');
   const services = ui
     .blockInfo('link-embed')
     ?.settings.find((field) => field.name === 'services');

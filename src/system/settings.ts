@@ -21,7 +21,7 @@ import {
   MIN_DIM,
 } from './background';
 import type { SellKind } from './sell';
-import { isSafeColor } from './theme';
+import { SITE_HOVERS, isSafeColor } from './theme';
 
 /*
  * What a creator can set on each block, described as plain data, so the page
@@ -570,6 +570,21 @@ export const LOOK_SETTINGS = [
     },
     default: 'none',
     help: 'A short loop once the block is on the page. Always still for visitors who ask for less motion.',
+    icon: 'eye',
+  },
+  {
+    name: 'hover',
+    label: 'Under the pointer',
+    type: 'choice',
+    options: SITE_HOVERS,
+    optionLabels: {
+      lift: 'Lift',
+      tint: 'Deepen the colour',
+      zoom: 'Zoom the picture',
+      glow: 'Glow',
+      none: 'Stay still',
+    },
+    help: 'What its links do on hover and tap. Left unset, the page’s hover.',
     icon: 'eye',
   },
   {

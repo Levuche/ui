@@ -6,7 +6,12 @@ import {
   type BlockBackground,
 } from './background';
 import { cn } from './cn';
-import { siteThemeStyle, type SiteColors } from './theme';
+import {
+  SITE_HOVERS,
+  siteThemeStyle,
+  type SiteColors,
+  type SiteHover,
+} from './theme';
 
 /*
  * The look every block shares. A creator picks these per block in the page
@@ -114,6 +119,11 @@ export type BlockLook = {
   background?: BlockBackground;
   /** Hide the block on these screens. Grid pages place blocks per screen instead. */
   hideOn?: BlockScreen[];
+  /**
+   * What this block's links and linked cards do under the pointer, over the
+   * page theme's `hover` (see SiteHover).
+   */
+  hover?: SiteHover;
 };
 
 const LOOK_KEYS = [
@@ -128,6 +138,7 @@ const LOOK_KEYS = [
   'font',
   'background',
   'hideOn',
+  'hover',
 ] as const satisfies readonly (keyof BlockLook)[];
 
 /**
@@ -199,6 +210,8 @@ export type LookProps = {
   'data-background'?: BackgroundType;
   'data-pattern'?: BackgroundPattern;
   'data-background-move'?: 'true';
+  /** Set when the block picks its own hover, which wins over the theme's. */
+  'data-hover'?: SiteHover;
 };
 
 /**
@@ -227,6 +240,7 @@ export function lookProps(
   const shadow = oneOf(BLOCK_SHADOWS, look.shadow) ?? defaults.shadow;
   const motion = oneOf(BLOCK_MOTIONS, look.motion) ?? defaults.motion;
   const effect = oneOf(BLOCK_EFFECTS, look.effect) ?? defaults.effect;
+  const hover = oneOf(SITE_HOVERS, look.hover) ?? defaults.hover;
   const hideOn = (look.hideOn ?? defaults.hideOn ?? []).filter((screen) =>
     BLOCK_SCREENS.includes(screen)
   );
@@ -257,5 +271,6 @@ export function lookProps(
     ...(effect && effect !== 'none' ? { 'data-effect': effect } : {}),
     ...(shadow ? { 'data-shadow': shadow } : {}),
     ...background,
+    ...(hover ? { 'data-hover': hover } : {}),
   };
 }
