@@ -23,7 +23,9 @@ const lookStory = (name: SiteLookName): Story => ({
   globals: { look: name },
   play: async ({ canvasElement }) => {
     const { theme } = SITE_LOOKS[name];
-    const page = canvasElement.closest<HTMLElement>('[data-site]')!;
+    const page = canvasElement.querySelector<HTMLElement>(
+      '[data-testid="story-theme"]'
+    )!;
     await expect(page).toHaveAttribute('data-site', theme.scheme ?? 'light');
     await expect(page.style.getPropertyValue('--site-accent')).toBe(
       theme.colors?.accent
