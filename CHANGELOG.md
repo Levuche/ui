@@ -8,6 +8,12 @@ change when it moves to that version.
 
 ### Added
 
+- Text blocks in a new `text` group, free in `core`: `SectionHeading` (a
+  heading a link can jump to, with a line of detail), `TextBlock` (bold,
+  italic, links, lists and emoji), `QuoteBlock` (a quote with who said it
+  and a small picture) and `Spacer` (a gap of whole grid rows, or a thin
+  line). What a creator types is never read as HTML (`parseRichText`,
+  `RichText`).
 - Motion inside blocks. `effect` on every block's look (`BLOCK_EFFECTS`):
   `float`, `pulse` and `shimmer` play for under five seconds, and `tilt`
   leans towards the mouse. `<BlockEffects />` or `useBlockEffects()` once on

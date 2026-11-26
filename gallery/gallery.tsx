@@ -23,13 +23,17 @@ import {
   LinkList,
   PackGrid,
   PackRow,
+  QuoteBlock,
   ReelGrid,
+  SectionHeading,
   ShareIcon,
   SiteButton,
   SiteDivider,
   SiteLinkButton,
   SiteSection,
   SiteText,
+  Spacer,
+  TextBlock,
   TextStrip,
   VideoIcon,
   YouTubeVideo,
@@ -331,6 +335,26 @@ function Panel({
                 answer: '100 prompts, a guide and 12 templates.',
               },
             ]}
+          />
+        </Group>
+
+        <Group id={id} name="text" title="Headings, text and quotes">
+          <SectionHeading
+            id={`${id}-works`}
+            title="My works"
+            detail="Every story, newest first"
+            headingAs="p"
+          />
+          <TextBlock
+            text={
+              'Stories about **everyday things**, in *under a minute* 🍵\n- New every Friday\n- [Watch on YouTube](https://www.youtube.com/@example)'
+            }
+          />
+          <Spacer line />
+          <QuoteBlock
+            quote="The best minute of my day."
+            name="Meera K."
+            avatar={null}
           />
         </Group>
 

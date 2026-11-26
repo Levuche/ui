@@ -213,6 +213,27 @@ test('each block has at most one main link, and data to load is slow', () => {
   expect(mainLinkSetting('testimonials')).toBeUndefined();
 });
 
+test('the text blocks have their settings', () => {
+  const field = (id: string, name: string) =>
+    ui.blockInfo(id)?.settings.find((setting) => setting.name === name);
+  // The heading's link name is a setting; its level is the app's.
+  expect(field('section-heading', 'title')?.required).toBe(true);
+  expect(field('section-heading', 'id')?.type).toBe('text');
+  expect(ui.blockInfo('section-heading')?.appOnly).toEqual(['headingAs']);
+  const text = field('text-block', 'text');
+  expect(text?.type).toBe('longText');
+  expect(text?.required).toBe(true);
+  expect(field('quote-block', 'quote')?.required).toBe(true);
+  expect(field('quote-block', 'avatar')?.type).toBe('picture');
+  // The spacer's height stops where the block does.
+  const rows = field('spacer', 'rows');
+  expect(rows?.type === 'number' && [rows.min, rows.max]).toEqual([
+    1,
+    ui.SPACER_MAX_ROWS,
+  ]);
+  expect(field('spacer', 'line')?.type).toBe('toggle');
+});
+
 test('the look settings are exactly the look a block takes', () => {
   const values = Object.fromEntries(
     LOOK_SETTINGS.map((field) => [field.name, 'x'])

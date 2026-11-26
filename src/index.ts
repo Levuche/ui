@@ -259,6 +259,7 @@ export {
 export { SiteDialog } from './molecules/dialog';
 export { Segmented, type SegmentOption } from './molecules/segmented';
 export { CountUp, type NumberStyle } from './molecules/count-up';
+export { RichText } from './molecules/rich-text';
 export { HiddenText, MessageComposer } from './molecules/message-composer';
 export {
   MotionToggle,
@@ -334,6 +335,24 @@ export {
   type CountdownLabels,
 } from './organisms/countdown';
 export { FaqList, Testimonials } from './organisms/trust';
+export {
+  QuoteBlock,
+  SPACER_MAX_ROWS,
+  SectionHeading,
+  Spacer,
+  TextBlock,
+  spacerHeight,
+} from './organisms/text-blocks';
+export {
+  RICH_TEXT_MAX_LENGTH,
+  anchorId,
+  parseInline,
+  parseRichText,
+  richTextWords,
+  type RichBlock,
+  type RichInline,
+  type RichLine,
+} from './system/rich-text';
 export { ReelGrid, YouTubeVideo, youtubeId } from './organisms/media';
 export { ImageGrid } from './organisms/images';
 export { LogoStrip, SiteImage, type Logo } from './organisms/pictures';
