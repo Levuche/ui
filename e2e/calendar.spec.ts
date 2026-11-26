@@ -120,6 +120,7 @@ test('event times are read in every form, and nonsense is refused', () => {
     expect(parseEventTime(bad), bad).toBeNull();
   }
   expect(parseEventTime(undefined)).toBeNull();
+  expect(parseEventTime(`2027-03-15T19:00${'0'.repeat(50_000)}`)).toBeNull();
 });
 
 test('an event without an end lasts an hour, or the whole day', () => {
@@ -280,6 +281,25 @@ test('the .ics link is a calendar file made from the event alone', () => {
   expect(icsFileName('Café Ünïcode')).toBe('cafe-unicode.ics');
   expect(icsFileName('🍵🍵')).toBe('event.ics');
   expect(icsFileName('a'.repeat(100))).toBe(`${'a'.repeat(60)}.ics`);
+  expect(icsFileName('Spice -- fair -')).toBe('spice-fair.ics');
+  expect(
+    icsFileName(
+      'one two three four five six seven eight nine ten eleven twelve'
+    )
+  ).toBe('one-two-three-four-five-six-seven-eight-nine-ten-eleven.ics');
+  // Long runs of what isn't a letter take no time at all.
+  for (const title of [
+    '-'.repeat(50_000),
+    `a${'-'.repeat(50_000)}a`,
+    `${'-'.repeat(50_000)}x`,
+    ' -'.repeat(50_000),
+  ]) {
+    const began = performance.now();
+    const name = icsFileName(title);
+    expect(performance.now() - began).toBeLessThan(50);
+    expect(name).toMatch(/^[a-z0-9-]*[a-z0-9]\.ics$|^event\.ics$/);
+  }
+  expect(icsFileName('-'.repeat(50_000))).toBe('event.ics');
 });
 
 test('the Google Calendar link carries the same times', () => {

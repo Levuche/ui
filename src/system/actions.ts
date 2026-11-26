@@ -86,7 +86,9 @@ export function readBlockAction(event: Event): BlockAction | null {
           // the page made itself (an .ics download) would carry the whole
           // file: report only what kind of file it is.
           href: /^(data|blob):/i.test(control.href)
-            ? control.href.replace(/^(data:[^;,]*|blob:).*$/is, '$1')
+            ? control.href.slice(0, 5).toLowerCase() === 'blob:'
+              ? 'blob:'
+              : control.href.split(/[;,]/, 1)[0]
             : control.hasAttribute('data-href-private')
               ? control.href.replace(/[?#].*$/s, '')
               : control.href,

@@ -188,7 +188,7 @@ export function parseEventTime(
   timeZone?: string,
   allDay = false
 ): EventTime | null {
-  if (typeof value !== 'string') return null;
+  if (typeof value !== 'string' || value.length > 64) return null;
   const match = ISO.exec(value.trim());
   if (!match) return null;
   const [, y, mo, d, h, mi, s, off] = match;
@@ -436,16 +436,29 @@ export function icsHref(event: CalendarEvent): string | null {
     : null;
 }
 
-/** A plain file name for the event's .ics file, as "live-cooking-night.ics". */
+/**
+ * A plain file name for the event's .ics file, as "live-cooking-night.ics":
+ * the title's letters and digits in words joined by "-", at most 60
+ * characters. Split into words rather than trimmed with a pattern, so it
+ * takes the same short time on any title.
+ */
 export function icsFileName(title: string): string {
-  const slug = title
+  const words = title
+    .slice(0, 500)
     .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 60)
-    .replace(/-+$/, '');
+    .split(/[^a-z0-9]/)
+    .filter(Boolean);
+  let slug = '';
+  for (const word of words) {
+    const next = slug ? `${slug}-${word}` : word;
+    if (next.length > 60) {
+      if (!slug) slug = word.slice(0, 60);
+      break;
+    }
+    slug = next;
+  }
   return `${slug || 'event'}.ics`;
 }
 
