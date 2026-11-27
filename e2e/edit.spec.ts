@@ -82,10 +82,7 @@ const decode = (text: string) =>
 function parse(html: string): Node {
   const root: Node = { tag: '#root', attrs: {}, children: [], parent: null };
   let at = root;
-  const tokens = html
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .split(/(<[^>]+>)/)
-    .filter(Boolean);
+  const tokens = html.split(/(<[^>]+>)/).filter(Boolean);
   for (const token of tokens) {
     if (!token.startsWith('<')) {
       at.children.push(decode(token));
