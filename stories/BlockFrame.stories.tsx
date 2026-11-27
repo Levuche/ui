@@ -439,7 +439,7 @@ export const EveryBlockOneFrame: Story = {
     await step('From the keyboard', async () => {
       const [links] = frames(canvasElement, 'Links');
       links.focus();
-      await expect(links).toHaveAttribute('data-selected');
+      await waitFor(() => expect(links).toHaveAttribute('data-selected'));
       await userEvent.keyboard('{Alt>}{ArrowUp}{/Alt}');
       await expect(order(canvasElement).at(-2)).toBe('Links');
       await waitFor(() => expect(links).toHaveFocus());
