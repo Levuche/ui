@@ -188,11 +188,7 @@ export {
   type EditPaths,
   type EditTarget,
 } from './system/edit';
-export {
-  EditMode,
-  type EditChange,
-  type EditPick,
-} from './system/edit-mode';
+export { EditMode, type EditChange, type EditPick } from './system/edit-mode';
 export {
   BLOCKS,
   BLOCK_GROUPS,

@@ -65,7 +65,9 @@ export function ItemHead({
     ) : null;
   const words = (
     <div className="flex min-w-0 flex-1 flex-col gap-1">
-      {eyebrow ? <Eyebrow {...editable(edit.eyebrow)}>{eyebrow}</Eyebrow> : null}
+      {eyebrow ? (
+        <Eyebrow {...editable(edit.eyebrow)}>{eyebrow}</Eyebrow>
+      ) : null}
       <Heading
         {...editable(edit.title)}
         className="text-block-title m-0 leading-tight font-bold"

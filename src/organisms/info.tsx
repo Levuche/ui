@@ -369,11 +369,7 @@ export function MapCard({
           marks={editable('image', 'picture')}
         />
       ) : null}
-      <ItemHead
-        title={place}
-        headingAs={headingAs}
-        edit={{ title: 'place' }}
-      />
+      <ItemHead title={place} headingAs={headingAs} edit={{ title: 'place' }} />
       {address ? (
         <address className="text-site-text-2 flex gap-2 not-italic">
           <MapPinIcon size={18} className="mt-0.5 flex-none" />

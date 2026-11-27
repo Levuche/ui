@@ -113,9 +113,7 @@ export function ContactForm({
             readOnly={busy}
           />
           <Field
-            label={
-              <span {...editable('labels.message')}>{words.message}</span>
-            }
+            label={<span {...editable('labels.message')}>{words.message}</span>}
             name="message"
             multiline
             rows={4}

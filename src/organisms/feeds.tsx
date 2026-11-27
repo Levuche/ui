@@ -701,7 +701,10 @@ export function NowPlaying({
           {title}
         </span>
         {by ? (
-          <span {...editable('by')} className="text-site-text-2 truncate text-sm">
+          <span
+            {...editable('by')}
+            className="text-site-text-2 truncate text-sm"
+          >
             {by}
           </span>
         ) : null}

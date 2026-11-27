@@ -204,7 +204,7 @@ test('paths join their parts and leave out missing ones', () => {
 
 test('typed text becomes the setting’s value', () => {
   expect(editedText('text', '  Two\nlines \n')).toBe('Two lines');
-  expect(editedText('text', 'No break')).toBe('No break');
+  expect(editedText('text', 'No\u00a0break')).toBe('No break');
   expect(editedText('longText', 'One\r\nTwo\n\n')).toBe('One\nTwo');
 });
 
@@ -287,8 +287,10 @@ for (const block of BLOCKS) {
           Object.values(node.attrs).some((attr) => attr.includes(shown.value))
         );
         if (!onPage) continue;
-        const mark = marks.get(shown.path);
-        if (!mark || mark.attrs[EDIT_KIND_ATTR] !== shown.type) {
+        const marked = pathsOf(shown.value).some(
+          (path) => marks.get(path)?.attrs[EDIT_KIND_ATTR] === shown.type
+        );
+        if (!marked) {
           missing.push(`${shown.path} (${shown.type})`);
         }
         continue;

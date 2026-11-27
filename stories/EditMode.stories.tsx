@@ -22,7 +22,9 @@ type Props = Record<string, unknown>;
 /** `props` with the setting at `path` ("links.0.label") set to `value`. */
 function setAt(props: Props, path: string, value: string): Props {
   const [key, ...rest] = path.split('.');
-  const copy: Props | unknown[] = Array.isArray(props) ? [...props] : { ...props };
+  const copy: Props | unknown[] = Array.isArray(props)
+    ? [...props]
+    : { ...props };
   const here = (copy as Props)[key];
   (copy as Props)[key] = rest.length
     ? setAt((here ?? {}) as Props, rest.join('.'), value)
@@ -65,7 +67,10 @@ function EditorCanvas({ everyBlock = false }: { everyBlock?: boolean }) {
       <EditMode
         onEdit={({ block, path, value }) => {
           if (!block) return;
-          setBlocks((all) => ({ ...all, [block]: setAt(all[block], path, value) }));
+          setBlocks((all) => ({
+            ...all,
+            [block]: setAt(all[block], path, value),
+          }));
         }}
         onPick={onPick}
         readValue={({ block, path }) =>
@@ -136,9 +141,9 @@ export const PickALink: Story = {
     await expect(link).not.toBeNull();
     await userEvent.click(link!, { skipHover: true });
     await waitFor(() =>
-      expect(
-        canvas.getByRole('list', { name: 'Picked' })
-      ).toHaveTextContent('links links.0.href (link)')
+      expect(canvas.getByRole('list', { name: 'Picked' })).toHaveTextContent(
+        'links links.0.href (link)'
+      )
     );
   },
 };

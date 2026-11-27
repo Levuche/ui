@@ -22,7 +22,7 @@ export function Segmented<T extends string>({
   className,
 }: {
   /** What's being chosen, for screen readers, such as "Billing". */
-  legend: string;
+  legend: ReactNode;
   name: string;
   options: SegmentOption<T>[];
   value: T;

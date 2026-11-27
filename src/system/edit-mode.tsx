@@ -122,7 +122,8 @@ export function EditMode({
       }
       box.setAttribute('role', 'textbox');
       box.tabIndex = 0;
-      if (target.kind === 'longText') box.setAttribute('aria-multiline', 'true');
+      if (target.kind === 'longText')
+        box.setAttribute('aria-multiline', 'true');
       const name = calls.current.describe?.(target);
       if (name) box.setAttribute('aria-label', name);
       part.hidden = true;

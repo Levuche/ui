@@ -706,7 +706,12 @@
   /* Captions laid over a picture let clicks through live; here they're edited. */
   pointer-events: auto;
 }
-[data-edit-mode='on'] [data-edit]:is([data-edit-kind='link'], [data-edit-kind='picture'], [data-edit-kind='setting']) {
+[data-edit-mode='on']
+  [data-edit]:is(
+    [data-edit-kind='link'],
+    [data-edit-kind='picture'],
+    [data-edit-kind='setting']
+  ) {
   cursor: pointer;
 }
 @media (hover: hover) {

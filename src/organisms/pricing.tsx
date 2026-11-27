@@ -139,9 +139,7 @@ export function PricingTable({
           new Intl.NumberFormat(locale ?? 'en-US').format(leastSaving)
         )
       : undefined);
-  const noteEdit = words.yearlyNote
-    ? 'labels.yearlyNote'
-    : 'labels.yearlySave';
+  const noteEdit = words.yearlyNote ? 'labels.yearlyNote' : 'labels.yearlySave';
   const name = useId();
   const [shown, setShown] = useControllableState({
     value: period,
@@ -164,7 +162,7 @@ export function PricingTable({
       ) : null}
       {hasYearly ? (
         <Segmented
-          legend={words.billing}
+          legend={<span {...editable('labels.billing')}>{words.billing}</span>}
           name={name}
           value={shown}
           onChange={setShown}
@@ -178,9 +176,7 @@ export function PricingTable({
             },
             {
               value: 'yearly',
-              label: (
-                <span {...editable('labels.yearly')}>{words.yearly}</span>
-              ),
+              label: <span {...editable('labels.yearly')}>{words.yearly}</span>,
               note: yearlyNote ? (
                 <span {...editable(noteEdit)}>{yearlyNote}</span>
               ) : undefined,

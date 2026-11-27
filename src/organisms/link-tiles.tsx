@@ -77,9 +77,7 @@ export function LinkCard({
         imageAlt={imageAlt}
         favicon={favicon}
         look={look}
-        detail={
-          detail ? <span {...editable('detail')}>{detail}</span> : detail
-        }
+        detail={detail ? <span {...editable('detail')}>{detail}</span> : detail}
         trailing={arrow ? 'arrow' : undefined}
         tileStyle={tileStyle}
         newTab={newTab}

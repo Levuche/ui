@@ -124,7 +124,9 @@ export type EditTarget = {
 type ElementLike = {
   closest(selectors: string): {
     getAttribute(name: string): string | null;
-    closest(selectors: string): { getAttribute(name: string): string | null } | null;
+    closest(
+      selectors: string
+    ): { getAttribute(name: string): string | null } | null;
   } | null;
 };
 
@@ -165,7 +167,7 @@ export function editTargetOf(node: unknown): EditTarget | null {
  * as typed, without the empty ones a text box leaves at the end.
  */
 export function editedText(kind: EditKind, typed: string): string {
-  const lines = typed.replace(/\r\n?/g, '\n').replace(/ /g, ' ');
+  const lines = typed.replace(/\r\n?/g, '\n').replace(/\u00a0/g, ' ');
   if (kind === 'longText') return lines.replace(/\n+$/, '').trim();
   return lines.replace(/\s*\n\s*/g, ' ').trim();
 }

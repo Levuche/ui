@@ -214,9 +214,7 @@ export function GoalTracker({
               <span className={item.done ? 'text-site-text-2' : undefined}>
                 <span className="sr-only">
                   <span
-                    {...editable(
-                      item.done ? 'labels.done' : 'labels.notDone'
-                    )}
+                    {...editable(item.done ? 'labels.done' : 'labels.notDone')}
                   >
                     {item.done ? words.done : words.notDone}
                   </span>

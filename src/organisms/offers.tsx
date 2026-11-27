@@ -223,7 +223,12 @@ export function MembershipTier({
           was={was}
           period={period}
           size="lg"
-          edit={{ save: 'saveLabel', value: edit.price, was: edit.was, period: edit.period }}
+          edit={{
+            save: 'saveLabel',
+            value: edit.price,
+            was: edit.was,
+            period: edit.period,
+          }}
         />
       </p>
       <CheckList items={perks} path={edit.perks} />

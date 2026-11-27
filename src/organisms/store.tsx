@@ -109,9 +109,7 @@ export function CourseCard({
                   ? words.oneLesson
                   : words.lessons.replace(
                       '{n}',
-                      new Intl.NumberFormat(language ?? 'en-US').format(
-                        lessons
-                      )
+                      new Intl.NumberFormat(language ?? 'en-US').format(lessons)
                     )}
               </span>
             </span>

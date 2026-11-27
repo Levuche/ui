@@ -427,7 +427,8 @@ export function PackGrid({
                   value={price}
                   was={was}
                   size="sm"
-                  edit={{ save: 'saveLabel',
+                  edit={{
+                    save: 'saveLabel',
                     value: editPath('packs', i, 'price'),
                     was: editPath('packs', i, 'was'),
                   }}
