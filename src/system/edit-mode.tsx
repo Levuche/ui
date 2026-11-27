@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
 import { cn } from './cn';
 import {
   EDITING_ATTR,
@@ -86,7 +86,8 @@ export function EditMode({
     calls.current = { onEdit, onPick, readValue, describe };
   });
 
-  useEffect(() => {
+  // Before the browser paints, as <PreviewMode> does.
+  useLayoutEffect(() => {
     const root = ref.current;
     if (!root || !enabled) return;
     let close: ((keep: boolean) => void) | null = null;

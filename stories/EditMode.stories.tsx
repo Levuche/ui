@@ -142,12 +142,27 @@ export const PickALink: Story = {
       '[data-edit="links.0.href"]'
     );
     await expect(link).not.toBeNull();
-    await userEvent.click(link!, { skipHover: true });
-    await waitFor(() =>
-      expect(canvas.getByRole('list', { name: 'Picked' })).toHaveTextContent(
-        'links links.0.href (link)'
-      )
-    );
+    // A click edit mode didn't stop would follow the link: note it, and
+    // stop it here so the test page stays.
+    const opened: string[] = [];
+    const follow = (event: MouseEvent) => {
+      const href = (event.target as Element).closest?.('a[href]');
+      if (!href || event.defaultPrevented) return;
+      opened.push(href.getAttribute('href') ?? '');
+      event.preventDefault();
+    };
+    window.addEventListener('click', follow);
+    try {
+      await userEvent.click(link!, { skipHover: true });
+      await waitFor(() =>
+        expect(canvas.getByRole('list', { name: 'Picked' })).toHaveTextContent(
+          'links links.0.href (link)'
+        )
+      );
+      await expect(opened).toEqual([]);
+    } finally {
+      window.removeEventListener('click', follow);
+    }
   },
 };
 
