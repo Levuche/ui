@@ -67,6 +67,20 @@ const make = (kind: Kind, props = NEW_BLOCK[kind]): Block => ({
   props,
 });
 
+/*
+ * The editor's own pieces here (the add menu, the undo note and the settings
+ * panel) stand in for the app's, in Levuche's product colours from
+ * @levuche/kit (its light values: the kit isn't loaded in this Storybook).
+ */
+const KIT = {
+  font: 'var(--font-sora, var(--font-sans, system-ui)), sans-serif',
+  text: '#14154a',
+  link: '#24257a',
+  border: '#dde0f3',
+  brand: '#24257a',
+};
+const pill = 'rounded-full border-2 px-4 py-1.5 text-sm font-bold';
+
 function PageEditor() {
   const [blocks, setBlocks] = useState<Block[]>(() =>
     KINDS.map((kind) => ({ id: kind, kind, props: RELEASE_ONE[kind] }))
@@ -187,13 +201,15 @@ function PageEditor() {
                   <div
                     role="group"
                     aria-label="Add a block"
-                    className="flex flex-wrap items-center gap-2 rounded-xl border border-dashed p-3 text-sm"
+                    className="flex flex-wrap items-center gap-2 rounded-[14px] border-2 border-dashed p-3"
+                    style={{ borderColor: KIT.border, fontFamily: KIT.font }}
                   >
                     {KINDS.map((kind) => (
                       <button
                         key={kind}
                         type="button"
-                        className="rounded-lg border px-3 py-1.5"
+                        className={pill}
+                        style={{ borderColor: KIT.border, color: KIT.link }}
                         onClick={() => add(block.id, kind)}
                       >
                         {NAMES[kind]}
@@ -201,7 +217,8 @@ function PageEditor() {
                     ))}
                     <button
                       type="button"
-                      className="px-3 py-1.5 underline"
+                      className="px-3 py-1.5 text-sm font-bold"
+                      style={{ color: KIT.link }}
                       onClick={() => setAdding(null)}
                     >
                       Cancel
@@ -215,7 +232,8 @@ function PageEditor() {
         {deleted ? (
           <div
             role="status"
-            className="flex items-center gap-3 self-center rounded-xl bg-gray-900 px-4 py-2 text-sm text-white"
+            className="flex items-center gap-3 self-center rounded-full px-5 py-2 text-sm text-white"
+            style={{ background: KIT.brand, fontFamily: KIT.font }}
           >
             Deleted {NAMES[deleted.block.kind]}.
             <button
@@ -232,7 +250,12 @@ function PageEditor() {
         {setting ? (
           <section
             aria-label={`${NAMES[setting.kind]} settings`}
-            className="flex flex-col gap-2 rounded-xl border p-4"
+            className="flex flex-col gap-2 rounded-[14px] border-2 p-4"
+            style={{
+              borderColor: KIT.border,
+              color: KIT.text,
+              fontFamily: KIT.font,
+            }}
           >
             <h2 className="m-0 text-base font-semibold">
               {NAMES[setting.kind]} settings
@@ -243,7 +266,8 @@ function PageEditor() {
                 <label key={key} className="flex flex-col gap-1">
                   {key}
                   <input
-                    className="rounded border px-2 py-1"
+                    className="rounded-xl border-2 px-3 py-1.5"
+                    style={{ borderColor: KIT.border }}
                     value={value as string}
                     onChange={(event) =>
                       setBlocks((all) =>
@@ -265,7 +289,8 @@ function PageEditor() {
               ))}
             <button
               type="button"
-              className="self-start underline"
+              className={`${pill} self-start`}
+              style={{ borderColor: KIT.border, color: KIT.link }}
               onClick={() => setSettings(null)}
             >
               Close

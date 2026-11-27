@@ -569,6 +569,11 @@ the block itself needs no `data-edit-block`:
   (Cmd+D) duplicates it; in a text box these keys type as usual.
 - **Dragging.** The grip drags the block; a line shows where it will land,
   and `onDrop` hears the dragged block's id and `before` or `after`.
+- **Colours.** The frame is the editor's, not the creator's page, so it
+  takes Levuche's product colours from `@levuche/kit`'s theme (`--lv-*`),
+  light and dark: the line and the add button are the primary colour, the
+  bar is brand navy, with Sora type and pill shapes like the app's
+  buttons. Without the kit it falls back to the kit's light colours.
 - The buttons' words are in `labels`. `Editor/Block frame` in Storybook is a
   working editor around release 1's blocks, with a test of every button.
 

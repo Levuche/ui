@@ -744,18 +744,36 @@
 /*
  * The editor's frame around each block (BlockFrame): a line round the block,
  * its name and buttons at the top, and a button to add one under it. They
- * show under a pointer, from the keyboard and on the selected block, in the
- * editor's own colours (not the page's), so they read the same on any theme.
+ * show under a pointer, from the keyboard and on the selected block.
+ *
+ * They're the editor's, not the creator's page, so they take Levuche's
+ * product colours from @levuche/kit's theme (--lv-*), which the app loads,
+ * and follow its light and dark modes; the values after each name are the
+ * kit's light ones, for places without the kit, like this Storybook. The
+ * line, the add button and the keyboard ring are the product's primary
+ * (navy, amber in dark mode); the bar is brand navy in both modes, so it
+ * reads on any creator page, with Sora type and pill shapes like the app's
+ * buttons.
  */
 [data-block-frame] {
-  --block-frame-accent: #2563eb;
-  --block-frame-bar: #111827;
-  --block-frame-text: #f9fafb;
-  --block-frame-danger: #f87171;
-  border-radius: 0.75rem;
+  --block-frame-line: var(--lv-primary, #24257a);
+  --block-frame-on-line: var(--lv-on-primary, #ffffff);
+  --block-frame-bar: var(--lv-brand, #24257a);
+  --block-frame-text: var(--lv-on-brand, #ffffff);
+  --block-frame-hover: rgb(255 255 255 / 0.16);
+  /* The kit's dark-mode danger colour: the bar is always navy. */
+  --block-frame-danger: #ff9b9b;
+  --block-frame-shadow: 0 6px 16px rgba(20, 21, 74, 0.28);
+  --block-frame-button: 2rem;
+  border-radius: 14px;
   outline: 2px dashed transparent;
   outline-offset: 6px;
   transition: outline-color 120ms ease;
+}
+@media (pointer: coarse) {
+  [data-block-frame] {
+    --block-frame-button: 2.75rem;
+  }
 }
 [data-block-frame]:focus {
   outline: none;
@@ -764,33 +782,34 @@
   [data-block-frame]:hover {
     outline-color: color-mix(
       in oklab,
-      var(--block-frame-accent) 55%,
+      var(--block-frame-line) 55%,
       transparent
     );
   }
 }
 [data-block-frame]:focus-visible,
 [data-block-frame][data-selected] {
-  outline: 2px solid var(--block-frame-accent);
+  outline: 2px solid var(--block-frame-line);
   outline-offset: 6px;
 }
 [data-block-frame-bar] {
   position: absolute;
   z-index: 20;
-  top: -1.125rem;
+  top: calc(var(--block-frame-button) / -2 - 0.25rem);
   right: 0.5rem;
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.1875rem 0.1875rem 0.1875rem 0.625rem;
-  border-radius: 0.5rem;
+  padding: 0.25rem 0.25rem 0.25rem 0.875rem;
+  border-radius: 999px;
   background: var(--block-frame-bar);
   color: var(--block-frame-text);
-  font:
-    600 0.75rem/1 system-ui,
-    sans-serif;
+  font-family: var(--font-sora, var(--font-sans, system-ui)), sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
   letter-spacing: 0;
-  box-shadow: 0 4px 14px rgb(0 0 0 / 0.18);
+  box-shadow: var(--block-frame-shadow);
   opacity: 0;
   visibility: hidden;
   transition:
@@ -806,9 +825,9 @@
 [data-block-frame-grip] {
   display: grid;
   place-items: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 0.375rem;
+  width: var(--block-frame-button);
+  height: var(--block-frame-button);
+  border-radius: 999px;
   color: inherit;
   background: transparent;
   cursor: pointer;
@@ -818,35 +837,39 @@
 }
 [data-block-frame-bar] button:hover,
 [data-block-frame-grip]:hover {
-  background: rgb(255 255 255 / 0.14);
+  background: var(--block-frame-hover);
 }
 [data-block-frame-bar] button[data-danger]:hover {
   color: var(--block-frame-danger);
 }
 [data-block-frame-bar] button:disabled {
-  opacity: 0.35;
-  cursor: default;
+  opacity: 0.6;
+  cursor: not-allowed;
   background: transparent;
 }
-[data-block-frame-bar] button:focus-visible,
-[data-block-frame-add]:focus-visible {
-  outline: 2px solid var(--block-frame-accent);
+/* The bar is navy in both modes, so its ring is the kit's accent. */
+[data-block-frame-bar] button:focus-visible {
+  outline: 2px solid var(--lv-accent, #ffb627);
   outline-offset: 1px;
+}
+[data-block-frame-add]:focus-visible {
+  outline: 2px solid var(--block-frame-line);
+  outline-offset: 2px;
 }
 [data-block-frame-add] {
   position: absolute;
   z-index: 20;
   left: 50%;
-  bottom: -1.25rem;
+  bottom: calc(var(--block-frame-button) / -2 - 0.25rem);
   translate: -50% 0;
   display: grid;
   place-items: center;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: var(--block-frame-button);
+  height: var(--block-frame-button);
   border-radius: 999px;
-  background: var(--block-frame-accent);
-  color: #fff;
-  box-shadow: 0 4px 14px rgb(0 0 0 / 0.18);
+  background: var(--block-frame-line);
+  color: var(--block-frame-on-line);
+  box-shadow: var(--block-frame-shadow);
   cursor: pointer;
   opacity: 0;
   visibility: hidden;
@@ -876,7 +899,7 @@
   right: 0;
   height: 3px;
   border-radius: 999px;
-  background: var(--block-frame-accent);
+  background: var(--block-frame-line);
   pointer-events: none;
 }
 [data-block-frame][data-drop='before']::after {
@@ -884,4 +907,11 @@
 }
 [data-block-frame][data-drop='after']::after {
   bottom: -0.75rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-block-frame],
+  [data-block-frame-bar],
+  [data-block-frame-add] {
+    transition: none;
+  }
 }
