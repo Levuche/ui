@@ -291,6 +291,9 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** The editor to try by hand: hover, click, drag and use the keyboard. */
+export const TryIt: Story = {};
+
 /** The blocks' names on the page, top to bottom. */
 const order = (root: HTMLElement) =>
   [...root.querySelectorAll('[data-block-frame]')].map((frame) =>
