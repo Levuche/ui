@@ -419,14 +419,17 @@ export const EveryBlockOneFrame: Story = {
         expect(profile).toHaveAttribute('data-drop', 'after')
       );
       profile.dispatchEvent(new DragEvent('drop', below));
-      await expect(order(canvasElement)).toEqual([
-        'Profile',
-        'Picture',
-        'Text',
-        'Social icons',
-        'Text',
-        'Links',
-      ]);
+      // React shows the drop after the event, so wait for it.
+      await waitFor(() =>
+        expect(order(canvasElement)).toEqual([
+          'Profile',
+          'Picture',
+          'Text',
+          'Social icons',
+          'Text',
+          'Links',
+        ])
+      );
       await expect(profile).not.toHaveAttribute('data-drop');
     });
 
