@@ -28,7 +28,9 @@ export const Reviews: Story = {
 export const Questions: StoryObj<typeof FaqList> = {
   render: () => <FaqList items={SAMPLE_FAQ} />,
   play: async ({ canvas, userEvent }) => {
-    const question = canvas.getByText('What do I get in the reel pack?');
+    const question = canvas
+      .getByText('What do I get in the reel pack?')
+      .closest('summary')!;
     const answer = canvas.getByText(/100 prompts/);
     await expect(answer).not.toBeVisible();
     await expectTapSize(question, 'question');

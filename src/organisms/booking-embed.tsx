@@ -158,9 +158,7 @@ export function BookingEmbed({
         {duration ? (
           <li className="inline-flex items-center gap-1.5">
             <ClockIcon size={16} className="flex-none" />
-            <span {...editable('labels.length')} className="sr-only">
-              {words.length}:{' '}
-            </span>
+            <span className="sr-only">{words.length}: </span>
             <span {...editable('duration')}>{duration}</span>
           </li>
         ) : null}

@@ -343,18 +343,12 @@ function RepoBody({
         <span className="inline-flex items-center gap-1">
           <StarIcon size={14} />
           {compact(repo.stars, locale)}
-          <span {...editable('labels.stars')} className="sr-only">
-            {' '}
-            {words.stars}
-          </span>
+          <span className="sr-only"> {words.stars}</span>
         </span>
         <span className="inline-flex items-center gap-1">
           <ForkIcon size={14} />
           {compact(repo.forks, locale)}
-          <span {...editable('labels.forks')} className="sr-only">
-            {' '}
-            {words.forks}
-          </span>
+          <span className="sr-only"> {words.forks}</span>
         </span>
       </p>
     </>

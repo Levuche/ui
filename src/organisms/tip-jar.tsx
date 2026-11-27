@@ -134,13 +134,14 @@ export function TipJar({
           }}
           options={amounts.map((value, i) => ({
             value: String(value),
+            // One span, so the chip's flex layout doesn't split the name.
             label: (
-              <>
+              <span>
                 <span {...editable('currency')}>{currency}</span>
                 <span {...editable(editPath('amounts', i), 'setting')}>
                   {value}
                 </span>
-              </>
+              </span>
             ),
           }))}
         />

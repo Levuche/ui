@@ -392,10 +392,7 @@ export function MessageCard({
         <div className="gap-block-gap flex min-w-0 flex-col">
           {text && !changeable ? (
             <p className="bg-site-surface-2 text-site-text rounded-block-inner m-0 max-w-[90%] self-start rounded-ss-sm px-3.5 py-2.5 text-start text-sm [overflow-wrap:anywhere] whitespace-pre-line">
-              <span className="sr-only">
-                <span {...editable('labels.preview')}>{words.preview}</span>
-                {': '}
-              </span>
+              <span className="sr-only">{words.preview}: </span>
               <span {...editable('message', 'longText')}>{text}</span>
             </p>
           ) : null}

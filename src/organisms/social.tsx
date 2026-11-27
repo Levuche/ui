@@ -204,19 +204,9 @@ export function SocialCard({
     : `labels.${buttonAction ?? info.action}`;
   const countPath =
     countLabel === undefined ? `labels.${info.count}` : 'countLabel';
-  // The name in it is marked as the title is, so it's edited as the title.
-  const on = words.on.replace('{platform}', info.name);
-  const nameAt = on.indexOf('{name}');
-  const context =
-    nameAt < 0 ? (
-      on
-    ) : (
-      <>
-        {on.slice(0, nameAt)}
-        <span {...editable(titlePath)}>{title}</span>
-        {on.slice(nameAt + '{name}'.length)}
-      </>
-    );
+  const context = words.on
+    .replace('{name}', title)
+    .replace('{platform}', info.name);
   const limit = postLimit === 4 ? 4 : 3;
 
   const identity = (

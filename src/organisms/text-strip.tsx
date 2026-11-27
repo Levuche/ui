@@ -108,8 +108,8 @@ export function TextStrip({
         <span {...editable(editPath('items', index))}>{text}</span>
         {separatorMark ? (
           <span
-            {...editable('separator')}
             aria-hidden="true"
+            {...editable('separator')}
             // Full strength, as the separator can be a word (AA contrast).
             // Still, the last phrase needs no separator after it.
             className={cn(!hidden && i === count - 1 && 'motion-reduce:hidden')}

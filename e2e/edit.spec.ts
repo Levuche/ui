@@ -120,6 +120,14 @@ function* walk(node: Node): Generator<Node> {
 const ownText = (node: Node) =>
   node.children.filter((child) => typeof child === 'string').join('');
 
+/** Whether `node` is only read by screen readers, so needs no mark. */
+function unseen(node: Node | null) {
+  for (let at = node; at; at = at.parent) {
+    if (/(^|\s)sr-only(\s|$)/.test(at.attrs.class ?? '')) return true;
+  }
+  return false;
+}
+
 /** The nearest element marked editable, from `node` outwards. */
 function markOf(node: Node | null) {
   for (let at = node; at; at = at.parent) {
@@ -301,6 +309,7 @@ for (const block of BLOCKS) {
         const text = ownText(node);
         return (
           text.includes(shown.value) &&
+          !unseen(node) &&
           !shownAll.some(
             (other) =>
               other.value !== shown.value &&

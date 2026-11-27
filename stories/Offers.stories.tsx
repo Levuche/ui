@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { expect, fn } from 'storybook/test';
 import { BookingCard, LeadMagnet, MembershipCard } from '../src';
 import { expectTapSize } from './expect-tap-size';
+import { wholeText } from './whole-text';
 
 const meta = {
   title: 'Blocks/Offers',
@@ -54,7 +55,7 @@ export const Membership: StoryObj<typeof MembershipCard> = {
   ),
   play: async ({ canvas }) => {
     await expect(canvas.getAllByRole('listitem')).toHaveLength(3);
-    await expect(canvas.getByText('/ month')).toBeVisible();
+    await expect(canvas.getByText(wholeText('/ month'))).toBeVisible();
     await expect(canvas.getByRole('link', { name: 'Join' })).toHaveAttribute(
       'href',
       'https://example.com/join'

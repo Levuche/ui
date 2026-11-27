@@ -117,7 +117,8 @@ export const TypeInPlace: Story = {
     await userEvent.click(name!);
     const box = await canvas.findByRole('textbox', { name: 'Edit name' });
     await expect(box).toHaveFocus();
-    await userEvent.keyboard('{Control>}a{/Control}Asha M.{Enter}');
+    await userEvent.clear(box);
+    await userEvent.keyboard('Asha M.{Enter}');
     await waitFor(() =>
       expect(canvas.getByText('Asha M.')).toBeInTheDocument()
     );
@@ -126,7 +127,9 @@ export const TypeInPlace: Story = {
     // Escape puts the words back.
     const label = canvas.getByText('My cookbook');
     await userEvent.click(label);
-    await userEvent.keyboard('{Control>}a{/Control}Something else{Escape}');
+    const second = await canvas.findByRole('textbox');
+    await userEvent.clear(second);
+    await userEvent.keyboard('Something else{Escape}');
     await expect(canvas.getByText('My cookbook')).toBeInTheDocument();
     await expect(canvas.queryByText('Something else')).toBeNull();
   },
@@ -151,9 +154,10 @@ export const PickALink: Story = {
 /** Every editable part can be reached with Tab and opened with Enter. */
 export const FromTheKeyboard: Story = {
   play: async ({ canvas, canvasElement }) => {
+    // All but those screen readers skip, such as a picture's placeholder.
     const parts = [
       ...canvasElement.querySelectorAll<HTMLElement>('[data-edit]'),
-    ];
+    ].filter((part) => !part.closest('[aria-hidden="true"], .sr-only'));
     await expect(parts.length).toBeGreaterThan(3);
     for (const part of parts) await expect(part.tabIndex).toBe(0);
     const tagline = canvasElement.querySelector<HTMLElement>(

@@ -34,6 +34,9 @@ export type EditPick = EditTarget & {
 /** Marks the parts edit mode made focusable, so it can undo that. */
 const TAB_ATTR = 'data-edit-tab';
 
+/** Parts screen readers skip, which mustn't take focus. */
+const UNREAD = '[aria-hidden="true"], .sr-only';
+
 /** Elements a keyboard already reaches. */
 const FOCUSABLE =
   'a[href], button, input, select, textarea, summary, [tabindex]';
@@ -88,10 +91,11 @@ export function EditMode({
     if (!root || !enabled) return;
     let close: ((keep: boolean) => void) | null = null;
 
-    // Every editable part in the tab order, also those a block adds later.
+    // Every editable part in the tab order, also those a block adds later,
+    // but none that screen readers skip: a hidden part can't take focus.
     const reach = () => {
       for (const part of root.querySelectorAll<HTMLElement>(`[${EDIT_ATTR}]`)) {
-        if (part.matches(FOCUSABLE)) continue;
+        if (part.matches(FOCUSABLE) || part.closest(UNREAD)) continue;
         part.tabIndex = 0;
         part.setAttribute(TAB_ATTR, '');
       }
@@ -115,11 +119,7 @@ export function EditMode({
       box.setAttribute(EDITING_ATTR, target.kind);
       if (start !== undefined) box.textContent = start;
       const before = start ?? part.innerText;
-      try {
-        box.contentEditable = 'plaintext-only';
-      } catch {
-        box.contentEditable = 'true';
-      }
+      box.contentEditable = 'true';
       box.setAttribute('role', 'textbox');
       box.tabIndex = 0;
       if (target.kind === 'longText')
@@ -165,6 +165,12 @@ export function EditMode({
       });
       // A click in the box is typing, not a click on the block.
       box.addEventListener('click', (event) => event.stopPropagation());
+      // Words only: what's pasted keeps none of its formatting.
+      box.addEventListener('paste', (event) => {
+        event.preventDefault();
+        const text = event.clipboardData?.getData('text/plain') ?? '';
+        document.execCommand('insertText', false, text);
+      });
     };
 
     const open = (node: EventTarget | null) => {

@@ -3,6 +3,7 @@ import { expect, userEvent, within } from 'storybook/test';
 import { EventCard } from '../src';
 import { expectTapSize } from './expect-tap-size';
 import { onScreen } from './screens';
+import { wholeText } from './whole-text';
 
 /*
  * One event with its date badge, how far away it is and an "Add to
@@ -68,7 +69,9 @@ export const Wide: Story = {
     await expect(time).toHaveAttribute('datetime', '2027-03-15T19:00:00.000Z');
     await expect(time.textContent).toMatch(/^Mon, Mar 15, 2027, 7:00/);
     await expect(canvas.getByText('UTC')).toBeVisible();
-    await expect(canvas.getByText('The Old Hall, Leeds')).toBeVisible();
+    await expect(
+      canvas.getByText(wholeText('The Old Hall, Leeds'))
+    ).toBeVisible();
 
     const tickets = canvas.getByRole('link', {
       name: /^Get tickets ?: Live cooking night$/,
