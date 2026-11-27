@@ -1,5 +1,6 @@
 import { cn } from '../system/cn';
 import { imageAttrs, toImageSource, type ImageSrc } from '../system/image';
+import type { EditMarks } from '../system/edit';
 
 /**
  * First letters of up to two words: "Desi Origins" becomes "DO". Empty for
@@ -27,6 +28,7 @@ export function Avatar({
   initialsFont = 'body',
   alt = '',
   className,
+  marks,
 }: {
   name: string;
   src?: ImageSrc | null;
@@ -40,6 +42,8 @@ export function Avatar({
   initialsFont?: 'body' | 'display';
   alt?: string;
   className?: string;
+  /** Marks the picture for edit mode, as editable(path, 'picture'). */
+  marks?: EditMarks;
 }) {
   const style = { width: size, height: size, fontSize: Math.round(size / 3) };
   const classes = cn(
@@ -57,6 +61,7 @@ export function Avatar({
   if (source) {
     return (
       <img
+        {...marks}
         {...imageAttrs(source, `${size}px`)}
         alt={alt}
         width={size}
@@ -68,6 +73,7 @@ export function Avatar({
   }
   return (
     <span
+      {...marks}
       {...(alt ? { role: 'img', 'aria-label': alt } : { 'aria-hidden': true })}
       style={style}
       className={cn(

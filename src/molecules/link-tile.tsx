@@ -8,6 +8,7 @@ import { ArrowRightIcon } from '../atoms/icons';
 import { SiteLink } from '../atoms/link';
 import { Thumb } from '../atoms/thumb';
 import { cn } from '../system/cn';
+import { editable, type EditPaths } from '../system/edit';
 import type { LinkBehavior } from '../system/href';
 import { cssImageUrl, type ImageSrc } from '../system/image';
 import { isSafeColor } from '../system/theme';
@@ -134,6 +135,7 @@ export function LinkTile({
   look,
   tint,
   action = 'link_click',
+  edit = {},
   children,
   className,
   style,
@@ -171,6 +173,11 @@ export function LinkTile({
      */
     tint?: string;
     action?: string;
+    /**
+     * The setting paths of the link and its picture, for edit mode (see
+     * edit.ts). Mark the words and `detail` where they're passed in.
+     */
+    edit?: EditPaths<'href' | 'image'>;
     ref?: Ref<HTMLAnchorElement>;
   }) {
   const shape: LinkTileVariant = LINK_TILE_VARIANTS.includes(variant)
@@ -182,6 +189,7 @@ export function LinkTile({
   const tinted = shape === 'chip' || (shape === 'icon' && Boolean(tint));
   const link = {
     ...props,
+    ...editable(edit.href, 'link'),
     href,
     action,
     'data-lift': '',
@@ -207,6 +215,7 @@ export function LinkTile({
           <Thumb
             src={mark.src}
             alt={imageAlt}
+            marks={editable(edit.image, 'picture')}
             ratio="square"
             sizes="24px"
             className="size-6"
@@ -248,6 +257,7 @@ export function LinkTile({
           <Thumb
             src={mark.src}
             alt={imageAlt}
+            marks={editable(edit.image, 'picture')}
             sizes="(min-width: 768px) 288px, 50vw"
             className="absolute inset-0 size-full rounded-none"
           />
@@ -255,6 +265,7 @@ export function LinkTile({
           <Thumb
             src={mark.src}
             alt={imageAlt}
+            marks={editable(edit.image, 'picture')}
             ratio="square"
             fit="contain"
             sizes="160px"
@@ -310,6 +321,7 @@ export function LinkTile({
         <Thumb
           src={mark.src}
           alt={imageAlt}
+          marks={editable(edit.image, 'picture')}
           ratio={wide ? 'video' : 'square'}
           sizes={wide ? '96px' : '48px'}
           className={cn('rounded-block-inner flex-none', markSize)}
