@@ -4,6 +4,82 @@ What changed in each release of `@levuche/ui`, newest first. Each release
 pull request into `dev` adds its section here, with anything an app must
 change when it moves to that version.
 
+## 0.5.0 (2026-11-27)
+
+Every open item from the block review, and four blocks that had the same
+problem, so each rule now holds in every block, with tests that every
+block works with every setting and state.
+
+### Changed
+
+- `LogoMarquee` takes `logos` and `copies` (arrays of list items) in place
+  of `children`. Like `TextStrip`, it repeats the logos until each half of
+  the row is as wide as the strip, so a few small logos leave no gap, and
+  it also holds still while a logo has keyboard focus. Apps that render
+  `LogoMarquee` themselves must pass the two arrays; `LogoStrip` is
+  unchanged.
+- Titles are headings everywhere. `LogoStrip`, `ImageCarousel`,
+  `TileGallery`, `Countdown` and `NewsletterBand` draw their title as an
+  `h3` (set with `headingAs`) where some used a `p` or `strong`. Titles
+  inside a block (`Timeline`, `RepoList`, the plan names in
+  `PricingTable`, the feeds) use `subHeading`: one level under the block's
+  heading, and a `p` below `h5`.
+- Nothing loops forever without a pause button (WCAG 2.2.2). The gradient
+  background drifts across once, over 4.8 seconds. The live dot pulses
+  twice and `ActionCard`'s ping runs four times. `TextStrip` holds still
+  while a phrase has keyboard focus, as `LogoStrip` does.
+- Status lines are in the page from the start, so screen readers announce
+  them: `Countdown`'s "done" line and `LockedLink`'s age answer.
+- Privacy notes say what each block loads. `NowPlaying` loads nothing.
+  `FeaturedLink`, `LogoTile` and `LinkChip` show a preview the app fetched,
+  as `LinkCard` does. `VideoTile` and `TileGallery` list `video-host`.
+- `PricingTable` works out the yearly note from the prices (the least
+  saving across plans, as "Save 16%"), unless `yearlyNote` is set.
+- Accessibility notes in the registry match what each block does
+  (`CreatorHeader`, `TextStrip`, `ImageGrid`, `ContactForm`, `MessageCard`,
+  `FeaturedPack`, `PackCheckout`, `CreditPack`, `EventList`).
+
+### Added
+
+- `VideoTile` and `TileGallery` take `consent` and `consentLabels`. With
+  `consent={false}`, a video on another site downloads nothing until play
+  and shows the same notice as the audio blocks (`MediaNotice`).
+  `video-host` is a new `OUTSIDE_SERVICES` entry.
+- Words in all six languages: `localTimeCities` (LocalTime's city names),
+  `props.reel` (a `ReelGrid` reel with no label) and
+  `pricingTable.yearlySave`. Apps with their own word lists add these keys.
+- `subHeading`, `yearlySaving`, `starFills` and `contributionCells` are
+  exported. `Rating` fills part of a star for a part score.
+- `AudioBar` takes `href`, so `PodcastEpisodes` links each episode's title.
+  `MapCard` shows its picture when there's no map. `QrCode` and `EmbedBody`
+  show their detail line when there's no title.
+- A `CreatorFooter` story with checks.
+- Tests that every block works with every setting, each way. On the server
+  (`e2e/every-setting.spec.ts`), each block renders with only what's
+  required, with everything set, and with each choice, toggle, number,
+  empty list and long line, with no React warnings; every setting and look
+  setting has to change the page; and each loading, failed, sending, sent,
+  sold-out and unavailable state has to show. In the browser
+  (`stories/EverySetting.stories.tsx`), each group of blocks is checked for
+  accessibility with everything set and mounted each of those ways with its
+  effects running, and the two settings that only act in a browser,
+  `YouTubeVideo`'s `start` and `StatsRow`'s `animate`, are checked there.
+
+### Fixed
+
+- `TextStrip` draws its separator at full strength. At 70% it failed AA
+  contrast on the band colour when the separator was a word.
+- `ContributionGraph` pads a short first week at the start and a short last
+  week at the end, so days line up under their weekday.
+- `TechStack` logos load at their drawn size.
+
+### An app must change
+
+- An app that renders `LogoMarquee` itself passes `logos` and `copies`
+  (arrays of list items) in place of `children`. `LogoStrip` is unchanged.
+- An app with its own word lists adds the new keys: `localTimeCities`,
+  `props.reel` and `pricingTable.yearlySave`.
+
 ## 0.4.0 (2026-11-26)
 
 New calendar and ticket blocks, the creator's name in its own style, a pause

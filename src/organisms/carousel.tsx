@@ -14,6 +14,7 @@ import { SiteLinkButton } from '../atoms/button';
 import { ChevronLeftIcon, ChevronRightIcon } from '../atoms/icons';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { MotionToggle } from '../molecules/motion-toggle';
+import type { HeadingTag } from '../molecules/item-head';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { useControllableState } from '../system/state';
@@ -71,6 +72,7 @@ const watchLessMotion = (change: () => void) => {
 export function ImageCarousel({
   slides,
   title,
+  headingAs: Heading = 'h3',
   ratio = 'video',
   index,
   defaultIndex = 0,
@@ -85,6 +87,8 @@ export function ImageCarousel({
 }: BlockRootProps & {
   slides: CarouselSlide[];
   title?: ReactNode;
+  /** The title's level on the page. `p` when it's only for looks. */
+  headingAs?: HeadingTag;
   ratio?: ThumbRatio;
   index?: number;
   defaultIndex?: number;
@@ -218,7 +222,9 @@ export function ImageCarousel({
       onKeyDown={onKeyDown}
       {...root}
     >
-      {title ? <p className="text-block-title m-0 font-bold">{title}</p> : null}
+      {title ? (
+        <Heading className="text-block-title m-0 font-bold">{title}</Heading>
+      ) : null}
       <div className="relative">
         {/* A scrolling area must be reachable with the keyboard (WCAG 2.1.1). */}
         <div

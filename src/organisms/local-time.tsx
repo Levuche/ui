@@ -7,7 +7,6 @@ import { useHydrated, useVisitorLocale } from '../system/locale';
 import { usePageWords } from '../system/page-words';
 import { WORDS_EN } from '../system/words/en';
 import {
-  LOCAL_TIME_CITIES,
   describeOffset,
   formatLocalDate,
   isLocalTimeCity,
@@ -170,10 +169,11 @@ export function LocalTime({
   visitorTimeZone?: string;
 }) {
   const words = usePageWords('localTime', labels);
+  const cities = usePageWords('localTimeCities');
   const zone = localTimeZone(city, timeZone);
+  // The creator's own name for the city, else its name in the page's language.
   const place =
-    cityName?.trim() ||
-    (isLocalTimeCity(city) ? LOCAL_TIME_CITIES[city].name : zone);
+    cityName?.trim() || (isLocalTimeCity(city) ? cities[city] : zone);
   const shownLocale = useVisitorLocale(locale);
   const hydrated = useHydrated();
   const timeRef = useRef<HTMLParagraphElement>(null);

@@ -8,6 +8,9 @@ import {
   type VideoLabels,
   type VideoTrack,
 } from '../molecules/video-frame';
+import type { HeadingTag } from '../molecules/item-head';
+import { MediaNotice } from '../molecules/media-notice';
+import type { ConsentLabels } from '../system/privacy';
 import { cn } from '../system/cn';
 import {
   isOverCaption,
@@ -68,7 +71,10 @@ export function TileGallery({
   columns = 3,
   captionStyle = 'chip',
   title,
+  headingAs: Heading = 'h3',
   labels,
+  consent,
+  consentLabels,
   ...root
 }: BlockRootProps & {
   items: GalleryItem[];
@@ -77,13 +83,26 @@ export function TileGallery({
   /** Where captions sit: a label or a bar over the tile, or under it. */
   captionStyle?: CaptionStyle;
   title?: ReactNode;
+  /** The title's level on the page. `p` when it's only for looks. */
+  headingAs?: HeadingTag;
   /** The words on the video buttons. */
   labels?: Partial<VideoLabels>;
+  /**
+   * Whether the visitor agreed to the sites the video tiles are on, from the
+   * page's cookie notice. False shows a line on what pressing play shares,
+   * and no video downloads or loops before it; leave it out on pages that
+   * don't ask. Videos on the page's own site need none.
+   */
+  consent?: boolean;
+  /** `load` isn't used: the play button loads the video. */
+  consentLabels?: Partial<ConsentLabels>;
 }) {
   const over = isOverCaption(captionStyle);
   return (
     <Block name="tile-gallery" defaults={{ tone: 'plain' }} {...root}>
-      {title ? <p className="text-block-title m-0 font-bold">{title}</p> : null}
+      {title ? (
+        <Heading className="text-block-title m-0 font-bold">{title}</Heading>
+      ) : null}
       <div className="@container">
         <ul
           className={cn(
@@ -113,6 +132,7 @@ export function TileGallery({
                     caption={item.caption}
                     captionStyle={captionStyle}
                     labels={labels}
+                    consent={consent}
                   />
                 </li>
               );
@@ -160,6 +180,11 @@ export function TileGallery({
           })}
         </ul>
       </div>
+      <MediaNotice
+        sources={items.flatMap((item) => (item.video ? [item.video] : []))}
+        consent={consent}
+        consentLabels={consentLabels}
+      />
     </Block>
   );
 }

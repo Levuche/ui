@@ -9,7 +9,7 @@ import {
   AddToCalendar,
   type CalendarLabels,
 } from '../molecules/add-to-calendar';
-import { ItemHead, type HeadingTag } from '../molecules/item-head';
+import { ItemHead, subHeading, type HeadingTag } from '../molecules/item-head';
 import { LiveData } from '../molecules/live-data';
 import { PlayFrame } from '../molecules/play-frame';
 import { Rating } from '../molecules/rating';
@@ -19,9 +19,6 @@ import { columnSizes, type ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
 import { usePageLocale, usePageWords } from '../system/page-words';
 import { OUTSIDE_SERVICES, type ConsentLabels } from '../system/privacy';
-
-const subHeading = (tag: HeadingTag): HeadingTag =>
-  tag === 'h2' ? 'h3' : tag === 'h3' ? 'h4' : 'p';
 
 /* ------------------------------------------------------------ LatestVideos */
 
@@ -304,7 +301,7 @@ export function LiveStatus({
                   {status.live ? (
                     <span
                       aria-hidden
-                      className="bg-site-on-button size-2 rounded-full motion-safe:animate-pulse"
+                      className="bg-site-on-button size-2 rounded-full motion-safe:animate-[levuche-live-pulse_2s_cubic-bezier(0.4,0,0.6,1)_2]"
                     />
                   ) : null}
                   {status.live ? words.live : words.offline}

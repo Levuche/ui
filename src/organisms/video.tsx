@@ -11,6 +11,8 @@ import { isSafeMediaSrc } from '../system/href';
 import type { ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
 import { usePageWords } from '../system/page-words';
+import { MediaNotice } from '../molecules/media-notice';
+import type { ConsentLabels } from '../system/privacy';
 
 export type VideoTileLabels = VideoLabels & {
   /** The link to the video's words. */
@@ -37,6 +39,8 @@ export function VideoTile({
   captionStyle = 'below',
   transcriptHref,
   labels,
+  consent,
+  consentLabels,
   ...root
 }: BlockRootProps & {
   /** The video file's address. */
@@ -57,6 +61,15 @@ export function VideoTile({
   /** A page with the video's words, for visitors who can't watch or hear it. */
   transcriptHref?: string;
   labels?: Partial<VideoTileLabels>;
+  /**
+   * Whether the visitor agreed to the site the video is on, from the page's
+   * cookie notice. False shows a line on what pressing play shares, and
+   * nothing downloads or loops before it; leave it out on pages that don't
+   * ask. A video on the page's own site needs none.
+   */
+  consent?: boolean;
+  /** `load` isn't used: the play button loads the video. */
+  consentLabels?: Partial<ConsentLabels>;
 }) {
   const words = usePageWords('videoTile', labels);
   if (!isSafeMediaSrc(src, 'video')) return null;
@@ -72,6 +85,7 @@ export function VideoTile({
         caption={caption}
         captionStyle={captionStyle}
         labels={words}
+        consent={consent}
         className={ratio === 'tall' ? 'mx-auto w-full max-w-90' : undefined}
       />
       {transcriptHref ? (
@@ -83,6 +97,11 @@ export function VideoTile({
           {words.transcript}
         </SiteLink>
       ) : null}
+      <MediaNotice
+        sources={[src]}
+        consent={consent}
+        consentLabels={consentLabels}
+      />
     </Block>
   );
 }

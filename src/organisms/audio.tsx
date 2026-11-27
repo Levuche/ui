@@ -7,7 +7,8 @@ import { LiveData } from '../molecules/live-data';
 import type { LiveProps } from '../system/live';
 import type { ImageSrc } from '../system/image';
 import { usePageWords } from '../system/page-words';
-import { consentNotice, siteName, type ConsentLabels } from '../system/privacy';
+import { MediaNotice } from '../molecules/media-notice';
+import type { ConsentLabels } from '../system/privacy';
 
 type AudioConsent = {
   /**
@@ -19,28 +20,6 @@ type AudioConsent = {
   /** `load` isn't used: the play button loads the audio. */
   consentLabels?: Partial<ConsentLabels>;
 };
-
-/**
- * The line under a player, when the visitor hasn't agreed to the sites its
- * audio is on. Nothing downloads before play, so play is the agreement.
- */
-function AudioNotice({
-  sources,
-  consent,
-  consentLabels,
-}: AudioConsent & { sources: string[] }) {
-  const consentWords = usePageWords('consent', consentLabels);
-  if (consent !== false) return null;
-  const sites = [
-    ...new Set(sources.map(siteName).filter((s): s is string => !!s)),
-  ];
-  if (!sites.length) return null;
-  return (
-    <p data-consent="pending" className="text-site-text-2 m-0 text-sm">
-      {consentNotice(sites.join(', '), consentWords)}
-    </p>
-  );
-}
 
 /** One track: play, pause, a bar to move through it, and the time. */
 export function AudioPlayer({
@@ -80,7 +59,7 @@ export function AudioPlayer({
         transcriptHref={transcriptHref}
         labels={labels}
       />
-      <AudioNotice
+      <MediaNotice
         sources={[src]}
         consent={consent}
         consentLabels={consentLabels}
@@ -95,7 +74,7 @@ export type PodcastEpisode = {
   audioUrl: string;
   /** As the visitor reads it, such as "12 Nov 2026 · 42 min". */
   detail?: string;
-  /** The episode's own page. */
+  /** The episode's own page; the episode's title links there. */
   href?: string;
   image?: ImageSrc | null;
   /** A page with the episode's words. */
@@ -153,12 +132,13 @@ export function PodcastEpisodes({
                     detail={episode.detail}
                     image={episode.image}
                     transcriptHref={episode.transcriptUrl}
+                    href={episode.href}
                     labels={labels}
                   />
                 </li>
               ))}
             </ul>
-            <AudioNotice
+            <MediaNotice
               sources={episodes.slice(0, limit).map((e) => e.audioUrl)}
               consent={consent}
               consentLabels={consentLabels}

@@ -374,7 +374,7 @@ export function EventCard({
               {state === 'live' ? (
                 <span
                   aria-hidden
-                  className="bg-site-on-button size-2 rounded-full motion-safe:animate-pulse"
+                  className="bg-site-on-button size-2 rounded-full motion-safe:animate-[levuche-live-pulse_2s_cubic-bezier(0.4,0,0.6,1)_2]"
                 />
               ) : null}
               {chip}

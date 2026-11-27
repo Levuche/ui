@@ -263,11 +263,13 @@ export function LockedLink({
         ) : null}
 
         {mode === 'age' ? (
-          denied ? (
-            <p role="status" className="m-0">
-              {fill(words.ageDenied, minAge)}
-            </p>
-          ) : target ? (
+          // In the page from the start, so the refusal is read out.
+          <p role="status" className="m-0 empty:sr-only">
+            {denied ? fill(words.ageDenied, minAge) : null}
+          </p>
+        ) : null}
+        {mode === 'age' ? (
+          denied ? null : target ? (
             <div className="flex flex-col gap-2">
               <SiteLinkButton
                 href={target}

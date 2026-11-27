@@ -222,7 +222,7 @@ export function PackCheckout({
 }
 
 /**
- * The featured pack: big picture, title, what's in it, price and buy. With
+ * The featured pack: big picture, title, a line about it, price and buy. With
  * `sell` the button checks out through BuildBase; with `href` it links to a
  * checkout on another site.
  */

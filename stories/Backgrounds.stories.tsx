@@ -121,7 +121,7 @@ export const GradientInACreatorsOwnTheme: Story = {
 };
 
 /**
- * A gradient that drifts slowly. It stands still for visitors who ask their
+ * A gradient that drifts across once, in under five seconds. It stands still for visitors who ask their
  * device for less motion.
  */
 export const MovingGradient: Story = {

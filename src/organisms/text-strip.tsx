@@ -100,11 +100,9 @@ export function TextStrip({
         {separatorMark ? (
           <span
             aria-hidden="true"
-            className={cn(
-              'opacity-70',
-              // Still, the last phrase needs no separator after it.
-              !hidden && i === count - 1 && 'motion-reduce:hidden'
-            )}
+            // Full strength, as the separator can be a word (AA contrast).
+            // Still, the last phrase needs no separator after it.
+            className={cn(!hidden && i === count - 1 && 'motion-reduce:hidden')}
           >
             {separatorMark}
           </span>
@@ -129,7 +127,7 @@ export function TextStrip({
           <ul
             ref={list}
             className={cn(
-              'text-block-title m-0 flex w-max list-none gap-4 p-0 pe-4 font-bold group-hover:[animation-play-state:paused] motion-safe:animate-[levuche-marquee_var(--marquee)_linear_infinite] motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-y-1 motion-reduce:pe-0 rtl:[--marquee-to:50%]'
+              'text-block-title m-0 flex w-max list-none gap-4 p-0 pe-4 font-bold group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-safe:animate-[levuche-marquee_var(--marquee)_linear_infinite] motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-y-1 motion-reduce:pe-0 rtl:[--marquee-to:50%]'
             )}
             style={{
               ['--marquee' as string]: `${motionSeconds(speed, 16) * repeats}s`,

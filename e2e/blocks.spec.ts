@@ -317,7 +317,7 @@ for (const [id, expected] of Object.entries(THEMES)) {
         '03days05hours00minutes00seconds'
       );
       await promo.getByRole('button', { name: 'Copy code' }).click();
-      await expect(promo.getByRole('status')).toHaveText('Copied ORIGINS10');
+      await expect(said(promo, 'Copied')).toHaveText('Copied ORIGINS10');
       expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
         'ORIGINS10'
       );

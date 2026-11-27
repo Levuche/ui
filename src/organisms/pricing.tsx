@@ -2,8 +2,9 @@
 
 import { useId, type ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
-import { ItemHead, type HeadingTag } from '../molecules/item-head';
+import { ItemHead, subHeading, type HeadingTag } from '../molecules/item-head';
 import { Segmented } from '../molecules/segmented';
+import { yearlySaving } from '../molecules/price';
 import { cn } from '../system/cn';
 import type { LinkBehavior } from '../system/href';
 import { useControllableState } from '../system/state';
@@ -11,7 +12,7 @@ import type { SellProps } from '../molecules/sell-button';
 import type { SellRef, SellState } from '../system/sell';
 import { MembershipCard } from './offers';
 import { WORDS_EN } from '../system/words/en';
-import { usePageWords } from '../system/page-words';
+import { usePageLocale, usePageWords } from '../system/page-words';
 
 /**
  * What a plan checks out for its yearly price: `yearlySell`, or the monthly
@@ -63,8 +64,13 @@ export type PricingTableLabels = {
   billing: string;
   monthly: string;
   yearly: string;
-  /** Shown beside Yearly, such as "Save 20%". */
+  /**
+   * Shown beside Yearly, such as "Save 20%". Left out, `yearlySave` with
+   * the least any plan saves by paying yearly, when the prices say.
+   */
   yearlyNote?: ReactNode;
+  /** {n} is the percent saved. */
+  yearlySave: string;
   month: string;
   year: string;
 };
@@ -116,6 +122,22 @@ export function PricingTable({
     headingAs?: HeadingTag;
   }) {
   const words = usePageWords('pricingTable', labels);
+  const locale = usePageLocale();
+  // What every yearly plan saves at least, so the note is true for each.
+  const savings = plans.map((plan) =>
+    plan.yearlyPrice ? yearlySaving(plan.price, plan.yearlyPrice) : undefined
+  );
+  const leastSaving = savings.some((saving) => saving === null)
+    ? null
+    : Math.min(...savings.filter((saving): saving is number => saving != null));
+  const yearlyNote =
+    words.yearlyNote ??
+    (leastSaving !== null && Number.isFinite(leastSaving)
+      ? words.yearlySave.replace(
+          '{n}',
+          new Intl.NumberFormat(locale ?? 'en-US').format(leastSaving)
+        )
+      : undefined);
   const name = useId();
   const [shown, setShown] = useControllableState({
     value: period,
@@ -125,8 +147,7 @@ export function PricingTable({
   const hasYearly = plans.some((plan) => plan.yearlyPrice);
   const yearly = hasYearly && shown === 'yearly';
   const cols = Math.min(4, Math.max(2, plans.length)) as 2 | 3 | 4;
-  const planHeading =
-    headingAs === 'h2' ? 'h3' : headingAs === 'h3' ? 'h4' : 'p';
+  const planHeading = subHeading(headingAs);
   return (
     <Block name="pricing-table" {...root}>
       {title ? (
@@ -141,7 +162,7 @@ export function PricingTable({
           className="self-center"
           options={[
             { value: 'monthly', label: words.monthly },
-            { value: 'yearly', label: words.yearly, note: words.yearlyNote },
+            { value: 'yearly', label: words.yearly, note: yearlyNote },
           ]}
         />
       ) : null}

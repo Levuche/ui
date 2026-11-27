@@ -57,7 +57,7 @@ Install a released version straight from GitHub (no npm account or token
 needed):
 
 ```bash
-npm install github:Levuche/ui#v0.4.0
+npm install github:Levuche/ui#v0.5.0
 ```
 
 The package ships TypeScript source. In a Next.js app:
@@ -205,7 +205,7 @@ over any tone, corners and card style, and inside `withBlockLook` and
 creator's theme and dark mode; a creator never types CSS.
 
 ```tsx
-// Two or three theme colours, at any angle. `move` drifts it slowly.
+// Two or three theme colours, at any angle. `move` drifts it across once.
 <BookingCard background={{ type: 'gradient', stops: ['accent', 'band'], angle: 135 }} />
 
 // lines, rings, dots, grid or waves, in a theme colour, 12% strong (30% at most).
