@@ -12,6 +12,7 @@ import {
   type EditPick,
 } from '../src';
 import { RegistrySamples, SAMPLE_PICTURE } from './block-samples';
+import { SAMPLE_SOCIALS } from './sample-page';
 
 /*
  * Edit mode, as the page editor (Levuche/app) will use it: a creator clicks a
@@ -209,10 +210,8 @@ const RELEASE_ONE: Record<string, Props> = {
     wordRing: 'cook · write · share · ',
   },
   social: {
-    links: [
-      { href: 'https://www.instagram.com/asha', label: 'Instagram' },
-      { href: 'https://www.youtube.com/@asha', label: 'YouTube' },
-    ],
+    // The icons come from the app, by each account's address.
+    links: SAMPLE_SOCIALS.slice(0, 2),
     label: 'Asha on social media',
   },
   links: {
