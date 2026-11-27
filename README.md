@@ -478,6 +478,50 @@ app's own client blocks and `renderBuy` buttons can do the same.
 `Editor/Preview mode` in Storybook presses every link, button and form of
 every block on the gallery and in the registry in preview mode.
 
+### Editing a block on the page
+
+In the page editor a creator can also edit a block where it is: click its
+words and type, or click a link or a picture and change it beside the
+block. Wrap the canvas in `<EditMode>` in place of `<PreviewMode>` (it is a
+preview too, so links and forms are stopped the same way) and give each
+block `data-edit-block` with its id:
+
+```tsx
+'use client';
+import { EditMode, SitePage } from '@levuche/ui';
+
+<EditMode
+  onEdit={({ block, path, value }) => save(block, path, value)}
+  onPick={({ block, path, kind, element }) => openPanel(block, path, element)}
+  readValue={({ block, path }) => settingOf(block, path)}
+>
+  <SitePage>
+    <LinkList data-edit-block={block.id} {...block.props} />
+  </SitePage>
+</EditMode>;
+```
+
+- **Words are typed in place.** A click (or Enter or F2 on a part reached
+  with Tab) opens a text box in the same place and look. Enter keeps a line
+  of text, Ctrl+Enter or Cmd+Enter keeps several lines, leaving the box
+  keeps it too, and Escape puts it back. `onEdit` hears the block, the
+  setting's path (`title`, `links.0.label`, `address.city`,
+  `labels.subscribe`, as the registry names them) and the new value, only
+  when it changed. The box is a copy of the part, laid over it, so React's
+  own elements are never changed.
+- **Links, pictures and other settings are picked.** `onPick` hears the
+  block, the path, its kind (`link`, `picture` or `setting`) and the element,
+  so the editor can open what sets it next to it.
+- **`readValue`** gives a box the text to start with, where the page shows
+  it otherwise: rich text, words cut short, or a part that's empty.
+
+Blocks only mark what can be edited, with `editable(path, kind)` from
+`src/system/edit.ts`, which sets `data-edit` and `data-edit-kind`; shared
+pieces such as `ItemHead`, `Price` and `LinkTile` take an `edit` prop with
+their parts' paths. On a live page the marks do nothing. `e2e/edit.spec.ts`
+renders every block with every setting set and checks that every word, link
+and picture a creator set is marked with its path.
+
 ### Sending forms to BuildBase Forms
 
 `NewsletterBand`, `LeadMagnet`, `ContactForm`, `PackCheckout` and `TipJar`
@@ -1065,7 +1109,8 @@ variable, the same pair the website uses.
    `SiteLink`, and add `'use client'` only if it has state. A client block
    that loads another site, opens a pop-up or plays something checks
    `usePreviewMode()` and doesn't, in the page editor (links and forms are
-   stopped for it).
+   stopped for it). Mark every part a creator sets with `editable(path)`
+   (see "Editing a block on the page"), so `e2e/edit.spec.ts` passes.
 2. Add it to `BLOCKS` in `src/system/registry.ts`, with a `settings` entry
    for each prop a creator sets and the rest in `appOnly` (`npm run
 typecheck` says what's missing), and export it from `src/index.ts`.

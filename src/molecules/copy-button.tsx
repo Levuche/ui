@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { SiteButton, type ButtonLook } from '../atoms/button';
 import { CheckIcon, CopyIcon } from '../atoms/icons';
+import { editable, type EditPaths } from '../system/edit';
 import { WORDS_EN } from '../system/words/en';
 import { usePageWords } from '../system/page-words';
 import { usePreviewMode } from '../system/preview-mode';
@@ -34,6 +35,7 @@ export function CopyButton({
   action = 'copy',
   variant,
   size = 'sm',
+  edit = {},
   className,
 }: ButtonLook & {
   text: string;
@@ -42,6 +44,8 @@ export function CopyButton({
   copy?: (text: string) => Promise<void>;
   onCopied?: (text: string) => void;
   action?: string;
+  /** Each word's setting path, for edit mode (see edit.ts). */
+  edit?: EditPaths<keyof CopyLabels>;
   className?: string;
 }) {
   const words = usePageWords('copy', labels);
@@ -72,9 +76,21 @@ export function CopyButton({
         }}
         className={className}
       >
-        {state === 'copied' ? words.copied : words.copy}
+        <span {...editable(state === 'copied' ? edit.copied : edit.copy)}>
+          {state === 'copied' ? words.copied : words.copy}
+        </span>
       </SiteButton>
-      <span role="status" className="sr-only">
+      <span
+        role="status"
+        className="sr-only"
+        {...editable(
+          state === 'copied'
+            ? edit.copiedStatus
+            : state === 'failed'
+              ? edit.failedStatus
+              : undefined
+        )}
+      >
         {state === 'copied'
           ? words.copiedStatus.replace('{text}', text)
           : state === 'failed'

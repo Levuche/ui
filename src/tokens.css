@@ -703,6 +703,8 @@
 [data-edit-mode='on'] [data-edit] {
   cursor: text;
   border-radius: 0.25em;
+  /* Captions laid over a picture let clicks through live; here they're edited. */
+  pointer-events: auto;
 }
 [data-edit-mode='on'] [data-edit]:is([data-edit-kind='link'], [data-edit-kind='picture'], [data-edit-kind='setting']) {
   cursor: pointer;
@@ -716,6 +718,11 @@
 [data-edit-mode='on'] [data-edit]:focus-visible {
   outline: 2px dashed currentColor;
   outline-offset: 2px;
+}
+/* A link stretched over its card lets a click reach the words under it. */
+[data-edit-mode='on'] :is(a, button, [data-edit])::before,
+[data-edit-mode='on'] :is(a, button, [data-edit])::after {
+  pointer-events: none;
 }
 [data-edit-mode='on'] [data-edit][hidden] {
   display: none !important;

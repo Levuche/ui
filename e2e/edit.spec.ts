@@ -272,8 +272,14 @@ for (const block of BLOCKS) {
         .map((node) => [node.attrs[EDIT_ATTR], node] as const)
     );
     const missing: string[] = [];
+    const shownAll = shownValues(block.settings, own);
+    // Two settings can show the same words; either one's mark will do.
+    const pathsOf = (value: string) =>
+      shownAll
+        .filter((other) => other.value === value)
+        .map((other) => other.path);
 
-    for (const shown of shownValues(block.settings, own)) {
+    for (const shown of shownAll) {
       const root = editPath(shown.path.split('.')[0]) ?? shown.path;
       if (NOT_IN_PLACE[`${block.id}.${root}`]) continue;
       if (shown.type === 'link' || shown.type === 'picture') {
@@ -288,12 +294,24 @@ for (const block of BLOCKS) {
         continue;
       }
       // Words: every element that shows them is inside their part.
-      const showing = page.filter((node) => ownText(node).includes(shown.value));
+      // Not where the words are only part of a longer value ($10 in $100).
+      const showing = page.filter((node) => {
+        const text = ownText(node);
+        return (
+          text.includes(shown.value) &&
+          !shownAll.some(
+            (other) =>
+              other.value !== shown.value &&
+              other.value.includes(shown.value) &&
+              text.includes(other.value)
+          )
+        );
+      });
       for (const node of showing) {
         const mark = markOf(node);
         if (
           !mark ||
-          mark.path !== shown.path ||
+          !pathsOf(shown.value).includes(mark.path) ||
           (mark.kind !== 'text' && mark.kind !== 'longText')
         ) {
           missing.push(

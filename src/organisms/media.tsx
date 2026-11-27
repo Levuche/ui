@@ -2,6 +2,7 @@ import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLink } from '../atoms/link';
 import { Thumb } from '../atoms/thumb';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 import { PlayFrame } from '../molecules/play-frame';
 import { columnSizes, type ImageSrc } from '../system/image';
 import { OUTSIDE_SERVICES, type ConsentLabels } from '../system/privacy';
@@ -33,6 +34,7 @@ export function ReelGrid({
               ratio="reel"
               sizes={columnSizes(1 / columns, 1 / Math.min(columns, 3))}
               className="w-full"
+              marks={editable(editPath('reels', i, 'image'), 'picture')}
             />
           );
           return (
@@ -42,6 +44,7 @@ export function ReelGrid({
                   href={reel.href}
                   newTab
                   action="open_reel"
+                  {...editable(editPath('reels', i, 'href'), 'link')}
                   aria-label={
                     reel.label?.trim() || own.reel.replace('{n}', String(i + 1))
                   }
@@ -132,20 +135,23 @@ export function YouTubeVideo({
   const from = start && start > 0 ? `&start=${Math.floor(start)}` : '';
   return (
     <Block name="youtube-video" defaults={{ tone: 'plain' }} {...root}>
-      <PlayFrame
-        src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0${from}`}
-        title={title}
-        playLabel={playLabel}
-        poster={
-          poster === undefined && consent !== false
-            ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg`
-            : poster
-        }
-        ratio={vertical ? 'vertical' : 'video'}
-        consent={consent}
-        site={OUTSIDE_SERVICES.youtube.name}
-        consentLabels={consentLabels}
-      />
+      {/* The cover picture, or YouTube's own when it's left empty. */}
+      <div {...editable('poster', 'picture')}>
+        <PlayFrame
+          src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0${from}`}
+          title={title}
+          playLabel={playLabel}
+          poster={
+            poster === undefined && consent !== false
+              ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg`
+              : poster
+          }
+          ratio={vertical ? 'vertical' : 'video'}
+          consent={consent}
+          site={OUTSIDE_SERVICES.youtube.name}
+          consentLabels={consentLabels}
+        />
+      </div>
     </Block>
   );
 }

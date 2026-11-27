@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLink } from '../atoms/link';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 import { usePageWords } from '../system/page-words';
 
 /** The page footer: policy links and "Made with Levuche". */
@@ -35,23 +36,30 @@ export function CreatorFooter({
       )}
     >
       <nav aria-label={label} className="flex flex-wrap gap-3">
-        {links.map((link) => (
+        {links.map((link, i) => (
           <SiteLink
             key={`${link.label} ${link.href}`}
             href={link.href}
+            {...editable(editPath('links', i, 'href'), 'link')}
             className="text-site-link"
           >
-            {link.label}
+            <span {...editable(editPath('links', i, 'label'))}>
+              {link.label}
+            </span>
           </SiteLink>
         ))}
       </nav>
       {credit ? (
         creditHref ? (
-          <SiteLink href={creditHref} className="text-site-text-2">
-            {credit}
+          <SiteLink
+            href={creditHref}
+            {...editable('creditHref', 'link')}
+            className="text-site-text-2"
+          >
+            <span {...editable('credit')}>{credit}</span>
           </SiteLink>
         ) : (
-          <span>{credit}</span>
+          <span {...editable('credit')}>{credit}</span>
         )
       ) : null}
     </Block>

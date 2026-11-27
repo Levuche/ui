@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from 'react';
 import { SiteLink } from '../atoms/link';
 import { cn } from '../system/cn';
+import type { EditMarks } from '../system/edit';
 import { isSafeHref } from '../system/href';
 import {
   parseRichText,
@@ -53,11 +54,14 @@ export function RichText({
   text,
   markers = 'outside',
   className,
+  marks,
 }: {
   text: string | null | undefined;
   /** `inside` keeps bullets with centred or end-aligned text. */
   markers?: 'inside' | 'outside';
   className?: string;
+  /** Marks the text for edit mode, as editable(path, 'longText'). */
+  marks?: EditMarks;
 }) {
   const blocks = parseRichText(text);
   if (blocks.length === 0) return null;
@@ -67,6 +71,7 @@ export function RichText({
   );
   return (
     <div
+      {...marks}
       className={cn('flex flex-col gap-[0.75em] leading-relaxed', className)}
     >
       {blocks.map((block, i) => {

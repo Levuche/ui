@@ -21,8 +21,15 @@ import { PreviewMode } from './preview-mode';
 /** A setting typed in place, for the editor to save. */
 export type EditChange = EditTarget & { value: string };
 
-/** A part picked to be set in the editor, with where it is on screen. */
-export type EditPick = EditTarget & { element: HTMLElement };
+/**
+ * A part picked to be set in the editor, with where it is on screen. `around`
+ * lists the editable parts it sits in, nearest first, such as the link a
+ * picture fills, so the editor can offer those too.
+ */
+export type EditPick = EditTarget & {
+  element: HTMLElement;
+  around: EditTarget[];
+};
 
 /** Marks the parts edit mode made focusable, so it can undo that. */
 const TAB_ATTR = 'data-edit-tab';
@@ -40,7 +47,8 @@ const FOCUSABLE =
  *   Ctrl+Enter over several lines) or leaving the box keeps what was typed;
  *   Escape puts it back. `onEdit` hears the new value when it changed.
  * - Links, pictures and other settings call `onPick`, with the element, so
- *   the editor can open what sets it beside it.
+ *   the editor can open what sets it beside it, and the parts around it
+ *   (`around`), so a picture that fills a link can offer the link too.
  *
  * Every editable part can be reached with Tab. `readValue` gives the text
  * a box starts with, when the page shows it otherwise (formatted, say, or
@@ -164,7 +172,16 @@ export function EditMode({
       const part = node.closest<HTMLElement>(`[${EDIT_ATTR}]`);
       if (!part || !root.contains(part)) return false;
       if (TYPED_KINDS.has(target.kind)) type(part, target);
-      else calls.current.onPick?.({ ...target, element: part });
+      else {
+        const around: EditTarget[] = [];
+        let outer = part.parentElement?.closest<HTMLElement>(`[${EDIT_ATTR}]`);
+        while (outer && root.contains(outer)) {
+          const found = editTargetOf(outer);
+          if (found) around.push(found);
+          outer = outer.parentElement?.closest<HTMLElement>(`[${EDIT_ATTR}]`);
+        }
+        calls.current.onPick?.({ ...target, element: part, around });
+      }
       return true;
     };
 

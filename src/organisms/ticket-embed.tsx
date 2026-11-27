@@ -12,6 +12,7 @@ import { ConsentCover } from '../molecules/consent-cover';
 import { SiteDialog } from '../molecules/dialog';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { ticketsFor } from '../system/embeds';
+import { editable } from '../system/edit';
 import { isSafeHref } from '../system/href';
 import { usePageWords } from '../system/page-words';
 import { usePreviewMode } from '../system/preview-mode';
@@ -93,9 +94,17 @@ export function TicketEmbed({
   if (!tickets && !(isSafeHref(src) && /^https:\/\//i.test(src))) return null;
   const href = tickets?.href ?? src;
 
-  const head = <ItemHead title={title} detail={detail} headingAs={headingAs} />;
+  const head = (
+    <ItemHead
+      title={title}
+      detail={detail}
+      headingAs={headingAs}
+      edit={{ title: 'title', detail: 'detail' }}
+    />
+  );
   const fallback = (
     <SiteLinkButton
+      {...editable('src', 'link')}
       href={href}
       newTab
       variant="text"
@@ -103,7 +112,7 @@ export function TicketEmbed({
       action="tickets_fallback"
       className="self-center"
     >
-      {words.fallback}
+      <span {...editable('labels.fallback')}>{words.fallback}</span>
     </SiteLinkButton>
   );
 
@@ -117,6 +126,7 @@ export function TicketEmbed({
       >
         {head}
         <SiteLinkButton
+          {...editable('src', 'link')}
           href={href}
           newTab
           variant={buttonVariant}
@@ -126,7 +136,7 @@ export function TicketEmbed({
           // In the editor's preview the link goes nowhere, so nothing opened.
           onClick={preview ? undefined : onOpen}
         >
-          {words.button}
+          <span {...editable('labels.button')}>{words.button}</span>
         </SiteLinkButton>
       </Block>
     );
@@ -147,6 +157,7 @@ export function TicketEmbed({
     </div>
   ) : shown ? (
     <iframe
+      {...editable('src', 'link')}
       ref={frameRef}
       src={tickets.src}
       title={name}
@@ -167,6 +178,7 @@ export function TicketEmbed({
       action="tickets_load"
       onLoad={() => setAgreed(true)}
       style={size}
+      edit={{ load: 'consentLabels.load' }}
     />
   );
 
@@ -199,11 +211,11 @@ export function TicketEmbed({
               onOpen?.();
             }}
           >
-            {words.button}
+            <span {...editable('labels.button')}>{words.button}</span>
           </SiteButton>
           <SiteDialog
             ref={dialog}
-            title={title}
+            title={<span {...editable('title')}>{title}</span>}
             size="lg"
             onClose={() => {
               setOpen(false);
@@ -218,7 +230,7 @@ export function TicketEmbed({
               fullWidth
               onClick={() => dialog.current?.close()}
             >
-              {words.close}
+              <span {...editable('labels.close')}>{words.close}</span>
             </SiteButton>
           </SiteDialog>
         </>

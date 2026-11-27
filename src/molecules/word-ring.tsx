@@ -2,6 +2,7 @@
 
 import { useId, useRef, useState, type ReactNode } from 'react';
 import { cn } from '../system/cn';
+import { editable } from '../system/edit';
 import { useOnScreen } from '../system/effects';
 import { motionSeconds, wordRingShape } from '../system/motion';
 import { MotionToggle, type MotionToggleLabels } from './motion-toggle';
@@ -24,6 +25,7 @@ export function WordRing({
   speed,
   separator = '•',
   labels,
+  edit,
   className,
   children,
 }: {
@@ -35,6 +37,8 @@ export function WordRing({
   /** Drawn between each time the words go round. */
   separator?: string;
   labels?: Partial<WordRingLabels>;
+  /** The words' setting path, for edit mode (see edit.ts). */
+  edit?: string;
   className?: string;
   /** The picture. */
   children: ReactNode;
@@ -72,6 +76,7 @@ export function WordRing({
           <path id={pathId} d={shape.path} fill="none" />
         </defs>
         <text
+          {...editable(edit)}
           fill="currentColor"
           fontSize={shape.fontSize}
           fontWeight={700}
@@ -87,7 +92,9 @@ export function WordRing({
         </text>
       </svg>
       {children}
-      <span className="sr-only">{words}</span>
+      <span {...editable(edit)} className="sr-only">
+        {words}
+      </span>
       <MotionToggle
         playing={playing}
         onToggle={() => setPlaying(!playing)}

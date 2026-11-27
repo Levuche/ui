@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from 'react';
 import { siteButtonClasses, type SiteButtonVariant } from '../atoms/button';
 import { cn } from '../system/cn';
+import { editable, type EditPaths } from '../system/edit';
 import { linkAttrs } from '../system/href';
 import { useHydrated } from '../system/locale';
 import {
@@ -42,12 +43,13 @@ export function MessageComposer({
   hidden = false,
   message = '',
   subject,
-  editable = false,
+  editable: changeable = false,
   fieldLabel,
   hint,
   button,
   buttonVariant,
   icon,
+  edit = {},
 }: {
   channel: MessageChannel;
   /** Null when the creator's number or address isn't valid: no link. */
@@ -61,6 +63,8 @@ export function MessageComposer({
   button: ReactNode;
   buttonVariant?: SiteButtonVariant;
   icon?: ReactNode;
+  /** The message's setting path, for edit mode (see edit.ts). */
+  edit?: EditPaths<'message'>;
 }) {
   const hydrated = useHydrated();
   const [text, setText] = useState(message);
@@ -78,20 +82,26 @@ export function MessageComposer({
     variant: buttonVariant,
     fullWidth: true,
   });
+  const field = changeable ? (
+    <Field
+      label={fieldLabel}
+      hint={hint}
+      name="message"
+      multiline
+      rows={3}
+      maxLength={MESSAGE_MAX_LENGTH}
+      value={text}
+      onChange={(event) => setText(event.target.value)}
+    />
+  ) : null;
   return (
     <>
-      {editable ? (
-        <Field
-          label={fieldLabel}
-          hint={hint}
-          name="message"
-          multiline
-          rows={3}
-          maxLength={MESSAGE_MAX_LENGTH}
-          value={text}
-          onChange={(event) => setText(event.target.value)}
-        />
-      ) : null}
+      {field && edit.message ? (
+        // Marks the box's words; the label and hint keep their own marks.
+        <div {...editable(edit.message, 'longText')}>{field}</div>
+      ) : (
+        field
+      )}
       {attrs ? (
         // The message is the visitor's: tracking gets the link without it.
         <a

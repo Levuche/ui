@@ -9,6 +9,7 @@ import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import type { HeadingTag } from '../molecules/item-head';
 import { LiveData } from '../molecules/live-data';
 import { cn } from '../system/cn';
+import { editable } from '../system/edit';
 import { isSafeHref } from '../system/href';
 import type { ImageSrc } from '../system/image';
 import type { LiveProps } from '../system/live';
@@ -66,7 +67,12 @@ function withCount(template: string, count: string) {
   return (
     <>
       {template.slice(0, at)}
-      <strong className="text-site-text font-bold">{count}</strong>
+      <strong
+        {...editable('followers', 'setting')}
+        className="text-site-text font-bold"
+      >
+        {count}
+      </strong>
       {template.slice(at + 3)}
     </>
   );
@@ -191,16 +197,38 @@ export function SocialCard({
       } as CSSProperties)
     : undefined;
   const word = buttonLabel?.trim() || words[buttonAction ?? info.action];
-  const context = words.on
-    .replace('{name}', title)
-    .replace('{platform}', info.name);
+  // Where each shown word comes from, for edit mode.
+  const titlePath = name?.trim() ? 'name' : at ? 'handle' : undefined;
+  const wordPath = buttonLabel?.trim()
+    ? 'buttonLabel'
+    : `labels.${buttonAction ?? info.action}`;
+  const countPath =
+    countLabel === undefined ? `labels.${info.count}` : 'countLabel';
+  // The name in it is marked as the title is, so it's edited as the title.
+  const on = words.on.replace('{platform}', info.name);
+  const nameAt = on.indexOf('{name}');
+  const context =
+    nameAt < 0 ? (
+      on
+    ) : (
+      <>
+        {on.slice(0, nameAt)}
+        <span {...editable(titlePath)}>{title}</span>
+        {on.slice(nameAt + '{name}'.length)}
+      </>
+    );
   const limit = postLimit === 4 ? 4 : 3;
 
   const identity = (
     <div className="flex min-w-0 items-center gap-3">
       {avatar !== undefined ? (
         <span className="relative flex-none">
-          <Avatar name={title} src={avatar} size={52} />
+          <Avatar
+            name={title}
+            src={avatar}
+            size={52}
+            marks={editable('avatar', 'picture')}
+          />
           <PlatformMark
             icon={icon}
             name={info.name}
@@ -213,7 +241,12 @@ export function SocialCard({
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <Heading className="text-block-title m-0 inline-flex min-w-0 items-center gap-1.5 leading-tight font-bold">
-          <span className="min-w-0 [overflow-wrap:anywhere]">{title}</span>
+          <span
+            {...editable(titlePath)}
+            className="min-w-0 [overflow-wrap:anywhere]"
+          >
+            {title}
+          </span>
           {verified ? (
             <span
               role="img"
@@ -227,19 +260,21 @@ export function SocialCard({
         <p className="text-site-text-2 m-0 text-sm [overflow-wrap:anywhere]">
           {at && at !== title ? (
             <>
-              <span dir="ltr">{at}</span>
+              <span {...editable('handle')} dir="ltr">
+                {at}
+              </span>
               <span aria-hidden> · </span>
               <span className="sr-only">, </span>
             </>
           ) : null}
-          {info.name}
+          <span {...editable('platform', 'setting')}>{info.name}</span>
         </p>
       </div>
     </div>
   );
 
   const countLine = count ? (
-    <p className="text-site-text-2 m-0 text-sm">
+    <p {...editable(countPath)} className="text-site-text-2 m-0 text-sm">
       {withCount(countLabel ?? words[info.count], count)}
     </p>
   ) : null;
@@ -250,10 +285,11 @@ export function SocialCard({
         href={link}
         newTab
         action="social_follow"
+        {...editable('href', 'link')}
         fullWidth={!wide}
         className={wide ? 'w-full @md:w-auto' : undefined}
       >
-        {word}
+        <span {...editable(wordPath)}>{word}</span>
         <span className="sr-only"> {context}</span>
       </SiteLinkButton>
     ) : null;

@@ -2,6 +2,7 @@ import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLink } from '../atoms/link';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 import type { LinkBehavior } from '../system/href';
 import { columnSizes, type ImageSrc } from '../system/image';
 
@@ -38,6 +39,7 @@ export function ImageGrid({
               ratio={ratio}
               sizes={columnSizes(1 / columns, 1 / Math.min(columns, 3))}
               className="w-full"
+              marks={editable(editPath('images', i, 'src'), 'picture')}
             />
           );
           return (
@@ -49,6 +51,7 @@ export function ImageGrid({
                   data-lift=""
                   className="rounded-block-inner block"
                   {...link}
+                  {...editable(editPath('images', i, 'href'), 'link')}
                 >
                   {picture}
                 </SiteLink>

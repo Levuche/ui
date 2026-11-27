@@ -7,6 +7,7 @@ import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { LiveData } from '../molecules/live-data';
 import { SellButton, type SellProps } from '../molecules/sell-button';
 import { isTimeZone } from '../system/calendar';
+import { editable } from '../system/edit';
 import type { LiveProps } from '../system/live';
 import { useVisitorLocale } from '../system/locale';
 import type { ItemSell } from '../system/sell';
@@ -123,11 +124,18 @@ export function SlotPicker({
     days.find((day) => day.key === dayKey) ??
     days[0];
   const pickedTime = pickedDay?.times.find((t) => t.value === picked);
+  // The zone line's words around the zone, which is its own setting.
+  const [zoneBefore, ...zoneAfter] = words.zone.split('{zone}');
 
   return (
     <Block name="slot-picker" {...root}>
       {title ? (
-        <ItemHead title={title} detail={detail} headingAs={headingAs} />
+        <ItemHead
+          title={title}
+          detail={detail}
+          headingAs={headingAs}
+          edit={{ title: 'title', detail: 'detail' }}
+        />
       ) : null}
       <LiveData
         data={data}
@@ -137,11 +145,20 @@ export function SlotPicker({
       >
         {() =>
           days.length === 0 ? (
-            <p className="text-site-text-2 m-0 text-sm">{words.none}</p>
+            <p
+              {...editable('labels.none')}
+              className="text-site-text-2 m-0 text-sm"
+            >
+              {words.none}
+            </p>
           ) : (
             <>
               <ChoiceChips
-                legend={words.day}
+                legend={
+                  words.day ? (
+                    <span {...editable('labels.day')}>{words.day}</span>
+                  ) : null
+                }
                 name={`${id}-day`}
                 value={pickedDay?.key ?? ''}
                 onChange={(key) => {
@@ -155,16 +172,30 @@ export function SlotPicker({
                 }))}
               />
               <ChoiceChips
-                legend={words.time}
+                legend={
+                  words.time ? (
+                    <span {...editable('labels.time')}>{words.time}</span>
+                  ) : null
+                }
                 name={`${id}-time`}
                 value={pickedTime?.value ?? ''}
                 onChange={setPicked}
                 options={pickedDay?.times ?? []}
               />
-              <p className="text-site-text-2 m-0 text-sm">
-                {words.zone.replace('{zone}', zone)}
+              <p
+                {...editable('labels.zone')}
+                className="text-site-text-2 m-0 text-sm"
+              >
+                {zoneBefore}
+                {zoneAfter.length ? (
+                  <>
+                    <span {...editable('timeZone')}>{zone}</span>
+                    {zoneAfter.join('{zone}')}
+                  </>
+                ) : null}
               </p>
               <SellButton
+                edit={{ sell: 'sell' }}
                 sell={
                   pickedTime
                     ? // As UTC, which BuildBase always takes, whatever way
@@ -181,12 +212,14 @@ export function SlotPicker({
                 action="book"
                 disabled={!pickedTime}
               >
-                {pickedTime
-                  ? words.book.replace(
-                      '{time}',
-                      `${pickedDay.label}, ${pickedTime.label}`
-                    )
-                  : words.pick}
+                <span {...editable(pickedTime ? 'labels.book' : 'labels.pick')}>
+                  {pickedTime
+                    ? words.book.replace(
+                        '{time}',
+                        `${pickedDay.label}, ${pickedTime.label}`
+                      )
+                    : words.pick}
+                </span>
               </SellButton>
             </>
           )

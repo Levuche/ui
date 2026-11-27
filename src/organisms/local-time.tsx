@@ -3,6 +3,7 @@
 import { Fragment, useEffect, useRef, useState, type RefObject } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { cn } from '../system/cn';
+import { editable, type EditMarks } from '../system/edit';
 import { useHydrated, useVisitorLocale } from '../system/locale';
 import { usePageWords } from '../system/page-words';
 import { WORDS_EN } from '../system/words/en';
@@ -200,7 +201,16 @@ export function LocalTime({
   const open = at === null ? null : isOpenAt(at, zone, hours);
   const date =
     showDate && at !== null ? formatLocalDate(at, zone, shownLocale) : null;
-  const under = [date, showCity ? place : null].filter(Boolean);
+  const under: { text: string; marks?: EditMarks }[] = [];
+  if (date) under.push({ text: date });
+  if (showCity && place) {
+    under.push({
+      text: place,
+      marks: cityName?.trim()
+        ? editable('cityName')
+        : editable('city', 'setting'),
+    });
+  }
 
   return (
     <Block
@@ -211,11 +221,15 @@ export function LocalTime({
       className={cn('@container', root.className)}
     >
       {words.title ? (
-        <p className="text-site-text-2 m-0 text-sm font-semibold">
+        <p
+          {...editable('labels.title')}
+          className="text-site-text-2 m-0 text-sm font-semibold"
+        >
           {words.title}
         </p>
       ) : null}
       <p
+        {...editable(timeZone ? 'timeZone' : 'city', 'setting')}
         ref={timeRef}
         className={cn(
           'm-0 leading-none font-bold tracking-tight tabular-nums',
@@ -257,7 +271,7 @@ export function LocalTime({
                   <span className="sr-only">, </span>
                 </>
               ) : null}
-              <span>{item}</span>
+              <span {...item.marks}>{item.text}</span>
             </Fragment>
           ))}
         </p>
@@ -270,7 +284,11 @@ export function LocalTime({
           )}
         >
           {open !== null ? (
-            <p className="m-0" data-open={open}>
+            <p
+              {...editable('hours', 'setting')}
+              className="m-0"
+              data-open={open}
+            >
               <span className="bg-site-surface-2 text-site-text inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold">
                 <span
                   aria-hidden
@@ -279,7 +297,9 @@ export function LocalTime({
                     open ? 'bg-site-accent' : 'bg-site-text-2'
                   )}
                 />
-                {open ? words.open : words.away}
+                <span {...editable(open ? 'labels.open' : 'labels.away')}>
+                  {open ? words.open : words.away}
+                </span>
               </span>
             </p>
           ) : null}

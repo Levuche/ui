@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 import { useOnScreen } from '../system/effects';
 import { motionSeconds, stripRepeats } from '../system/motion';
 import {
@@ -54,7 +55,11 @@ export function TextStrip({
   const words = usePageWords('textStrip', labels);
   const own = usePageWords('props');
   const label = labelProp ?? own.highlights;
-  const phrases = items.map((item) => String(item).trim()).filter(Boolean);
+  // Each phrase keeps its place in `items`, for its edit path.
+  const phrases = items.flatMap((item, index) => {
+    const text = String(item).trim();
+    return text ? [{ text, index }] : [];
+  });
   const view = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLUListElement>(null);
   const onScreen = useOnScreen(view);
@@ -64,7 +69,7 @@ export function TextStrip({
   const [repeats, setRepeats] = useState(1);
   const count = phrases.length;
   // Measured again whenever the words change.
-  const shown = phrases.join('\n');
+  const shown = phrases.map(({ text }) => text).join('\n');
 
   useEffect(() => {
     const el = view.current;
@@ -85,7 +90,11 @@ export function TextStrip({
   if (!count) return null;
 
   const separatorMark = separator.trim();
-  const phrase = (text: string, i: number, copy: number) => {
+  const phrase = (
+    { text, index }: (typeof phrases)[number],
+    i: number,
+    copy: number
+  ) => {
     const hidden = copy > 0;
     return (
       <li
@@ -96,9 +105,10 @@ export function TextStrip({
           hidden && 'motion-reduce:hidden'
         )}
       >
-        <span>{text}</span>
+        <span {...editable(editPath('items', index))}>{text}</span>
         {separatorMark ? (
           <span
+            {...editable('separator')}
             aria-hidden="true"
             // Full strength, as the separator can be a word (AA contrast).
             // Still, the last phrase needs no separator after it.
@@ -137,7 +147,7 @@ export function TextStrip({
             }}
           >
             {Array.from({ length: repeats * 2 }, (_, copy) =>
-              phrases.map((text, i) => phrase(text, i, copy))
+              phrases.map((item, i) => phrase(item, i, copy))
             )}
           </ul>
         </div>

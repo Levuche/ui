@@ -177,7 +177,7 @@ export function LinkTile({
      * The setting paths of the link and its picture, for edit mode (see
      * edit.ts). Mark the words and `detail` where they're passed in.
      */
-    edit?: EditPaths<'href' | 'image'>;
+    edit?: EditPaths<'href' | 'image' | 'favicon'>;
     ref?: Ref<HTMLAnchorElement>;
   }) {
   const shape: LinkTileVariant = LINK_TILE_VARIANTS.includes(variant)
@@ -223,6 +223,7 @@ export function LinkTile({
         ) : mark?.type === 'favicon' ? (
           <Thumb
             src={mark.src}
+            marks={editable(edit.favicon, 'picture')}
             ratio="square"
             fit="contain"
             sizes="24px"
@@ -274,6 +275,7 @@ export function LinkTile({
         ) : mark?.type === 'favicon' ? (
           <Thumb
             src={mark.src}
+            marks={editable(edit.favicon, 'picture')}
             ratio="square"
             fit="contain"
             sizes="96px"
@@ -334,6 +336,7 @@ export function LinkTile({
           {mark.type === 'favicon' ? (
             <Thumb
               src={mark.src}
+              marks={editable(edit.favicon, 'picture')}
               ratio="square"
               fit="contain"
               sizes="24px"

@@ -9,6 +9,7 @@ import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { TileCaption, UNDER_CAPTION } from '../molecules/tile-caption';
 import { isOverCaption, type CaptionStyle } from '../system/gallery';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 import type { LinkBehavior } from '../system/href';
 import { imageAttrs, toImageSource, type ImageSrc } from '../system/image';
 import { usePageWords } from '../system/page-words';
@@ -52,6 +53,7 @@ export function SiteImage({
       ratio={ratio}
       fit={fit}
       className={cn('w-full', over && !href && UNDER_CAPTION)}
+      marks={editable('src', 'picture')}
     />
   );
   return (
@@ -70,6 +72,7 @@ export function SiteImage({
           nofollow={nofollow}
           action="image_click"
           className={cn('block', over && UNDER_CAPTION)}
+          {...editable('href', 'link')}
         >
           {picture}
         </SiteLink>
@@ -77,7 +80,9 @@ export function SiteImage({
         picture
       )}
       {caption ? (
-        <TileCaption captionStyle={captionStyle}>{caption}</TileCaption>
+        <TileCaption captionStyle={captionStyle} edit="caption">
+          {caption}
+        </TileCaption>
       ) : null}
     </Block>
   );
@@ -135,9 +140,11 @@ export function LogoStrip({
   const label = labelProp === undefined ? own.brands : labelProp;
   const item = (logo: Logo, i: number, hidden = false) => {
     const source = toImageSource(logo.src);
+    const path = editPath('logos', i);
     // Logos are at most 160 px wide (max-w-40).
     const image = source ? (
       <img
+        {...editable(editPath(path, 'src'), 'picture')}
         {...imageAttrs(source, '160px')}
         alt={hidden ? '' : logo.alt}
         style={{ height: logoHeight }}
@@ -148,7 +155,12 @@ export function LogoStrip({
         )}
       />
     ) : (
-      <span className="text-site-text-2 font-bold">{logo.alt}</span>
+      <span
+        {...editable(editPath(path, 'alt'))}
+        className="text-site-text-2 font-bold"
+      >
+        {logo.alt}
+      </span>
     );
     return (
       <li
@@ -167,6 +179,7 @@ export function LogoStrip({
             nofollow={logo.nofollow}
             action="logo_click"
             className="flex items-center"
+            {...editable(editPath(path, 'href'), 'link')}
           >
             {image}
           </SiteLink>
@@ -186,7 +199,10 @@ export function LogoStrip({
       {...root}
     >
       {title ? (
-        <Heading className="text-site-text-2 m-0 text-xs font-bold tracking-wide uppercase">
+        <Heading
+          {...editable('title')}
+          className="text-site-text-2 m-0 text-xs font-bold tracking-wide uppercase"
+        >
           {title}
         </Heading>
       ) : null}

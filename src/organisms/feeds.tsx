@@ -14,6 +14,7 @@ import { LiveData } from '../molecules/live-data';
 import { PlayFrame } from '../molecules/play-frame';
 import { Rating } from '../molecules/rating';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 import type { LiveProps } from '../system/live';
 import { columnSizes, type ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
@@ -59,7 +60,13 @@ export function LatestVideos({
   const Item = subHeading(headingAs);
   return (
     <Block name="latest-videos" {...root}>
-      {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
+      {title ? (
+        <ItemHead
+          title={title}
+          headingAs={headingAs}
+          edit={{ title: 'title' }}
+        />
+      ) : null}
       <LiveData
         data={data}
         loading={loading}
@@ -104,13 +111,14 @@ export function LatestVideos({
             </ul>
             {channelHref ? (
               <SiteLinkButton
+                {...editable('channelHref', 'link')}
                 href={channelHref}
                 newTab
                 variant="outline"
                 action="channel_click"
                 fullWidth
               >
-                {channelLabel}
+                <span {...editable('channelLabel')}>{channelLabel}</span>
               </SiteLinkButton>
             ) : null}
           </>
@@ -157,7 +165,13 @@ export function LatestPosts({
   const Item = subHeading(headingAs);
   return (
     <Block name="latest-posts" {...root}>
-      {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
+      {title ? (
+        <ItemHead
+          title={title}
+          headingAs={headingAs}
+          edit={{ title: 'title' }}
+        />
+      ) : null}
       <LiveData
         data={data}
         loading={loading}
@@ -304,7 +318,13 @@ export function LiveStatus({
                       className="bg-site-on-button size-2 rounded-full motion-safe:animate-[levuche-live-pulse_2s_cubic-bezier(0.4,0,0.6,1)_2]"
                     />
                   ) : null}
-                  {status.live ? words.live : words.offline}
+                  <span
+                    {...editable(
+                      status.live ? 'labels.live' : 'labels.offline'
+                    )}
+                  >
+                    {status.live ? words.live : words.offline}
+                  </span>
                 </Badge>
               </div>
               {status.live && status.title ? (
@@ -343,7 +363,7 @@ export function LiveStatus({
                 action="live_channel"
                 fullWidth
               >
-                {words.watch}
+                <span {...editable('labels.watch')}>{words.watch}</span>
               </SiteLinkButton>
             </>
           );
@@ -410,7 +430,13 @@ export function EventList({
   const Item = subHeading(headingAs);
   return (
     <Block name="event-list" {...root}>
-      {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
+      {title ? (
+        <ItemHead
+          title={title}
+          headingAs={headingAs}
+          edit={{ title: 'title' }}
+        />
+      ) : null}
       <LiveData
         data={data}
         loading={loading}
@@ -430,32 +456,54 @@ export function EventList({
                     className="inline-flex items-center gap-1.5 text-sm font-bold"
                   >
                     <CalendarIcon size={16} />
-                    {event.date}
+                    <span {...editable(editPath('data', n, 'date'))}>
+                      {event.date}
+                    </span>
                   </time>
-                  <Item className="m-0 text-base font-semibold">
+                  <Item
+                    {...editable(editPath('data', n, 'title'))}
+                    className="m-0 text-base font-semibold"
+                  >
                     {event.title}
                   </Item>
                   {event.venue || event.city ? (
                     <p className="text-site-text-2 m-0 inline-flex items-center gap-1.5 text-sm">
                       <MapPinIcon size={14} />
-                      {[event.venue, event.city].filter(Boolean).join(', ')}
+                      <span>
+                        {event.venue ? (
+                          <span {...editable(editPath('data', n, 'venue'))}>
+                            {event.venue}
+                          </span>
+                        ) : null}
+                        {event.venue && event.city ? ', ' : null}
+                        {event.city ? (
+                          <span {...editable(editPath('data', n, 'city'))}>
+                            {event.city}
+                          </span>
+                        ) : null}
+                      </span>
                     </p>
                   ) : null}
                 </div>
                 <div className="flex flex-wrap items-start gap-2">
                   {event.soldOut ? (
                     <Badge tone="outline" className="mt-2.5">
-                      {words.soldOut}
+                      <span {...editable('labels.soldOut')}>
+                        {words.soldOut}
+                      </span>
                     </Badge>
                   ) : event.href ? (
                     <SiteLinkButton
+                      {...editable(editPath('data', n, 'href'), 'link')}
                       href={event.href}
                       newTab
                       size="sm"
                       action="event_tickets"
                       aria-label={`${words.tickets}: ${event.title}, ${event.date}`}
                     >
-                      {words.tickets}
+                      <span {...editable('labels.tickets')}>
+                        {words.tickets}
+                      </span>
                     </SiteLinkButton>
                   ) : null}
                   {calendar && event.dateTime ? (
@@ -541,7 +589,13 @@ export function ReviewSummary({
   const words = usePageWords('reviewSummary', labels);
   return (
     <Block name="review-summary" {...root}>
-      {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
+      {title ? (
+        <ItemHead
+          title={title}
+          headingAs={headingAs}
+          edit={{ title: 'title' }}
+        />
+      ) : null}
       <LiveData
         data={data}
         loading={loading}
@@ -583,9 +637,9 @@ export function ReviewSummary({
               ))}
             </ul>
             <p className="text-site-text-2 m-0 flex flex-wrap items-center justify-between gap-2 text-xs">
-              <span>{attribution}</span>
+              <span {...editable('attribution')}>{attribution}</span>
               <SiteLink href={summary.url} newTab action="reviews_all">
-                {words.all}
+                <span {...editable('labels.all')}>{words.all}</span>
               </SiteLink>
             </p>
           </>
@@ -630,15 +684,26 @@ export function NowPlaying({
           ratio="square"
           sizes="56px"
           className="w-14 flex-none"
+          marks={editable('image', 'picture')}
         />
       ) : null}
       <span className="flex min-w-0 flex-col">
-        <span className="text-site-text-2 text-xs font-semibold tracking-wide uppercase">
+        <span
+          {...editable(`labels.${kind}`)}
+          className="text-site-text-2 text-xs font-semibold tracking-wide uppercase"
+        >
           {words[kind]}
         </span>
-        <span className="text-site-text truncate font-semibold">{title}</span>
+        <span
+          {...editable('title')}
+          className="text-site-text truncate font-semibold"
+        >
+          {title}
+        </span>
         {by ? (
-          <span className="text-site-text-2 truncate text-sm">{by}</span>
+          <span {...editable('by')} className="text-site-text-2 truncate text-sm">
+            {by}
+          </span>
         ) : null}
       </span>
     </>
@@ -647,6 +712,7 @@ export function NowPlaying({
     <Block name="now-playing" {...root}>
       {href ? (
         <SiteLink
+          {...editable('href', 'link')}
           href={href}
           newTab
           action="now_playing"

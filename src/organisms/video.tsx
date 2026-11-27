@@ -7,6 +7,7 @@ import {
   type VideoTrack,
 } from '../molecules/video-frame';
 import type { CaptionStyle, VideoRatio } from '../system/gallery';
+import { editable } from '../system/edit';
 import { isSafeMediaSrc } from '../system/href';
 import type { ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
@@ -86,6 +87,12 @@ export function VideoTile({
         captionStyle={captionStyle}
         labels={words}
         consent={consent}
+        edit={{
+          src: 'src',
+          poster: 'poster',
+          caption: 'caption',
+          tracks: 'tracks',
+        }}
         className={ratio === 'tall' ? 'mx-auto w-full max-w-90' : undefined}
       />
       {transcriptHref ? (
@@ -93,8 +100,9 @@ export function VideoTile({
           href={transcriptHref}
           action="video_transcript"
           className="min-h-control inline-flex items-center self-start text-sm font-semibold"
+          {...editable('transcriptHref', 'link')}
         >
-          {words.transcript}
+          <span {...editable('labels.transcript')}>{words.transcript}</span>
         </SiteLink>
       ) : null}
       <MediaNotice

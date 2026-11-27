@@ -15,6 +15,7 @@ import { LiveData, SkeletonLines } from '../molecules/live-data';
 import { Sparkline } from '../molecules/sparkline';
 import { StatList } from '../molecules/stat-list';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 import { imageAttrs } from '../system/image';
 import type { LiveProps } from '../system/live';
 import { isSafeColor } from '../system/theme';
@@ -102,10 +103,24 @@ export function GitHubProfile({
             <StatList
               locale={locale}
               items={[
-                { label: words.followers, value: profile.followers },
-                { label: words.repos, value: profile.publicRepos },
+                {
+                  label: words.followers,
+                  value: profile.followers,
+                  edit: 'labels.followers',
+                },
+                {
+                  label: words.repos,
+                  value: profile.publicRepos,
+                  edit: 'labels.repos',
+                },
                 ...(profile.stars != null
-                  ? [{ label: words.stars, value: profile.stars }]
+                  ? [
+                      {
+                        label: words.stars,
+                        value: profile.stars,
+                        edit: 'labels.stars',
+                      },
+                    ]
                   : []),
               ]}
             />
@@ -116,7 +131,7 @@ export function GitHubProfile({
               action="github_profile"
               fullWidth
             >
-              {words.button}
+              <span {...editable('labels.button')}>{words.button}</span>
             </SiteLinkButton>
           </>
         )}
@@ -204,7 +219,13 @@ export function ContributionGraph({
   const days = (n: number) => words.days.replace('{n}', compact(n, locale));
   return (
     <Block name="contribution-graph" {...root}>
-      {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
+      {title ? (
+        <ItemHead
+          title={title}
+          headingAs={headingAs}
+          edit={{ title: 'title' }}
+        />
+      ) : null}
       <LiveData
         data={data}
         loading={loading}
@@ -241,8 +262,16 @@ export function ContributionGraph({
               <StatList
                 locale={locale}
                 items={[
-                  { label: words.current, value: days(year.currentStreak) },
-                  { label: words.longest, value: days(year.longestStreak) },
+                  {
+                    label: words.current,
+                    value: days(year.currentStreak),
+                    edit: 'labels.current',
+                  },
+                  {
+                    label: words.longest,
+                    value: days(year.longestStreak),
+                    edit: 'labels.longest',
+                  },
                 ]}
               />
             </>
@@ -314,12 +343,18 @@ function RepoBody({
         <span className="inline-flex items-center gap-1">
           <StarIcon size={14} />
           {compact(repo.stars, locale)}
-          <span className="sr-only"> {words.stars}</span>
+          <span {...editable('labels.stars')} className="sr-only">
+            {' '}
+            {words.stars}
+          </span>
         </span>
         <span className="inline-flex items-center gap-1">
           <ForkIcon size={14} />
           {compact(repo.forks, locale)}
-          <span className="sr-only"> {words.forks}</span>
+          <span {...editable('labels.forks')} className="sr-only">
+            {' '}
+            {words.forks}
+          </span>
         </span>
       </p>
     </>
@@ -390,7 +425,13 @@ export function RepoList({
   const itemHeading = subHeading(headingAs);
   return (
     <Block name="repo-list" {...root}>
-      {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
+      {title ? (
+        <ItemHead
+          title={title}
+          headingAs={headingAs}
+          edit={{ title: 'title' }}
+        />
+      ) : null}
       <LiveData
         data={data}
         loading={loading}
@@ -483,11 +524,16 @@ export function PackageStats({
             <StatList
               locale={locale}
               items={[
-                { label: words.version, value: pkg.version },
+                {
+                  label: words.version,
+                  value: pkg.version,
+                  edit: 'labels.version',
+                },
                 {
                   label: words.weekly,
                   value: pkg.weeklyDownloads,
                   icon: <DownloadIcon size={12} />,
+                  edit: 'labels.weekly',
                 },
               ]}
             />
@@ -527,14 +573,21 @@ export function TechStack({
 }) {
   return (
     <Block name="tech-stack" {...root}>
-      {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
+      {title ? (
+        <ItemHead
+          title={title}
+          headingAs={headingAs}
+          edit={{ title: 'title' }}
+        />
+      ) : null}
       <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-        {items.map((item) => {
+        {items.map((item, n) => {
           const chip = (
             <>
               {typeof item.logo === 'string' ? (
                 item.logo.trim() ? (
                   <img
+                    {...editable(editPath('items', n, 'logo'), 'picture')}
                     {...imageAttrs({ src: item.logo.trim() }, '20px')}
                     alt=""
                     className="size-5 object-contain"
@@ -543,7 +596,9 @@ export function TechStack({
               ) : (
                 item.logo
               )}
-              {item.name}
+              <span {...editable(editPath('items', n, 'name'))}>
+                {item.name}
+              </span>
             </>
           );
           const chipClass =
@@ -552,6 +607,7 @@ export function TechStack({
             <li key={item.name}>
               {item.href ? (
                 <SiteLink
+                  {...editable(editPath('items', n, 'href'), 'link')}
                   href={item.href}
                   newTab
                   action="tech_click"

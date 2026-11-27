@@ -2,6 +2,7 @@ import type { FormEventHandler, ReactNode } from 'react';
 import { SiteButton, type SiteButtonVariant } from '../atoms/button';
 import { SiteInput } from '../atoms/input';
 import { cn } from '../system/cn';
+import { editable, type EditPaths } from '../system/edit';
 import type { FormStatus } from '../system/state';
 import { FormNotice } from './form-notice';
 import { WORDS_EN } from '../system/words/en';
@@ -36,6 +37,7 @@ export function EmailForm({
   action,
   onSubmit,
   children,
+  edit = {},
   className,
 }: {
   labels?: Partial<EmailFormLabels>;
@@ -49,9 +51,12 @@ export function EmailForm({
   onSubmit?: FormEventHandler<HTMLFormElement>;
   /** More fields or a consent line, above the button. */
   children?: ReactNode;
+  /** The setting paths of its words, for edit mode (see edit.ts). */
+  edit?: EditPaths<'button' | 'sent' | 'error'>;
   className?: string;
 }) {
   const words = usePageWords('emailForm', labels);
+  const button = <span {...editable(edit.button)}>{words.button}</span>;
   const sent = status === 'sent' && hideWhenSent;
   return (
     <form
@@ -86,7 +91,7 @@ export function EmailForm({
                 loading={status === 'sending'}
                 className="flex-none"
               >
-                {words.button}
+                {button}
               </SiteButton>
             ) : null}
           </span>
@@ -98,12 +103,16 @@ export function EmailForm({
               loading={status === 'sending'}
               fullWidth
             >
-              {words.button}
+              {button}
             </SiteButton>
           ) : null}
         </>
       )}
-      <FormNotice status={status} sent={words.sent} error={words.error} />
+      <FormNotice
+        status={status}
+        sent={<span {...editable(edit.sent)}>{words.sent}</span>}
+        error={<span {...editable(edit.error)}>{words.error}</span>}
+      />
     </form>
   );
 }

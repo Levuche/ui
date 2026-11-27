@@ -89,7 +89,7 @@ export function Price({
   saveLabel?: string | null;
   size?: 'sm' | 'md' | 'lg';
   /** Each part's setting path, for edit mode (see edit.ts). */
-  edit?: EditPaths<'value' | 'period' | 'was'>;
+  edit?: EditPaths<'value' | 'period' | 'was' | 'save'>;
   className?: string;
 }) {
   const own = usePageWords('props');
@@ -123,7 +123,10 @@ export function Price({
         </span>
       ) : null}
       {saving && saveLabel ? (
-        <span className="text-site-link text-sm font-semibold">
+        <span
+          {...editable(edit.save)}
+          className="text-site-link text-sm font-semibold"
+        >
           {saveLabel.replace('{amount}', saving)}
         </span>
       ) : null}

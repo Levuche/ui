@@ -3,6 +3,7 @@ import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteLink } from '../atoms/link';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
+import { editable, editPath, editPaths } from '../system/edit';
 import type { LinkBehavior } from '../system/href';
 import {
   LinkTile,
@@ -83,7 +84,7 @@ export function LinkList({
                 )
         )}
       >
-        {links.map(({ label: text, href, ...link }, i) => (
+        {links.map(({ label: text, href, detail, trailing, ...link }, i) => (
           <li key={`${i}-${href}`} className="m-0 min-w-0">
             <LinkTile
               href={href}
@@ -92,8 +93,31 @@ export function LinkList({
               variant={variant}
               look={look}
               {...link}
+              detail={
+                detail ? (
+                  <span {...editable(editPath('links', i, 'detail'))}>
+                    {detail}
+                  </span>
+                ) : (
+                  detail
+                )
+              }
+              trailing={
+                trailing && trailing !== 'arrow' ? (
+                  <span {...editable(editPath('links', i, 'trailing'))}>
+                    {trailing}
+                  </span>
+                ) : (
+                  trailing
+                )
+              }
+              edit={editPaths(editPath('links', i), [
+                'href',
+                'image',
+                'favicon',
+              ])}
             >
-              {text}
+              <span {...editable(editPath('links', i, 'label'))}>{text}</span>
             </LinkTile>
           </li>
         ))}
@@ -141,6 +165,7 @@ export function FeaturedLink({
         sponsored={sponsored}
         nofollow={nofollow}
         action="link_click"
+        {...editable('href', 'link')}
         className="text-site-text flex flex-col no-underline"
       >
         <Thumb
@@ -148,11 +173,19 @@ export function FeaturedLink({
           alt={imageAlt}
           ratio={ratio}
           className="w-full rounded-none"
+          marks={editable('image', 'picture')}
         />
         <span className="p-block flex flex-col gap-0.5">
-          <span className="font-semibold">{title}</span>
+          <span {...editable('title')} className="font-semibold">
+            {title}
+          </span>
           {detail ? (
-            <span className="text-site-text-2 text-sm">{detail}</span>
+            <span
+              {...editable('detail', 'longText')}
+              className="text-site-text-2 text-sm"
+            >
+              {detail}
+            </span>
           ) : null}
         </span>
       </SiteLink>
@@ -195,6 +228,7 @@ export function SocialIcons({
               title={name}
               action="social_click"
               data-lift=""
+              {...editable(editPath('links', i, 'href'), 'link')}
               {...link}
               className={cn(
                 'text-site-text size-control-md inline-flex items-center justify-center rounded-full',

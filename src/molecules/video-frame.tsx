@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { PauseIcon, PlayIcon, SoundOnIcon } from '../atoms/icons';
 import { cn } from '../system/cn';
+import { editable, editPath, type EditPaths } from '../system/edit';
 import { isSafeMediaSrc } from '../system/href';
 import { safeImageSource, type ImageSrc } from '../system/image';
 import {
@@ -87,6 +88,7 @@ export function VideoFrame({
   captionStyle = 'below',
   labels,
   consent,
+  edit = {},
   className,
 }: {
   /** The video file's address. */
@@ -113,6 +115,11 @@ export function VideoFrame({
    * nothing downloads and nothing loops until they press play.
    */
   consent?: boolean;
+  /**
+   * Each part's setting path, for edit mode (see edit.ts). `tracks` is the
+   * list's path: each file is marked as "tracks.0.src".
+   */
+  edit?: EditPaths<'src' | 'poster' | 'caption' | 'tracks'>;
   className?: string;
 }) {
   const words = usePageWords('video', labels);
@@ -214,7 +221,9 @@ export function VideoFrame({
         className
       )}
     >
+      {/* A click on the play button over the cover picks the video. */}
       <div
+        {...editable(edit.src, 'link')}
         ref={frame}
         data-video-mode={mode}
         className={cn(
@@ -226,6 +235,7 @@ export function VideoFrame({
         {/* Captions come from `tracks`; a creator may have none to give. */}
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <video
+          {...editable(edit.poster, 'picture')}
           ref={video}
           src={cover || waits ? src : firstFrame(src)}
           poster={cover?.src}
@@ -246,6 +256,10 @@ export function VideoFrame({
         >
           {captionFiles.map((track) => (
             <track
+              {...editable(
+                editPath(edit.tracks ?? null, tracks.indexOf(track), 'src'),
+                'link'
+              )}
               key={`${track.lang}-${track.src}`}
               src={track.src}
               srcLang={track.lang}
@@ -295,7 +309,9 @@ export function VideoFrame({
         ) : null}
       </div>
       {caption && !(over && mode === 'watch') ? (
-        <TileCaption captionStyle={captionStyle}>{caption}</TileCaption>
+        <TileCaption captionStyle={captionStyle} edit={edit.caption}>
+          {caption}
+        </TileCaption>
       ) : null}
     </figure>
   );

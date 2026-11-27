@@ -7,6 +7,7 @@ import { Thumb } from '../atoms/thumb';
 import { SellButton, type SellProps } from '../molecules/sell-button';
 import type { HeadingTag } from '../molecules/item-head';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 import type { LinkBehavior } from '../system/href';
 import { usePageWords } from '../system/page-words';
 import { sellJson } from '../system/sell';
@@ -45,6 +46,7 @@ function Media({ media }: { media: ActionCardMedia }) {
         alt={media.alt ?? ''}
         ratio="square"
         className="size-18 flex-none"
+        marks={editable('media.src', 'picture')}
       />
     );
   }
@@ -67,6 +69,7 @@ function Media({ media }: { media: ActionCardMedia }) {
               'ring-site-surface absolute top-1 w-13 shadow-md ring-2',
               FAN[covers.length === 1 ? 1 : i]
             )}
+            marks={editable(editPath('media.covers', i, 'src'), 'picture')}
           />
         ))}
       </span>
@@ -74,7 +77,12 @@ function Media({ media }: { media: ActionCardMedia }) {
   }
   return (
     <span className="relative block flex-none">
-      <Avatar name={media.name} src={media.src} size={64} />
+      <Avatar
+        name={media.name}
+        src={media.src}
+        size={64}
+        marks={editable('media.src', 'picture')}
+      />
       {media.live ? (
         <span
           role="img"
@@ -133,6 +141,8 @@ export function ActionCard({
   }) {
   // A sell that can't check out falls back to the link, as SellButton does.
   const selling = Boolean(sellJson(sell));
+  // SellButton passes no marks on, so the bar's inside carries them.
+  const bar = selling ? editable('sell', 'setting') : editable('href', 'link');
   return (
     <Block
       as="article"
@@ -141,15 +151,28 @@ export function ActionCard({
       {...root}
       className={cn('relative', root.className)}
     >
-      {ribbon ? <Ribbon>{ribbon}</Ribbon> : null}
+      {ribbon ? <Ribbon {...editable('ribbon')}>{ribbon}</Ribbon> : null}
       <div className="flex items-center gap-4">
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <Heading className="text-block-title m-0 font-bold">{title}</Heading>
-          {detail ? <p className="text-site-text-2 m-0">{detail}</p> : null}
+          <Heading
+            {...editable('title')}
+            className="text-block-title m-0 font-bold"
+          >
+            {title}
+          </Heading>
+          {detail ? (
+            <p
+              {...editable('detail', 'longText')}
+              className="text-site-text-2 m-0"
+            >
+              {detail}
+            </p>
+          ) : null}
         </div>
         {media ? <Media media={media} /> : null}
       </div>
       <SellButton
+        edit={{ href: 'href', sell: 'sell' }}
         href={href}
         sell={sell}
         sellState={sellState}
@@ -167,8 +190,11 @@ export function ActionCard({
             : "after:absolute after:inset-0 after:content-['']"
         }
       >
-        <span className="flex w-full items-center justify-between gap-3">
-          {buttonLabel}
+        <span
+          {...bar}
+          className="flex w-full items-center justify-between gap-3"
+        >
+          <span {...editable('buttonLabel')}>{buttonLabel}</span>
           <span
             aria-hidden
             className="bg-site-on-button text-site-button flex size-7 flex-none items-center justify-center rounded-full"

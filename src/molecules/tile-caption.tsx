@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '../system/cn';
+import { editable } from '../system/edit';
 import type { CaptionStyle } from '../system/gallery';
 
 /**
@@ -29,15 +30,21 @@ const STYLES: Record<CaptionStyle, string> = {
 /** A picture's or a video's caption, below it or over it (see CAPTION_STYLES). */
 export function TileCaption({
   captionStyle = 'below',
+  edit,
   className,
   children,
 }: {
   captionStyle?: CaptionStyle;
+  /** The caption's setting path, for edit mode (see edit.ts). */
+  edit?: string;
   className?: string;
   children: ReactNode;
 }) {
   return (
-    <figcaption className={cn('m-0', STYLES[captionStyle], className)}>
+    <figcaption
+      {...editable(edit)}
+      className={cn('m-0', STYLES[captionStyle], className)}
+    >
       {children}
     </figcaption>
   );

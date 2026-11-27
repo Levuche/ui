@@ -1,6 +1,7 @@
 import type { FormEventHandler, ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { EmailIcon } from '../atoms/icons';
+import { editable } from '../system/edit';
 import type { FormStatus } from '../system/state';
 import { DialogButton } from '../molecules/dialog-button';
 import { EmailForm, type EmailFormLabels } from '../molecules/email-form';
@@ -64,10 +65,25 @@ export function NewsletterBand({
     ...(placeholder ? { placeholder } : {}),
     ...labels,
   };
+  const formEdit = {
+    button: labels?.button ? 'labels.button' : 'buttonLabel',
+    sent: 'labels.sent',
+    error: 'labels.error',
+  };
+  const about = detail ? (
+    <p
+      {...editable('detail', 'longText')}
+      className="text-site-text-2 m-0 text-sm"
+    >
+      {detail}
+    </p>
+  ) : null;
   const heading = (
     <div className="flex flex-col gap-1">
-      <Heading className="m-0 font-bold">{title}</Heading>
-      {detail ? <p className="text-site-text-2 m-0 text-sm">{detail}</p> : null}
+      <Heading {...editable('title')} className="m-0 font-bold">
+        {title}
+      </Heading>
+      {about}
     </div>
   );
 
@@ -81,22 +97,23 @@ export function NewsletterBand({
       >
         {heading}
         <DialogButton
-          label={words.open}
-          title={title}
-          closeLabel={words.close}
+          label={<span {...editable('tileLabels.open')}>{words.open}</span>}
+          title={<span {...editable('title')}>{title}</span>}
+          closeLabel={
+            <span {...editable('tileLabels.close')}>{words.close}</span>
+          }
           variant="outline"
           icon={<EmailIcon size={18} />}
           action="newsletter_open"
         >
-          {detail ? (
-            <p className="text-site-text-2 m-0 text-sm">{detail}</p>
-          ) : null}
+          {about}
           <EmailForm
             layout="stack"
             status={status}
             action={action}
             onSubmit={onSubmit}
             labels={formLabels}
+            edit={formEdit}
           />
         </DialogButton>
       </Block>
@@ -113,6 +130,7 @@ export function NewsletterBand({
         onSubmit={onSubmit}
         buttonVariant="outline"
         labels={formLabels}
+        edit={formEdit}
       />
     </Block>
   );

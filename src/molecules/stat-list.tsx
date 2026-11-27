@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '../system/cn';
+import { editable } from '../system/edit';
 import { usePageLocale } from '../system/page-words';
 
 /** One figure in a StatList. */
@@ -7,6 +8,8 @@ export type StatItem = {
   label: ReactNode;
   value: number | string;
   icon?: ReactNode;
+  /** The label's setting path, for edit mode (see edit.ts). */
+  edit?: string;
 };
 
 /**
@@ -33,7 +36,7 @@ export function StatList({
         <div key={n} className="flex flex-col-reverse">
           <dt className="text-site-text-2 inline-flex items-center gap-1 text-xs">
             {item.icon}
-            {item.label}
+            <span {...editable(item.edit)}>{item.label}</span>
           </dt>
           <dd className="m-0 font-bold tabular-nums">{write(item.value)}</dd>
         </div>
