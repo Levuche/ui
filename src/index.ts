@@ -190,6 +190,12 @@ export {
 } from './system/edit';
 export { EditMode, type EditChange, type EditPick } from './system/edit-mode';
 export {
+  BlockFrame,
+  BLOCK_FRAME_LABELS,
+  type BlockDropPlace,
+  type BlockFrameLabels,
+} from './system/block-frame';
+export {
   BLOCKS,
   BLOCK_GROUPS,
   BLOCK_PACKS,

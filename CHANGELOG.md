@@ -18,6 +18,10 @@ change when it moves to that version.
   setting's words in one more `span` than before; nothing else changes on
   a live page. Words drawn in a picture (the profile's turning words) are
   picked, not typed on, so an `EditPick`'s `element` can be an SVG element.
+- `BlockFrame`, the page editor's frame around each block: its name and
+  buttons to drag, move, duplicate, set and delete it, and to add a block
+  below, with keyboard shortcuts. One frame serves every block, so no
+  block adds buttons of its own; the editor keeps the list of blocks.
 
 ## 0.5.0 (2026-11-27)
 

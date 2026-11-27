@@ -522,6 +522,56 @@ their parts' paths. On a live page the marks do nothing. `e2e/edit.spec.ts`
 renders every block with every setting set and checks that every word, link
 and picture a creator set is marked with its path.
 
+### Buttons on every block in the editor
+
+The editor puts one `<BlockFrame>` around each block it shows, so every block
+gets the same buttons and no block has buttons of its own: its name, a grip
+to drag it, Move up and Move down, Duplicate, Settings, Delete, and a button
+under it to add a block below. The frame names the block for edit mode, so
+the block itself needs no `data-edit-block`:
+
+```tsx
+<EditMode onEdit={save} onPick={openPanel}>
+  <SitePage gap="lg">
+    {blocks.map((block, i) => (
+      <BlockFrame
+        key={block.id}
+        id={block.id}
+        label="Links"
+        first={i === 0}
+        last={i === blocks.length - 1}
+        selected={block.id === selected}
+        onSelect={setSelected}
+        onMove={(by) => move(block.id, by)}
+        onDrop={(from, place) => drop(from, block.id, place)}
+        onDuplicate={() => duplicate(block.id)}
+        onSettings={() => openSettings(block.id)}
+        onDelete={() => remove(block.id)}
+        onAdd={() => openAddMenu(block.id)}
+      >
+        <LinkList {...block.props} />
+      </BlockFrame>
+    ))}
+  </SitePage>
+</EditMode>
+```
+
+- **The frame only reports.** Each button calls its callback, and the editor
+  changes and saves its list of blocks (and offers an undo after a delete).
+  A button shows only when its callback is given, so a block that can't be
+  deleted simply gets no `onDelete`.
+- **When the buttons show.** Under a pointer, while the frame or anything in
+  it has the keyboard, and while the block is selected. A click or tap
+  anywhere in a block selects it and still reaches its words, so typing in
+  place works as before, and on a touch screen a tap shows the buttons.
+- **From the keyboard.** Tab reaches each block. On the block itself,
+  Delete or Backspace deletes it, Alt+Up and Alt+Down move it, and Ctrl+D
+  (Cmd+D) duplicates it; in a text box these keys type as usual.
+- **Dragging.** The grip drags the block; a line shows where it will land,
+  and `onDrop` hears the dragged block's id and `before` or `after`.
+- The buttons' words are in `labels`. `Editor/Block frame` in Storybook is a
+  working editor around release 1's blocks, with a test of every button.
+
 ### Sending forms to BuildBase Forms
 
 `NewsletterBand`, `LeadMagnet`, `ContactForm`, `PackCheckout` and `TipJar`
