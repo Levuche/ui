@@ -16,7 +16,8 @@ change when it moves to that version.
   `ItemHead`, `Price`, `LinkTile`, `Thumb` and `Avatar` take the paths of
   their parts. `e2e/edit.spec.ts` checks every block. Some blocks wrap a
   setting's words in one more `span` than before; nothing else changes on
-  a live page.
+  a live page. Words drawn in a picture (the profile's turning words) are
+  picked, not typed on, so an `EditPick`'s `element` can be an SVG element.
 
 ## 0.5.0 (2026-11-27)
 

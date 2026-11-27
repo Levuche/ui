@@ -27,7 +27,8 @@ export type EditChange = EditTarget & { value: string };
  * picture fills, so the editor can offer those too.
  */
 export type EditPick = EditTarget & {
-  element: HTMLElement;
+  /** The part on the page: an SVG element for words drawn in a picture. */
+  element: HTMLElement | SVGElement;
   around: EditTarget[];
 };
 
@@ -49,6 +50,8 @@ const FOCUSABLE =
  *   and look when clicked, or on Enter or F2 from the keyboard. Enter (or
  *   Ctrl+Enter over several lines) or leaving the box keeps what was typed;
  *   Escape puts it back. `onEdit` hears the new value when it changed.
+ *   Words drawn in a picture, as an SVG, can't be typed on there: a click
+ *   on them calls `onPick`, so the editor opens them beside the page.
  * - Links, pictures and other settings call `onPick`, with the element, so
  *   the editor can open what sets it beside it, and the parts around it
  *   (`around`), so a picture that fills a link can offer the link too.
@@ -177,10 +180,12 @@ export function EditMode({
     const open = (node: EventTarget | null) => {
       const target = editTargetOf(node);
       if (!target || !(node instanceof Element)) return false;
-      const part = node.closest<HTMLElement>(`[${EDIT_ATTR}]`);
+      const part = node.closest<HTMLElement | SVGElement>(`[${EDIT_ATTR}]`);
       if (!part || !root.contains(part)) return false;
-      if (TYPED_KINDS.has(target.kind)) type(part, target);
-      else {
+      // Words drawn in a picture (on a curve, say) can't be typed on there.
+      if (TYPED_KINDS.has(target.kind) && part instanceof HTMLElement) {
+        type(part, target);
+      } else {
         const around: EditTarget[] = [];
         let outer = part.parentElement?.closest<HTMLElement>(`[${EDIT_ATTR}]`);
         while (outer && root.contains(outer)) {

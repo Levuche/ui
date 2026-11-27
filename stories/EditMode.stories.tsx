@@ -396,6 +396,26 @@ export const ReleaseOneBlocks: Story = {
         }
       }
 
+      // The words turning around the picture are drawn on a curve, where
+      // they can't be typed on: a click hands them to the editor instead.
+      const ring = canvasElement.querySelector<SVGElement>(
+        '[data-edit-block="header"] [data-word-ring] svg [data-edit]'
+      );
+      if (!ring) problems.push('header wordRing: not on the page');
+      else {
+        await userEvent.click(ring, { skipHover: true });
+        if (
+          changes().lastElementChild?.textContent !== 'header wordRing (text)'
+        ) {
+          problems.push(
+            "header wordRing: a click didn't hand it to the editor"
+          );
+        }
+        if (canvas.queryByRole('textbox')) {
+          problems.push('header wordRing: a text box opened on the curve');
+        }
+      }
+
       // Escape puts the words back.
       const name = canvasElement.querySelector<HTMLElement>(
         '[data-edit-block="text"] [data-edit="text"]'
