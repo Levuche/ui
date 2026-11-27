@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { CalendarIcon } from '../atoms/icons';
 import { cn } from '../system/cn';
+import { editPath, editable, type EditPaths } from '../system/edit';
 import { useHydrated, useVisitorLocale } from '../system/locale';
 import { usePageWords } from '../system/page-words';
 import {
@@ -40,6 +41,7 @@ export function DaysLeft({
   now: fixedNow,
   locale,
   labels,
+  edit = {},
   className,
 }: {
   /** A date and time, as an ISO string. */
@@ -48,6 +50,11 @@ export function DaysLeft({
   now?: number;
   locale?: string;
   labels?: Partial<DaysLeftLabels>;
+  /**
+   * For edit mode (see edit.ts): the deadline's setting path, and the path
+   * the words are under, as 'labels'.
+   */
+  edit?: EditPaths<'deadline' | 'labels'>;
   className?: string;
 }) {
   const words = usePageWords('daysLeft', labels);
@@ -69,13 +76,20 @@ export function DaysLeft({
   });
   if (!date) return null;
   const state = now === null ? null : deadlineState(deadline, now);
+  // A word with {n} in it isn't typed in place: it shows the filled number.
+  const leftWord = !state
+    ? null
+    : state.ended
+      ? 'ended'
+      : state.days === 1
+        ? 'oneDay'
+        : null;
   const left = !state
     ? ''
-    : state.ended
-      ? words.ended
-      : state.days === 1
-        ? words.oneDay
-        : fillTemplate(words.days, { n: state.days });
+    : leftWord
+      ? words[leftWord]
+      : fillTemplate(words.days, { n: state.days });
+  const leftPath = leftWord ? editPath(edit.labels ?? null, leftWord) : null;
   const iso = new Date(deadline).toISOString();
   return (
     <p
@@ -86,12 +100,16 @@ export function DaysLeft({
       data-ended={state?.ended ? '' : undefined}
     >
       <CalendarIcon size={15} className="flex-none" />
-      <time dateTime={iso}>{fillTemplate(words.due, { date })}</time>
+      <time {...editable(edit.deadline, 'setting')} dateTime={iso}>
+        {fillTemplate(words.due, { date })}
+      </time>
       {left ? (
         <>
           <span aria-hidden>·</span>
           <span className="sr-only">, </span>
-          <span className="font-semibold">{left}</span>
+          <span {...editable(leftPath)} className="font-semibold">
+            {left}
+          </span>
         </>
       ) : null}
     </p>

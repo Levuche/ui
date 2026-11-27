@@ -1,4 +1,5 @@
 import { cn } from '../system/cn';
+import { editable, type EditPaths } from '../system/edit';
 import { usePageWords } from '../system/page-words';
 
 type Amount = {
@@ -73,6 +74,7 @@ export function Price({
   was,
   saveLabel: saveLabelProp,
   size = 'md',
+  edit = {},
   className,
 }: {
   value: string;
@@ -86,6 +88,8 @@ export function Price({
    */
   saveLabel?: string | null;
   size?: 'sm' | 'md' | 'lg';
+  /** Each part's setting path, for edit mode (see edit.ts). */
+  edit?: EditPaths<'value' | 'period' | 'was' | 'save'>;
   className?: string;
 }) {
   const own = usePageWords('props');
@@ -102,7 +106,7 @@ export function Price({
       {was ? (
         <s className="text-site-text-2 text-sm whitespace-nowrap tabular-nums">
           <span className="sr-only">{own.was} </span>
-          {was}
+          <span {...editable(edit.was)}>{was}</span>
         </s>
       ) : null}
       <span
@@ -111,13 +115,18 @@ export function Price({
           sizes[size] ?? sizes.md
         )}
       >
-        {value}
+        <span {...editable(edit.value)}>{value}</span>
       </span>
       {period ? (
-        <span className="text-site-text-2 text-sm">/ {period}</span>
+        <span className="text-site-text-2 text-sm">
+          / <span {...editable(edit.period)}>{period}</span>
+        </span>
       ) : null}
       {saving && saveLabel ? (
-        <span className="text-site-link text-sm font-semibold">
+        <span
+          {...editable(edit.save)}
+          className="text-site-link text-sm font-semibold"
+        >
           {saveLabel.replace('{amount}', saving)}
         </span>
       ) : null}

@@ -4,6 +4,7 @@ import { Block, type BlockRootProps } from '../atoms/block';
 import { CheckIcon } from '../atoms/icons';
 import { WordRing, type WordRingLabels } from '../molecules/word-ring';
 import { cn } from '../system/cn';
+import { editable } from '../system/edit';
 import { toImageSource, type ImageSrc } from '../system/image';
 import {
   nameLook,
@@ -136,7 +137,7 @@ export function CreatorHeader({
         )}
         style={nameStyle.style}
       >
-        {name}
+        <span {...editable('name')}>{name}</span>
         {verified ? (
           <span
             role="img"
@@ -146,10 +147,13 @@ export function CreatorHeader({
             <CheckIcon size={13} strokeWidth={3} />
           </span>
         ) : null}
-        {badge}
+        {badge ? <span {...editable('badge')}>{badge}</span> : null}
       </Heading>
       {tagline ? (
-        <p className="text-site-text-2 m-0 text-sm">
+        <p
+          {...editable('tagline', 'longText')}
+          className="text-site-text-2 m-0 text-sm"
+        >
           {withHighlight(tagline, highlight)}
         </p>
       ) : null}
@@ -163,6 +167,7 @@ export function CreatorHeader({
       shape={avatarShape}
       ring={avatarRing}
       initialsFont={initialsFont}
+      marks={editable('avatar', 'picture')}
     />
   );
   const photo = wordRing?.trim() ? (
@@ -171,6 +176,7 @@ export function CreatorHeader({
       size={avatarSize}
       speed={wordRingSpeed}
       labels={wordRingLabels}
+      edit="wordRing"
     >
       {avatarImage}
     </WordRing>

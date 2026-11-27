@@ -203,7 +203,9 @@ export const BookingWithNextFreeTime: StoryObj<typeof BookingEmbed> = {
   play: async ({ canvas, canvasElement }) => {
     await expect(canvas.getByText('30 min')).toBeVisible();
     // Screen readers hear what the length is.
-    await expect(canvas.getByText('30 min').textContent).toContain('Length');
+    await expect(
+      canvas.getByText('30 min').closest('li')?.textContent
+    ).toContain('Length');
     const time = canvasElement.querySelector('time');
     await expect(time).toHaveAttribute('dateTime', '2026-12-03T04:30:00Z');
     // 04:30 UTC is 10:00 in India.

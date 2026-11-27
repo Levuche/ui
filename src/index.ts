@@ -171,6 +171,31 @@ export {
   usePreviewMode,
 } from './system/preview-mode';
 export {
+  EDITING_ATTR,
+  EDIT_ATTR,
+  EDIT_BLOCK_ATTR,
+  EDIT_KINDS,
+  EDIT_KIND_ATTR,
+  EDIT_MODE_ATTR,
+  TYPED_KINDS,
+  editPath,
+  editPaths,
+  editTargetOf,
+  editable,
+  editedText,
+  type EditKind,
+  type EditMarks,
+  type EditPaths,
+  type EditTarget,
+} from './system/edit';
+export { EditMode, type EditChange, type EditPick } from './system/edit-mode';
+export {
+  BlockFrame,
+  BLOCK_FRAME_LABELS,
+  type BlockDropPlace,
+  type BlockFrameLabels,
+} from './system/block-frame';
+export {
   BLOCKS,
   BLOCK_GROUPS,
   BLOCK_PACKS,

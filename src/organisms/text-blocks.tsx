@@ -3,6 +3,7 @@ import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteDivider, SiteHeading } from '../atoms/text';
 import { RichText } from '../molecules/rich-text';
 import { cn } from '../system/cn';
+import { editable } from '../system/edit';
 import { GRID_GAP, GRID_ROW } from '../system/grid';
 import type { ImageSrc } from '../system/image';
 import {
@@ -68,6 +69,7 @@ export function SectionHeading({
       className={cn('scroll-mt-6 justify-end gap-1', root.className)}
     >
       <SiteHeading
+        {...editable('title')}
         as={headingAs}
         size="lg"
         className={cn(
@@ -79,7 +81,12 @@ export function SectionHeading({
         {title}
       </SiteHeading>
       {detail ? (
-        <p className="text-site-text-2 m-0 leading-snug">{detail}</p>
+        <p
+          {...editable('detail', 'longText')}
+          className="text-site-text-2 m-0 leading-snug"
+        >
+          {detail}
+        </p>
       ) : null}
     </Block>
   );
@@ -103,6 +110,7 @@ export function TextBlock({
     <Block name="text-block" {...root}>
       <RichText
         text={text}
+        marks={editable('text', 'longText')}
         markers={align === 'start' ? 'outside' : 'inside'}
         className="self-stretch"
       />
@@ -142,18 +150,32 @@ export function QuoteBlock({
         >
           “
         </span>
-        <p className="text-block-title m-0 leading-snug font-semibold whitespace-pre-line">
+        <p
+          {...editable('quote', 'longText')}
+          className="text-block-title m-0 leading-snug font-semibold whitespace-pre-line"
+        >
           {quote}
         </p>
       </blockquote>
       {name ? (
         <figcaption className="flex items-center gap-2.5 text-sm">
           {avatar !== undefined ? (
-            <Avatar name={name} src={avatar} size={40} />
+            <Avatar
+              name={name}
+              src={avatar}
+              size={40}
+              marks={editable('avatar', 'picture')}
+            />
           ) : null}
           <span className="flex min-w-0 flex-col">
-            <span className="font-semibold">{name}</span>
-            {detail ? <span className="text-site-text-2">{detail}</span> : null}
+            <span {...editable('name')} className="font-semibold">
+              {name}
+            </span>
+            {detail ? (
+              <span {...editable('detail')} className="text-site-text-2">
+                {detail}
+              </span>
+            ) : null}
           </span>
         </figcaption>
       ) : null}
@@ -190,6 +212,7 @@ export function Spacer({
     <Block
       name="spacer"
       defaults={{ tone: 'plain' }}
+      {...editable('rows', 'setting')}
       {...(line ? {} : { 'aria-hidden': true })}
       {...root}
       className={cn('justify-center', root.className)}

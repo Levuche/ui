@@ -5,6 +5,7 @@ import { Avatar } from '../atoms/avatar';
 import { ChatIcon, DownloadIcon, EmailIcon, SendIcon } from '../atoms/icons';
 import { siteButtonClasses } from '../atoms/button';
 import { cn } from '../system/cn';
+import { editable } from '../system/edit';
 import type { ImageSrc } from '../system/image';
 import {
   cleanMessageTarget,
@@ -85,13 +86,18 @@ export function ContactForm({
       {...root}
     >
       {title ? (
-        <ItemHead title={title} detail={detail} headingAs={headingAs} />
+        <ItemHead
+          title={title}
+          detail={detail}
+          headingAs={headingAs}
+          edit={{ title: 'title', detail: 'detail' }}
+        />
       ) : null}
       {sent ? null : (
         <>
           {askName ? (
             <Field
-              label={words.name}
+              label={<span {...editable('labels.name')}>{words.name}</span>}
               name="name"
               autoComplete="name"
               required
@@ -99,7 +105,7 @@ export function ContactForm({
             />
           ) : null}
           <Field
-            label={words.email}
+            label={<span {...editable('labels.email')}>{words.email}</span>}
             name="email"
             type="email"
             autoComplete="email"
@@ -107,7 +113,7 @@ export function ContactForm({
             readOnly={busy}
           />
           <Field
-            label={words.message}
+            label={<span {...editable('labels.message')}>{words.message}</span>}
             name="message"
             multiline
             rows={4}
@@ -132,11 +138,15 @@ export function ContactForm({
             action="contact"
             fullWidth
           >
-            {words.button}
+            <span {...editable('labels.button')}>{words.button}</span>
           </SiteButton>
         </>
       )}
-      <FormNotice status={status} sent={words.sent} error={words.error} />
+      <FormNotice
+        status={status}
+        sent={<span {...editable('labels.sent')}>{words.sent}</span>}
+        error={<span {...editable('labels.error')}>{words.error}</span>}
+      />
     </Block>
   );
 }
@@ -224,10 +234,16 @@ export function SaveContact({
   return (
     <Block name="save-contact" {...root}>
       {title ? (
-        <ItemHead title={title} detail={detail} headingAs={headingAs} />
+        <ItemHead
+          title={title}
+          detail={detail}
+          headingAs={headingAs}
+          edit={{ title: 'title', detail: 'detail' }}
+        />
       ) : null}
       {/* Our own contact card, built here; not an address a creator typed. */}
       <a
+        {...editable('contact', 'setting')}
         href={href}
         download={file}
         data-action="save_contact"
@@ -237,7 +253,7 @@ export function SaveContact({
         })}
       >
         <DownloadIcon size={18} />
-        {buttonLabel}
+        <span {...editable('buttonLabel')}>{buttonLabel}</span>
       </a>
     </Block>
   );
@@ -287,7 +303,7 @@ export function MessageCard({
   to,
   message,
   subject,
-  editable = false,
+  editable: changeable = false,
   showTarget = true,
   hideFromSource = true,
   buttonLabel,
@@ -341,19 +357,32 @@ export function MessageCard({
       <div className="gap-block-gap grid grid-cols-1 @xl:grid-cols-2 @xl:items-center">
         <div className="flex min-w-0 items-center gap-3">
           {picture !== undefined ? (
-            <Avatar name={name} src={picture} size={52} />
+            <Avatar
+              name={name}
+              src={picture}
+              size={52}
+              marks={editable('picture', 'picture')}
+            />
           ) : null}
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <Heading className="text-block-title m-0 leading-tight font-bold [overflow-wrap:anywhere]">
+            <Heading
+              {...editable('name')}
+              className="text-block-title m-0 leading-tight font-bold [overflow-wrap:anywhere]"
+            >
               {name}
             </Heading>
             {detail ? (
-              <p className="text-site-text-2 m-0 text-sm">{detail}</p>
+              <p
+                {...editable('detail', 'longText')}
+                className="text-site-text-2 m-0 text-sm"
+              >
+                {detail}
+              </p>
             ) : null}
             {showTarget && shown ? (
               <p className="text-site-text-2 m-0 min-h-5 text-sm [overflow-wrap:anywhere]">
                 {/* A number reads left to right in any script. */}
-                <span dir="ltr">
+                <span {...editable('to')} dir="ltr">
                   <HiddenText text={conceal(shown)} hidden={hideFromSource} />
                 </span>
               </p>
@@ -361,10 +390,10 @@ export function MessageCard({
           </div>
         </div>
         <div className="gap-block-gap flex min-w-0 flex-col">
-          {text && !editable ? (
+          {text && !changeable ? (
             <p className="bg-site-surface-2 text-site-text rounded-block-inner m-0 max-w-[90%] self-start rounded-ss-sm px-3.5 py-2.5 text-start text-sm [overflow-wrap:anywhere] whitespace-pre-line">
               <span className="sr-only">{words.preview}: </span>
-              {text}
+              <span {...editable('message', 'longText')}>{text}</span>
             </p>
           ) : null}
           <MessageComposer
@@ -373,12 +402,25 @@ export function MessageCard({
             hidden={hideFromSource}
             message={text}
             subject={title}
-            editable={editable}
-            fieldLabel={words.message}
-            hint={words.hint}
-            button={buttonLabel ?? words[channel]}
+            editable={changeable}
+            fieldLabel={
+              <span {...editable('labels.message')}>{words.message}</span>
+            }
+            hint={<span {...editable('labels.hint')}>{words.hint}</span>}
+            button={
+              <span
+                {...editable(
+                  buttonLabel === undefined
+                    ? `labels.${channel}`
+                    : 'buttonLabel'
+                )}
+              >
+                {buttonLabel ?? words[channel]}
+              </span>
+            }
             buttonVariant={buttonVariant}
             icon={CHANNEL_ICONS[channel]}
+            edit={{ message: 'message' }}
           />
         </div>
       </div>

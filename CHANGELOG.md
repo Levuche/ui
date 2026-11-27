@@ -4,6 +4,25 @@ What changed in each release of `@levuche/ui`, newest first. Each release
 pull request into `dev` adds its section here, with anything an app must
 change when it moves to that version.
 
+## Unreleased
+
+### Added
+
+- `EditMode`, for editing blocks on the page in the page editor: a click on
+  a block's words opens a text box in their place, and a click on a link,
+  picture or other setting tells the editor which one, so it can open what
+  sets it beside the block. Every block marks the parts a creator sets
+  with `editable(path, kind)` (`data-edit` and `data-edit-kind`), and
+  `ItemHead`, `Price`, `LinkTile`, `Thumb` and `Avatar` take the paths of
+  their parts. `e2e/edit.spec.ts` checks every block. Some blocks wrap a
+  setting's words in one more `span` than before; nothing else changes on
+  a live page. Words drawn in a picture (the profile's turning words) are
+  picked, not typed on, so an `EditPick`'s `element` can be an SVG element.
+- `BlockFrame`, the page editor's frame around each block: its name and
+  buttons to drag, move, duplicate, set and delete it, and to add a block
+  below, with keyboard shortcuts. One frame serves every block, so no
+  block adds buttons of its own; the editor keeps the list of blocks.
+
 ## 0.5.0 (2026-11-27)
 
 Every open item from the block review, and four blocks that had the same

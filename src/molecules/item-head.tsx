@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Eyebrow } from '../atoms/text';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
+import { editable, type EditPaths } from '../system/edit';
 import type { ImageSrc } from '../system/image';
 
 export type HeadingTag = 'h2' | 'h3' | 'h4' | 'p';
@@ -22,6 +23,9 @@ export function subHeading(tag: HeadingTag | undefined): SubHeadingTag {
  * The top of a card: an optional picture, a small line above the title, the
  * title and a line or two about it. `media="side"` puts a small square
  * picture beside the words; `top` puts a wide one above them.
+ *
+ * `edit` gives each part's setting path, for edit mode (see edit.ts): with
+ * { title: 'items.0.title' } the title can be typed in place.
  */
 export function ItemHead({
   title,
@@ -32,6 +36,7 @@ export function ItemHead({
   media = 'side',
   ratio,
   headingAs: Heading = 'h3',
+  edit = {},
   className,
 }: {
   title: ReactNode;
@@ -43,6 +48,8 @@ export function ItemHead({
   media?: 'side' | 'top';
   ratio?: ThumbRatio;
   headingAs?: HeadingTag | SubHeadingTag;
+  /** Each part's setting path, for edit mode. */
+  edit?: EditPaths<'title' | 'detail' | 'eyebrow' | 'image'>;
   className?: string;
 }) {
   const picture =
@@ -53,15 +60,28 @@ export function ItemHead({
         ratio={ratio ?? (media === 'top' ? 'auto' : 'square')}
         sizes={media === 'top' ? undefined : '52px'}
         className={media === 'top' ? 'h-28 w-full' : 'size-13'}
+        marks={editable(edit.image, 'picture')}
       />
     ) : null;
   const words = (
     <div className="flex min-w-0 flex-1 flex-col gap-1">
-      {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
-      <Heading className="text-block-title m-0 leading-tight font-bold">
+      {eyebrow ? (
+        <Eyebrow {...editable(edit.eyebrow)}>{eyebrow}</Eyebrow>
+      ) : null}
+      <Heading
+        {...editable(edit.title)}
+        className="text-block-title m-0 leading-tight font-bold"
+      >
         {title}
       </Heading>
-      {detail ? <p className="text-site-text-2 m-0 text-sm">{detail}</p> : null}
+      {detail ? (
+        <p
+          {...editable(edit.detail, 'longText')}
+          className="text-site-text-2 m-0 text-sm"
+        >
+          {detail}
+        </p>
+      ) : null}
     </div>
   );
   return media === 'top' ? (

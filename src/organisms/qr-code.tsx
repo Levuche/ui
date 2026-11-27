@@ -5,6 +5,7 @@ import { siteButtonClasses, type SiteButtonVariant } from '../atoms/button';
 import { DownloadIcon } from '../atoms/icons';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { cn } from '../system/cn';
+import { editable } from '../system/edit';
 import { safeImageSource } from '../system/image';
 import { isSafeColor } from '../system/theme';
 import { usePageWords } from '../system/page-words';
@@ -139,12 +140,25 @@ export function QrCode({
   return (
     <Block name="qr-code" defaults={{ align: 'center' }} size={size} {...root}>
       {title ? (
-        <ItemHead title={title} detail={detail} headingAs={headingAs} />
+        <ItemHead
+          title={title}
+          detail={detail}
+          headingAs={headingAs}
+          edit={{ title: 'title', detail: 'detail' }}
+        />
       ) : detail ? (
-        <p className="text-site-text-2 m-0 text-sm">{detail}</p>
+        <p
+          {...editable('detail', 'longText')}
+          className="text-site-text-2 m-0 text-sm"
+        >
+          {detail}
+        </p>
       ) : null}
       {picture ? (
         <img
+          {...(ownPicture
+            ? editable('src', 'picture')
+            : editable('value', 'link'))}
           src={picture}
           alt={name}
           className={cn(
@@ -154,7 +168,12 @@ export function QrCode({
           style={{ background: paper }}
         />
       ) : null}
-      <p className="text-site-text-2 m-0 text-sm break-all">
+      <p
+        {...(caption === undefined || caption === null
+          ? editable('value', 'link')
+          : editable('caption'))}
+        className="text-site-text-2 m-0 text-sm break-all"
+      >
         {caption ?? value.replace(/^https?:\/\//, '')}
       </p>
       {download && picture ? (
@@ -168,7 +187,7 @@ export function QrCode({
           })}
         >
           <DownloadIcon size={18} />
-          {downloadLabel}
+          <span {...editable('downloadLabel')}>{downloadLabel}</span>
         </a>
       ) : null}
     </Block>

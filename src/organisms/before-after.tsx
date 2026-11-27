@@ -6,6 +6,7 @@ import { ArrowsHorizontalIcon } from '../atoms/icons';
 import { Badge } from '../atoms/text';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
+import { editable } from '../system/edit';
 import { useControllableState } from '../system/state';
 import type { ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
@@ -75,6 +76,7 @@ export function BeforeAfter({
           alt={after.alt}
           ratio={ratio}
           className="w-full rounded-none"
+          marks={editable('after.src', 'picture')}
         />
         {/* The before picture shows from the side the text starts on, so it
             follows the slider in right-to-left scripts too. */}
@@ -87,14 +89,23 @@ export function BeforeAfter({
             alt={before.alt}
             ratio={ratio}
             className="size-full rounded-none"
+            marks={editable('before.src', 'picture')}
           />
         </div>
         {showLabels ? (
           <>
-            <Badge className="absolute start-2 top-2" aria-hidden>
+            <Badge
+              {...editable('labels.before')}
+              className="absolute start-2 top-2"
+              aria-hidden
+            >
               {words.before}
             </Badge>
-            <Badge className="absolute end-2 top-2" aria-hidden>
+            <Badge
+              {...editable('labels.after')}
+              className="absolute end-2 top-2"
+              aria-hidden
+            >
               {words.after}
             </Badge>
           </>
@@ -129,7 +140,12 @@ export function BeforeAfter({
         />
       </div>
       {caption ? (
-        <figcaption className="text-site-text-2 text-sm">{caption}</figcaption>
+        <figcaption
+          {...editable('caption')}
+          className="text-site-text-2 text-sm"
+        >
+          {caption}
+        </figcaption>
       ) : null}
     </Block>
   );

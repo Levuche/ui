@@ -4,6 +4,7 @@ import type { SiteButtonVariant } from '../atoms/button';
 import { ClockIcon } from '../atoms/icons';
 import { Badge, Ribbon } from '../atoms/text';
 import { cn } from '../system/cn';
+import { editable, type EditPaths } from '../system/edit';
 import type { LinkBehavior } from '../system/href';
 import type { FormStatus } from '../system/state';
 import { CheckList } from '../molecules/check-list';
@@ -75,15 +76,17 @@ export function BookingCard({
         detail={detail}
         image={image}
         headingAs={headingAs}
+        edit={{ title: 'title', detail: 'detail', image: 'image' }}
       />
       <p className="m-0 flex items-center justify-between gap-3 text-sm">
         <span className="text-site-text-2 inline-flex items-center gap-1.5">
           <ClockIcon size={16} />
-          {duration}
+          <span {...editable('duration')}>{duration}</span>
         </span>
-        <Price value={price} />
+        <Price value={price} edit={{ value: 'price' }} />
       </p>
       <SellButton
+        edit={{ href: 'href', sell: 'sell' }}
         href={href}
         sell={sell}
         sellState={sellState}
@@ -95,35 +98,13 @@ export function BookingCard({
         nofollow={nofollow}
         action="book"
       >
-        {buttonLabel}
+        <span {...editable('buttonLabel')}>{buttonLabel}</span>
       </SellButton>
     </Block>
   );
 }
 
-/** A membership tier: the price per period, what members get and a link. */
-export function MembershipCard({
-  title,
-  price,
-  was,
-  period: periodProp,
-  perks,
-  href,
-  sell,
-  sellState,
-  sellLabels,
-  renderBuy,
-  buttonLabel: buttonLabelProp,
-  featured = false,
-  featuredLabel,
-  ribbon,
-  headingAs: Heading = 'h3',
-  newTab,
-  sponsored,
-  nofollow,
-  saveLabel,
-  ...root
-}: BlockRootProps &
+type MembershipCardProps = BlockRootProps &
   LinkBehavior &
   SellProps & {
     /** With `was`, what the visitor saves ("Save {amount}"); null hides it. */
@@ -145,7 +126,67 @@ export function MembershipCard({
     /** A small tilted label over the top corner, such as "Best value". */
     ribbon?: ReactNode;
     headingAs?: HeadingTag | SubHeadingTag;
-  }) {
+  };
+
+/** The parts of a membership tier edit mode marks (see edit.ts). */
+export type MembershipEditPaths = EditPaths<
+  | 'title'
+  | 'price'
+  | 'was'
+  | 'period'
+  | 'perks'
+  | 'buttonLabel'
+  | 'featuredLabel'
+  | 'ribbon'
+  | 'href'
+  | 'sell'
+>;
+
+const MEMBERSHIP_EDIT: MembershipEditPaths = {
+  href: 'href',
+  sell: 'sell',
+  title: 'title',
+  price: 'price',
+  was: 'was',
+  period: 'period',
+  perks: 'perks',
+  buttonLabel: 'buttonLabel',
+  featuredLabel: 'featuredLabel',
+  ribbon: 'ribbon',
+};
+
+/** A membership tier: the price per period, what members get and a link. */
+export function MembershipCard(props: MembershipCardProps) {
+  return <MembershipTier {...props} edit={MEMBERSHIP_EDIT} />;
+}
+
+/**
+ * MembershipCard with the setting paths its parts are marked with, for a
+ * block that shows tiers among its own settings, as PricingTable does.
+ */
+export function MembershipTier({
+  title,
+  price,
+  was,
+  period: periodProp,
+  perks,
+  href,
+  sell,
+  sellState,
+  sellLabels,
+  renderBuy,
+  buttonLabel: buttonLabelProp,
+  featured = false,
+  featuredLabel,
+  ribbon,
+  headingAs: Heading = 'h3',
+  newTab,
+  sponsored,
+  nofollow,
+  saveLabel,
+  edit = {},
+  ...root
+}: MembershipCardProps & { edit?: MembershipEditPaths }) {
   const own = usePageWords('props');
   const period = periodProp === undefined ? own.month : periodProp;
   const buttonLabel =
@@ -161,11 +202,18 @@ export function MembershipCard({
         root.className
       )}
     >
-      {ribbon ? <Ribbon>{ribbon}</Ribbon> : null}
+      {ribbon ? <Ribbon {...editable(edit.ribbon)}>{ribbon}</Ribbon> : null}
       <div className="flex items-center justify-between gap-2">
-        <Heading className="text-block-title m-0 font-bold">{title}</Heading>
+        <Heading
+          {...editable(edit.title)}
+          className="text-block-title m-0 font-bold"
+        >
+          {title}
+        </Heading>
         {featured && featuredLabel ? (
-          <Badge tone="solid">{featuredLabel}</Badge>
+          <Badge {...editable(edit.featuredLabel)} tone="solid">
+            {featuredLabel}
+          </Badge>
         ) : null}
       </div>
       <p className="m-0">
@@ -175,10 +223,17 @@ export function MembershipCard({
           was={was}
           period={period}
           size="lg"
+          edit={{
+            save: 'saveLabel',
+            value: edit.price,
+            was: edit.was,
+            period: edit.period,
+          }}
         />
       </p>
-      <CheckList items={perks} />
+      <CheckList items={perks} path={edit.perks} />
       <SellButton
+        edit={{ href: edit.href, sell: edit.sell }}
         href={href}
         sell={sell}
         sellState={sellState}
@@ -190,7 +245,7 @@ export function MembershipCard({
         nofollow={nofollow}
         action="join"
       >
-        {buttonLabel}
+        <span {...editable(edit.buttonLabel)}>{buttonLabel}</span>
       </SellButton>
     </Block>
   );
@@ -252,6 +307,12 @@ export function LeadMagnet({
         image={image}
         media="top"
         headingAs={headingAs}
+        edit={{
+          title: 'title',
+          detail: 'detail',
+          eyebrow: 'labels.free',
+          image: 'image',
+        }}
       />
       <EmailForm
         layout="stack"
@@ -263,6 +324,11 @@ export function LeadMagnet({
           ...formLabels,
           button: buttonLabel,
           ...(placeholder ? { placeholder } : {}),
+        }}
+        edit={{
+          button: buttonLabelProp ? 'buttonLabel' : 'labels.button',
+          sent: 'labels.sent',
+          error: 'labels.error',
         }}
       >
         <SellField sell={sell} />

@@ -4,6 +4,7 @@ import { SiteLink } from '../atoms/link';
 import { AudioBar, type AudioBarLabels } from '../molecules/audio-bar';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { LiveData } from '../molecules/live-data';
+import { editable } from '../system/edit';
 import type { LiveProps } from '../system/live';
 import type { ImageSrc } from '../system/image';
 import { usePageWords } from '../system/page-words';
@@ -50,7 +51,13 @@ export function AudioPlayer({
   }) {
   return (
     <Block name="audio-player" {...root}>
-      {heading ? <ItemHead title={heading} headingAs={headingAs} /> : null}
+      {heading ? (
+        <ItemHead
+          title={heading}
+          headingAs={headingAs}
+          edit={{ title: 'heading' }}
+        />
+      ) : null}
       <AudioBar
         src={src}
         title={title}
@@ -58,6 +65,14 @@ export function AudioPlayer({
         image={image}
         transcriptHref={transcriptHref}
         labels={labels}
+        edit={{
+          src: 'src',
+          title: 'title',
+          detail: 'detail',
+          image: 'image',
+          transcriptHref: 'transcriptHref',
+          transcript: 'labels.transcript',
+        }}
       />
       <MediaNotice
         sources={[src]}
@@ -114,7 +129,13 @@ export function PodcastEpisodes({
   const allLabel = allLabelProp === undefined ? own.allEpisodes : allLabelProp;
   return (
     <Block name="podcast-episodes" {...root}>
-      {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
+      {title ? (
+        <ItemHead
+          title={title}
+          headingAs={headingAs}
+          edit={{ title: 'title' }}
+        />
+      ) : null}
       <LiveData
         data={data}
         loading={loading}
@@ -134,6 +155,7 @@ export function PodcastEpisodes({
                     transcriptHref={episode.transcriptUrl}
                     href={episode.href}
                     labels={labels}
+                    edit={{ transcript: 'labels.transcript' }}
                   />
                 </li>
               ))}
@@ -145,12 +167,13 @@ export function PodcastEpisodes({
             />
             {allHref ? (
               <SiteLink
+                {...editable('allHref', 'link')}
                 href={allHref}
                 newTab
                 action="podcast_all"
                 className="self-start text-sm font-semibold"
               >
-                {allLabel}
+                <span {...editable('allLabel')}>{allLabel}</span>
               </SiteLink>
             ) : null}
           </>

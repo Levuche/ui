@@ -8,6 +8,7 @@ import { CountUp, type NumberStyle } from '../molecules/count-up';
 import { ItemHead, subHeading, type HeadingTag } from '../molecules/item-head';
 import { PlayFrame } from '../molecules/play-frame';
 import { cn } from '../system/cn';
+import { editPath, editable } from '../system/edit';
 import type { LinkBehavior } from '../system/href';
 import type { ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
@@ -60,20 +61,40 @@ export function StatsRow({
   const cols = columns ?? (Math.min(4, Math.max(2, stats.length)) as 2 | 3 | 4);
   return (
     <Block name="stats-row" {...root}>
-      {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
+      {title ? (
+        <ItemHead
+          title={title}
+          headingAs={headingAs}
+          edit={{ title: 'title' }}
+        />
+      ) : null}
       <dl className={cn('@container m-0 grid gap-4', STAT_COLUMNS[cols])}>
         {stats.map((stat, n) => (
           <div key={n} className="flex flex-col-reverse gap-1 text-center">
-            <dt className="text-site-text-2 text-sm">{stat.label}</dt>
+            <dt
+              {...editable(editPath('stats', n, 'label'))}
+              className="text-site-text-2 text-sm"
+            >
+              {stat.label}
+            </dt>
             <dd className="text-block-title m-0 font-bold">
-              {stat.prefix}
+              {stat.prefix ? (
+                <span {...editable(editPath('stats', n, 'prefix'))}>
+                  {stat.prefix}
+                </span>
+              ) : null}
               <CountUp
                 value={stat.value}
                 locale={locale}
                 format={stat.format}
                 animate={animate}
+                marks={editable(editPath('stats', n, 'value'), 'setting')}
               />
-              {stat.suffix}
+              {stat.suffix ? (
+                <span {...editable(editPath('stats', n, 'suffix'))}>
+                  {stat.suffix}
+                </span>
+              ) : null}
             </dd>
           </div>
         ))}
@@ -113,7 +134,13 @@ export function Timeline({
   const ItemHeading = subHeading(headingAs);
   return (
     <Block name="timeline" {...root}>
-      {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
+      {title ? (
+        <ItemHead
+          title={title}
+          headingAs={headingAs}
+          edit={{ title: 'title' }}
+        />
+      ) : null}
       <ol className="m-0 flex list-none flex-col p-0">
         {items.map((item, n) => (
           <li
@@ -125,6 +152,7 @@ export function Timeline({
               className="bg-site-button border-site-surface absolute -start-[0.5625rem] top-1 size-4 rounded-full border-2"
             />
             <time
+              {...editable(editPath('items', n, 'date'))}
               dateTime={item.dateTime}
               className="text-site-text-2 block text-sm font-semibold"
             >
@@ -133,20 +161,30 @@ export function Timeline({
             <ItemHeading className="m-0 text-base font-bold">
               {item.href ? (
                 <SiteLink
+                  {...editable(editPath('items', n, 'href'), 'link')}
                   href={item.href}
                   newTab={item.newTab}
                   sponsored={item.sponsored}
                   nofollow={item.nofollow}
                   action="timeline_click"
                 >
-                  {item.title}
+                  <span {...editable(editPath('items', n, 'title'))}>
+                    {item.title}
+                  </span>
                 </SiteLink>
               ) : (
-                item.title
+                <span {...editable(editPath('items', n, 'title'))}>
+                  {item.title}
+                </span>
               )}
             </ItemHeading>
             {item.detail ? (
-              <p className="text-site-text-2 m-0 mt-1">{item.detail}</p>
+              <p
+                {...editable(editPath('items', n, 'detail'), 'longText')}
+                className="text-site-text-2 m-0 mt-1"
+              >
+                {item.detail}
+              </p>
             ) : null}
           </li>
         ))}
@@ -293,7 +331,12 @@ export function MapCard({
   return (
     <Block name="map-card" {...root}>
       {showMap && hasPin ? (
-        <div className="relative" data-map-style={mapStyle}>
+        // The map's poster is the place's picture: a click on it picks it.
+        <div
+          {...(image ? editable('image', 'picture') : {})}
+          className="relative"
+          data-map-style={mapStyle}
+        >
           <PlayFrame
             src={mapFrameUrl(lat, lng, mapStyle)}
             title={fill(words.map, place)}
@@ -309,20 +352,28 @@ export function MapCard({
           />
           {mapCaption ? (
             // Over the map's corner; taps go through to the map under it.
-            <p className="bg-site-surface text-site-text rounded-block-inner pointer-events-none absolute start-2 bottom-2 m-0 max-w-[calc(100%-1rem)] px-2.5 py-1 text-sm font-semibold shadow-md">
+            <p
+              {...editable('mapCaption')}
+              className="bg-site-surface text-site-text rounded-block-inner pointer-events-none absolute start-2 bottom-2 m-0 max-w-[calc(100%-1rem)] px-2.5 py-1 text-sm font-semibold shadow-md"
+            >
               {mapCaption}
             </p>
           ) : null}
         </div>
       ) : image !== undefined && image !== null ? (
         // No map to load: the picture of the place on its own.
-        <Thumb src={image} ratio="video" className="w-full" />
+        <Thumb
+          src={image}
+          ratio="video"
+          className="w-full"
+          marks={editable('image', 'picture')}
+        />
       ) : null}
-      <ItemHead title={place} headingAs={headingAs} />
+      <ItemHead title={place} headingAs={headingAs} edit={{ title: 'place' }} />
       {address ? (
         <address className="text-site-text-2 flex gap-2 not-italic">
           <MapPinIcon size={18} className="mt-0.5 flex-none" />
-          <span>{address}</span>
+          <span {...editable('address', 'longText')}>{address}</span>
         </address>
       ) : null}
       {hours?.length ? (
@@ -334,8 +385,18 @@ export function MapCard({
           >
             {hours.map((row, n) => (
               <div key={n} className="contents">
-                <dt className="font-semibold">{row.days}</dt>
-                <dd className="text-site-text-2 m-0">{row.time}</dd>
+                <dt
+                  {...editable(editPath('hours', n, 'days'))}
+                  className="font-semibold"
+                >
+                  {row.days}
+                </dt>
+                <dd
+                  {...editable(editPath('hours', n, 'time'))}
+                  className="text-site-text-2 m-0"
+                >
+                  {row.time}
+                </dd>
               </div>
             ))}
           </dl>
@@ -343,13 +404,14 @@ export function MapCard({
       ) : null}
       {children}
       <SiteLinkButton
+        {...editable('directionsHref', 'link')}
         href={directions}
         newTab
         variant={buttonVariant}
         action="directions"
         fullWidth
       >
-        {words.directions}
+        <span {...editable('labels.directions')}>{words.directions}</span>
       </SiteLinkButton>
     </Block>
   );

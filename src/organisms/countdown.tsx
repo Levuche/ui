@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
+import { editable } from '../system/edit';
 import { WORDS_EN } from '../system/words/en';
 import { usePageWords } from '../system/page-words';
 import type { HeadingTag } from '../molecules/item-head';
@@ -100,19 +101,29 @@ export function Countdown({
 
   return (
     <Block name="countdown" defaults={{ align: 'center' }} {...root}>
-      {title ? <Heading className="m-0 font-bold">{title}</Heading> : null}
+      {title ? (
+        <Heading {...editable('title')} className="m-0 font-bold">
+          {title}
+        </Heading>
+      ) : null}
       {/* In the page from the start, so the done words are read out when
           they arrive rather than mounting with the region. */}
       <p
         role="status"
         className="text-site-link m-0 text-xl font-bold empty:sr-only"
       >
-        {done ? doneLabel : null}
+        {done ? <span {...editable('doneLabel')}>{doneLabel}</span> : null}
       </p>
       {done ? (
-        doneContent
+        doneContent ? (
+          <div {...editable('doneContent', 'longText')}>{doneContent}</div>
+        ) : null
       ) : (
-        <p role="timer" className="m-0 flex justify-center gap-2">
+        <p
+          {...editable('to', 'setting')}
+          role="timer"
+          className="m-0 flex justify-center gap-2"
+        >
           {parts.map((part) => (
             <span
               key={part.label}
@@ -123,7 +134,10 @@ export function Countdown({
                   ? '–'
                   : String(part.value).padStart(2, '0')}
               </span>
-              <span className="text-site-text-2 text-xs">
+              <span
+                {...editable(`labels.${part.label}`)}
+                className="text-site-text-2 text-xs"
+              >
                 {words[part.label as keyof CountdownLabels]}
               </span>
             </span>

@@ -9,6 +9,7 @@ import {
   type LinkTileStyle,
 } from '../molecules/link-tile';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 import type { LinkBehavior } from '../system/href';
 import { cssImageUrl, type ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
@@ -21,6 +22,16 @@ import { usePageWords } from '../system/page-words';
  * site's preview picture and icon from its address and passes them in; none
  * of these fetch anything.
  */
+
+/**
+ * Where a single-link block's link and pictures are set. LinkTile marks
+ * `favicon` once it takes that part.
+ */
+const TILE_EDIT = {
+  href: 'href',
+  image: 'image',
+  favicon: 'favicon',
+} as const;
 
 /**
  * One link as a card that shows the site it goes to: its preview picture,
@@ -66,14 +77,15 @@ export function LinkCard({
         imageAlt={imageAlt}
         favicon={favicon}
         look={look}
-        detail={detail}
+        detail={detail ? <span {...editable('detail')}>{detail}</span> : detail}
         trailing={arrow ? 'arrow' : undefined}
         tileStyle={tileStyle}
         newTab={newTab}
         sponsored={sponsored}
         nofollow={nofollow}
+        edit={TILE_EDIT}
       >
-        {title}
+        <span {...editable('title')}>{title}</span>
       </LinkTile>
     </Block>
   );
@@ -131,8 +143,9 @@ export function LogoTile({
         newTab={newTab}
         sponsored={sponsored}
         nofollow={nofollow}
+        edit={TILE_EDIT}
       >
-        {title}
+        <span {...editable('title')}>{title}</span>
       </LinkTile>
     </Block>
   );
@@ -185,8 +198,9 @@ export function LinkChip({
         newTab={newTab}
         sponsored={sponsored}
         nofollow={nofollow}
+        edit={TILE_EDIT}
       >
-        {title}
+        <span {...editable('title')}>{title}</span>
       </LinkTile>
     </Block>
   );
@@ -259,49 +273,61 @@ export function AppBadges({
       {...root}
     >
       <ul className="m-0 flex list-none flex-wrap gap-2.5 p-0">
-        {apps
-          .filter((app) => APP_STORES.includes(app.store))
-          .map(({ store, href, badge, ...link }, i) => {
-            const words = STORE_WORDS[store];
-            const lead = labels[words.lead];
-            const name = labels[words.name];
-            const picture = badge && cssImageUrl(badge) ? badge : null;
-            return (
-              <li key={`${i}-${store}`} className="m-0">
-                <SiteLink
-                  href={href}
-                  action="app_store_click"
-                  data-store={store}
-                  data-lift=""
-                  {...link}
-                  className={cn(
-                    'rounded-block inline-flex min-h-12 items-center no-underline hover:opacity-90',
-                    picture
-                      ? ''
-                      : 'bg-site-text text-site-bg gap-2.5 py-1.5 ps-3 pe-4'
-                  )}
-                >
-                  {picture ? (
-                    <Thumb
-                      src={picture}
-                      alt={`${lead} ${name}`}
-                      fit="contain"
-                      sizes="180px"
-                      className="h-12 w-auto rounded-none"
-                    />
-                  ) : (
-                    <>
-                      {words.icon}
-                      <span className="flex flex-col text-start leading-tight">
-                        <span className="text-xs">{lead}</span>{' '}
-                        <span className="text-lg font-semibold">{name}</span>
+        {apps.map(({ store, href, badge, ...link }, i) => {
+          // Mapped before filtering, so `i` is the app's place in the setting.
+          if (!APP_STORES.includes(store)) return null;
+          const words = STORE_WORDS[store];
+          const lead = labels[words.lead];
+          const name = labels[words.name];
+          const picture = badge && cssImageUrl(badge) ? badge : null;
+          return (
+            <li key={`${i}-${store}`} className="m-0">
+              <SiteLink
+                href={href}
+                action="app_store_click"
+                data-store={store}
+                data-lift=""
+                {...editable(editPath('apps', i, 'href'), 'link')}
+                {...link}
+                className={cn(
+                  'rounded-block inline-flex min-h-12 items-center no-underline hover:opacity-90',
+                  picture
+                    ? ''
+                    : 'bg-site-text text-site-bg gap-2.5 py-1.5 ps-3 pe-4'
+                )}
+              >
+                {picture ? (
+                  <Thumb
+                    src={picture}
+                    alt={`${lead} ${name}`}
+                    fit="contain"
+                    sizes="180px"
+                    className="h-12 w-auto rounded-none"
+                    marks={editable(editPath('apps', i, 'badge'), 'picture')}
+                  />
+                ) : (
+                  <>
+                    {words.icon}
+                    <span className="flex flex-col text-start leading-tight">
+                      <span
+                        {...editable(`labels.${words.lead}`)}
+                        className="text-xs"
+                      >
+                        {lead}
+                      </span>{' '}
+                      <span
+                        {...editable(`labels.${words.name}`)}
+                        className="text-lg font-semibold"
+                      >
+                        {name}
                       </span>
-                    </>
-                  )}
-                </SiteLink>
-              </li>
-            );
-          })}
+                    </span>
+                  </>
+                )}
+              </SiteLink>
+            </li>
+          );
+        })}
       </ul>
     </Block>
   );

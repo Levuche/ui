@@ -6,11 +6,12 @@ import { ItemHead, subHeading, type HeadingTag } from '../molecules/item-head';
 import { Segmented } from '../molecules/segmented';
 import { yearlySaving } from '../molecules/price';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 import type { LinkBehavior } from '../system/href';
 import { useControllableState } from '../system/state';
 import type { SellProps } from '../molecules/sell-button';
 import type { SellRef, SellState } from '../system/sell';
-import { MembershipCard } from './offers';
+import { MembershipTier } from './offers';
 import { WORDS_EN } from '../system/words/en';
 import { usePageLocale, usePageWords } from '../system/page-words';
 
@@ -138,6 +139,7 @@ export function PricingTable({
           new Intl.NumberFormat(locale ?? 'en-US').format(leastSaving)
         )
       : undefined);
+  const noteEdit = words.yearlyNote ? 'labels.yearlyNote' : 'labels.yearlySave';
   const name = useId();
   const [shown, setShown] = useControllableState({
     value: period,
@@ -151,26 +153,43 @@ export function PricingTable({
   return (
     <Block name="pricing-table" {...root}>
       {title ? (
-        <ItemHead title={title} detail={detail} headingAs={headingAs} />
+        <ItemHead
+          title={title}
+          detail={detail}
+          headingAs={headingAs}
+          edit={{ title: 'title', detail: 'detail' }}
+        />
       ) : null}
       {hasYearly ? (
         <Segmented
-          legend={words.billing}
+          legend={<span {...editable('labels.billing')}>{words.billing}</span>}
           name={name}
           value={shown}
           onChange={setShown}
           className="self-center"
           options={[
-            { value: 'monthly', label: words.monthly },
-            { value: 'yearly', label: words.yearly, note: yearlyNote },
+            {
+              value: 'monthly',
+              label: (
+                <span {...editable('labels.monthly')}>{words.monthly}</span>
+              ),
+            },
+            {
+              value: 'yearly',
+              label: <span {...editable('labels.yearly')}>{words.yearly}</span>,
+              note: yearlyNote ? (
+                <span {...editable(noteEdit)}>{yearlyNote}</span>
+              ) : undefined,
+            },
           ]}
         />
       ) : null}
       <div className={cn('@container grid gap-4', PLAN_COLUMNS[cols])}>
-        {plans.map((plan) => {
+        {plans.map((plan, i) => {
           const useYear = yearly && plan.yearlyPrice;
+          const at = (part: string) => editPath('plans', i, part);
           return (
-            <MembershipCard
+            <MembershipTier
               saveLabel={saveLabel}
               key={plan.name}
               title={plan.name}
@@ -192,6 +211,18 @@ export function PricingTable({
               newTab={newTab}
               sponsored={sponsored}
               nofollow={nofollow}
+              edit={{
+                title: at('name'),
+                price: at(useYear ? 'yearlyPrice' : 'price'),
+                was: at('was'),
+                period: useYear ? 'labels.year' : 'labels.month',
+                perks: at('perks'),
+                buttonLabel: at('buttonLabel'),
+                featuredLabel: at('featuredLabel'),
+                ribbon: at('ribbon'),
+                href: at(useYear && plan.yearlyHref ? 'yearlyHref' : 'href'),
+                sell: at(useYear && plan.yearlySell ? 'yearlySell' : 'sell'),
+              }}
             />
           );
         })}

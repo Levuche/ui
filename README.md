@@ -478,6 +478,105 @@ app's own client blocks and `renderBuy` buttons can do the same.
 `Editor/Preview mode` in Storybook presses every link, button and form of
 every block on the gallery and in the registry in preview mode.
 
+### Editing a block on the page
+
+In the page editor a creator can also edit a block where it is: click its
+words and type, or click a link or a picture and change it beside the
+block. Wrap the canvas in `<EditMode>` in place of `<PreviewMode>` (it is a
+preview too, so links and forms are stopped the same way) and give each
+block `data-edit-block` with its id:
+
+```tsx
+'use client';
+import { EditMode, SitePage } from '@levuche/ui';
+
+<EditMode
+  onEdit={({ block, path, value }) => save(block, path, value)}
+  onPick={({ block, path, kind, element }) => openPanel(block, path, element)}
+  readValue={({ block, path }) => settingOf(block, path)}
+>
+  <SitePage>
+    <LinkList data-edit-block={block.id} {...block.props} />
+  </SitePage>
+</EditMode>;
+```
+
+- **Words are typed in place.** A click (or Enter or F2 on a part reached
+  with Tab) opens a text box in the same place and look. Enter keeps a line
+  of text, Ctrl+Enter or Cmd+Enter keeps several lines, leaving the box
+  keeps it too, and Escape puts it back. `onEdit` hears the block, the
+  setting's path (`title`, `links.0.label`, `address.city`,
+  `labels.subscribe`, as the registry names them) and the new value, only
+  when it changed. The box is a copy of the part, laid over it, so React's
+  own elements are never changed.
+- **Links, pictures and other settings are picked.** `onPick` hears the
+  block, the path, its kind (`link`, `picture` or `setting`) and the element,
+  so the editor can open what sets it next to it.
+- **`readValue`** gives a box the text to start with, where the page shows
+  it otherwise: rich text, words cut short, or a part that's empty.
+
+Blocks only mark what can be edited, with `editable(path, kind)` from
+`src/system/edit.ts`, which sets `data-edit` and `data-edit-kind`; shared
+pieces such as `ItemHead`, `Price` and `LinkTile` take an `edit` prop with
+their parts' paths. On a live page the marks do nothing. `e2e/edit.spec.ts`
+renders every block with every setting set and checks that every word, link
+and picture a creator set is marked with its path.
+
+### Buttons on every block in the editor
+
+The editor puts one `<BlockFrame>` around each block it shows, so every block
+gets the same buttons and no block has buttons of its own: its name, a grip
+to drag it, Move up and Move down, Duplicate, Settings, Delete, and a button
+under it to add a block below. The frame names the block for edit mode, so
+the block itself needs no `data-edit-block`:
+
+```tsx
+<EditMode onEdit={save} onPick={openPanel}>
+  <SitePage gap="lg">
+    {blocks.map((block, i) => (
+      <BlockFrame
+        key={block.id}
+        id={block.id}
+        label="Links"
+        first={i === 0}
+        last={i === blocks.length - 1}
+        selected={block.id === selected}
+        onSelect={setSelected}
+        onMove={(by) => move(block.id, by)}
+        onDrop={(from, place) => drop(from, block.id, place)}
+        onDuplicate={() => duplicate(block.id)}
+        onSettings={() => openSettings(block.id)}
+        onDelete={() => remove(block.id)}
+        onAdd={() => openAddMenu(block.id)}
+      >
+        <LinkList {...block.props} />
+      </BlockFrame>
+    ))}
+  </SitePage>
+</EditMode>
+```
+
+- **The frame only reports.** Each button calls its callback, and the editor
+  changes and saves its list of blocks (and offers an undo after a delete).
+  A button shows only when its callback is given, so a block that can't be
+  deleted simply gets no `onDelete`.
+- **When the buttons show.** Under a pointer, while the frame or anything in
+  it has the keyboard, and while the block is selected. A click or tap
+  anywhere in a block selects it and still reaches its words, so typing in
+  place works as before, and on a touch screen a tap shows the buttons.
+- **From the keyboard.** Tab reaches each block. On the block itself,
+  Delete or Backspace deletes it, Alt+Up and Alt+Down move it, and Ctrl+D
+  (Cmd+D) duplicates it; in a text box these keys type as usual.
+- **Dragging.** The grip drags the block; a line shows where it will land,
+  and `onDrop` hears the dragged block's id and `before` or `after`.
+- **Colours.** The frame is the editor's, not the creator's page, so it
+  takes Levuche's product colours from `@levuche/kit`'s theme (`--lv-*`),
+  light and dark: the line and the add button are the primary colour, the
+  bar is brand navy, with Sora type and pill shapes like the app's
+  buttons. Without the kit it falls back to the kit's light colours.
+- The buttons' words are in `labels`. `Editor/Block frame` in Storybook is a
+  working editor around release 1's blocks, with a test of every button.
+
 ### Sending forms to BuildBase Forms
 
 `NewsletterBand`, `LeadMagnet`, `ContactForm`, `PackCheckout` and `TipJar`
@@ -1065,7 +1164,8 @@ variable, the same pair the website uses.
    `SiteLink`, and add `'use client'` only if it has state. A client block
    that loads another site, opens a pop-up or plays something checks
    `usePreviewMode()` and doesn't, in the page editor (links and forms are
-   stopped for it).
+   stopped for it). Mark every part a creator sets with `editable(path)`
+   (see "Editing a block on the page"), so `e2e/edit.spec.ts` passes.
 2. Add it to `BLOCKS` in `src/system/registry.ts`, with a `settings` entry
    for each prop a creator sets and the rest in `appOnly` (`npm run
 typecheck` says what's missing), and export it from `src/index.ts`.

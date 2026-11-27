@@ -1,6 +1,7 @@
 import { useId, type CSSProperties, type ReactNode } from 'react';
 import { SiteButton } from '../atoms/button';
 import { cn } from '../system/cn';
+import { editable, type EditPaths } from '../system/edit';
 
 /**
  * What a block shows in place of another site's player, map or page until
@@ -15,6 +16,7 @@ export function ConsentCover({
   action,
   onLoad,
   cover,
+  edit = {},
   className,
   style,
 }: {
@@ -29,6 +31,8 @@ export function ConsentCover({
   onLoad: () => void;
   /** A picture behind the notice: the creator's own, never the service's. */
   cover?: ReactNode;
+  /** The setting paths of its words, for edit mode (see edit.ts). */
+  edit?: EditPaths<'notice' | 'load'>;
   className?: string;
   style?: CSSProperties;
 }) {
@@ -44,7 +48,7 @@ export function ConsentCover({
     >
       {cover}
       <div className="bg-site-surface text-site-text rounded-block-inner relative flex max-w-sm flex-col items-center gap-3 p-4 text-center">
-        <p id={noticeId} className="m-0 text-sm">
+        <p {...editable(edit.notice)} id={noticeId} className="m-0 text-sm">
           {notice}
         </p>
         <SiteButton
@@ -54,7 +58,7 @@ export function ConsentCover({
           aria-describedby={noticeId}
           onClick={onLoad}
         >
-          {load}
+          <span {...editable(edit.load)}>{load}</span>
         </SiteButton>
       </div>
     </div>

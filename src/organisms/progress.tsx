@@ -6,6 +6,7 @@ import { Badge } from '../atoms/text';
 import { DaysLeft, type DaysLeftLabels } from '../molecules/days-left';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { cn } from '../system/cn';
+import { editPath, editable } from '../system/edit';
 import { usePageLocale, usePageWords } from '../system/page-words';
 import { WORDS_EN } from '../system/words/en';
 import {
@@ -135,20 +136,33 @@ export function GoalTracker({
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <Heading
+          {...editable('title')}
           id={headingId}
           className="text-block-title m-0 min-w-0 leading-tight font-bold"
         >
           {title}
         </Heading>
-        {progress.done ? <Badge tone="solid">{words.reached}</Badge> : null}
+        {progress.done ? (
+          <Badge {...editable('labels.reached')} tone="solid">
+            {words.reached}
+          </Badge>
+        ) : null}
       </div>
-      {detail ? <p className="text-site-text-2 m-0 text-sm">{detail}</p> : null}
+      {detail ? (
+        <p
+          {...editable('detail', 'longText')}
+          className="text-site-text-2 m-0 text-sm"
+        >
+          {detail}
+        </p>
+      ) : null}
       {deadline ? (
         <DaysLeft
           deadline={deadline}
           now={now}
           locale={locale}
           labels={words}
+          edit={{ deadline: 'deadline', labels: 'labels' }}
         />
       ) : null}
       <div className="flex flex-col gap-1.5">
@@ -157,7 +171,12 @@ export function GoalTracker({
             aria-hidden
             className="m-0 flex flex-wrap items-baseline justify-between gap-x-3 text-sm"
           >
-            <span className="text-site-text-2">{summary}</span>
+            <span
+              {...editable(byAmount ? 'current' : undefined, 'setting')}
+              className="text-site-text-2"
+            >
+              {summary}
+            </span>
             {showPercent ? (
               <span className="text-base font-bold tabular-nums">
                 {percent}
@@ -196,7 +215,9 @@ export function GoalTracker({
                 <span className="sr-only">
                   {item.done ? words.done : words.notDone}:{' '}
                 </span>
-                {item.label}
+                <span {...editable(editPath('items', n, 'label'))}>
+                  {item.label}
+                </span>
               </span>
             </li>
           ))}
@@ -260,7 +281,13 @@ export function ProgressList({
   const id = useId();
   return (
     <Block name="progress-list" {...root}>
-      {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
+      {title ? (
+        <ItemHead
+          title={title}
+          headingAs={headingAs}
+          edit={{ title: 'title' }}
+        />
+      ) : null}
       <ul className="m-0 flex list-none flex-col gap-3 p-0">
         {items.map((item, n) => {
           const progress = progressOf(item.value, item.max ?? max);
@@ -277,11 +304,16 @@ export function ProgressList({
           return (
             <li key={n} className="m-0 flex flex-col gap-1.5">
               <span className="flex items-baseline justify-between gap-3 text-sm">
-                <span id={`${id}-${n}`} className="min-w-0 font-semibold">
+                <span
+                  {...editable(editPath('items', n, 'label'))}
+                  id={`${id}-${n}`}
+                  className="min-w-0 font-semibold"
+                >
                   {item.label}
                 </span>
                 {shown ? (
                   <span
+                    {...editable(editPath('items', n, 'value'), 'setting')}
                     aria-hidden
                     className="text-site-text-2 flex-none tabular-nums"
                   >

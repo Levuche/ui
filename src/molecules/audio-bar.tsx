@@ -5,6 +5,7 @@ import { PauseIcon, PlayIcon } from '../atoms/icons';
 import { SiteLink } from '../atoms/link';
 import { Thumb } from '../atoms/thumb';
 import { cn } from '../system/cn';
+import { editable, type EditPaths } from '../system/edit';
 import { isSafeMediaSrc } from '../system/href';
 import type { ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
@@ -48,6 +49,7 @@ export function AudioBar({
   href,
   labels,
   onPlay,
+  edit = {},
   className,
 }: {
   /** The audio file's address. */
@@ -62,6 +64,19 @@ export function AudioBar({
   href?: string;
   labels?: Partial<AudioBarLabels>;
   onPlay?: () => void;
+  /**
+   * Each part's setting path, for edit mode (see edit.ts); `src` marks the
+   * whole bar and `transcript` the transcript link's words.
+   */
+  edit?: EditPaths<
+    | 'src'
+    | 'title'
+    | 'detail'
+    | 'image'
+    | 'href'
+    | 'transcriptHref'
+    | 'transcript'
+  >;
   className?: string;
 }) {
   const words = usePageWords('audioBar', labels);
@@ -91,6 +106,7 @@ export function AudioBar({
 
   return (
     <div
+      {...editable(edit.src, 'link')}
       data-audio-bar=""
       className={cn(
         'bg-site-surface-2 rounded-block-inner flex items-center gap-3 p-2',
@@ -104,6 +120,7 @@ export function AudioBar({
           ratio="square"
           sizes="56px"
           className="w-14 flex-none"
+          marks={editable(edit.image, 'picture')}
         />
       ) : null}
       <button
@@ -121,15 +138,25 @@ export function AudioBar({
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className="m-0 truncate text-sm font-semibold">
           {href ? (
-            <SiteLink href={href} newTab action="audio_open">
-              {title}
+            <SiteLink
+              {...editable(edit.href, 'link')}
+              href={href}
+              newTab
+              action="audio_open"
+            >
+              <span {...editable(edit.title)}>{title}</span>
             </SiteLink>
           ) : (
-            title
+            <span {...editable(edit.title)}>{title}</span>
           )}
         </p>
         {detail ? (
-          <p className="text-site-text-2 m-0 truncate text-xs">{detail}</p>
+          <p
+            {...editable(edit.detail)}
+            className="text-site-text-2 m-0 truncate text-xs"
+          >
+            {detail}
+          </p>
         ) : null}
         <div className="flex items-center gap-2">
           <input
@@ -156,11 +183,12 @@ export function AudioBar({
         </div>
         {transcriptHref ? (
           <SiteLink
+            {...editable(edit.transcriptHref, 'link')}
             href={transcriptHref}
             action="audio_transcript"
             className="self-start text-xs font-semibold"
           >
-            {words.transcript}
+            <span {...editable(edit.transcript)}>{words.transcript}</span>
           </SiteLink>
         ) : null}
       </div>

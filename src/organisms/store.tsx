@@ -9,6 +9,7 @@ import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { Price } from '../molecules/price';
 import { SellButton, type SellProps } from '../molecules/sell-button';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 import type { LinkBehavior } from '../system/href';
 import type { ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
@@ -87,30 +88,48 @@ export function CourseCard({
         media="top"
         ratio="video"
         headingAs={headingAs}
+        edit={{
+          title: 'title',
+          detail: 'detail',
+          eyebrow: 'level',
+          image: 'image',
+        }}
       />
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
         <span className="text-site-text-2 inline-flex flex-wrap items-center gap-x-3 gap-y-1">
           {lessons != null ? (
             <span className="inline-flex items-center gap-1.5">
               <VideoIcon size={16} />
-              {lessons === 1
-                ? words.oneLesson
-                : words.lessons.replace(
-                    '{n}',
-                    new Intl.NumberFormat(language ?? 'en-US').format(lessons)
-                  )}
+              <span
+                {...editable(
+                  lessons === 1 ? 'labels.oneLesson' : 'labels.lessons'
+                )}
+              >
+                {lessons === 1
+                  ? words.oneLesson
+                  : words.lessons.replace(
+                      '{n}',
+                      new Intl.NumberFormat(language ?? 'en-US').format(lessons)
+                    )}
+              </span>
             </span>
           ) : null}
           {duration ? (
             <span className="inline-flex items-center gap-1.5">
               <ClockIcon size={16} />
-              {duration}
+              <span {...editable('duration')}>{duration}</span>
             </span>
           ) : null}
         </span>
-        <Price saveLabel={saveLabel} value={price} was={was} />
+        <Price
+          saveLabel={saveLabel}
+          value={price}
+          was={was}
+          edit={{ save: 'saveLabel', value: 'price', was: 'was' }}
+        />
       </div>
       <SellButton
+        edit={{ href: 'href', sell: 'sell' }}
         href={href}
         sell={sell}
         sellState={sellState}
@@ -122,7 +141,7 @@ export function CourseCard({
         nofollow={nofollow}
         action="buy_course"
       >
-        {words.button}
+        <span {...editable('labels.button')}>{words.button}</span>
       </SellButton>
     </Block>
   );
@@ -183,7 +202,13 @@ export function TopPicks({
   const anyAffiliate = picks.some((pick) => pick.affiliate);
   return (
     <Block name="top-picks" {...root}>
-      {title ? <ItemHead title={title} headingAs={headingAs} /> : null}
+      {title ? (
+        <ItemHead
+          title={title}
+          headingAs={headingAs}
+          edit={{ title: 'title' }}
+        />
+      ) : null}
       <ul
         className={cn(
           '@container m-0 grid list-none gap-3 p-0',
@@ -193,6 +218,7 @@ export function TopPicks({
         {picks.map((pick, n) => (
           <li key={n}>
             <SiteLink
+              {...editable(editPath('picks', n, 'href'), 'link')}
               href={pick.href}
               newTab={newTab}
               sponsored={pick.affiliate}
@@ -206,14 +232,23 @@ export function TopPicks({
                   ratio="square"
                   sizes="64px"
                   className="w-16 flex-none"
+                  marks={editable(editPath('picks', n, 'image'), 'picture')}
                 />
               ) : null}
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="text-site-text font-semibold">
+                <span
+                  {...editable(editPath('picks', n, 'name'))}
+                  className="text-site-text font-semibold"
+                >
                   {pick.name}
                 </span>
                 {pick.note ? (
-                  <span className="text-site-text-2 text-sm">{pick.note}</span>
+                  <span
+                    {...editable(editPath('picks', n, 'note'))}
+                    className="text-site-text-2 text-sm"
+                  >
+                    {pick.note}
+                  </span>
                 ) : null}
               </span>
               <span className="flex flex-none flex-col items-end gap-1">
@@ -222,10 +257,13 @@ export function TopPicks({
                     value={pick.price}
                     size="sm"
                     className="text-site-text"
+                    edit={{ value: editPath('picks', n, 'price') }}
                   />
                 ) : null}
                 {pick.affiliate ? (
-                  <Badge tone="outline">{words.affiliate}</Badge>
+                  <Badge {...editable('labels.affiliate')} tone="outline">
+                    {words.affiliate}
+                  </Badge>
                 ) : null}
               </span>
             </SiteLink>
@@ -233,7 +271,12 @@ export function TopPicks({
         ))}
       </ul>
       {anyAffiliate ? (
-        <p className="text-site-text-2 m-0 text-xs">{words.disclosure}</p>
+        <p
+          {...editable('labels.disclosure')}
+          className="text-site-text-2 m-0 text-xs"
+        >
+          {words.disclosure}
+        </p>
       ) : null}
     </Block>
   );

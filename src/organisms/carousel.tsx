@@ -16,6 +16,7 @@ import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { MotionToggle } from '../molecules/motion-toggle';
 import type { HeadingTag } from '../molecules/item-head';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 import type { LinkBehavior } from '../system/href';
 import { useControllableState } from '../system/state';
 import type { ImageSrc } from '../system/image';
@@ -223,7 +224,12 @@ export function ImageCarousel({
       {...root}
     >
       {title ? (
-        <Heading className="text-block-title m-0 font-bold">{title}</Heading>
+        <Heading
+          {...editable('title')}
+          className="text-block-title m-0 font-bold"
+        >
+          {title}
+        </Heading>
       ) : null}
       <div className="relative">
         {/* A scrolling area must be reachable with the keyboard (WCAG 2.1.1). */}
@@ -254,9 +260,15 @@ export function ImageCarousel({
                 alt={slide.alt}
                 ratio={ratio}
                 className="w-full"
+                marks={editable(editPath('slides', i, 'src'), 'picture')}
               />
               {slide.caption ? (
-                <p className="text-site-text-2 m-0 text-sm">{slide.caption}</p>
+                <p
+                  {...editable(editPath('slides', i, 'caption'))}
+                  className="text-site-text-2 m-0 text-sm"
+                >
+                  {slide.caption}
+                </p>
               ) : null}
               {slide.button ? (
                 <SiteLinkButton
@@ -267,8 +279,11 @@ export function ImageCarousel({
                   action="slide_button"
                   size="sm"
                   className="self-start"
+                  {...editable(editPath('slides', i, 'button', 'href'), 'link')}
                 >
-                  {slide.button.label}
+                  <span {...editable(editPath('slides', i, 'button', 'label'))}>
+                    {slide.button.label}
+                  </span>
                 </SiteLinkButton>
               ) : null}
             </div>

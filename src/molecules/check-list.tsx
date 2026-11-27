@@ -1,13 +1,19 @@
 import type { ReactNode } from 'react';
 import { CheckIcon } from '../atoms/icons';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 
-/** What's included, one tick per line. */
+/**
+ * What's included, one tick per line. `path` is the list's setting path,
+ * for edit mode (see edit.ts): with 'perks', each line is 'perks.0'...
+ */
 export function CheckList({
   items,
+  path,
   className,
 }: {
   items: ReactNode[];
+  path?: string;
   className?: string;
 }) {
   return (
@@ -17,7 +23,9 @@ export function CheckList({
       {items.map((item, i) => (
         <li key={i} className="m-0 flex items-start gap-2">
           <CheckIcon size={18} className="text-site-link mt-px flex-none" />
-          <span>{item}</span>
+          <span {...editable(path ? editPath(path, i) : undefined)}>
+            {item}
+          </span>
         </li>
       ))}
     </ul>

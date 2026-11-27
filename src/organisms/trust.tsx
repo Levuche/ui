@@ -3,6 +3,7 @@ import { Avatar } from '../atoms/avatar';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { ChevronDownIcon } from '../atoms/icons';
 import { cn } from '../system/cn';
+import { editPath, editable } from '../system/edit';
 import { Rating } from '../molecules/rating';
 import type { ImageSrc } from '../system/image';
 
@@ -47,19 +48,40 @@ export function Testimonials({
               )}
             >
               {item.rating !== undefined ? (
-                <p className="m-0">
+                <p
+                  {...editable(editPath('items', i, 'rating'), 'setting')}
+                  className="m-0"
+                >
                   <Rating value={item.rating} />
                 </p>
               ) : null}
-              <blockquote className="m-0 leading-relaxed">
+              <blockquote
+                {...editable(editPath('items', i, 'quote'), 'longText')}
+                className="m-0 leading-relaxed"
+              >
                 {item.quote}
               </blockquote>
               <figcaption className="mt-auto flex items-center gap-2 text-sm">
-                <Avatar name={item.name} src={item.avatar} size={32} />
+                <Avatar
+                  name={item.name}
+                  src={item.avatar}
+                  size={32}
+                  marks={editable(editPath('items', i, 'avatar'), 'picture')}
+                />
                 <span className="flex min-w-0 flex-col">
-                  <span className="font-semibold">{item.name}</span>
+                  <span
+                    {...editable(editPath('items', i, 'name'))}
+                    className="font-semibold"
+                  >
+                    {item.name}
+                  </span>
                   {item.detail ? (
-                    <span className="text-site-text-2">{item.detail}</span>
+                    <span
+                      {...editable(editPath('items', i, 'detail'))}
+                      className="text-site-text-2"
+                    >
+                      {item.detail}
+                    </span>
                   ) : null}
                 </span>
               </figcaption>
@@ -104,13 +126,18 @@ export function FaqList({
           className="bg-site-surface text-site-text rounded-block group"
         >
           <summary className="min-h-control-md flex cursor-pointer list-none items-center justify-between gap-3 p-3 font-semibold [&::-webkit-details-marker]:hidden">
-            {item.question}
+            <span {...editable(editPath('items', i, 'question'))}>
+              {item.question}
+            </span>
             <ChevronDownIcon
               size={20}
               className="flex-none transition-transform group-open:rotate-180 motion-reduce:transition-none"
             />
           </summary>
-          <div className="text-site-text-2 px-3 pb-3 text-sm leading-relaxed">
+          <div
+            {...editable(editPath('items', i, 'answer'), 'longText')}
+            className="text-site-text-2 px-3 pb-3 text-sm leading-relaxed"
+          >
             {item.answer}
           </div>
         </details>

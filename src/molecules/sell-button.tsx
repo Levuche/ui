@@ -6,6 +6,7 @@ import {
   type SiteButtonVariant,
 } from '../atoms/button';
 import { cn } from '../system/cn';
+import { editable, type EditPaths } from '../system/edit';
 import type { LinkBehavior } from '../system/href';
 import {
   sellJson,
@@ -59,6 +60,7 @@ export function SellButton({
   fullWidth = true,
   className,
   disabled = false,
+  edit = {},
   children,
   newTab,
   sponsored,
@@ -73,6 +75,11 @@ export function SellButton({
     className?: string;
     /** Off until the visitor has chosen, such as a time. */
     disabled?: boolean;
+    /**
+     * The setting paths of the link and of what it sells, for edit mode
+     * (see edit.ts). Mark the button's words where they're passed in.
+     */
+    edit?: EditPaths<'href' | 'sell'>;
     children: ReactNode;
   }) {
   const words = usePageWords('sell', sellLabels);
@@ -109,6 +116,7 @@ export function SellButton({
         )}
       >
         <SiteButton
+          {...editable(edit.sell, 'setting')}
           type="button"
           variant={variant}
           size={size}
@@ -136,6 +144,7 @@ export function SellButton({
   if (!href) return null;
   return (
     <SiteLinkButton
+      {...editable(edit.href, 'link')}
       href={href}
       variant={variant}
       size={size}

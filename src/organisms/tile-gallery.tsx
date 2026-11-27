@@ -12,6 +12,7 @@ import type { HeadingTag } from '../molecules/item-head';
 import { MediaNotice } from '../molecules/media-notice';
 import type { ConsentLabels } from '../system/privacy';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 import {
   isOverCaption,
   type CaptionStyle,
@@ -101,7 +102,12 @@ export function TileGallery({
   return (
     <Block name="tile-gallery" defaults={{ tone: 'plain' }} {...root}>
       {title ? (
-        <Heading className="text-block-title m-0 font-bold">{title}</Heading>
+        <Heading
+          {...editable('title')}
+          className="text-block-title m-0 font-bold"
+        >
+          {title}
+        </Heading>
       ) : null}
       <div className="@container">
         <ul
@@ -117,6 +123,7 @@ export function TileGallery({
           {items.map((item, i) => {
             const span = SPANS[item.span ?? '1x1'] ?? '';
             const wide = item.span === '2x1' || item.span === '2x2' ? 2 : 1;
+            const path = editPath('items', i);
             if (item.video && isSafeMediaSrc(item.video, 'video')) {
               return (
                 <li
@@ -133,6 +140,12 @@ export function TileGallery({
                     captionStyle={captionStyle}
                     labels={labels}
                     consent={consent}
+                    edit={{
+                      src: editPath(path, 'video'),
+                      poster: editPath(path, 'src'),
+                      caption: editPath(path, 'caption'),
+                      tracks: editPath(path, 'tracks'),
+                    }}
                   />
                 </li>
               );
@@ -143,6 +156,7 @@ export function TileGallery({
                 alt={item.alt}
                 sizes={columnSizes(wide / columns, wide / 2)}
                 className={cn('size-full', !item.href && UNDER_CAPTION)}
+                marks={editable(editPath(path, 'src'), 'picture')}
               />
             );
             return (
@@ -163,6 +177,7 @@ export function TileGallery({
                       nofollow={item.nofollow}
                       action="image_click"
                       className={cn('block min-h-0', UNDER_CAPTION)}
+                      {...editable(editPath(path, 'href'), 'link')}
                     >
                       {picture}
                     </SiteLink>
@@ -170,7 +185,10 @@ export function TileGallery({
                     picture
                   )}
                   {item.caption ? (
-                    <TileCaption captionStyle={captionStyle}>
+                    <TileCaption
+                      captionStyle={captionStyle}
+                      edit={editPath(path, 'caption')}
+                    >
                       {item.caption}
                     </TileCaption>
                   ) : null}

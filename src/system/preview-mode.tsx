@@ -1,6 +1,12 @@
 'use client';
 
-import { createContext, use, useEffect, useRef, type ReactNode } from 'react';
+import {
+  createContext,
+  use,
+  useLayoutEffect,
+  useRef,
+  type ReactNode,
+} from 'react';
 import { cn } from './cn';
 import { PREVIEW_ATTR, PREVIEW_EVENTS, previewStop } from './preview';
 
@@ -45,7 +51,8 @@ export function PreviewMode({
   children?: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
+  // Before the browser paints, so no click lands before the guard is there.
+  useLayoutEffect(() => {
     const node = ref.current;
     if (!node || !enabled) return;
     // In the capture phase, before the browser or any block acts on it.

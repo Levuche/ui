@@ -13,6 +13,7 @@ import { CalendarIcon } from '../atoms/icons';
 import { ConsentCover } from '../molecules/consent-cover';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
 import { isTimeZone } from '../system/calendar';
+import { editable } from '../system/edit';
 import { isSafeHref } from '../system/href';
 import { calendarEmbed, type CalendarView } from '../system/embeds';
 import { usePageLocale, usePageWords } from '../system/page-words';
@@ -134,6 +135,7 @@ export function CalendarEmbed({
     still
   ) : shown ? (
     <iframe
+      {...editable('src', 'link')}
       ref={frameRef}
       src={page.src}
       title={name}
@@ -150,6 +152,7 @@ export function CalendarEmbed({
       action="calendar_load"
       onLoad={() => setAgreed(true)}
       style={size}
+      edit={{ load: 'consentLabels.load' }}
     />
   );
 
@@ -160,9 +163,15 @@ export function CalendarEmbed({
       data-view={page?.service === 'googlecalendar' ? view : undefined}
       {...root}
     >
-      <ItemHead title={title} detail={detail} headingAs={headingAs} />
+      <ItemHead
+        title={title}
+        detail={detail}
+        headingAs={headingAs}
+        edit={{ title: 'title', detail: 'detail' }}
+      />
       {frame ? <div ref={place}>{frame}</div> : null}
       <SiteLinkButton
+        {...editable('src', 'link')}
         href={link?.src ?? src}
         newTab
         variant="text"
@@ -170,7 +179,7 @@ export function CalendarEmbed({
         action="calendar_fallback"
         className="self-center"
       >
-        {words.fallback}
+        <span {...editable('labels.fallback')}>{words.fallback}</span>
       </SiteLinkButton>
     </Block>
   );

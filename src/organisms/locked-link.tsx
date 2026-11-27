@@ -18,6 +18,7 @@ import { LockIcon } from '../atoms/icons';
 import { SiteDialog } from '../molecules/dialog';
 import { Field } from '../molecules/field';
 import { FormNotice } from '../molecules/form-notice';
+import { editable } from '../system/edit';
 import { isSafeHref, type LinkBehavior } from '../system/href';
 import { usePreviewMode } from '../system/preview-mode';
 import type { FormStatus } from '../system/state';
@@ -118,6 +119,14 @@ export function LockedLink({
     onUnlock?: () => void;
   }) {
   const words = usePageWords('lockedLink', labels);
+  // One of the block's words, marked with its path for edit mode.
+  const word = (
+    part: keyof LockedLinkLabels,
+    text: ReactNode = words[part]
+  ) => <span {...editable(`labels.${part}`)}>{text}</span>;
+  const buttonWords = <span {...editable('label')}>{label}</span>;
+  // On the age and warning links only: a code's goes where the server says.
+  const hrefMarks = editable('href', 'link');
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
@@ -154,11 +163,12 @@ export function LockedLink({
         <SiteLinkButton
           href={target}
           {...link}
+          {...hrefMarks}
           variant={buttonVariant}
           action="link_click"
           fullWidth
         >
-          {label}
+          {buttonWords}
         </SiteLinkButton>
       </Block>
     );
@@ -210,16 +220,16 @@ export function LockedLink({
           dialog.current?.showModal();
         }}
       >
-        {label}
+        {buttonWords}
       </SiteButton>
       <SiteDialog
         ref={dialog}
         title={
           mode === 'age'
-            ? fill(words.ageQuestion, minAge)
+            ? word('ageQuestion', fill(words.ageQuestion, minAge))
             : mode === 'warning'
-              ? words.warningTitle
-              : label
+              ? word('warningTitle')
+              : buttonWords
         }
         onClose={() => trigger.current?.focus()}
       >
@@ -232,7 +242,7 @@ export function LockedLink({
             fullWidth
             onClick={close}
           >
-            {words.open}
+            {word('open')}
           </SiteLinkButton>
         ) : null}
 
@@ -243,7 +253,7 @@ export function LockedLink({
             className="flex flex-col gap-3"
           >
             <Field
-              label={words.code}
+              label={word('code')}
               name="code"
               autoComplete="off"
               required
@@ -256,16 +266,16 @@ export function LockedLink({
               action="lock_unlock"
               fullWidth
             >
-              {words.unlock}
+              {word('unlock')}
             </SiteButton>
-            <FormNotice status={status} error={words.wrongCode} />
+            <FormNotice status={status} error={word('wrongCode')} />
           </form>
         ) : null}
 
         {mode === 'age' ? (
           // In the page from the start, so the refusal is read out.
           <p role="status" className="m-0 empty:sr-only">
-            {denied ? fill(words.ageDenied, minAge) : null}
+            {denied ? word('ageDenied', fill(words.ageDenied, minAge)) : null}
           </p>
         ) : null}
         {mode === 'age' ? (
@@ -274,12 +284,13 @@ export function LockedLink({
               <SiteLinkButton
                 href={target}
                 {...link}
+                {...hrefMarks}
                 variant={buttonVariant}
                 action="lock_continue"
                 fullWidth
                 onClick={pass}
               >
-                {words.ageYes}
+                {word('ageYes')}
               </SiteLinkButton>
               <SiteButton
                 variant="outline"
@@ -291,7 +302,7 @@ export function LockedLink({
                   requestAnimationFrame(() => closeButton.current?.focus());
                 }}
               >
-                {words.ageNo}
+                {word('ageNo')}
               </SiteButton>
             </div>
           ) : null
@@ -299,16 +310,24 @@ export function LockedLink({
 
         {mode === 'warning' && target ? (
           <>
-            {message ? <div className="text-site-text-2">{message}</div> : null}
+            {message ? (
+              <div
+                {...editable('message', 'longText')}
+                className="text-site-text-2"
+              >
+                {message}
+              </div>
+            ) : null}
             <SiteLinkButton
               href={target}
               {...link}
+              {...hrefMarks}
               variant={buttonVariant}
               action="lock_continue"
               fullWidth
               onClick={pass}
             >
-              {words.continue}
+              {word('continue')}
             </SiteLinkButton>
           </>
         ) : null}
@@ -320,7 +339,7 @@ export function LockedLink({
           fullWidth
           onClick={close}
         >
-          {mode === 'warning' ? words.cancel : words.close}
+          {mode === 'warning' ? word('cancel') : word('close')}
         </SiteButton>
       </SiteDialog>
     </Block>

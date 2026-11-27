@@ -694,3 +694,224 @@
     overflow-wrap: anywhere;
   }
 }
+
+/*
+ * Edit mode (EditMode): what a creator can edit shows a dashed line under a
+ * pointer or from the keyboard, and the text box open in its place a solid
+ * one, in the block's own text colour so it reads on any tone.
+ */
+[data-edit-mode='on'] [data-edit] {
+  cursor: text;
+  border-radius: 0.25em;
+  /* Captions laid over a picture let clicks through live; here they're edited. */
+  pointer-events: auto;
+}
+[data-edit-mode='on']
+  [data-edit]:is(
+    [data-edit-kind='link'],
+    [data-edit-kind='picture'],
+    [data-edit-kind='setting']
+  ) {
+  cursor: pointer;
+}
+@media (hover: hover) {
+  [data-edit-mode='on'] [data-edit]:hover {
+    outline: 2px dashed color-mix(in oklab, currentColor 55%, transparent);
+    outline-offset: 2px;
+  }
+}
+[data-edit-mode='on'] [data-edit]:focus-visible {
+  outline: 2px dashed currentColor;
+  outline-offset: 2px;
+}
+/* A link stretched over its card lets a click reach the words under it. */
+[data-edit-mode='on'] :is(a, button, [data-edit])::before,
+[data-edit-mode='on'] :is(a, button, [data-edit])::after {
+  pointer-events: none;
+}
+[data-edit-mode='on'] [data-edit][hidden] {
+  display: none !important;
+}
+[data-editing] {
+  cursor: text;
+  min-width: 2ch;
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 0.25em;
+  white-space: pre-wrap;
+}
+
+/*
+ * The editor's frame around each block (BlockFrame): a line round the block,
+ * its name and buttons at the top, and a button to add one under it. They
+ * show under a pointer, from the keyboard and on the selected block.
+ *
+ * They're the editor's, not the creator's page, so they take Levuche's
+ * product colours from @levuche/kit's theme (--lv-*), which the app loads,
+ * and follow its light and dark modes; the values after each name are the
+ * kit's light ones, for places without the kit, like this Storybook. The
+ * line, the add button and the keyboard ring are the product's primary
+ * (navy, amber in dark mode); the bar is brand navy in both modes, so it
+ * reads on any creator page, with Sora type and pill shapes like the app's
+ * buttons.
+ */
+[data-block-frame] {
+  --block-frame-line: var(--lv-primary, #24257a);
+  --block-frame-on-line: var(--lv-on-primary, #ffffff);
+  --block-frame-bar: var(--lv-brand, #24257a);
+  --block-frame-text: var(--lv-on-brand, #ffffff);
+  --block-frame-hover: rgb(255 255 255 / 0.16);
+  /* The kit's dark-mode danger colour: the bar is always navy. */
+  --block-frame-danger: #ff9b9b;
+  --block-frame-shadow: 0 6px 16px rgba(20, 21, 74, 0.28);
+  --block-frame-button: 2rem;
+  border-radius: 14px;
+  outline: 2px dashed transparent;
+  outline-offset: 6px;
+  transition: outline-color 120ms ease;
+}
+@media (pointer: coarse) {
+  [data-block-frame] {
+    --block-frame-button: 2.75rem;
+  }
+}
+[data-block-frame]:focus {
+  outline: none;
+}
+@media (hover: hover) {
+  [data-block-frame]:hover {
+    outline-color: color-mix(
+      in oklab,
+      var(--block-frame-line) 55%,
+      transparent
+    );
+  }
+}
+[data-block-frame]:focus-visible,
+[data-block-frame][data-selected] {
+  outline: 2px solid var(--block-frame-line);
+  outline-offset: 6px;
+}
+[data-block-frame-bar] {
+  position: absolute;
+  z-index: 20;
+  top: calc(var(--block-frame-button) / -2 - 0.25rem);
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.25rem 0.25rem 0.875rem;
+  border-radius: 999px;
+  background: var(--block-frame-bar);
+  color: var(--block-frame-text);
+  font-family: var(--font-sora, var(--font-sans, system-ui)), sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  box-shadow: var(--block-frame-shadow);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 120ms ease,
+    visibility 120ms;
+}
+[data-block-frame-buttons] {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+}
+[data-block-frame-bar] button,
+[data-block-frame-grip] {
+  display: grid;
+  place-items: center;
+  width: var(--block-frame-button);
+  height: var(--block-frame-button);
+  border-radius: 999px;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+[data-block-frame-grip] {
+  cursor: grab;
+}
+[data-block-frame-bar] button:hover,
+[data-block-frame-grip]:hover {
+  background: var(--block-frame-hover);
+}
+[data-block-frame-bar] button[data-danger]:hover {
+  color: var(--block-frame-danger);
+}
+[data-block-frame-bar] button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: transparent;
+}
+/* The bar is navy in both modes, so its ring is the kit's accent. */
+[data-block-frame-bar] button:focus-visible {
+  outline: 2px solid var(--lv-accent, #ffb627);
+  outline-offset: 1px;
+}
+[data-block-frame-add]:focus-visible {
+  outline: 2px solid var(--block-frame-line);
+  outline-offset: 2px;
+}
+[data-block-frame-add] {
+  position: absolute;
+  z-index: 20;
+  left: 50%;
+  bottom: calc(var(--block-frame-button) / -2 - 0.25rem);
+  translate: -50% 0;
+  display: grid;
+  place-items: center;
+  width: var(--block-frame-button);
+  height: var(--block-frame-button);
+  border-radius: 999px;
+  background: var(--block-frame-line);
+  color: var(--block-frame-on-line);
+  box-shadow: var(--block-frame-shadow);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 120ms ease,
+    visibility 120ms;
+}
+@media (hover: hover) {
+  [data-block-frame]:hover
+    > :is([data-block-frame-bar], [data-block-frame-add]) {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+[data-block-frame]:focus-within
+  > :is([data-block-frame-bar], [data-block-frame-add]),
+[data-block-frame][data-selected]
+  > :is([data-block-frame-bar], [data-block-frame-add]) {
+  opacity: 1;
+  visibility: visible;
+}
+/* Where a dragged block will land: a line above or below this one. */
+[data-block-frame][data-drop]::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--block-frame-line);
+  pointer-events: none;
+}
+[data-block-frame][data-drop='before']::after {
+  top: -0.75rem;
+}
+[data-block-frame][data-drop='after']::after {
+  bottom: -0.75rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-block-frame],
+  [data-block-frame-bar],
+  [data-block-frame-add] {
+    transition: none;
+  }
+}

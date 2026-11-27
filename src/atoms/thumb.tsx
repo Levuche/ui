@@ -6,6 +6,7 @@ import {
   toImageSource,
   type ImageSrc,
 } from '../system/image';
+import type { EditMarks } from '../system/edit';
 
 /** The shapes a picture can take. `auto` keeps the picture's own shape. */
 export type ThumbRatio =
@@ -35,6 +36,7 @@ export function Thumb({
   sizes = columnSizes(),
   className,
   style,
+  marks,
 }: {
   src?: ImageSrc | null;
   /** Leave empty when the picture only repeats words next to it. */
@@ -46,6 +48,8 @@ export function Thumb({
   sizes?: string;
   className?: string;
   style?: CSSProperties;
+  /** Marks the picture for edit mode, as editable(path, 'picture'). */
+  marks?: EditMarks;
 }) {
   const classes = cn(
     'rounded-block-inner block flex-none',
@@ -61,6 +65,7 @@ export function Thumb({
         : null;
     return (
       <img
+        {...marks}
         {...imageAttrs(source, sizes)}
         alt={alt}
         style={shape ? { ...shape, ...style } : style}
@@ -75,6 +80,7 @@ export function Thumb({
   // it would show; a decorative one is hidden.
   return alt ? (
     <span
+      {...marks}
       role="img"
       aria-label={alt}
       style={style}
@@ -82,6 +88,7 @@ export function Thumb({
     />
   ) : (
     <span
+      {...marks}
       aria-hidden
       style={style}
       className={cn('bg-site-surface-2', classes)}

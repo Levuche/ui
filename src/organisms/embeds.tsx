@@ -16,6 +16,7 @@ import {
   type EmbedService,
 } from '../system/embeds';
 import { youtubeId } from './media';
+import { editable } from '../system/edit';
 import type { ImageSrc } from '../system/image';
 import { WORDS_EN } from '../system/words/en';
 import { usePageWords } from '../system/page-words';
@@ -76,36 +77,55 @@ function EmbedBody({
     <Block name={name} data-service={embed?.service} {...root}>
       {/* A plain link's tile shows its own title and detail. */}
       {showTitle && embed ? (
-        <ItemHead title={title} detail={detail} headingAs={headingAs} />
+        <ItemHead
+          title={title}
+          detail={detail}
+          headingAs={headingAs}
+          edit={{ title: 'title', detail: 'detail' }}
+        />
       ) : null}
       {embed ? (
-        <PlayFrame
-          src={embed.src}
-          title={title}
-          poster={poster}
-          ratio={embed.shape}
-          playLabel={words.play.replace('{title}', title)}
-          playIcon={<PlayIcon size={28} />}
-          sandbox={SANDBOX}
-          action={`play_${embed.service}`}
-          tint={embed.tint}
-          consent={consent}
-          site={OUTSIDE_SERVICES[embed.service].name}
-          consentLabels={consentLabels}
-        />
+        // The cover picture shows until play is pressed: a click on it
+        // changes the picture.
+        <div {...editable('poster', 'picture')}>
+          <PlayFrame
+            src={embed.src}
+            title={title}
+            poster={poster}
+            ratio={embed.shape}
+            playLabel={words.play.replace('{title}', title)}
+            playIcon={<PlayIcon size={28} />}
+            sandbox={SANDBOX}
+            action={`play_${embed.service}`}
+            tint={embed.tint}
+            consent={consent}
+            site={OUTSIDE_SERVICES[embed.service].name}
+            consentLabels={consentLabels}
+          />
+        </div>
       ) : (
         <LinkTile
           href={url}
           icon={<LinkIcon size={20} />}
-          detail={detail}
+          detail={
+            detail ? (
+              <span {...editable('detail', 'longText')}>{detail}</span>
+            ) : undefined
+          }
           tileStyle="soft"
+          edit={{ href: 'url' }}
         >
-          {title}
+          <span {...editable('title')}>{title}</span>
         </LinkTile>
       )}
       {/* Without the title above the player, its detail sits under it. */}
       {embed && !showTitle && detail ? (
-        <p className="text-site-text-2 m-0 text-sm">{detail}</p>
+        <p
+          {...editable('detail', 'longText')}
+          className="text-site-text-2 m-0 text-sm"
+        >
+          {detail}
+        </p>
       ) : null}
     </Block>
   );

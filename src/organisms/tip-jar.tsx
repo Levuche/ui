@@ -5,6 +5,7 @@ import { Block, type BlockRootProps } from '../atoms/block';
 import { SiteButton } from '../atoms/button';
 import { HeartIcon } from '../atoms/icons';
 import { SiteInput } from '../atoms/input';
+import { editable, editPath } from '../system/edit';
 import type { FormStatus } from '../system/state';
 import { ChoiceChips } from '../molecules/choice-chips';
 import { FormNotice } from '../molecules/form-notice';
@@ -112,10 +113,15 @@ export function TipJar({
           ) : (
             icon
           )}
-          {title}
+          <span {...editable('title')}>{title}</span>
         </legend>
         {detail ? (
-          <p className="text-site-text-2 m-0 text-sm">{detail}</p>
+          <p
+            {...editable('detail', 'longText')}
+            className="text-site-text-2 m-0 text-sm"
+          >
+            {detail}
+          </p>
         ) : null}
         <ChoiceChips
           // Always one group, so the arrow keys move between amounts. While
@@ -126,9 +132,17 @@ export function TipJar({
             setPicked(value);
             setOther('');
           }}
-          options={amounts.map((value) => ({
+          options={amounts.map((value, i) => ({
             value: String(value),
-            label: `${currency}${value}`,
+            // One span, so the chip's flex layout doesn't split the name.
+            label: (
+              <span>
+                <span {...editable('currency')}>{currency}</span>
+                <span {...editable(editPath('amounts', i), 'setting')}>
+                  {value}
+                </span>
+              </span>
+            ),
           }))}
         />
         {allowOther ? (
@@ -136,7 +150,7 @@ export function TipJar({
             htmlFor={`${id}-other`}
             className="text-site-text-2 flex flex-col gap-1 text-sm"
           >
-            {words.other}
+            <span {...editable('labels.other')}>{words.other}</span>
             <SiteInput
               id={`${id}-other`}
               type="number"
@@ -158,9 +172,21 @@ export function TipJar({
         disabled={!amount}
         loading={status === 'sending'}
       >
-        {buttonLabel} {amount ? `${currency}${amount}` : ''}
+        <span>
+          <span {...editable('buttonLabel')}>{buttonLabel}</span>{' '}
+          {amount ? (
+            <>
+              <span {...editable('currency')}>{currency}</span>
+              {amount}
+            </>
+          ) : null}
+        </span>
       </SiteButton>
-      <FormNotice status={status} sent={words.sent} error={words.error} />
+      <FormNotice
+        status={status}
+        sent={<span {...editable('labels.sent')}>{words.sent}</span>}
+        error={<span {...editable('labels.error')}>{words.error}</span>}
+      />
     </Block>
   );
 }

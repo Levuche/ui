@@ -11,6 +11,7 @@ import { SiteLink } from '../atoms/link';
 import { Badge, Ribbon } from '../atoms/text';
 import { Thumb, type ThumbRatio } from '../atoms/thumb';
 import { cn } from '../system/cn';
+import { editable, editPath } from '../system/edit';
 import type { LinkBehavior } from '../system/href';
 import type { FormStatus } from '../system/state';
 import { FormNotice } from '../molecules/form-notice';
@@ -68,20 +69,38 @@ export function PackRow({
   const buttonLabel = buttonLabelProp === undefined ? own.buy : buttonLabelProp;
   const body = (
     <>
-      <Thumb src={image} ratio="square" sizes="52px" className="size-13" />
+      <Thumb
+        src={image}
+        ratio="square"
+        sizes="52px"
+        className="size-13"
+        marks={editable('image', 'picture')}
+      />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="font-semibold">{title}</span>
+        <span {...editable('title')} className="font-semibold">
+          {title}
+        </span>
         {detail ? (
-          <span className="text-site-text-2 text-sm">{detail}</span>
+          <span
+            {...editable('detail', 'longText')}
+            className="text-site-text-2 text-sm"
+          >
+            {detail}
+          </span>
         ) : null}
         {duration ? (
           <span className="text-site-text-2 inline-flex items-center gap-1.5 text-sm">
             <ClockIcon size={14} className="flex-none" />
-            {duration}
+            <span {...editable('duration')}>{duration}</span>
           </span>
         ) : null}
       </span>
-      <Price saveLabel={saveLabel} value={price} was={was} />
+      <Price
+        saveLabel={saveLabel}
+        value={price}
+        was={was}
+        edit={{ save: 'saveLabel', value: 'price', was: 'was' }}
+      />
     </>
   );
   const row = 'text-site-text flex items-center gap-3 no-underline';
@@ -91,6 +110,7 @@ export function PackRow({
         <div className="flex flex-wrap items-center gap-3">
           <div className={cn(row, 'min-w-48 flex-1')}>{body}</div>
           <SellButton
+            edit={{ sell: 'sell' }}
             sell={sell}
             sellState={sellState}
             sellLabels={sellLabels}
@@ -98,11 +118,12 @@ export function PackRow({
             size="sm"
             fullWidth={false}
           >
-            {buttonLabel}
+            <span {...editable('buttonLabel')}>{buttonLabel}</span>
           </SellButton>
         </div>
       ) : href ? (
         <SiteLink
+          {...editable('href', 'link')}
           href={href}
           newTab={newTab}
           sponsored={sponsored}
@@ -207,16 +228,22 @@ export function PackCheckout({
           required
           className="accent-site-button m-0 size-5.5 flex-none"
         />
-        {consent}
+        <span {...editable('consent', 'longText')}>{consent}</span>
       </label>
       <BuyButton
         type="submit"
         variant={buttonVariant}
         loading={status === 'sending'}
       >
-        {buttonLabel ?? own.takeItFor.replace('{price}', price)}
+        <span {...editable('buttonLabel')}>
+          {buttonLabel ?? own.takeItFor.replace('{price}', price)}
+        </span>
       </BuyButton>
-      <FormNotice status={status} sent={words.sent} error={words.error} />
+      <FormNotice
+        status={status}
+        sent={<span {...editable('labels.sent')}>{words.sent}</span>}
+        error={<span {...editable('labels.error')}>{words.error}</span>}
+      />
     </Block>
   );
 }
@@ -288,7 +315,7 @@ export function FeaturedPack({
       {...root}
       className={cn('relative', root.className)}
     >
-      {ribbon ? <Ribbon>{ribbon}</Ribbon> : null}
+      {ribbon ? <Ribbon {...editable('ribbon')}>{ribbon}</Ribbon> : null}
       <ItemHead
         title={title}
         detail={detail}
@@ -297,18 +324,26 @@ export function FeaturedPack({
         ratio={ratio}
         media="top"
         headingAs={headingAs}
+        edit={{ title: 'title', detail: 'detail', image: 'image' }}
       />
       {duration ? (
         <p className="text-site-text-2 m-0 inline-flex items-center gap-1.5 text-sm">
           <ClockIcon size={16} className="flex-none" />
-          {duration}
+          <span {...editable('duration')}>{duration}</span>
         </p>
       ) : null}
       <div className="flex items-center justify-between gap-3">
-        <Price saveLabel={saveLabel} value={price} was={was} size="lg" />
+        <Price
+          saveLabel={saveLabel}
+          value={price}
+          was={was}
+          size="lg"
+          edit={{ save: 'saveLabel', value: 'price', was: 'was' }}
+        />
         {action ??
           (sell || href ? (
             <SellButton
+              edit={{ href: 'href', sell: 'sell' }}
               sell={sell}
               sellState={sellState}
               sellLabels={sellLabels}
@@ -320,10 +355,13 @@ export function FeaturedPack({
               size="sm"
               fullWidth={false}
             >
-              {buttonLabel}
+              <span {...editable('buttonLabel')}>{buttonLabel}</span>
             </SellButton>
           ) : (
-            <span className={siteButtonClasses({ size: 'sm' })}>
+            <span
+              {...editable('buttonLabel')}
+              className={siteButtonClasses({ size: 'sm' })}
+            >
               {buttonLabel}
             </span>
           ))}
@@ -379,13 +417,21 @@ export function PackGrid({
                   src={image}
                   sizes={columnSizes(1 / columns, 1 / 2)}
                   className="h-15 w-full"
+                  marks={editable(editPath('packs', i, 'image'), 'picture')}
                 />
-                <strong>{title}</strong>
+                <strong {...editable(editPath('packs', i, 'title'))}>
+                  {title}
+                </strong>
                 <Price
                   saveLabel={saveLabel}
                   value={price}
                   was={was}
                   size="sm"
+                  edit={{
+                    save: 'saveLabel',
+                    value: editPath('packs', i, 'price'),
+                    was: editPath('packs', i, 'was'),
+                  }}
                 />
               </>
             );
@@ -397,6 +443,7 @@ export function PackGrid({
                   <div className={tile}>
                     {body}
                     <SellButton
+                      edit={{ sell: 'sell' }}
                       sell={sell}
                       sellState={sellState}
                       sellLabels={sellLabels}
@@ -404,11 +451,12 @@ export function PackGrid({
                       size="sm"
                       className="mt-auto"
                     >
-                      {buttonLabel}
+                      <span {...editable('buttonLabel')}>{buttonLabel}</span>
                     </SellButton>
                   </div>
                 ) : href ? (
                   <SiteLink
+                    {...editable(editPath('packs', i, 'href'), 'link')}
                     href={href}
                     newTab={link.newTab}
                     sponsored={link.sponsored}
@@ -500,30 +548,51 @@ export function CreditPack({
       )}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Heading className="text-block-title m-0 font-bold tabular-nums">
+        <Heading
+          {...editable('labels.credits')}
+          className="text-block-title m-0 font-bold tabular-nums"
+        >
           {words.credits.replace('{n}', count.format(credits))}
         </Heading>
         {featured && featuredLabel ? (
-          <Badge tone="solid">{featuredLabel}</Badge>
+          <Badge {...editable('featuredLabel')} tone="solid">
+            {featuredLabel}
+          </Badge>
         ) : bonus ? (
-          <Badge tone="outline">
+          <Badge {...editable('labels.bonus')} tone="outline">
             {words.bonus.replace('{n}', count.format(bonus))}
           </Badge>
         ) : null}
       </div>
       {featured && featuredLabel && bonus ? (
-        <p className="m-0 text-sm font-semibold">
+        <p {...editable('labels.bonus')} className="m-0 text-sm font-semibold">
           {words.bonus.replace('{n}', count.format(bonus))}
         </p>
       ) : null}
-      {detail ? <p className="text-site-text-2 m-0 text-sm">{detail}</p> : null}
+      {detail ? (
+        <p
+          {...editable('detail', 'longText')}
+          className="text-site-text-2 m-0 text-sm"
+        >
+          {detail}
+        </p>
+      ) : null}
       <p className="m-0">
-        <Price saveLabel={saveLabel} value={price} was={was} size="lg" />
+        <Price
+          saveLabel={saveLabel}
+          value={price}
+          was={was}
+          size="lg"
+          edit={{ save: 'saveLabel', value: 'price', was: 'was' }}
+        />
       </p>
       {expires ? (
-        <p className="text-site-text-2 m-0 text-sm">{expires}</p>
+        <p {...editable('expires')} className="text-site-text-2 m-0 text-sm">
+          {expires}
+        </p>
       ) : null}
       <SellButton
+        edit={{ href: 'href', sell: 'sell' }}
         href={href}
         sell={sell}
         sellState={sellState}
@@ -532,7 +601,7 @@ export function CreditPack({
         variant={featured ? 'solid' : 'outline'}
         action="buy_credits"
       >
-        {words.button}
+        <span {...editable('labels.button')}>{words.button}</span>
       </SellButton>
     </Block>
   );

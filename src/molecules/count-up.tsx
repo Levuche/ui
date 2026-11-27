@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import type { EditMarks } from '../system/edit';
 import { useVisitorLocale } from '../system/locale';
 
 /** How a number is written, as Intl.NumberFormat takes it. */
@@ -18,6 +19,7 @@ export function CountUp({
   duration = 1200,
   animate = true,
   className,
+  marks,
 }: {
   value: number;
   /** Such as "en-IN". The visitor's own when left out. */
@@ -28,6 +30,8 @@ export function CountUp({
   duration?: number;
   animate?: boolean;
   className?: string;
+  /** Marks the number for edit mode, as editable(path, 'setting'). */
+  marks?: EditMarks;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [shown, setShown] = useState(value);
@@ -75,7 +79,7 @@ export function CountUp({
         ? Number(shown.toFixed(decimals))
         : Math.round(shown);
   return (
-    <span ref={ref} className={className}>
+    <span {...marks} ref={ref} className={className}>
       <span aria-hidden className="tabular-nums">
         {write(rounded)}
       </span>

@@ -1,6 +1,12 @@
 'use client';
 
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import {
+  Fragment,
+  useEffect,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 import { Block, type BlockRootProps } from '../atoms/block';
 import { ClockIcon, MapPinIcon } from '../atoms/icons';
 import { Skeleton } from '../atoms/skeleton';
@@ -21,6 +27,7 @@ import {
   type EventState,
 } from '../system/calendar';
 import { cn } from '../system/cn';
+import { editable } from '../system/edit';
 import type { LinkBehavior } from '../system/href';
 import { toImageSource, type ImageSrc } from '../system/image';
 import type { LiveProps } from '../system/live';
@@ -237,10 +244,12 @@ export function EventCard({
       ? eventState(eventInstants(span, clock?.zone), now)
       : null;
   const past = state === 'past';
-  let chip: string | null = null;
-  if (state === 'live') chip = words.live;
-  else if (past) chip = words.ended;
-  else if (state === 'upcoming' && span && now !== null) {
+  let chip: ReactNode = null;
+  if (state === 'live') {
+    chip = <span {...editable('labels.live')}>{words.live}</span>;
+  } else if (past) {
+    chip = <span {...editable('labels.ended')}>{words.ended}</span>;
+  } else if (state === 'upcoming' && span && now !== null) {
     const far = howFar(span, now, clock?.zone);
     chip = capitalise(
       new Intl.RelativeTimeFormat(visitorLocale, { numeric: 'auto' }).format(
@@ -252,7 +261,13 @@ export function EventCard({
   }
 
   const name = event.title || words.untitled;
-  const place = [event.venue, event.city].filter(Boolean).join(', ');
+  const named = (
+    <span {...editable(event.title ? 'title' : 'labels.untitled')}>{name}</span>
+  );
+  const place = [
+    event.venue ? { path: 'venue', text: event.venue } : null,
+    event.city ? { path: 'city', text: event.city } : null,
+  ].filter((part) => part !== null);
   const picture = toImageSource(event.image);
   const tall = tile === '2x2';
   const ownBackground = root.background !== undefined;
@@ -260,13 +275,18 @@ export function EventCard({
   let tickets: ReactNode = null;
   if (soldOut && !sellJson(sell)) {
     tickets = (
-      <Badge tone="outline" className="self-center">
+      <Badge
+        {...editable('labels.soldOut')}
+        tone="outline"
+        className="self-center"
+      >
         {words.soldOut}
       </Badge>
     );
   } else if (sell || href) {
     tickets = (
       <SellButton
+        edit={{ href: 'href', sell: 'sell' }}
         href={href}
         sell={sell}
         // The Sold out toggle closes the buy button too.
@@ -279,8 +299,8 @@ export function EventCard({
         size="sm"
         action="event_tickets"
       >
-        {words.tickets}
-        <span className="sr-only">: {name}</span>
+        <span {...editable('labels.tickets')}>{words.tickets}</span>
+        <span className="sr-only">: {named}</span>
       </SellButton>
     );
   }
@@ -293,7 +313,7 @@ export function EventCard({
           end: event.end,
           timeZone: event.timeZone,
           allDay: event.allDay,
-          location: place || undefined,
+          location: place.map((part) => part.text).join(', ') || undefined,
           description: event.description,
           url: href,
         }}
@@ -328,6 +348,7 @@ export function EventCard({
               <Thumb
                 src={picture}
                 alt=""
+                marks={editable('image', 'picture')}
                 sizes="(min-width: 768px) 576px, 100vw"
                 className={cn('size-full rounded-none', past && 'grayscale')}
               />
@@ -344,6 +365,7 @@ export function EventCard({
           <Thumb
             src={picture}
             alt=""
+            marks={editable('image', 'picture')}
             ratio="video"
             sizes="(min-width: 768px) 576px, 100vw"
             className={cn('w-full rounded-none', past && 'grayscale')}
@@ -355,6 +377,7 @@ export function EventCard({
       <div className="flex items-start gap-3">
         {when ? (
           <span
+            {...editable('start', 'setting')}
             aria-hidden
             className="bg-site-surface text-site-text border-site-border rounded-block-inner flex w-14 flex-none flex-col items-center border py-1.5 leading-none"
           >
@@ -381,30 +404,50 @@ export function EventCard({
             </Badge>
           ) : null}
           <Heading className="text-block-title m-0 leading-tight font-bold [overflow-wrap:anywhere]">
-            {name}
+            {named}
           </Heading>
           {when ? (
             <p className="m-0 flex items-start gap-1.5 text-sm">
               <ClockIcon size={16} className="mt-0.5 flex-none" />
               <span>
-                <time dateTime={when.dateTime}>{when.text}</time>
+                <time
+                  {...editable('start', 'setting')}
+                  dateTime={when.dateTime}
+                >
+                  {when.text}
+                </time>
                 {when.zone ? (
-                  <span className="text-site-text-2"> {when.zone}</span>
+                  <span className="text-site-text-2">
+                    {' '}
+                    <span {...editable('timeZone', 'setting')}>
+                      {when.zone}
+                    </span>
+                  </span>
                 ) : null}
               </span>
             </p>
           ) : null}
-          {place ? (
+          {place.length ? (
             <p className="m-0 flex items-start gap-1.5 text-sm">
               <MapPinIcon size={16} className="mt-0.5 flex-none" />
-              <span className="[overflow-wrap:anywhere]">{place}</span>
+              <span className="[overflow-wrap:anywhere]">
+                {place.map((part, i) => (
+                  <Fragment key={part.path}>
+                    {i > 0 ? ', ' : null}
+                    <span {...editable(part.path)}>{part.text}</span>
+                  </Fragment>
+                ))}
+              </span>
             </p>
           ) : null}
         </div>
       </div>
 
       {tall && event.description ? (
-        <p className="text-site-text-2 m-0 line-clamp-4 text-sm whitespace-pre-line">
+        <p
+          {...editable('description', 'longText')}
+          className="text-site-text-2 m-0 line-clamp-4 text-sm whitespace-pre-line"
+        >
           {event.description}
         </p>
       ) : null}

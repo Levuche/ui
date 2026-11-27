@@ -11,6 +11,7 @@ import { CalendarIcon, ClockIcon } from '../atoms/icons';
 import { ConsentCover } from '../molecules/consent-cover';
 import { SiteDialog } from '../molecules/dialog';
 import { ItemHead, type HeadingTag } from '../molecules/item-head';
+import { editable } from '../system/edit';
 import { isSafeHref } from '../system/href';
 import { useHydrated, useVisitorLocale } from '../system/locale';
 import { WORDS_EN } from '../system/words/en';
@@ -158,7 +159,7 @@ export function BookingEmbed({
           <li className="inline-flex items-center gap-1.5">
             <ClockIcon size={16} className="flex-none" />
             <span className="sr-only">{words.length}: </span>
-            {duration}
+            <span {...editable('duration')}>{duration}</span>
           </li>
         ) : null}
         {nextFree && nextTime ? (
@@ -193,6 +194,7 @@ export function BookingEmbed({
     </div>
   ) : shown ? (
     <iframe
+      {...editable('src', 'link')}
       ref={frameRef}
       src={src}
       title={words.frame.replace('{title}', title)}
@@ -212,10 +214,12 @@ export function BookingEmbed({
       action="booking_load"
       onLoad={() => setAgreed(true)}
       style={pageHeight}
+      edit={{ load: 'consentLabels.load' }}
     />
   );
   const fallback = (
     <SiteLinkButton
+      {...editable('src', 'link')}
       href={src}
       newTab
       variant="text"
@@ -223,13 +227,18 @@ export function BookingEmbed({
       action="booking_fallback"
       className="self-center"
     >
-      {words.fallback}
+      <span {...editable('labels.fallback')}>{words.fallback}</span>
     </SiteLinkButton>
   );
 
   return (
     <Block name="booking-embed" data-display={display} {...root}>
-      <ItemHead title={title} detail={detail} headingAs={headingAs} />
+      <ItemHead
+        title={title}
+        detail={detail}
+        headingAs={headingAs}
+        edit={{ title: 'title', detail: 'detail' }}
+      />
       {facts}
       {display === 'inline' ? (
         <>
@@ -252,11 +261,11 @@ export function BookingEmbed({
               onOpen?.();
             }}
           >
-            {words.button}
+            <span {...editable('labels.button')}>{words.button}</span>
           </SiteButton>
           <SiteDialog
             ref={dialog}
-            title={title}
+            title={<span {...editable('title')}>{title}</span>}
             size="lg"
             onClose={() => {
               setOpen(false);
@@ -271,7 +280,7 @@ export function BookingEmbed({
               fullWidth
               onClick={() => dialog.current?.close()}
             >
-              {words.close}
+              <span {...editable('labels.close')}>{words.close}</span>
             </SiteButton>
           </SiteDialog>
         </>
